@@ -1,6 +1,6 @@
 # This script is utilized to create local credential, while using app password from gmail
 
-$cred = Get-Credential -Message "Enter email credentials"
+$cred = Get-Credential -Message "Enter email credentials" # Enter existing email
 $credDir = "$env:USERPROFILE\.face-recog"
 if (-not (Test-Path $credDir)) { New-Item -ItemType Directory -Path $credDir -Force }
-$cred | Export-Clixml -Path "$credDir\email-credential.xml"
+$cred | Export-Clixml -Path "$credDir\email-credential.xml" # Enter gmail app password and not our password

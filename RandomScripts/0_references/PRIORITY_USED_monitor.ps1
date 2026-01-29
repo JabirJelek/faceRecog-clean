@@ -61,8 +61,9 @@ $Config = @{
             Address = "ikeepmypromiz@gmail.com"
             Language = "Bahasa"  # Indonesian
         }
-        # @{
-        #     Address = "team@company.com"
+        # @{ 
+        #     Address = "itdiv@sinarcemaramasabadi.co.id" # Only un-comment this when the code is in production, because
+        #                                                 # this is formal IT email.
         #     Language = "Bahasa"  # Indonesian
         # }
     )
