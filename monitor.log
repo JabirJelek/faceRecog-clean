@@ -31,3 +31,1111 @@
 [2026-01-27 14:59:51] [INFO] Cleaning up...
 [2026-01-27 14:59:51] [WARN] No worker PID recorded
 [2026-01-27 14:59:51] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 13:29:25] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 13:29:25] [INFO] Start Time: 15:08
+[2026-01-29 13:29:25] [INFO] End Time: 15:15
+[2026-01-29 13:29:25] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 13:29:25] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 13:29:25] [DEBUG] No PID tracking file found
+[2026-01-29 13:29:25] [DEBUG] Check: 13:29:25 | Window: Inactive | Python: Stopped
+[2026-01-29 13:29:27] [INFO] Cleaning up...
+[2026-01-29 13:29:27] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 13:29:49] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 13:29:49] [INFO] Start Time: 13.30
+[2026-01-29 13:29:49] [INFO] End Time: 13:32
+[2026-01-29 13:29:49] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 13:29:49] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 13:29:49] [DEBUG] No PID tracking file found
+[2026-01-29 13:29:50] [ERROR] Invalid time format: 13.30
+[2026-01-29 13:29:50] [ERROR] Invalid time format: 13.30
+[2026-01-29 13:29:50] [DEBUG] Check: 13:29:50 | Window: Inactive | Python: Stopped
+[2026-01-29 13:29:55] [INFO] Cleaning up...
+[2026-01-29 13:29:55] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 13:30:05] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 13:30:05] [INFO] Start Time: 13.30
+[2026-01-29 13:30:05] [INFO] End Time: 13:32
+[2026-01-29 13:30:05] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 13:30:05] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 13:30:05] [DEBUG] No PID tracking file found
+[2026-01-29 13:30:05] [ERROR] Invalid time format: 13.30
+[2026-01-29 13:30:05] [ERROR] Invalid time format: 13.30
+[2026-01-29 13:30:05] [DEBUG] Check: 13:30:05 | Window: Inactive | Python: Stopped
+[2026-01-29 13:30:09] [INFO] Cleaning up...
+[2026-01-29 13:30:09] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 13:30:42] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 13:30:42] [INFO] Start Time: 13:30
+[2026-01-29 13:30:43] [INFO] End Time: 13:32
+[2026-01-29 13:30:43] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 13:30:43] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 13:30:43] [DEBUG] No PID tracking file found
+[2026-01-29 13:30:43] [DEBUG] Check: 13:30:43 | Window: Active | Python: Stopped
+[2026-01-29 13:30:43] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-29 13:30:43] [DEBUG] Searching for Python process...
+[2026-01-29 13:30:44] [DEBUG] No Python process found matching criteria
+[2026-01-29 13:30:44] [INFO] Starting face recognition worker process...
+[2026-01-29 13:30:44] [SUCCESS] Worker process started (PID: 1884)
+[2026-01-29 13:30:44] [INFO] Waiting for Python process to start...
+[2026-01-29 13:30:44] [DEBUG] Searching for Python process...
+[2026-01-29 13:30:44] [DEBUG] No Python process found matching criteria
+[2026-01-29 13:30:46] [DEBUG] Searching for Python process...
+[2026-01-29 13:30:47] [SUCCESS] Found Python process with our script: PID=27368
+[2026-01-29 13:30:47] [SUCCESS] Python process found (PID: 27368)
+[2026-01-29 13:30:47] [DEBUG] PID tracking saved: WorkerPID=1884, PythonPID=27368
+[2026-01-29 13:30:47] [SUCCESS] Worker started. Monitoring Python process...
+[2026-01-29 13:30:47] [ERROR] FATAL ERROR: Cannot overwrite variable PID because it is read-only or constant.
+[2026-01-29 13:30:47] [ERROR] at Check-ProcessStatus, D:\RaihanFarid\Dokumen\exp-magick\monitor1.ps1: line 455
+at <ScriptBlock>, D:\RaihanFarid\Dokumen\exp-magick\monitor1.ps1: line 837
+[2026-01-29 13:30:47] [INFO] Cleaning up...
+[2026-01-29 13:30:47] [INFO] Stopping Python process (PID: 27368)...
+[2026-01-29 13:30:49] [WARN] Forcefully terminating Python process...
+[2026-01-29 13:30:49] [SUCCESS] Python process terminated
+[2026-01-29 13:30:49] [INFO] Stopping worker process (PID: 1884)...
+[2026-01-29 13:30:51] [SUCCESS] Worker process exited gracefully
+[2026-01-29 13:30:51] [DEBUG] Removed PID tracking file
+[2026-01-29 13:30:51] [INFO] Stopped processes: Python, Worker
+[2026-01-29 13:30:51] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 14:07:44] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 14:07:44] [INFO] Start Time: 13:30
+[2026-01-29 14:07:44] [INFO] End Time: 13:32
+[2026-01-29 14:07:44] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 14:07:44] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 14:07:44] [DEBUG] No PID tracking file found
+[2026-01-29 14:07:44] [DEBUG] Check: 14:07:44 | Window: Inactive | Python: Stopped
+[2026-01-29 14:07:46] [INFO] Cleaning up...
+[2026-01-29 14:07:46] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 14:08:22] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 14:08:22] [INFO] Start Time: 14:09
+[2026-01-29 14:08:22] [INFO] End Time: 14:11
+[2026-01-29 14:08:22] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 14:08:22] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 14:08:22] [DEBUG] No PID tracking file found
+[2026-01-29 14:08:22] [DEBUG] Check: 14:08:22 | Window: Inactive | Python: Stopped
+[2026-01-29 14:08:32] [DEBUG] Check: 14:08:32 | Window: Inactive | Python: Stopped
+[2026-01-29 14:08:42] [DEBUG] Check: 14:08:42 | Window: Inactive | Python: Stopped
+[2026-01-29 14:08:52] [DEBUG] Check: 14:08:52 | Window: Inactive | Python: Stopped
+[2026-01-29 14:08:56] [INFO] Cleaning up...
+[2026-01-29 14:08:56] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 14:09:00] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 14:09:00] [INFO] Start Time: 14:09
+[2026-01-29 14:09:00] [INFO] End Time: 14:11
+[2026-01-29 14:09:00] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 14:09:00] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 14:09:00] [DEBUG] No PID tracking file found
+[2026-01-29 14:09:00] [DEBUG] Check: 14:09:00 | Window: Active | Python: Stopped
+[2026-01-29 14:09:00] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-29 14:09:00] [DEBUG] Searching for Python process...
+[2026-01-29 14:09:01] [DEBUG] No Python process found matching criteria
+[2026-01-29 14:09:01] [INFO] Starting face recognition worker process...
+[2026-01-29 14:09:01] [SUCCESS] Worker process started (PID: 39876)
+[2026-01-29 14:09:01] [INFO] Waiting for Python process to start...
+[2026-01-29 14:09:01] [DEBUG] Searching for Python process...
+[2026-01-29 14:09:01] [DEBUG] No Python process found matching criteria
+[2026-01-29 14:09:03] [DEBUG] Searching for Python process...
+[2026-01-29 14:09:04] [SUCCESS] Found Python process with our script: PID=19244
+[2026-01-29 14:09:04] [SUCCESS] Python process found (PID: 19244)
+[2026-01-29 14:09:04] [DEBUG] PID tracking saved: WorkerPID=39876, PythonPID=19244
+[2026-01-29 14:09:04] [SUCCESS] Worker started. Monitoring Python process...
+[2026-01-29 14:09:04] [DEBUG] PID tracking saved: WorkerPID=39876, PythonPID=19244
+[2026-01-29 14:09:14] [DEBUG] Check: 14:09:14 | Window: Active | Python: Running (PID: 19244)
+[2026-01-29 14:09:14] [DEBUG] PID tracking saved: WorkerPID=39876, PythonPID=19244
+[2026-01-29 14:09:24] [DEBUG] Check: 14:09:24 | Window: Active | Python: Running (PID: 19244)
+[2026-01-29 14:09:24] [DEBUG] PID tracking saved: WorkerPID=39876, PythonPID=19244
+[2026-01-29 14:09:34] [DEBUG] Check: 14:09:34 | Window: Active | Python: Running (PID: 19244)
+[2026-01-29 14:09:34] [DEBUG] PID tracking saved: WorkerPID=39876, PythonPID=19244
+[2026-01-29 14:09:44] [DEBUG] Check: 14:09:44 | Window: Active | Python: Running (PID: 19244)
+[2026-01-29 14:09:44] [DEBUG] PID tracking saved: WorkerPID=39876, PythonPID=19244
+[2026-01-29 14:09:54] [DEBUG] Check: 14:09:54 | Window: Active | Python: Running (PID: 19244)
+[2026-01-29 14:09:54] [DEBUG] PID tracking saved: WorkerPID=39876, PythonPID=19244
+[2026-01-29 14:10:05] [DEBUG] Check: 14:10:05 | Window: Active | Python: Running (PID: 19244)
+[2026-01-29 14:10:05] [DEBUG] PID tracking saved: WorkerPID=39876, PythonPID=19244
+[2026-01-29 14:10:15] [DEBUG] Check: 14:10:15 | Window: Active | Python: Running (PID: 19244)
+[2026-01-29 14:10:15] [DEBUG] PID tracking saved: WorkerPID=39876, PythonPID=19244
+[2026-01-29 14:10:25] [DEBUG] Check: 14:10:25 | Window: Active | Python: Running (PID: 19244)
+[2026-01-29 14:10:25] [DEBUG] PID tracking saved: WorkerPID=39876, PythonPID=19244
+[2026-01-29 14:10:35] [DEBUG] Check: 14:10:35 | Window: Active | Python: Running (PID: 19244)
+[2026-01-29 14:10:35] [DEBUG] PID tracking saved: WorkerPID=39876, PythonPID=19244
+[2026-01-29 14:10:45] [DEBUG] Searching for Python process...
+[2026-01-29 14:10:45] [DEBUG] No Python process found matching criteria
+[2026-01-29 14:10:46] [DEBUG] Check: 14:10:46 | Window: Active | Python: Stopped
+[2026-01-29 14:10:46] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-29 14:10:46] [DEBUG] Searching for Python process...
+[2026-01-29 14:10:46] [DEBUG] No Python process found matching criteria
+[2026-01-29 14:10:46] [INFO] Starting face recognition worker process...
+[2026-01-29 14:10:46] [SUCCESS] Worker process started (PID: 14956)
+[2026-01-29 14:10:46] [INFO] Waiting for Python process to start...
+[2026-01-29 14:10:46] [DEBUG] Searching for Python process...
+[2026-01-29 14:10:46] [DEBUG] No Python process found matching criteria
+[2026-01-29 14:10:48] [DEBUG] Searching for Python process...
+[2026-01-29 14:10:48] [SUCCESS] Found Python process with our script: PID=29412
+[2026-01-29 14:10:48] [SUCCESS] Python process found (PID: 29412)
+[2026-01-29 14:10:48] [DEBUG] PID tracking saved: WorkerPID=14956, PythonPID=29412
+[2026-01-29 14:10:48] [SUCCESS] Worker started. Monitoring Python process...
+[2026-01-29 14:10:48] [DEBUG] PID tracking saved: WorkerPID=14956, PythonPID=29412
+[2026-01-29 14:10:59] [DEBUG] Check: 14:10:59 | Window: Active | Python: Running (PID: 29412)
+[2026-01-29 14:10:59] [DEBUG] PID tracking saved: WorkerPID=14956, PythonPID=29412
+[2026-01-29 14:11:09] [DEBUG] Check: 14:11:09 | Window: Inactive | Python: Running (PID: 29412)
+[2026-01-29 14:11:09] [INFO] End time reached - stopping processes...
+[2026-01-29 14:11:09] [INFO] Stopping Python process (PID: 29412)...
+[2026-01-29 14:11:11] [WARN] Forcefully terminating Python process...
+[2026-01-29 14:11:11] [SUCCESS] Python process terminated
+[2026-01-29 14:11:11] [INFO] Stopping worker process (PID: 14956)...
+[2026-01-29 14:11:13] [SUCCESS] Worker process exited gracefully
+[2026-01-29 14:11:13] [DEBUG] Removed PID tracking file
+[2026-01-29 14:11:13] [INFO] Stopped processes: Python, Worker
+[2026-01-29 14:11:18] [INFO] Validating worker output...
+[2026-01-29 14:11:18] [INFO] Validating face recognition output structure...
+[2026-01-29 14:11:18] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-01-29_14-10-46
+[2026-01-29 14:11:18] [DEBUG] Found subfolder: logs
+[2026-01-29 14:11:18] [DEBUG] Found subfolder: script_output
+[2026-01-29 14:11:18] [DEBUG] Metadata file is valid JSON
+[2026-01-29 14:11:18] [DEBUG] Found 3 log files
+[2026-01-29 14:11:18] [DEBUG] Script output contains 1 items
+[2026-01-29 14:11:18] [DEBUG] Total folder size: 0.04 MB
+[2026-01-29 14:11:18] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-01-29 14:11:18] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\process-run\Magick_Process_MaskDetect_2026-01-29_14-10-46
+[2026-01-29 14:11:18] [SUCCESS]   - Created: 01/29/2026 14:10:46
+[2026-01-29 14:11:18] [SUCCESS]   - Size: 0.04 MB
+[2026-01-29 14:11:19] [SUCCESS] Face recognition pipeline completed successfully!
+[2026-01-29 14:11:19] [DEBUG] PID tracking saved: WorkerPID=, PythonPID=
+[2026-01-29 14:11:29] [DEBUG] Check: 14:11:29 | Window: Inactive | Python: Stopped
+[2026-01-29 14:11:39] [DEBUG] Check: 14:11:39 | Window: Inactive | Python: Stopped
+[2026-01-29 14:11:42] [INFO] Cleaning up...
+[2026-01-29 14:11:42] [DEBUG] Removed PID tracking file
+[2026-01-29 14:11:42] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 14:31:22] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 14:31:22] [INFO] Start Time: 14:09
+[2026-01-29 14:31:22] [INFO] End Time: 14:11
+[2026-01-29 14:31:22] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 14:31:22] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 14:31:22] [DEBUG] No PID tracking file found
+[2026-01-29 14:31:22] [DEBUG] Check: 14:31:22 | Window: Inactive | Python: Stopped
+[2026-01-29 14:31:22] [INFO] Email notifications disabled
+[2026-01-29 14:31:24] [INFO] Cleaning up...
+[2026-01-29 14:31:24] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 14:33:17] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 14:33:17] [INFO] Start Time: 14:09
+[2026-01-29 14:33:17] [INFO] End Time: 14:11
+[2026-01-29 14:33:17] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 14:33:17] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 14:33:17] [DEBUG] No PID tracking file found
+[2026-01-29 14:33:17] [DEBUG] Check: 14:33:17 | Window: Inactive | Python: Stopped
+[2026-01-29 14:33:17] [INFO] Email notifications disabled
+[2026-01-29 14:33:19] [INFO] Cleaning up...
+[2026-01-29 14:33:19] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 14:34:44] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 14:34:44] [INFO] Start Time: 14:09
+[2026-01-29 14:34:44] [INFO] End Time: 14:11
+[2026-01-29 14:34:44] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 14:34:44] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 14:34:44] [DEBUG] No PID tracking file found
+[2026-01-29 14:34:44] [DEBUG] Check: 14:34:44 | Window: Inactive | Python: Stopped
+[2026-01-29 14:34:44] [INFO] Testing email configuration...
+[2026-01-29 14:34:44] [SUCCESS] Email configuration appears valid
+[2026-01-29 14:34:45] [INFO] Cleaning up...
+[2026-01-29 14:34:45] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 14:34:46] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 14:34:46] [INFO] Start Time: 14:09
+[2026-01-29 14:34:46] [INFO] End Time: 14:11
+[2026-01-29 14:34:46] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 14:34:46] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 14:34:46] [DEBUG] No PID tracking file found
+[2026-01-29 14:34:46] [DEBUG] Check: 14:34:46 | Window: Inactive | Python: Stopped
+[2026-01-29 14:34:46] [INFO] Testing email configuration...
+[2026-01-29 14:34:46] [SUCCESS] Email configuration appears valid
+[2026-01-29 14:34:46] [INFO] Cleaning up...
+[2026-01-29 14:34:46] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 14:34:48] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 14:34:48] [INFO] Start Time: 14:09
+[2026-01-29 14:34:48] [INFO] End Time: 14:11
+[2026-01-29 14:34:48] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 14:34:48] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 14:34:48] [DEBUG] No PID tracking file found
+[2026-01-29 14:34:48] [DEBUG] Check: 14:34:48 | Window: Inactive | Python: Stopped
+[2026-01-29 14:34:48] [INFO] Testing email configuration...
+[2026-01-29 14:34:48] [SUCCESS] Email configuration appears valid
+[2026-01-29 14:34:51] [INFO] Cleaning up...
+[2026-01-29 14:34:51] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 14:35:10] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 14:35:10] [INFO] Start Time: 14:35
+[2026-01-29 14:35:10] [INFO] End Time: 14:16
+[2026-01-29 14:35:10] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 14:35:10] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 14:35:10] [DEBUG] No PID tracking file found
+[2026-01-29 14:35:10] [DEBUG] Check: 14:35:10 | Window: Inactive | Python: Stopped
+[2026-01-29 14:35:10] [INFO] Testing email configuration...
+[2026-01-29 14:35:10] [SUCCESS] Email configuration valid
+[2026-01-29 14:35:20] [DEBUG] Check: 14:35:20 | Window: Inactive | Python: Stopped
+[2026-01-29 14:35:20] [INFO] Testing email configuration...
+[2026-01-29 14:35:20] [SUCCESS] Email configuration valid
+[2026-01-29 14:35:30] [DEBUG] Check: 14:35:30 | Window: Inactive | Python: Stopped
+[2026-01-29 14:35:30] [INFO] Testing email configuration...
+[2026-01-29 14:35:30] [SUCCESS] Email configuration valid
+[2026-01-29 14:35:40] [DEBUG] Check: 14:35:40 | Window: Inactive | Python: Stopped
+[2026-01-29 14:35:40] [INFO] Testing email configuration...
+[2026-01-29 14:35:40] [SUCCESS] Email configuration valid
+[2026-01-29 14:35:43] [INFO] Cleaning up...
+[2026-01-29 14:35:43] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 14:36:17] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 14:36:17] [INFO] Start Time: 14:35
+[2026-01-29 14:36:17] [INFO] End Time: 14:16
+[2026-01-29 14:36:17] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 14:36:17] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 14:36:17] [DEBUG] No PID tracking file found
+[2026-01-29 14:36:17] [DEBUG] Check: 14:36:17 | Window: Inactive | Python: Stopped
+[2026-01-29 14:36:17] [INFO] Testing email configuration...
+[2026-01-29 14:36:17] [SUCCESS] Email configuration valid
+[2026-01-29 14:36:27] [DEBUG] Check: 14:36:27 | Window: Inactive | Python: Stopped
+[2026-01-29 14:36:27] [INFO] Testing email configuration...
+[2026-01-29 14:36:27] [SUCCESS] Email configuration valid
+[2026-01-29 14:36:29] [INFO] Cleaning up...
+[2026-01-29 14:36:29] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 14:43:00] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 14:43:00] [INFO] Start Time: 14:43
+[2026-01-29 14:43:00] [INFO] End Time: 14:44
+[2026-01-29 14:43:00] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 14:43:00] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 14:43:00] [DEBUG] No PID tracking file found
+[2026-01-29 14:43:00] [DEBUG] Check: 14:43:00 | Window: Active | Python: Stopped
+[2026-01-29 14:43:00] [INFO] Testing email configuration...
+[2026-01-29 14:43:00] [ERROR] FATAL ERROR: The term 'q' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+[2026-01-29 14:43:00] [ERROR] at Test-EmailConfiguration, D:\RaihanFarid\Dokumen\exp-magick\monitor1.ps1: line 940
+at <ScriptBlock>, D:\RaihanFarid\Dokumen\exp-magick\monitor1.ps1: line 968
+[2026-01-29 14:43:00] [INFO] Cleaning up...
+[2026-01-29 14:43:00] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 14:43:17] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 14:43:18] [INFO] Start Time: 14:43
+[2026-01-29 14:43:18] [INFO] End Time: 14:44
+[2026-01-29 14:43:18] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 14:43:18] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 14:43:18] [DEBUG] No PID tracking file found
+[2026-01-29 14:43:18] [DEBUG] Check: 14:43:18 | Window: Active | Python: Stopped
+[2026-01-29 14:43:18] [INFO] Testing email configuration...
+[2026-01-29 14:43:18] [SUCCESS] Email configuration valid
+[2026-01-29 14:43:18] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-29 14:43:18] [DEBUG] Searching for Python process...
+[2026-01-29 14:43:19] [DEBUG] No Python process found matching criteria
+[2026-01-29 14:43:19] [INFO] Starting face recognition worker process...
+[2026-01-29 14:43:19] [SUCCESS] Worker process started (PID: 35916)
+[2026-01-29 14:43:19] [INFO] Waiting for Python process to start...
+[2026-01-29 14:43:20] [DEBUG] Searching for Python process...
+[2026-01-29 14:43:20] [DEBUG] No Python process found matching criteria
+[2026-01-29 14:43:22] [DEBUG] Searching for Python process...
+[2026-01-29 14:43:22] [SUCCESS] Found Python process with our script: PID=23036
+[2026-01-29 14:43:22] [SUCCESS] Python process found (PID: 23036)
+[2026-01-29 14:43:22] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:43:22] [SUCCESS] Worker started. Monitoring Python process...
+[2026-01-29 14:43:22] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:43:22] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:43:22] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:43:22] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:43:22] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:43:32] [DEBUG] Check: 14:43:32 | Window: Active | Python: Running (PID: 23036)
+[2026-01-29 14:43:32] [INFO] Testing email configuration...
+[2026-01-29 14:43:32] [SUCCESS] Email configuration valid
+[2026-01-29 14:43:32] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:43:33] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:43:33] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:43:33] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:43:33] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:43:43] [DEBUG] Check: 14:43:43 | Window: Active | Python: Running (PID: 23036)
+[2026-01-29 14:43:43] [INFO] Testing email configuration...
+[2026-01-29 14:43:43] [SUCCESS] Email configuration valid
+[2026-01-29 14:43:43] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:43:43] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:43:43] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:43:43] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:43:43] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:43:53] [DEBUG] Check: 14:43:53 | Window: Active | Python: Running (PID: 23036)
+[2026-01-29 14:43:53] [INFO] Testing email configuration...
+[2026-01-29 14:43:53] [SUCCESS] Email configuration valid
+[2026-01-29 14:43:53] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:43:53] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:43:53] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:43:53] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:43:53] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:44:03] [DEBUG] Check: 14:44:03 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:44:03] [INFO] Testing email configuration...
+[2026-01-29 14:44:03] [SUCCESS] Email configuration valid
+[2026-01-29 14:44:03] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:44:03] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:44:03] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:44:03] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:44:03] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:44:14] [DEBUG] Check: 14:44:14 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:44:14] [INFO] Testing email configuration...
+[2026-01-29 14:44:14] [SUCCESS] Email configuration valid
+[2026-01-29 14:44:14] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:44:14] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:44:14] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:44:14] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:44:14] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:44:24] [DEBUG] Check: 14:44:24 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:44:24] [INFO] Testing email configuration...
+[2026-01-29 14:44:24] [SUCCESS] Email configuration valid
+[2026-01-29 14:44:24] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:44:24] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:44:24] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:44:24] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:44:24] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:44:34] [DEBUG] Check: 14:44:34 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:44:34] [INFO] Testing email configuration...
+[2026-01-29 14:44:34] [SUCCESS] Email configuration valid
+[2026-01-29 14:44:34] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:44:34] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:44:34] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:44:34] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:44:34] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:44:44] [DEBUG] Check: 14:44:44 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:44:44] [INFO] Testing email configuration...
+[2026-01-29 14:44:44] [SUCCESS] Email configuration valid
+[2026-01-29 14:44:44] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:44:44] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:44:44] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:44:44] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:44:44] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:44:54] [DEBUG] Check: 14:44:54 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:44:54] [INFO] Testing email configuration...
+[2026-01-29 14:44:54] [SUCCESS] Email configuration valid
+[2026-01-29 14:44:54] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:44:55] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:44:55] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:44:55] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:44:55] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:45:05] [DEBUG] Check: 14:45:05 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:45:05] [INFO] Testing email configuration...
+[2026-01-29 14:45:05] [SUCCESS] Email configuration valid
+[2026-01-29 14:45:05] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:45:05] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:45:05] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:45:05] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:45:05] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:45:15] [DEBUG] Check: 14:45:15 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:45:15] [INFO] Testing email configuration...
+[2026-01-29 14:45:15] [SUCCESS] Email configuration valid
+[2026-01-29 14:45:15] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:45:15] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:45:15] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:45:15] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:45:15] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:45:25] [DEBUG] Check: 14:45:25 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:45:25] [INFO] Testing email configuration...
+[2026-01-29 14:45:25] [SUCCESS] Email configuration valid
+[2026-01-29 14:45:25] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:45:25] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:45:25] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:45:25] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:45:25] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:45:35] [DEBUG] Check: 14:45:35 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:45:35] [INFO] Testing email configuration...
+[2026-01-29 14:45:35] [SUCCESS] Email configuration valid
+[2026-01-29 14:45:35] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:45:35] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:45:36] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:45:36] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:45:36] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:45:46] [DEBUG] Check: 14:45:46 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:45:46] [INFO] Testing email configuration...
+[2026-01-29 14:45:46] [SUCCESS] Email configuration valid
+[2026-01-29 14:45:46] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:45:46] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:45:46] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:45:46] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:45:46] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:45:56] [DEBUG] Check: 14:45:56 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:45:56] [INFO] Testing email configuration...
+[2026-01-29 14:45:56] [SUCCESS] Email configuration valid
+[2026-01-29 14:45:56] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:45:56] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:45:56] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:45:56] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:45:56] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:46:06] [DEBUG] Check: 14:46:06 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:46:06] [INFO] Testing email configuration...
+[2026-01-29 14:46:06] [SUCCESS] Email configuration valid
+[2026-01-29 14:46:06] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:46:06] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:46:07] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:46:07] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:46:07] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:46:17] [DEBUG] Check: 14:46:17 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:46:17] [INFO] Testing email configuration...
+[2026-01-29 14:46:17] [SUCCESS] Email configuration valid
+[2026-01-29 14:46:17] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:46:17] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:46:17] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:46:17] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:46:17] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:46:27] [DEBUG] Check: 14:46:27 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:46:27] [INFO] Testing email configuration...
+[2026-01-29 14:46:27] [SUCCESS] Email configuration valid
+[2026-01-29 14:46:27] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:46:27] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:46:27] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:46:27] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:46:27] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:46:37] [DEBUG] Check: 14:46:37 | Window: Inactive | Python: Running (PID: 23036)
+[2026-01-29 14:46:37] [INFO] Testing email configuration...
+[2026-01-29 14:46:37] [SUCCESS] Email configuration valid
+[2026-01-29 14:46:37] [INFO] First Python process detected. Attempting to send email notification...
+[2026-01-29 14:46:37] [INFO] Attempting to send process start notification email...
+[2026-01-29 14:46:37] [ERROR] Failed to send email: No such host is known.
+[2026-01-29 14:46:37] [WARN] Email sending failed. Continuing monitor...
+[2026-01-29 14:46:37] [DEBUG] PID tracking saved: WorkerPID=35916, PythonPID=23036
+[2026-01-29 14:46:47] [DEBUG] Searching for Python process...
+[2026-01-29 14:46:48] [DEBUG] No Python process found matching criteria
+[2026-01-29 14:46:48] [DEBUG] Check: 14:46:48 | Window: Inactive | Python: Stopped
+[2026-01-29 14:46:48] [INFO] Testing email configuration...
+[2026-01-29 14:46:48] [SUCCESS] Email configuration valid
+[2026-01-29 14:46:58] [DEBUG] Check: 14:46:58 | Window: Inactive | Python: Stopped
+[2026-01-29 14:46:58] [INFO] Testing email configuration...
+[2026-01-29 14:46:58] [SUCCESS] Email configuration valid
+[2026-01-29 14:47:08] [DEBUG] Check: 14:47:08 | Window: Inactive | Python: Stopped
+[2026-01-29 14:47:08] [INFO] Testing email configuration...
+[2026-01-29 14:47:08] [SUCCESS] Email configuration valid
+[2026-01-29 14:47:18] [DEBUG] Check: 14:47:18 | Window: Inactive | Python: Stopped
+[2026-01-29 14:47:18] [INFO] Testing email configuration...
+[2026-01-29 14:47:18] [SUCCESS] Email configuration valid
+[2026-01-29 14:47:28] [DEBUG] Check: 14:47:28 | Window: Inactive | Python: Stopped
+[2026-01-29 14:47:28] [INFO] Testing email configuration...
+[2026-01-29 14:47:28] [SUCCESS] Email configuration valid
+[2026-01-29 14:47:38] [DEBUG] Check: 14:47:38 | Window: Inactive | Python: Stopped
+[2026-01-29 14:47:38] [INFO] Testing email configuration...
+[2026-01-29 14:47:38] [SUCCESS] Email configuration valid
+[2026-01-29 14:47:48] [DEBUG] Check: 14:47:48 | Window: Inactive | Python: Stopped
+[2026-01-29 14:47:48] [INFO] Testing email configuration...
+[2026-01-29 14:47:48] [SUCCESS] Email configuration valid
+[2026-01-29 14:47:58] [DEBUG] Check: 14:47:58 | Window: Inactive | Python: Stopped
+[2026-01-29 14:47:58] [INFO] Testing email configuration...
+[2026-01-29 14:47:58] [SUCCESS] Email configuration valid
+[2026-01-29 14:48:08] [DEBUG] Check: 14:48:08 | Window: Inactive | Python: Stopped
+[2026-01-29 14:48:08] [INFO] Testing email configuration...
+[2026-01-29 14:48:08] [SUCCESS] Email configuration valid
+[2026-01-29 14:48:18] [DEBUG] Check: 14:48:18 | Window: Inactive | Python: Stopped
+[2026-01-29 14:48:18] [INFO] Testing email configuration...
+[2026-01-29 14:48:18] [SUCCESS] Email configuration valid
+[2026-01-29 14:48:28] [DEBUG] Check: 14:48:28 | Window: Inactive | Python: Stopped
+[2026-01-29 14:48:28] [INFO] Testing email configuration...
+[2026-01-29 14:48:28] [SUCCESS] Email configuration valid
+[2026-01-29 14:48:38] [DEBUG] Check: 14:48:38 | Window: Inactive | Python: Stopped
+[2026-01-29 14:48:38] [INFO] Testing email configuration...
+[2026-01-29 14:48:38] [SUCCESS] Email configuration valid
+[2026-01-29 14:48:48] [DEBUG] Check: 14:48:48 | Window: Inactive | Python: Stopped
+[2026-01-29 14:48:48] [INFO] Testing email configuration...
+[2026-01-29 14:48:48] [SUCCESS] Email configuration valid
+[2026-01-29 14:48:59] [DEBUG] Check: 14:48:59 | Window: Inactive | Python: Stopped
+[2026-01-29 14:48:59] [INFO] Testing email configuration...
+[2026-01-29 14:48:59] [SUCCESS] Email configuration valid
+[2026-01-29 14:49:09] [DEBUG] Check: 14:49:09 | Window: Inactive | Python: Stopped
+[2026-01-29 14:49:09] [INFO] Testing email configuration...
+[2026-01-29 14:49:09] [SUCCESS] Email configuration valid
+[2026-01-29 14:49:19] [DEBUG] Check: 14:49:19 | Window: Inactive | Python: Stopped
+[2026-01-29 14:49:19] [INFO] Testing email configuration...
+[2026-01-29 14:49:19] [SUCCESS] Email configuration valid
+[2026-01-29 14:49:29] [DEBUG] Check: 14:49:29 | Window: Inactive | Python: Stopped
+[2026-01-29 14:49:29] [INFO] Testing email configuration...
+[2026-01-29 14:49:29] [SUCCESS] Email configuration valid
+[2026-01-29 14:49:39] [DEBUG] Check: 14:49:39 | Window: Inactive | Python: Stopped
+[2026-01-29 14:49:39] [INFO] Testing email configuration...
+[2026-01-29 14:49:39] [SUCCESS] Email configuration valid
+[2026-01-29 14:49:49] [DEBUG] Check: 14:49:49 | Window: Inactive | Python: Stopped
+[2026-01-29 14:49:49] [INFO] Testing email configuration...
+[2026-01-29 14:49:49] [SUCCESS] Email configuration valid
+[2026-01-29 14:49:59] [DEBUG] Check: 14:49:59 | Window: Inactive | Python: Stopped
+[2026-01-29 14:49:59] [INFO] Testing email configuration...
+[2026-01-29 14:49:59] [SUCCESS] Email configuration valid
+[2026-01-29 14:50:09] [DEBUG] Check: 14:50:09 | Window: Inactive | Python: Stopped
+[2026-01-29 14:50:09] [INFO] Testing email configuration...
+[2026-01-29 14:50:09] [SUCCESS] Email configuration valid
+[2026-01-29 14:50:19] [DEBUG] Check: 14:50:19 | Window: Inactive | Python: Stopped
+[2026-01-29 14:50:19] [INFO] Testing email configuration...
+[2026-01-29 14:50:19] [SUCCESS] Email configuration valid
+[2026-01-29 14:50:29] [DEBUG] Check: 14:50:29 | Window: Inactive | Python: Stopped
+[2026-01-29 14:50:29] [INFO] Testing email configuration...
+[2026-01-29 14:50:29] [SUCCESS] Email configuration valid
+[2026-01-29 14:50:39] [DEBUG] Check: 14:50:39 | Window: Inactive | Python: Stopped
+[2026-01-29 14:50:39] [INFO] Testing email configuration...
+[2026-01-29 14:50:39] [SUCCESS] Email configuration valid
+[2026-01-29 14:50:49] [DEBUG] Check: 14:50:49 | Window: Inactive | Python: Stopped
+[2026-01-29 14:50:49] [INFO] Testing email configuration...
+[2026-01-29 14:50:49] [SUCCESS] Email configuration valid
+[2026-01-29 14:50:59] [DEBUG] Check: 14:50:59 | Window: Inactive | Python: Stopped
+[2026-01-29 14:50:59] [INFO] Testing email configuration...
+[2026-01-29 14:50:59] [SUCCESS] Email configuration valid
+[2026-01-29 14:51:09] [DEBUG] Check: 14:51:09 | Window: Inactive | Python: Stopped
+[2026-01-29 14:51:09] [INFO] Testing email configuration...
+[2026-01-29 14:51:09] [SUCCESS] Email configuration valid
+[2026-01-29 14:51:19] [DEBUG] Check: 14:51:19 | Window: Inactive | Python: Stopped
+[2026-01-29 14:51:19] [INFO] Testing email configuration...
+[2026-01-29 14:51:19] [SUCCESS] Email configuration valid
+[2026-01-29 14:51:30] [DEBUG] Check: 14:51:30 | Window: Inactive | Python: Stopped
+[2026-01-29 14:51:30] [INFO] Testing email configuration...
+[2026-01-29 14:51:30] [SUCCESS] Email configuration valid
+[2026-01-29 14:51:40] [DEBUG] Check: 14:51:40 | Window: Inactive | Python: Stopped
+[2026-01-29 14:51:40] [INFO] Testing email configuration...
+[2026-01-29 14:51:40] [SUCCESS] Email configuration valid
+[2026-01-29 14:51:50] [DEBUG] Check: 14:51:50 | Window: Inactive | Python: Stopped
+[2026-01-29 14:51:50] [INFO] Testing email configuration...
+[2026-01-29 14:51:50] [SUCCESS] Email configuration valid
+[2026-01-29 14:52:00] [DEBUG] Check: 14:52:00 | Window: Inactive | Python: Stopped
+[2026-01-29 14:52:00] [INFO] Testing email configuration...
+[2026-01-29 14:52:00] [SUCCESS] Email configuration valid
+[2026-01-29 14:52:10] [DEBUG] Check: 14:52:10 | Window: Inactive | Python: Stopped
+[2026-01-29 14:52:10] [INFO] Testing email configuration...
+[2026-01-29 14:52:10] [SUCCESS] Email configuration valid
+[2026-01-29 14:52:20] [DEBUG] Check: 14:52:20 | Window: Inactive | Python: Stopped
+[2026-01-29 14:52:20] [INFO] Testing email configuration...
+[2026-01-29 14:52:20] [SUCCESS] Email configuration valid
+[2026-01-29 14:52:30] [DEBUG] Check: 14:52:30 | Window: Inactive | Python: Stopped
+[2026-01-29 14:52:30] [INFO] Testing email configuration...
+[2026-01-29 14:52:30] [SUCCESS] Email configuration valid
+[2026-01-29 14:52:40] [DEBUG] Check: 14:52:40 | Window: Inactive | Python: Stopped
+[2026-01-29 14:52:40] [INFO] Testing email configuration...
+[2026-01-29 14:52:40] [SUCCESS] Email configuration valid
+[2026-01-29 14:52:50] [DEBUG] Check: 14:52:50 | Window: Inactive | Python: Stopped
+[2026-01-29 14:52:50] [INFO] Testing email configuration...
+[2026-01-29 14:52:50] [SUCCESS] Email configuration valid
+[2026-01-29 14:53:00] [DEBUG] Check: 14:53:00 | Window: Inactive | Python: Stopped
+[2026-01-29 14:53:00] [INFO] Testing email configuration...
+[2026-01-29 14:53:00] [SUCCESS] Email configuration valid
+[2026-01-29 14:53:10] [DEBUG] Check: 14:53:10 | Window: Inactive | Python: Stopped
+[2026-01-29 14:53:10] [INFO] Testing email configuration...
+[2026-01-29 14:53:10] [SUCCESS] Email configuration valid
+[2026-01-29 14:53:20] [DEBUG] Check: 14:53:20 | Window: Inactive | Python: Stopped
+[2026-01-29 14:53:20] [INFO] Testing email configuration...
+[2026-01-29 14:53:20] [SUCCESS] Email configuration valid
+[2026-01-29 14:53:30] [DEBUG] Check: 14:53:30 | Window: Inactive | Python: Stopped
+[2026-01-29 14:53:30] [INFO] Testing email configuration...
+[2026-01-29 14:53:30] [SUCCESS] Email configuration valid
+[2026-01-29 14:53:40] [DEBUG] Check: 14:53:40 | Window: Inactive | Python: Stopped
+[2026-01-29 14:53:41] [INFO] Testing email configuration...
+[2026-01-29 14:53:41] [SUCCESS] Email configuration valid
+[2026-01-29 14:53:51] [DEBUG] Check: 14:53:51 | Window: Inactive | Python: Stopped
+[2026-01-29 14:53:51] [INFO] Testing email configuration...
+[2026-01-29 14:53:51] [SUCCESS] Email configuration valid
+[2026-01-29 14:54:01] [DEBUG] Check: 14:54:01 | Window: Inactive | Python: Stopped
+[2026-01-29 14:54:01] [INFO] Testing email configuration...
+[2026-01-29 14:54:01] [SUCCESS] Email configuration valid
+[2026-01-29 14:54:11] [DEBUG] Check: 14:54:11 | Window: Inactive | Python: Stopped
+[2026-01-29 14:54:11] [INFO] Testing email configuration...
+[2026-01-29 14:54:11] [SUCCESS] Email configuration valid
+[2026-01-29 14:54:21] [DEBUG] Check: 14:54:21 | Window: Inactive | Python: Stopped
+[2026-01-29 14:54:21] [INFO] Testing email configuration...
+[2026-01-29 14:54:21] [SUCCESS] Email configuration valid
+[2026-01-29 14:54:31] [DEBUG] Check: 14:54:31 | Window: Inactive | Python: Stopped
+[2026-01-29 14:54:31] [INFO] Testing email configuration...
+[2026-01-29 14:54:31] [SUCCESS] Email configuration valid
+[2026-01-29 14:54:41] [DEBUG] Check: 14:54:41 | Window: Inactive | Python: Stopped
+[2026-01-29 14:54:41] [INFO] Testing email configuration...
+[2026-01-29 14:54:41] [SUCCESS] Email configuration valid
+[2026-01-29 14:54:51] [DEBUG] Check: 14:54:51 | Window: Inactive | Python: Stopped
+[2026-01-29 14:54:51] [INFO] Testing email configuration...
+[2026-01-29 14:54:51] [SUCCESS] Email configuration valid
+[2026-01-29 14:55:01] [DEBUG] Check: 14:55:01 | Window: Inactive | Python: Stopped
+[2026-01-29 14:55:01] [INFO] Testing email configuration...
+[2026-01-29 14:55:01] [SUCCESS] Email configuration valid
+[2026-01-29 14:55:11] [DEBUG] Check: 14:55:11 | Window: Inactive | Python: Stopped
+[2026-01-29 14:55:11] [INFO] Testing email configuration...
+[2026-01-29 14:55:11] [SUCCESS] Email configuration valid
+[2026-01-29 14:55:21] [DEBUG] Check: 14:55:21 | Window: Inactive | Python: Stopped
+[2026-01-29 14:55:21] [INFO] Testing email configuration...
+[2026-01-29 14:55:21] [SUCCESS] Email configuration valid
+[2026-01-29 14:55:31] [DEBUG] Check: 14:55:31 | Window: Inactive | Python: Stopped
+[2026-01-29 14:55:31] [INFO] Testing email configuration...
+[2026-01-29 14:55:31] [SUCCESS] Email configuration valid
+[2026-01-29 14:55:41] [DEBUG] Check: 14:55:41 | Window: Inactive | Python: Stopped
+[2026-01-29 14:55:41] [INFO] Testing email configuration...
+[2026-01-29 14:55:41] [SUCCESS] Email configuration valid
+[2026-01-29 14:55:51] [DEBUG] Check: 14:55:51 | Window: Inactive | Python: Stopped
+[2026-01-29 14:55:51] [INFO] Testing email configuration...
+[2026-01-29 14:55:51] [SUCCESS] Email configuration valid
+[2026-01-29 14:56:01] [DEBUG] Check: 14:56:01 | Window: Inactive | Python: Stopped
+[2026-01-29 14:56:01] [INFO] Testing email configuration...
+[2026-01-29 14:56:01] [SUCCESS] Email configuration valid
+[2026-01-29 14:56:12] [DEBUG] Check: 14:56:12 | Window: Inactive | Python: Stopped
+[2026-01-29 14:56:12] [INFO] Testing email configuration...
+[2026-01-29 14:56:12] [SUCCESS] Email configuration valid
+[2026-01-29 14:56:22] [DEBUG] Check: 14:56:22 | Window: Inactive | Python: Stopped
+[2026-01-29 14:56:22] [INFO] Testing email configuration...
+[2026-01-29 14:56:22] [SUCCESS] Email configuration valid
+[2026-01-29 14:56:32] [DEBUG] Check: 14:56:32 | Window: Inactive | Python: Stopped
+[2026-01-29 14:56:32] [INFO] Testing email configuration...
+[2026-01-29 14:56:32] [SUCCESS] Email configuration valid
+[2026-01-29 14:56:42] [DEBUG] Check: 14:56:42 | Window: Inactive | Python: Stopped
+[2026-01-29 14:56:42] [INFO] Testing email configuration...
+[2026-01-29 14:56:42] [SUCCESS] Email configuration valid
+[2026-01-29 14:56:52] [DEBUG] Check: 14:56:52 | Window: Inactive | Python: Stopped
+[2026-01-29 14:56:52] [INFO] Testing email configuration...
+[2026-01-29 14:56:52] [SUCCESS] Email configuration valid
+[2026-01-29 14:57:02] [DEBUG] Check: 14:57:02 | Window: Inactive | Python: Stopped
+[2026-01-29 14:57:02] [INFO] Testing email configuration...
+[2026-01-29 14:57:02] [SUCCESS] Email configuration valid
+[2026-01-29 14:57:12] [DEBUG] Check: 14:57:12 | Window: Inactive | Python: Stopped
+[2026-01-29 14:57:12] [INFO] Testing email configuration...
+[2026-01-29 14:57:12] [SUCCESS] Email configuration valid
+[2026-01-29 14:57:22] [DEBUG] Check: 14:57:22 | Window: Inactive | Python: Stopped
+[2026-01-29 14:57:22] [INFO] Testing email configuration...
+[2026-01-29 14:57:22] [SUCCESS] Email configuration valid
+[2026-01-29 14:57:32] [DEBUG] Check: 14:57:32 | Window: Inactive | Python: Stopped
+[2026-01-29 14:57:32] [INFO] Testing email configuration...
+[2026-01-29 14:57:32] [SUCCESS] Email configuration valid
+[2026-01-29 14:57:42] [DEBUG] Check: 14:57:42 | Window: Inactive | Python: Stopped
+[2026-01-29 14:57:42] [INFO] Testing email configuration...
+[2026-01-29 14:57:42] [SUCCESS] Email configuration valid
+[2026-01-29 14:57:52] [DEBUG] Check: 14:57:52 | Window: Inactive | Python: Stopped
+[2026-01-29 14:57:52] [INFO] Testing email configuration...
+[2026-01-29 14:57:52] [SUCCESS] Email configuration valid
+[2026-01-29 14:58:02] [DEBUG] Check: 14:58:02 | Window: Inactive | Python: Stopped
+[2026-01-29 14:58:02] [INFO] Testing email configuration...
+[2026-01-29 14:58:02] [SUCCESS] Email configuration valid
+[2026-01-29 14:58:12] [DEBUG] Check: 14:58:12 | Window: Inactive | Python: Stopped
+[2026-01-29 14:58:12] [INFO] Testing email configuration...
+[2026-01-29 14:58:13] [SUCCESS] Email configuration valid
+[2026-01-29 14:58:23] [DEBUG] Check: 14:58:23 | Window: Inactive | Python: Stopped
+[2026-01-29 14:58:23] [INFO] Testing email configuration...
+[2026-01-29 14:58:23] [SUCCESS] Email configuration valid
+[2026-01-29 14:58:33] [DEBUG] Check: 14:58:33 | Window: Inactive | Python: Stopped
+[2026-01-29 14:58:33] [INFO] Testing email configuration...
+[2026-01-29 14:58:33] [SUCCESS] Email configuration valid
+[2026-01-29 14:58:43] [DEBUG] Check: 14:58:43 | Window: Inactive | Python: Stopped
+[2026-01-29 14:58:43] [INFO] Testing email configuration...
+[2026-01-29 14:58:43] [SUCCESS] Email configuration valid
+[2026-01-29 14:58:53] [DEBUG] Check: 14:58:53 | Window: Inactive | Python: Stopped
+[2026-01-29 14:58:53] [INFO] Testing email configuration...
+[2026-01-29 14:58:53] [SUCCESS] Email configuration valid
+[2026-01-29 14:59:03] [DEBUG] Check: 14:59:03 | Window: Inactive | Python: Stopped
+[2026-01-29 14:59:03] [INFO] Testing email configuration...
+[2026-01-29 14:59:03] [SUCCESS] Email configuration valid
+[2026-01-29 14:59:13] [DEBUG] Check: 14:59:13 | Window: Inactive | Python: Stopped
+[2026-01-29 14:59:13] [INFO] Testing email configuration...
+[2026-01-29 14:59:14] [SUCCESS] Email configuration valid
+[2026-01-29 14:59:24] [DEBUG] Check: 14:59:24 | Window: Inactive | Python: Stopped
+[2026-01-29 14:59:24] [INFO] Testing email configuration...
+[2026-01-29 14:59:24] [SUCCESS] Email configuration valid
+[2026-01-29 14:59:34] [DEBUG] Check: 14:59:34 | Window: Inactive | Python: Stopped
+[2026-01-29 14:59:34] [INFO] Testing email configuration...
+[2026-01-29 14:59:34] [SUCCESS] Email configuration valid
+[2026-01-29 14:59:44] [DEBUG] Check: 14:59:44 | Window: Inactive | Python: Stopped
+[2026-01-29 14:59:44] [INFO] Testing email configuration...
+[2026-01-29 14:59:44] [SUCCESS] Email configuration valid
+[2026-01-29 14:59:54] [DEBUG] Check: 14:59:54 | Window: Inactive | Python: Stopped
+[2026-01-29 14:59:54] [INFO] Testing email configuration...
+[2026-01-29 14:59:54] [SUCCESS] Email configuration valid
+[2026-01-29 15:00:04] [DEBUG] Check: 15:00:04 | Window: Inactive | Python: Stopped
+[2026-01-29 15:00:04] [INFO] Testing email configuration...
+[2026-01-29 15:00:04] [SUCCESS] Email configuration valid
+[2026-01-29 15:00:14] [DEBUG] Check: 15:00:14 | Window: Inactive | Python: Stopped
+[2026-01-29 15:00:14] [INFO] Testing email configuration...
+[2026-01-29 15:00:14] [SUCCESS] Email configuration valid
+[2026-01-29 15:00:24] [DEBUG] Check: 15:00:24 | Window: Inactive | Python: Stopped
+[2026-01-29 15:00:24] [INFO] Testing email configuration...
+[2026-01-29 15:00:24] [SUCCESS] Email configuration valid
+[2026-01-29 15:00:34] [DEBUG] Check: 15:00:34 | Window: Inactive | Python: Stopped
+[2026-01-29 15:00:34] [INFO] Testing email configuration...
+[2026-01-29 15:00:34] [SUCCESS] Email configuration valid
+[2026-01-29 15:00:44] [DEBUG] Check: 15:00:44 | Window: Inactive | Python: Stopped
+[2026-01-29 15:00:44] [INFO] Testing email configuration...
+[2026-01-29 15:00:44] [SUCCESS] Email configuration valid
+[2026-01-29 15:00:54] [DEBUG] Check: 15:00:54 | Window: Inactive | Python: Stopped
+[2026-01-29 15:00:54] [INFO] Testing email configuration...
+[2026-01-29 15:00:54] [SUCCESS] Email configuration valid
+[2026-01-29 15:01:04] [DEBUG] Check: 15:01:04 | Window: Inactive | Python: Stopped
+[2026-01-29 15:01:04] [INFO] Testing email configuration...
+[2026-01-29 15:01:04] [SUCCESS] Email configuration valid
+[2026-01-29 15:01:14] [DEBUG] Check: 15:01:14 | Window: Inactive | Python: Stopped
+[2026-01-29 15:01:14] [INFO] Testing email configuration...
+[2026-01-29 15:01:14] [SUCCESS] Email configuration valid
+[2026-01-29 15:01:24] [DEBUG] Check: 15:01:24 | Window: Inactive | Python: Stopped
+[2026-01-29 15:01:24] [INFO] Testing email configuration...
+[2026-01-29 15:01:24] [SUCCESS] Email configuration valid
+[2026-01-29 15:01:34] [DEBUG] Check: 15:01:34 | Window: Inactive | Python: Stopped
+[2026-01-29 15:01:34] [INFO] Testing email configuration...
+[2026-01-29 15:01:34] [SUCCESS] Email configuration valid
+[2026-01-29 15:01:44] [DEBUG] Check: 15:01:44 | Window: Inactive | Python: Stopped
+[2026-01-29 15:01:44] [INFO] Testing email configuration...
+[2026-01-29 15:01:44] [SUCCESS] Email configuration valid
+[2026-01-29 15:01:55] [DEBUG] Check: 15:01:55 | Window: Inactive | Python: Stopped
+[2026-01-29 15:01:55] [INFO] Testing email configuration...
+[2026-01-29 15:01:55] [SUCCESS] Email configuration valid
+[2026-01-29 15:02:05] [DEBUG] Check: 15:02:05 | Window: Inactive | Python: Stopped
+[2026-01-29 15:02:05] [INFO] Testing email configuration...
+[2026-01-29 15:02:05] [SUCCESS] Email configuration valid
+[2026-01-29 15:02:15] [DEBUG] Check: 15:02:15 | Window: Inactive | Python: Stopped
+[2026-01-29 15:02:15] [INFO] Testing email configuration...
+[2026-01-29 15:02:15] [SUCCESS] Email configuration valid
+[2026-01-29 15:02:25] [DEBUG] Check: 15:02:25 | Window: Inactive | Python: Stopped
+[2026-01-29 15:02:25] [INFO] Testing email configuration...
+[2026-01-29 15:02:25] [SUCCESS] Email configuration valid
+[2026-01-29 15:02:35] [DEBUG] Check: 15:02:35 | Window: Inactive | Python: Stopped
+[2026-01-29 15:02:35] [INFO] Testing email configuration...
+[2026-01-29 15:02:35] [SUCCESS] Email configuration valid
+[2026-01-29 15:02:45] [DEBUG] Check: 15:02:45 | Window: Inactive | Python: Stopped
+[2026-01-29 15:02:45] [INFO] Testing email configuration...
+[2026-01-29 15:02:45] [SUCCESS] Email configuration valid
+[2026-01-29 15:02:55] [DEBUG] Check: 15:02:55 | Window: Inactive | Python: Stopped
+[2026-01-29 15:02:55] [INFO] Testing email configuration...
+[2026-01-29 15:02:55] [SUCCESS] Email configuration valid
+[2026-01-29 15:03:05] [DEBUG] Check: 15:03:05 | Window: Inactive | Python: Stopped
+[2026-01-29 15:03:05] [INFO] Testing email configuration...
+[2026-01-29 15:03:05] [SUCCESS] Email configuration valid
+[2026-01-29 15:03:15] [DEBUG] Check: 15:03:15 | Window: Inactive | Python: Stopped
+[2026-01-29 15:03:15] [INFO] Testing email configuration...
+[2026-01-29 15:03:15] [SUCCESS] Email configuration valid
+[2026-01-29 15:03:25] [DEBUG] Check: 15:03:25 | Window: Inactive | Python: Stopped
+[2026-01-29 15:03:25] [INFO] Testing email configuration...
+[2026-01-29 15:03:25] [SUCCESS] Email configuration valid
+[2026-01-29 15:03:35] [DEBUG] Check: 15:03:35 | Window: Inactive | Python: Stopped
+[2026-01-29 15:03:35] [INFO] Testing email configuration...
+[2026-01-29 15:03:35] [SUCCESS] Email configuration valid
+[2026-01-29 15:03:45] [DEBUG] Check: 15:03:45 | Window: Inactive | Python: Stopped
+[2026-01-29 15:03:45] [INFO] Testing email configuration...
+[2026-01-29 15:03:45] [SUCCESS] Email configuration valid
+[2026-01-29 15:03:47] [INFO] Cleaning up...
+[2026-01-29 15:03:47] [INFO] Stopping Python process (PID: 23036)...
+[2026-01-29 15:03:47] [ERROR] Error stopping Python process: Cannot find a process with the process identifier 23036.
+[2026-01-29 15:03:47] [INFO] Stopping worker process (PID: 35916)...
+[2026-01-29 15:03:47] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 35916.
+[2026-01-29 15:03:47] [DEBUG] Removed PID tracking file
+[2026-01-29 15:03:47] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 15:22:25] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 15:22:26] [ERROR] FATAL ERROR: The term 'Test-EmailConfiguration' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+[2026-01-29 15:22:26] [ERROR] at <ScriptBlock>, D:\RaihanFarid\Dokumen\exp-magick\monitor1.ps1: line 988
+[2026-01-29 15:22:26] [INFO] Cleaning up...
+[2026-01-29 15:22:26] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 15:24:50] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 15:24:50] [INFO] Testing email configuration...
+[2026-01-29 15:24:50] [SUCCESS] Email credential file found
+[2026-01-29 15:24:50] [SUCCESS] Email configuration valid
+[2026-01-29 15:24:50] [INFO] Start Time: 15:23
+[2026-01-29 15:24:50] [INFO] End Time: 15:24
+[2026-01-29 15:24:50] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 15:24:50] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 15:24:50] [DEBUG] No PID tracking file found
+[2026-01-29 15:24:50] [DEBUG] Check: 15:24:50 | Window: Inactive | Python: Stopped
+[2026-01-29 15:24:50] [INFO] Testing email configuration...
+[2026-01-29 15:24:50] [SUCCESS] Email credential file found
+[2026-01-29 15:24:50] [SUCCESS] Email configuration valid
+[2026-01-29 15:24:55] [INFO] Cleaning up...
+[2026-01-29 15:24:55] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 15:25:03] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 15:25:03] [INFO] Testing email configuration...
+[2026-01-29 15:25:03] [SUCCESS] Email credential file found
+[2026-01-29 15:25:03] [SUCCESS] Email configuration valid
+[2026-01-29 15:25:03] [INFO] Start Time: 15:25
+[2026-01-29 15:25:03] [INFO] End Time: 15:26
+[2026-01-29 15:25:03] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 15:25:03] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 15:25:03] [DEBUG] No PID tracking file found
+[2026-01-29 15:25:03] [DEBUG] Check: 15:25:03 | Window: Active | Python: Stopped
+[2026-01-29 15:25:03] [INFO] Testing email configuration...
+[2026-01-29 15:25:03] [SUCCESS] Email credential file found
+[2026-01-29 15:25:03] [SUCCESS] Email configuration valid
+[2026-01-29 15:25:03] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-29 15:25:03] [DEBUG] Searching for Python process...
+[2026-01-29 15:25:05] [DEBUG] No Python process found matching criteria
+[2026-01-29 15:25:05] [INFO] Starting face recognition worker process...
+[2026-01-29 15:25:05] [SUCCESS] Worker process started (PID: 23128)
+[2026-01-29 15:25:05] [INFO] Waiting for Python process to start...
+[2026-01-29 15:25:05] [DEBUG] Searching for Python process...
+[2026-01-29 15:25:05] [DEBUG] No Python process found matching criteria
+[2026-01-29 15:25:07] [DEBUG] Searching for Python process...
+[2026-01-29 15:25:07] [SUCCESS] Found Python process with our script: PID=14152
+[2026-01-29 15:25:07] [SUCCESS] Python process found (PID: 14152)
+[2026-01-29 15:25:07] [DEBUG] PID tracking saved: WorkerPID=23128, PythonPID=14152
+[2026-01-29 15:25:08] [SUCCESS] Worker started. Monitoring Python process...
+[2026-01-29 15:25:08] [DEBUG] PID tracking saved: WorkerPID=23128, PythonPID=14152
+[2026-01-29 15:25:18] [DEBUG] Check: 15:25:18 | Window: Active | Python: Running (PID: 14152)
+[2026-01-29 15:25:18] [INFO] Testing email configuration...
+[2026-01-29 15:25:18] [SUCCESS] Email credential file found
+[2026-01-29 15:25:18] [SUCCESS] Email configuration valid
+[2026-01-29 15:25:18] [DEBUG] PID tracking saved: WorkerPID=23128, PythonPID=14152
+[2026-01-29 15:25:28] [DEBUG] Check: 15:25:28 | Window: Active | Python: Running (PID: 14152)
+[2026-01-29 15:25:28] [INFO] Testing email configuration...
+[2026-01-29 15:25:28] [SUCCESS] Email credential file found
+[2026-01-29 15:25:28] [SUCCESS] Email configuration valid
+[2026-01-29 15:25:28] [DEBUG] PID tracking saved: WorkerPID=23128, PythonPID=14152
+[2026-01-29 15:25:38] [DEBUG] Check: 15:25:38 | Window: Active | Python: Running (PID: 14152)
+[2026-01-29 15:25:38] [INFO] Testing email configuration...
+[2026-01-29 15:25:38] [SUCCESS] Email credential file found
+[2026-01-29 15:25:38] [SUCCESS] Email configuration valid
+[2026-01-29 15:25:38] [DEBUG] PID tracking saved: WorkerPID=23128, PythonPID=14152
+[2026-01-29 15:25:48] [DEBUG] Check: 15:25:48 | Window: Active | Python: Running (PID: 14152)
+[2026-01-29 15:25:48] [INFO] Testing email configuration...
+[2026-01-29 15:25:48] [SUCCESS] Email credential file found
+[2026-01-29 15:25:48] [SUCCESS] Email configuration valid
+[2026-01-29 15:25:48] [DEBUG] PID tracking saved: WorkerPID=23128, PythonPID=14152
+[2026-01-29 15:25:58] [DEBUG] Check: 15:25:58 | Window: Active | Python: Running (PID: 14152)
+[2026-01-29 15:25:58] [INFO] Testing email configuration...
+[2026-01-29 15:25:58] [SUCCESS] Email credential file found
+[2026-01-29 15:25:58] [SUCCESS] Email configuration valid
+[2026-01-29 15:25:58] [DEBUG] PID tracking saved: WorkerPID=23128, PythonPID=14152
+[2026-01-29 15:26:08] [DEBUG] Check: 15:26:08 | Window: Inactive | Python: Running (PID: 14152)
+[2026-01-29 15:26:08] [INFO] Testing email configuration...
+[2026-01-29 15:26:08] [SUCCESS] Email credential file found
+[2026-01-29 15:26:08] [SUCCESS] Email configuration valid
+[2026-01-29 15:26:09] [INFO] End time reached - stopping processes...
+[2026-01-29 15:26:09] [INFO] Stopping Python process (PID: 14152)...
+[2026-01-29 15:26:11] [WARN] Forcefully terminating Python process...
+[2026-01-29 15:26:11] [SUCCESS] Python process terminated
+[2026-01-29 15:26:11] [INFO] Stopping worker process (PID: 23128)...
+[2026-01-29 15:26:13] [SUCCESS] Worker process exited gracefully
+[2026-01-29 15:26:13] [DEBUG] Removed PID tracking file
+[2026-01-29 15:26:13] [INFO] Stopped processes: Python, Worker
+[2026-01-29 15:26:18] [INFO] Validating worker output...
+[2026-01-29 15:26:18] [INFO] Validating face recognition output structure...
+[2026-01-29 15:26:18] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-01-29_15-25-05
+[2026-01-29 15:26:18] [DEBUG] Found subfolder: logs
+[2026-01-29 15:26:18] [DEBUG] Found subfolder: script_output
+[2026-01-29 15:26:18] [DEBUG] Metadata file is valid JSON
+[2026-01-29 15:26:18] [DEBUG] Found 3 log files
+[2026-01-29 15:26:18] [DEBUG] Script output contains 1 items
+[2026-01-29 15:26:18] [DEBUG] Total folder size: 0.09 MB
+[2026-01-29 15:26:18] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-01-29 15:26:18] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\process-run\Magick_Process_MaskDetect_2026-01-29_15-25-05
+[2026-01-29 15:26:18] [SUCCESS]   - Created: 01/29/2026 15:25:05
+[2026-01-29 15:26:18] [SUCCESS]   - Size: 0.09 MB
+[2026-01-29 15:26:18] [INFO] Attempting to send completion notification email...
+[2026-01-29 15:26:18] [DEBUG] Email credential loaded from C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-01-29 15:26:20] [ERROR] Failed to send completion email: The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+[2026-01-29 15:26:20] [WARN] Failed to send completion email. Stopping monitor.
+[2026-01-29 15:26:20] [SUCCESS] Face recognition pipeline completed successfully!
+[2026-01-29 15:26:20] [INFO] Process completed. Stopping monitor as configured...
+[2026-01-29 15:26:20] [INFO] Cleaning up...
+[2026-01-29 15:26:20] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 15:35:27] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 15:35:27] [INFO] Start Time: 15:25
+[2026-01-29 15:35:27] [INFO] End Time: 15:26
+[2026-01-29 15:35:27] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 15:35:27] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 15:35:27] [INFO] Testing email configuration...
+[2026-01-29 15:35:27] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-29 15:35:27] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-29 15:35:27] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-29 15:35:27] [INFO] - SSL Enabled: True
+[2026-01-29 15:35:27] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-29 15:35:27] [SUCCESS] Email configuration valid
+[2026-01-29 15:35:27] [DEBUG] No PID tracking file found
+[2026-01-29 15:35:27] [DEBUG] Check: 15:35:27 | Window: Inactive | Python: Stopped
+[2026-01-29 15:35:28] [INFO] Cleaning up...
+[2026-01-29 15:35:28] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 15:35:39] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 15:35:39] [INFO] Start Time: 15:35
+[2026-01-29 15:35:39] [INFO] End Time: 15:36
+[2026-01-29 15:35:39] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 15:35:39] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 15:35:39] [INFO] Testing email configuration...
+[2026-01-29 15:35:39] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-29 15:35:39] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-29 15:35:39] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-29 15:35:39] [INFO] - SSL Enabled: True
+[2026-01-29 15:35:39] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-29 15:35:39] [SUCCESS] Email configuration valid
+[2026-01-29 15:35:39] [DEBUG] No PID tracking file found
+[2026-01-29 15:35:39] [DEBUG] Check: 15:35:39 | Window: Active | Python: Stopped
+[2026-01-29 15:35:39] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-29 15:35:39] [DEBUG] Searching for Python process...
+[2026-01-29 15:35:41] [DEBUG] No Python process found matching criteria
+[2026-01-29 15:35:41] [INFO] Starting face recognition worker process...
+[2026-01-29 15:35:41] [SUCCESS] Worker process started (PID: 33844)
+[2026-01-29 15:35:41] [INFO] Waiting for Python process to start...
+[2026-01-29 15:35:41] [DEBUG] Searching for Python process...
+[2026-01-29 15:35:41] [DEBUG] No Python process found matching criteria
+[2026-01-29 15:35:43] [DEBUG] Searching for Python process...
+[2026-01-29 15:35:43] [SUCCESS] Found Python process with our script: PID=13216
+[2026-01-29 15:35:43] [SUCCESS] Python process found (PID: 13216)
+[2026-01-29 15:35:43] [DEBUG] PID tracking saved: WorkerPID=33844, PythonPID=13216
+[2026-01-29 15:35:43] [SUCCESS] Worker started. Monitoring Python process...
+[2026-01-29 15:35:43] [DEBUG] PID tracking saved: WorkerPID=33844, PythonPID=13216
+[2026-01-29 15:35:53] [DEBUG] Check: 15:35:53 | Window: Active | Python: Running (PID: 13216)
+[2026-01-29 15:35:53] [DEBUG] PID tracking saved: WorkerPID=33844, PythonPID=13216
+[2026-01-29 15:36:04] [DEBUG] Check: 15:36:04 | Window: Inactive | Python: Running (PID: 13216)
+[2026-01-29 15:36:04] [INFO] End time reached - stopping processes...
+[2026-01-29 15:36:04] [INFO] Stopping Python process (PID: 13216)...
+[2026-01-29 15:36:06] [WARN] Forcefully terminating Python process...
+[2026-01-29 15:36:06] [SUCCESS] Python process terminated
+[2026-01-29 15:36:06] [INFO] Stopping worker process (PID: 33844)...
+[2026-01-29 15:36:08] [SUCCESS] Worker process exited gracefully
+[2026-01-29 15:36:08] [DEBUG] Removed PID tracking file
+[2026-01-29 15:36:08] [INFO] Stopped processes: Python, Worker
+[2026-01-29 15:36:13] [INFO] Validating worker output...
+[2026-01-29 15:36:13] [INFO] Validating face recognition output structure...
+[2026-01-29 15:36:13] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-01-29_15-35-41
+[2026-01-29 15:36:13] [DEBUG] Found subfolder: logs
+[2026-01-29 15:36:13] [DEBUG] Found subfolder: script_output
+[2026-01-29 15:36:13] [DEBUG] Metadata file is valid JSON
+[2026-01-29 15:36:13] [DEBUG] Found 3 log files
+[2026-01-29 15:36:13] [DEBUG] Script output contains 1 items
+[2026-01-29 15:36:13] [DEBUG] Total folder size: 0.03 MB
+[2026-01-29 15:36:13] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-01-29 15:36:13] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\process-run\Magick_Process_MaskDetect_2026-01-29_15-35-41
+[2026-01-29 15:36:13] [SUCCESS]   - Created: 01/29/2026 15:35:41
+[2026-01-29 15:36:13] [SUCCESS]   - Size: 0.03 MB
+[2026-01-29 15:36:13] [INFO] Attempting to send completion notification email...
+[2026-01-29 15:36:13] [DEBUG] Email credential loaded from C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-01-29 15:36:13] [DEBUG] Using credential username as From address: faridraihan17@gmail.com
+[2026-01-29 15:36:17] [SUCCESS] Successfully sent completion email to faridraihan17@gmail.com
+[2026-01-29 15:36:17] [SUCCESS] Completion email sent successfully.
+[2026-01-29 15:36:17] [SUCCESS] Face recognition pipeline completed successfully!
+[2026-01-29 15:36:17] [INFO] Process completed. Stopping monitor as configured...
+[2026-01-29 15:36:17] [INFO] Cleaning up...
+[2026-01-29 15:36:17] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 15:43:01] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 15:43:01] [INFO] Start Time: 15:42
+[2026-01-29 15:43:01] [INFO] End Time: 15:44
+[2026-01-29 15:43:01] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 15:43:01] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 15:43:01] [INFO] Testing email configuration...
+[2026-01-29 15:43:01] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-29 15:43:01] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-29 15:43:01] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-29 15:43:01] [INFO] - SSL Enabled: True
+[2026-01-29 15:43:01] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-29 15:43:01] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-29 15:43:01] [SUCCESS] Email configuration valid
+[2026-01-29 15:43:01] [DEBUG] No PID tracking file found
+[2026-01-29 15:43:02] [DEBUG] Check: 15:43:02 | Window: Active | Python: Stopped
+[2026-01-29 15:43:02] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-29 15:43:02] [DEBUG] Searching for Python process...
+[2026-01-29 15:43:03] [DEBUG] No Python process found matching criteria
+[2026-01-29 15:43:03] [INFO] Starting face recognition worker process...
+[2026-01-29 15:43:03] [SUCCESS] Worker process started (PID: 18572)
+[2026-01-29 15:43:03] [INFO] Waiting for Python process to start...
+[2026-01-29 15:43:03] [DEBUG] Searching for Python process...
+[2026-01-29 15:43:03] [INFO] Found Python process started after worker: PID=13200
+[2026-01-29 15:43:03] [SUCCESS] Python process found (PID: 13200)
+[2026-01-29 15:43:03] [DEBUG] PID tracking saved: WorkerPID=18572, PythonPID=13200
+[2026-01-29 15:43:03] [SUCCESS] Worker started. Monitoring Python process...
+[2026-01-29 15:43:03] [DEBUG] PID tracking saved: WorkerPID=18572, PythonPID=13200
+[2026-01-29 15:43:13] [DEBUG] Check: 15:43:13 | Window: Active | Python: Running (PID: 13200)
+[2026-01-29 15:43:13] [DEBUG] PID tracking saved: WorkerPID=18572, PythonPID=13200
+[2026-01-29 15:43:23] [DEBUG] Check: 15:43:23 | Window: Active | Python: Running (PID: 13200)
+[2026-01-29 15:43:23] [DEBUG] PID tracking saved: WorkerPID=18572, PythonPID=13200
+[2026-01-29 15:43:33] [DEBUG] Check: 15:43:33 | Window: Active | Python: Running (PID: 13200)
+[2026-01-29 15:43:33] [DEBUG] PID tracking saved: WorkerPID=18572, PythonPID=13200
+[2026-01-29 15:43:43] [DEBUG] Check: 15:43:43 | Window: Active | Python: Running (PID: 13200)
+[2026-01-29 15:43:44] [DEBUG] PID tracking saved: WorkerPID=18572, PythonPID=13200
+[2026-01-29 15:43:54] [DEBUG] Check: 15:43:54 | Window: Active | Python: Running (PID: 13200)
+[2026-01-29 15:43:54] [DEBUG] PID tracking saved: WorkerPID=18572, PythonPID=13200
+[2026-01-29 15:44:04] [DEBUG] Check: 15:44:04 | Window: Inactive | Python: Running (PID: 13200)
+[2026-01-29 15:44:04] [INFO] End time reached - stopping processes...
+[2026-01-29 15:44:04] [INFO] Stopping Python process (PID: 13200)...
+[2026-01-29 15:44:06] [SUCCESS] Python process exited gracefully
+[2026-01-29 15:44:06] [INFO] Stopping worker process (PID: 18572)...
+[2026-01-29 15:44:06] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 18572.
+[2026-01-29 15:44:06] [DEBUG] Removed PID tracking file
+[2026-01-29 15:44:06] [INFO] Stopped processes: Python
+[2026-01-29 15:44:11] [INFO] Validating worker output...
+[2026-01-29 15:44:11] [INFO] Validating face recognition output structure...
+[2026-01-29 15:44:11] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-01-29_15-43-03
+[2026-01-29 15:44:11] [DEBUG] Found subfolder: logs
+[2026-01-29 15:44:11] [DEBUG] Found subfolder: script_output
+[2026-01-29 15:44:11] [DEBUG] Metadata file is valid JSON
+[2026-01-29 15:44:11] [DEBUG] Metadata file size: 1.14 KB
+[2026-01-29 15:44:11] [DEBUG] Found 3 log files
+[2026-01-29 15:44:11] [DEBUG] completion_summary.txt size: 3.99 KB
+[2026-01-29 15:44:11] [DEBUG] python_output.txt size: 72.19 KB
+[2026-01-29 15:44:11] [DEBUG] Latest run log: run_2026-01-29_15-43-03.log (2.3 KB)
+[2026-01-29 15:44:11] [DEBUG] Script output contains 1 items
+[2026-01-29 15:44:11] [DEBUG] Total folder size: 0.08 MB
+[2026-01-29 15:44:11] [DEBUG] Total attachment size: 0.01 MB
+[2026-01-29 15:44:11] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-01-29 15:44:11] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\process-run\Magick_Process_MaskDetect_2026-01-29_15-43-03
+[2026-01-29 15:44:11] [SUCCESS]   - Created: 01/29/2026 15:43:03
+[2026-01-29 15:44:11] [SUCCESS]   - Size: 0.08 MB
+[2026-01-29 15:44:11] [SUCCESS]   - Attachments: 0.01 MB
+[2026-01-29 15:44:11] [INFO] Attempting to send completion notification email with attachments...
+[2026-01-29 15:44:11] [DEBUG] Email credential loaded from C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-01-29 15:44:11] [DEBUG] Found completion_summary.txt: D:\RaihanFarid\Dokumen\faceRecog\process-run\Magick_Process_MaskDetect_2026-01-29_15-43-03\logs\completion_summary.txt
+[2026-01-29 15:44:11] [DEBUG] Found latest run log: run_2026-01-29_15-43-03.log
+[2026-01-29 15:44:11] [DEBUG] Found metadata.json: D:\RaihanFarid\Dokumen\faceRecog\process-run\Magick_Process_MaskDetect_2026-01-29_15-43-03\metadata.json
+[2026-01-29 15:44:11] [INFO] Attaching 3 file(s) to email
+[2026-01-29 15:44:11] [DEBUG] Using credential username as From address: faridraihan17@gmail.com
+[2026-01-29 15:44:16] [SUCCESS] Successfully sent completion email with 3 attachment(s) to faridraihan17@gmail.com
+[2026-01-29 15:44:16] [SUCCESS] Completion email sent successfully.
+[2026-01-29 15:44:16] [SUCCESS] Face recognition pipeline completed successfully!
+[2026-01-29 15:44:16] [INFO] Process completed. Stopping monitor as configured...
+[2026-01-29 15:44:16] [INFO] Cleaning up...
+[2026-01-29 15:44:16] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-29 16:03:23] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 16:03:23] [INFO] Start Time: 16:02
+[2026-01-29 16:03:23] [INFO] End Time: 16:04
+[2026-01-29 16:03:23] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 16:03:23] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 16:03:23] [INFO] Testing email configuration...
+[2026-01-29 16:03:24] [SUCCESS] Found 2 email recipient(s)
+[2026-01-29 16:03:24] [INFO] Configured languages: Bahasa, English
+[2026-01-29 16:03:24] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-29 16:03:24] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-29 16:03:24] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-29 16:03:24] [INFO] - SSL Enabled: True
+[2026-01-29 16:03:24] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-29 16:03:24] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-29 16:03:24] [SUCCESS] Email configuration valid
+[2026-01-29 16:03:24] [DEBUG] No PID tracking file found
+[2026-01-29 16:03:24] [DEBUG] Check: 16:03:24 | Window: Active | Python: Stopped
+[2026-01-29 16:03:24] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-29 16:03:24] [DEBUG] Searching for Python process...
+[2026-01-29 16:03:25] [DEBUG] No Python process found matching criteria
+[2026-01-29 16:03:25] [INFO] Starting face recognition worker process...
+[2026-01-29 16:03:25] [SUCCESS] Worker process started (PID: 4296)
+[2026-01-29 16:03:25] [INFO] Waiting for Python process to start...
+[2026-01-29 16:03:25] [DEBUG] Searching for Python process...
+[2026-01-29 16:03:26] [DEBUG] No Python process found matching criteria
+[2026-01-29 16:03:28] [DEBUG] Searching for Python process...
+[2026-01-29 16:03:28] [SUCCESS] Found Python process with our script: PID=6748
+[2026-01-29 16:03:28] [SUCCESS] Python process found (PID: 6748)
+[2026-01-29 16:03:28] [DEBUG] PID tracking saved: WorkerPID=4296, PythonPID=6748
+[2026-01-29 16:03:28] [SUCCESS] Worker started. Monitoring Python process...
+[2026-01-29 16:03:28] [DEBUG] PID tracking saved: WorkerPID=4296, PythonPID=6748
+[2026-01-29 16:03:38] [DEBUG] Check: 16:03:38 | Window: Active | Python: Running (PID: 6748)
+[2026-01-29 16:03:38] [DEBUG] PID tracking saved: WorkerPID=4296, PythonPID=6748
+[2026-01-29 16:03:48] [DEBUG] Check: 16:03:48 | Window: Active | Python: Running (PID: 6748)
+[2026-01-29 16:03:48] [DEBUG] PID tracking saved: WorkerPID=4296, PythonPID=6748
+[2026-01-29 16:03:58] [DEBUG] Check: 16:03:58 | Window: Active | Python: Running (PID: 6748)
+[2026-01-29 16:03:58] [DEBUG] PID tracking saved: WorkerPID=4296, PythonPID=6748
+[2026-01-29 16:04:08] [DEBUG] Check: 16:04:08 | Window: Inactive | Python: Running (PID: 6748)
+[2026-01-29 16:04:08] [INFO] End time reached - stopping processes...
+[2026-01-29 16:04:08] [INFO] Stopping Python process (PID: 6748)...
+[2026-01-29 16:04:10] [WARN] Forcefully terminating Python process...
+[2026-01-29 16:04:11] [SUCCESS] Python process terminated
+[2026-01-29 16:04:11] [INFO] Stopping worker process (PID: 4296)...
+[2026-01-29 16:04:13] [SUCCESS] Worker process exited gracefully
+[2026-01-29 16:04:13] [DEBUG] Removed PID tracking file
+[2026-01-29 16:04:13] [INFO] Stopped processes: Python, Worker
+[2026-01-29 16:04:18] [INFO] Validating worker output...
+[2026-01-29 16:04:18] [INFO] Validating face recognition output structure...
+[2026-01-29 16:04:18] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-01-29_16-03-26
+[2026-01-29 16:04:18] [DEBUG] Found subfolder: logs
+[2026-01-29 16:04:18] [DEBUG] Found subfolder: script_output
+[2026-01-29 16:04:18] [DEBUG] Metadata file is valid JSON
+[2026-01-29 16:04:18] [DEBUG] Metadata file size: 1.14 KB
+[2026-01-29 16:04:18] [DEBUG] Found 3 log files
+[2026-01-29 16:04:18] [DEBUG] completion_summary.txt size: 4.02 KB
+[2026-01-29 16:04:18] [DEBUG] python_output.txt size: 51.03 KB
+[2026-01-29 16:04:18] [DEBUG] Latest run log: run_2026-01-29_16-03-26.log (2.31 KB)
+[2026-01-29 16:04:18] [DEBUG] Script output contains 1 items
+[2026-01-29 16:04:18] [DEBUG] Total folder size: 0.06 MB
+[2026-01-29 16:04:18] [DEBUG] Total attachment size: 0.01 MB
+[2026-01-29 16:04:18] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-01-29 16:04:18] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\process-run\Magick_Process_MaskDetect_2026-01-29_16-03-26
+[2026-01-29 16:04:18] [SUCCESS]   - Created: 01/29/2026 16:03:26
+[2026-01-29 16:04:18] [SUCCESS]   - Size: 0.06 MB
+[2026-01-29 16:04:18] [SUCCESS]   - Attachments: 0.01 MB
+[2026-01-29 16:04:18] [DEBUG] Configuration backed up to: D:\RaihanFarid\Dokumen\faceRecog\config_backup_20260129_160418.json
+[2026-01-29 16:04:18] [INFO] Preparing to send completion notifications to 2 recipient(s)...
+[2026-01-29 16:04:18] [DEBUG] Email credential loaded from C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-01-29 16:04:18] [DEBUG] Found completion_summary.txt
+[2026-01-29 16:04:18] [DEBUG] Found latest run log: run_2026-01-29_16-03-26.log
+[2026-01-29 16:04:18] [DEBUG] Found metadata.json
+[2026-01-29 16:04:18] [INFO] Sending emails in 2 different language(s)
+[2026-01-29 16:04:18] [INFO] Sending English email to: faridraihan17@gmail.com
+[2026-01-29 16:04:22] [SUCCESS] Successfully sent English email to 1 recipient(s)
+[2026-01-29 16:04:22] [INFO] Sending Bahasa email to: ikeepmypromiz@gmail.com
+[2026-01-29 16:04:26] [SUCCESS] Successfully sent Bahasa email to 1 recipient(s)
+[2026-01-29 16:04:26] [SUCCESS] All emails sent successfully (2 total recipients)
+[2026-01-29 16:04:26] [SUCCESS] Completion emails sent successfully.
+[2026-01-29 16:04:26] [SUCCESS] Face recognition pipeline completed successfully!
+[2026-01-29 16:04:26] [INFO] Process completed. Stopping monitor as configured...
+[2026-01-29 16:04:26] [INFO] Cleaning up...
+[2026-01-29 16:04:26] [INFO] === Face Recognition Monitor Stopped ===

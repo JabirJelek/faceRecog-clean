@@ -1,0 +1,11 @@
+[2026-01-29 11:50:22] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 11:50:22] [INFO] Start Time: 15:08
+[2026-01-29 11:50:22] [INFO] End Time: 15:15
+[2026-01-29 11:50:22] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 11:50:22] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\run_py\modular\entry_multi-USED-Magick.py
+[2026-01-29 11:50:22] [DEBUG] No PID tracking file found
+[2026-01-29 11:50:22] [ERROR] FATAL ERROR: The term 'Show-StatusBanner' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+[2026-01-29 11:50:23] [ERROR] at <ScriptBlock>, D:\RaihanFarid\Dokumen\exp-magick\monitor1.ps1: line 545
+[2026-01-29 11:50:23] [INFO] Cleaning up...
+[2026-01-29 11:50:23] [INFO] === Face Recognition Monitor Stopped ===

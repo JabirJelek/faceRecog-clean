@@ -1,0 +1,10 @@
+[2026-01-29 11:44:16] [INFO] === Face Recognition Monitor Started ===
+[2026-01-29 11:44:16] [INFO] Start Time: 15:22
+[2026-01-29 11:44:16] [INFO] End Time: 15:25
+[2026-01-29 11:44:16] [INFO] Worker Script: D:\RaihanFarid\Dokumen\exp-magick\maskDetect.ps1
+[2026-01-29 11:44:16] [INFO] Runs Base Path: D:\RaihanFarid\Dokumen\faceRecog\process-run
+[2026-01-29 11:44:16] [INFO] Worker Start Delay: 10 seconds
+[2026-01-29 11:44:16] [INFO] Worker status changed: Stopped
+[2026-01-29 11:44:16] [DEBUG] Check: 11:44 | Worker: Stopped | Window: Inactive
+[2026-01-29 11:44:18] [INFO] Cleaning up...
+[2026-01-29 11:44:18] [INFO] === Face Recognition Monitor Stopped ===
