@@ -1,0 +1,46 @@
+==================================================
+RUN COMPLETION SUMMARY
+==================================================
+Completion Time: 2026-01-28 14:39:03
+Run ID: 2026-01-28_13-33-38
+PowerShell Script: process-run-0.ps1
+Status: SUCCESS
+
+FOLDER STRUCTURE
+==================================================
+Run Folder: C:\raihan\dokumen\project\global-env\faceRecog\process-run\Run_Process_TowerCPU_MaskDetect_2026-01-28_13-33-38
+├── logs\
+│   ├── run_2026-01-28_13-33-38.log          (This main log file)
+│   ├── python_output.txt           (Full Python script output)
+│   └── completion_summary.txt      (This summary)
+├── script_output\                  (Python script's working directory)
+│   └── [Output folders created by Python]
+└── metadata.json                   (Run configuration metadata)
+
+EXECUTION DETAILS
+==================================================
+PowerShell Script: process-run-0.ps1
+Virtual Environment: C:\raihan\dokumen\project\global-env\faceRecog\.venv
+Python Script: C:\raihan\dokumen\project\global-env\faceRecog\run_py\modular\entry_multi-USED-TowerCPU.py
+Start Time: 2026-01-28 13:33:38
+End Time: 2026-01-28 14:38:59
+Duration: 01:05:21
+
+ARGUMENTS PASSED
+==================================================
+  --multi-source
+
+
+LOG FILES
+==================================================
+1. Main Execution Log: C:\raihan\dokumen\project\global-env\faceRecog\process-run\Run_Process_TowerCPU_MaskDetect_2026-01-28_13-33-38\logs\run_2026-01-28_13-33-38.log
+2. Python Output: C:\raihan\dokumen\project\global-env\faceRecog\process-run\Run_Process_TowerCPU_MaskDetect_2026-01-28_13-33-38\logs\python_output.txt
+3. Python Exit Code: 0
+
+SCRIPT OUTPUT LOCATION
+==================================================
+Any folders/files created by the Python script should be located in:
+C:\raihan\dokumen\project\global-env\faceRecog\process-run\Run_Process_TowerCPU_MaskDetect_2026-01-28_13-33-38\script_output
+
+NOTE: For debugging, check python_output.txt for detailed error messages.
+==================================================

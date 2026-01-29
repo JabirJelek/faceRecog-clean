@@ -1,0 +1,10 @@
+{
+  "run_id": "2026-01-28_15-25-49",
+  "start_time": "2026-01-28 15:25:49",
+  "arguments": "--multi-source",
+  "arguments_count": 1,
+  "python_script": "C:\\raihan\\dokumen\\project\\global-env\\faceRecog\\run_py\\modular\\entry_multi-USED-TowerCPU.py",
+  "powershell_script": "process-run-0.ps1",
+  "virtual_env": "C:\\raihan\\dokumen\\project\\global-env\\faceRecog\\.venv",
+  "run_folder": "C:\\raihan\\dokumen\\project\\global-env\\faceRecog\\process-run\\Run_Process_TowerCPU_MaskDetect_2026-01-28_15-25-49"
+}

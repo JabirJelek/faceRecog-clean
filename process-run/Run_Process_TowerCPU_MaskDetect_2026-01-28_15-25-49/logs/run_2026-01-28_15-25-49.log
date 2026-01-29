@@ -1,0 +1,13 @@
+==================================================
+RUN STARTED: 2026-01-28 15:25:49
+Run Folder: C:\raihan\dokumen\project\global-env\faceRecog\process-run\Run_Process_TowerCPU_MaskDetect_2026-01-28_15-25-49
+PowerShell Script: process-run-0.ps1
+Virtual Environment: C:\raihan\dokumen\project\global-env\faceRecog\.venv
+Python Script: C:\raihan\dokumen\project\global-env\faceRecog\run_py\modular\entry_multi-USED-TowerCPU.py
+Arguments: --multi-source
+Number of arguments: 1
+==================================================
+
+Execution started at: 2026-01-28 15:25:49
+"C:\raihan\dokumen\project\global-env\faceRecog\.venv\Scripts\python.exe" "C:\raihan\dokumen\project\global-env\faceRecog\run_py\modular\entry_multi-USED-TowerCPU.py" --multi-source
+

@@ -1,0 +1,46 @@
+==================================================
+RUN COMPLETION SUMMARY
+==================================================
+Completion Time: 2026-01-27 13:40:09
+Run ID: 2026-01-27_09-41-59
+PowerShell Script: process-run-0.ps1
+Status: FAILED (Exit code: -1073740940)
+
+FOLDER STRUCTURE
+==================================================
+Run Folder: C:\raihan\dokumen\project\global-env\faceRecog\process-run\Run_Process_TowerCPU_MaskDetect_2026-01-27_09-41-59
+├── logs\
+│   ├── run_2026-01-27_09-41-59.log          (This main log file)
+│   ├── python_output.txt           (Full Python script output)
+│   └── completion_summary.txt      (This summary)
+├── script_output\                  (Python script's working directory)
+│   └── [Output folders created by Python]
+└── metadata.json                   (Run configuration metadata)
+
+EXECUTION DETAILS
+==================================================
+PowerShell Script: process-run-0.ps1
+Virtual Environment: C:\raihan\dokumen\project\global-env\faceRecog\.venv
+Python Script: C:\raihan\dokumen\project\global-env\faceRecog\run_py\modular\entry_multi-USED-TowerCPU.py
+Start Time: 2026-01-27 09:41:59
+End Time: 2026-01-27 13:40:09
+Duration: 03:58:10
+
+ARGUMENTS PASSED
+==================================================
+  --multi-source
+
+
+LOG FILES
+==================================================
+1. Main Execution Log: C:\raihan\dokumen\project\global-env\faceRecog\process-run\Run_Process_TowerCPU_MaskDetect_2026-01-27_09-41-59\logs\run_2026-01-27_09-41-59.log
+2. Python Output: C:\raihan\dokumen\project\global-env\faceRecog\process-run\Run_Process_TowerCPU_MaskDetect_2026-01-27_09-41-59\logs\python_output.txt
+3. Python Exit Code: -1073740940
+
+SCRIPT OUTPUT LOCATION
+==================================================
+Any folders/files created by the Python script should be located in:
+C:\raihan\dokumen\project\global-env\faceRecog\process-run\Run_Process_TowerCPU_MaskDetect_2026-01-27_09-41-59\script_output
+
+NOTE: For debugging, check python_output.txt for detailed error messages.
+==================================================

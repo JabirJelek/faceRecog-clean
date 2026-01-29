@@ -5,7 +5,7 @@
 
 # ========== CONFIGURATION ==========
 $VENV_ROOT = "C:\raihan\dokumen\project\global-env\faceRecog\.venv"
-$PYTHON_SCRIPT = "C:\raihan\dokumen\project\global-env\faceRecog\run_py\autoEmbedPerson.py"
+$PYTHON_SCRIPT = "C:\raihan\dokumen\project\global-env\faceRecog\run_py\modular\entry_multi-USED-TowerCPU.py"
 $POWERSHELL_SCRIPT_NAME = Split-Path -Leaf $MyInvocation.MyCommand.Path  # Added: Get current script name
 
 # ENHANCED: Use an array for multiple arguments

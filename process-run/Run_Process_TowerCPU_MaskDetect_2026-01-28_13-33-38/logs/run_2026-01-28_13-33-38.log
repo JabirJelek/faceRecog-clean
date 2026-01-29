@@ -1,0 +1,27 @@
+==================================================
+RUN STARTED: 2026-01-28 13:33:38
+Run Folder: C:\raihan\dokumen\project\global-env\faceRecog\process-run\Run_Process_TowerCPU_MaskDetect_2026-01-28_13-33-38
+PowerShell Script: process-run-0.ps1
+Virtual Environment: C:\raihan\dokumen\project\global-env\faceRecog\.venv
+Python Script: C:\raihan\dokumen\project\global-env\faceRecog\run_py\modular\entry_multi-USED-TowerCPU.py
+Arguments: --multi-source
+Number of arguments: 1
+==================================================
+
+Execution started at: 2026-01-28 13:33:38
+"C:\raihan\dokumen\project\global-env\faceRecog\.venv\Scripts\python.exe" "C:\raihan\dokumen\project\global-env\faceRecog\run_py\modular\entry_multi-USED-TowerCPU.py" --multi-source
+
+
+==================================================
+EXECUTION SUMMARY
+==================================================
+PowerShell Script: process-run-0.ps1
+Exit code: 0
+Start time: 2026-01-28 13:33:38
+End time: 2026-01-28 14:38:59
+Duration: 01:05:21
+Arguments passed to Python script:
+  [0]: -
+Python script created folders:
+  - C:\raihan\dokumen\project\global-env\faceRecog\process-run\Run_Process_TowerCPU_MaskDetect_2026-01-28_13-33-38\script_output\multi_source_20260128_133425_Camera-101_images
+  - C:\raihan\dokumen\project\global-env\faceRecog\process-run\Run_Process_TowerCPU_MaskDetect_2026-01-28_13-33-38\script_output\multi_source_20260128_133425_Camera-601_images

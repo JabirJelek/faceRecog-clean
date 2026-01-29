@@ -212,7 +212,7 @@ def get_default_config():
                                                 # VALUE BEFORE TRYING TO CHANGE THE TYPE OF mask MODEL USED.        
         
         # ========== CORE DETECTION PARAMETERS ==========
-        'detection_confidence': 0.6,
+        'detection_confidence': 0.75,
         'recognition_threshold': 0.8,
         'mask_detection_threshold': 0.6,  # INCREASED from 0.5 - makes mask detection more conservative
         'detection_iou': 0.3,
