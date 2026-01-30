@@ -1,0 +1,13 @@
+{
+  "virtual_env": "D:\\RaihanFarid\\Dokumen\\global-env\\.venv",
+  "arguments_count": 1,
+  "start_time": "2026-01-30 14:29:06",
+  "powershell_script": "process-run_placeholder-0.ps1",
+  "run_folder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\history\\logs\\process-run\\process_run_placeholder_2026-01-30_14-29-06",
+  "arguments": "--multi-source",
+  "python_script": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\references\\algorithms\\C_threading.py",
+  "run_id": "2026-01-30_14-29-06",
+  "end_time": "2026-01-30 14:29:25",
+  "duration": "00:00:19",
+  "exit_code": 1
+}

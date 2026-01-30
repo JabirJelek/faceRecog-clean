@@ -1,0 +1,25 @@
+==================================================
+RUN STARTED: 2026-01-30 14:29:06
+Run Folder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\history\logs\process-run\process_run_placeholder_2026-01-30_14-29-06
+PowerShell Script: process-run_placeholder-0.ps1
+Virtual Environment: D:\RaihanFarid\Dokumen\global-env\.venv
+Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\references\algorithms\C_threading.py
+Arguments: --multi-source
+Number of arguments: 1
+==================================================
+
+Execution started at: 2026-01-30 14:29:06
+"D:\RaihanFarid\Dokumen\global-env\.venv\Scripts\python.exe" "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\references\algorithms\C_threading.py" --multi-source
+
+
+==================================================
+EXECUTION SUMMARY
+==================================================
+PowerShell Script: process-run_placeholder-0.ps1
+Exit code: 1
+Start time: 2026-01-30 14:29:06
+End time: 2026-01-30 14:29:25
+Duration: 00:00:19
+Arguments passed to Python script:
+  [0]: -
+No new folders were created by Python script in: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\history\logs\process-run\process_run_placeholder_2026-01-30_14-29-06\script_output

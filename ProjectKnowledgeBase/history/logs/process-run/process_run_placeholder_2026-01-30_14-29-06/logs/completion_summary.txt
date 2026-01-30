@@ -1,0 +1,46 @@
+==================================================
+RUN COMPLETION SUMMARY
+==================================================
+Completion Time: 2026-01-30 14:29:25
+Run ID: 2026-01-30_14-29-06
+PowerShell Script: process-run_placeholder-0.ps1
+Status: FAILED (Exit code: 1)
+
+FOLDER STRUCTURE
+==================================================
+Run Folder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\history\logs\process-run\process_run_placeholder_2026-01-30_14-29-06
+├── logs\
+│   ├── run_2026-01-30_14-29-06.log          (This main log file)
+│   ├── python_output.txt           (Full Python script output)
+│   └── completion_summary.txt      (This summary)
+├── script_output\                  (Python script's working directory)
+│   └── [Output folders created by Python]
+└── metadata.json                   (Run configuration metadata)
+
+EXECUTION DETAILS
+==================================================
+PowerShell Script: process-run_placeholder-0.ps1
+Virtual Environment: D:\RaihanFarid\Dokumen\global-env\.venv
+Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\references\algorithms\C_threading.py
+Start Time: 2026-01-30 14:29:06
+End Time: 2026-01-30 14:29:25
+Duration: 00:00:19
+
+ARGUMENTS PASSED
+==================================================
+  --multi-source
+
+
+LOG FILES
+==================================================
+1. Main Execution Log: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\history\logs\process-run\process_run_placeholder_2026-01-30_14-29-06\logs\run_2026-01-30_14-29-06.log
+2. Python Output: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\history\logs\process-run\process_run_placeholder_2026-01-30_14-29-06\logs\python_output.txt
+3. Python Exit Code: 1
+
+SCRIPT OUTPUT LOCATION
+==================================================
+Any folders/files created by the Python script should be located in:
+D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\history\logs\process-run\process_run_placeholder_2026-01-30_14-29-06\script_output
+
+NOTE: For debugging, check python_output.txt for detailed error messages.
+==================================================
