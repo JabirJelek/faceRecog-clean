@@ -37,21 +37,9 @@ https://vps.scasda.my.id/actions/a_notifikasi_suara_speaker.php
 
 zte-gedangan = S6RczHu6
 
-link rtsp magick lantai 1 = "rtsp://admin:CemaraMas2025!@192.168.2.190:554/Streaming/Channels/101"
-link rtsp cctv di pintu masuk magick lt 3 = "rtsp://admin:CemaraMas2025!@192.168.2.190:554/Streaming/Channels/101"
 
-link dvr lt 3 16ch: dekat meja bu dyah
-rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/501
+MOST RECENT IP in magick:
 
-link dvr lt 3 dekat meja kerja
-rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/501
-
-
-Custom cctv bisa di ubah Channels di atas. Bisa di coba 1 - 1 untuk mendapatkan area cctv yang berbeda.
-
-new link: pengganti 2.24
-rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/101
-
-new link: pengganti 2.24
+rtsp://admin:admin888@192.168.110.40:554/Streaming/Channels/101
+rtsp://admin:CemaraMas2025!@192.168.110.39:554/Streaming/Channels/101
 rtsp://admin:admin888@192.168.110.36:554/Streaming/Channels/101
-
