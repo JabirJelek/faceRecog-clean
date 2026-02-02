@@ -1,18 +1,263 @@
-
-
+ 
 <#
 .SYNOPSIS
-Time-based process monitor for Face Recognition pipeline with proper PID tracking.
-
+Sets up portable paths for the project and validates all components exist
 .DESCRIPTION
-Runs in background and manages the face recognition worker process based on schedule.
-Tracks the actual Python process spawned by the worker script.
-
-.NOTES
-Configured for C:\RaihanFarid\Dokumen\faceRecog\process-run output structure
+This SINGLE function does 3 things:
+1. Finds the maskRecog project root
+2. Builds all paths relative to it
+3. Validates critical components exist
 #>
+function Initialize-ProjectPortablePaths {
+    [CmdletBinding()]
+    param()
+    
+    Write-Host "Initializing portable paths for maskRecog project..." -ForegroundColor Cyan
+    
+    # ====================================================================
+    # STEP 1: FIND THE PROJECT ROOT (maskRecog directory)
+    # ====================================================================
+    
+    # Method A: Check if we're already IN maskRecog directory
+    $scriptPath = $PSScriptRoot  # Where this script is located
+    $currentPath = $scriptPath
+    
+    # Look for maskRecog by going UP through parent directories
+    while ($currentPath -and (Split-Path $currentPath -Parent)) {
+        $currentDirName = Split-Path $currentPath -Leaf
+        
+        if ($currentDirName -eq "maskRecog") {
+            $projectRoot = $currentPath
+            break
+        }
+        
+        $parentPath = Split-Path $currentPath -Parent
+        # Stop if we reach drive root (like C:\) or can't go further
+        if (!$parentPath -or $parentPath -eq $currentPath) {
+            break
+        }
+        $currentPath = $parentPath
+    }
+    
+    # Method B: If not found above, check current directory name
+    if (!$projectRoot) {
+        $currentDir = Get-Location
+        if ((Split-Path $currentDir -Leaf) -eq "maskRecog") {
+            $projectRoot = $currentDir
+        }
+    }
+    
+    # Method C: Last resort - ask user
+    if (!$projectRoot) {
+        Write-Host "Could not automatically find 'maskRecog' directory." -ForegroundColor Yellow
+        $projectRoot = Read-Host "Please enter the full path to 'maskRecog' project root"
+        
+        if (!(Test-Path $projectRoot)) {
+            Write-Host "ERROR: Path '$projectRoot' does not exist!" -ForegroundColor Red
+            exit 1
+        }
+    }
 
-# Configuration for face recognition pipeline
+    # Load shared configuration if it exists
+    $sharedConfigPath = Join-Path $projectRoot "project_config.psd1"
+    if (Test-Path $sharedConfigPath) {
+        try {
+            $sharedConfig = Import-PowerShellDataFile -Path $sharedConfigPath
+            Write-Host "Loaded shared configuration from: $sharedConfigPath" -ForegroundColor Green
+            # You can use $sharedConfig.Paths.patterns, etc.
+        } catch {
+            Write-Host "Note: Could not load shared configuration" -ForegroundColor Yellow
+        }
+    }
+    
+    # ====================================================================
+    # STEP 2: BUILD PATHS RELATIVE TO PROJECT ROOT
+    # ====================================================================
+    
+    # Store project root globally so all functions can use it
+    $global:ProjectRoot = $projectRoot
+    $global:ActiveRoot = Split-Path $projectRoot -Parent | Split-Path -Parent
+    
+    # Show what we found
+    Write-Host "Project Root: $ProjectRoot" -ForegroundColor Green
+    Write-Host "Active Root: $ActiveRoot" -ForegroundColor Green
+    
+    # ====================================================================
+    # STEP 3: UPDATE CONFIGURATION WITH RELATIVE PATHS
+    # ====================================================================
+    
+    # Get email credential from user profile
+    $emailCredentialPath = "$env:USERPROFILE\.face-recog\email-credential.xml"
+    if (!(Test-Path (Split-Path $emailCredentialPath -Parent))) {
+        New-Item -ItemType Directory -Path (Split-Path $emailCredentialPath -Parent) -Force | Out-Null
+    }
+    
+    # Update the $Config object with relative paths
+    $Script:Config = @{
+        # Schedule configuration (CRITICAL - was missing)
+        StartTime = "08:00"  # Default start time
+        EndTime = "14:52"    # Default end time
+        
+        # Worker script path - RELATIVE to project root
+        WorkerScript = Join-Path $ProjectRoot "patterns\scripts\1_towerCPU\maskDetect.ps1"
+        
+        # Python script path - RELATIVE to project root  
+        PythonScriptPath = Join-Path $ProjectRoot "patterns\algorithm\entry_multi-USED-TowerCPU.py"
+        
+        # Paths for validation - RELATIVE to active root
+        RunsBasePath = Join-Path $ActiveRoot "logs-running\towerCPU"
+        OutputFolderPattern = "TowerCPU_Process_MaskDetect_*"
+        
+        # Process tracking
+        PythonProcessName = "python"
+        WorkerProcessName = "powershell"
+        
+        # Expected folder structure
+        ExpectedSubfolders = @("logs", "script_output")
+        ExpectedFiles = @("metadata.json")
+        
+        # Validation settings
+        MaxValidationRetries = 5
+        RetryDelaySeconds = 10
+        
+        # Process monitoring
+        ProcessCheckInterval = 15
+        GracefulShutdownTimeout = 60
+        
+        # PID tracking - RELATIVE to RunsBasePath
+        PIDFilePath = Join-Path (Join-Path $ActiveRoot "logs-running\towerCPU") "monitor_pid_towerCPU.json"
+        MaxPIDFileAgeMinutes = 120
+        
+        # Logging - RELATIVE to RunsBasePath
+        LogFile = Join-Path (Join-Path $ActiveRoot "logs-running\towerCPU") "monitor_towerCPU.log"
+        
+        # Email notifications (updated to use MailKit)
+        SendEmailOnCompletion = $true
+        EmailRecipients = @(
+            @{ Address = "faridraihan17@gmail.com"; Language = "English" },
+            @{ Address = "ikeepmypromiz@gmail.com"; Language = "Bahasa" }
+        )
+        EmailFrom = "faridraihan17@gmail.com"
+        EmailSubject = @{
+            English = "Face Recognition Process Completed Successfully"
+            Bahasa = "Proses Pengenalan Wajah Selesai dengan Sukses"
+        }
+        SmtpServer = "smtp.gmail.com"
+        SmtpPort = 587
+        UseSSL = $true
+        EmailCredentialPath = $emailCredentialPath
+    }
+    
+    # ====================================================================
+    # STEP 4: VALIDATE CRITICAL COMPONENTS EXIST
+    # ====================================================================
+    
+    Write-Host "`nValidating project components..." -ForegroundColor Yellow
+    
+    $criticalComponents = @(
+        @{ Name = "Worker Script"; Path = $Config.WorkerScript }
+        @{ Name = "Python Script"; Path = $Config.PythonScriptPath }
+        @{ Name = "Log Directory"; Path = (Split-Path $Config.LogFile -Parent) }
+        @{ Name = "PID File Directory"; Path = (Split-Path $Config.PIDFilePath -Parent) }
+    )
+    
+    $missingComponents = @()
+    $createdDirectories = @()
+    
+    foreach ($component in $criticalComponents) {
+        if (!(Test-Path $component.Path)) {
+            Write-Host "  [MISSING] $($component.Name): $($component.Path)" -ForegroundColor Red
+            
+            # Try to create missing directories
+            if ($component.Name -match "Directory") {
+                try {
+                    New-Item -ItemType Directory -Path $component.Path -Force | Out-Null
+                    Write-Host "  [CREATED] Directory: $($component.Path)" -ForegroundColor Yellow
+                    $createdDirectories += $component.Path
+                } catch {
+                    $missingComponents += $component.Name
+                }
+            } else {
+                $missingComponents += $component.Name
+            }
+        } else {
+            Write-Host "  [OK] $($component.Name)" -ForegroundColor Green
+        }
+    }
+    
+    # ====================================================================
+    # STEP 5: SUMMARY AND ERROR HANDLING
+    # ====================================================================
+    
+    if ($missingComponents.Count -gt 0) {
+        Write-Host "`nERROR: Missing critical components!" -ForegroundColor Red
+        foreach ($missing in $missingComponents) {
+            Write-Host "  - $missing" -ForegroundColor Red
+        }
+        
+        Write-Host "`nTroubleshooting:" -ForegroundColor Yellow
+        Write-Host "1. Ensure all scripts are in the correct locations" -ForegroundColor Yellow
+        Write-Host "2. Check that the maskRecog project structure is intact" -ForegroundColor Yellow
+        Write-Host "3. Verify you have read/write permissions" -ForegroundColor Yellow
+        
+        $continue = Read-Host "`nSome components are missing. Continue anyway? (Y/N)"
+        if ($continue -notmatch '^[Yy]') {
+            Write-Host "Exiting script..." -ForegroundColor Red
+            exit 1
+        }
+    }
+    
+    if ($createdDirectories.Count -gt 0) {
+        Write-Host "`nNote: Created missing directories:" -ForegroundColor Yellow
+        foreach ($dir in $createdDirectories) {
+            Write-Host "  - $dir" -ForegroundColor Yellow
+        }
+    }
+    
+    Write-Host "`nProject initialization complete!" -ForegroundColor Green
+    Write-Host "All paths are now portable and relative to:" -ForegroundColor Green
+    Write-Host "  Project Root: $ProjectRoot" -ForegroundColor White
+    
+    # ====================================================================
+    # STEP 6: MODIFIED - Wait for key press with 60-second timeout
+    # ====================================================================
+    
+    Write-Host "`nPress any key to continue with monitoring (waiting for 60 seconds)..." -ForegroundColor Cyan
+    
+    # Create a timeout mechanism for 60 seconds
+    $timeout = New-TimeSpan -Seconds 60
+    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+    $keyPressed = $false
+    
+    while ($stopwatch.Elapsed -lt $timeout -and -not $keyPressed) {
+        if ($Host.UI.RawUI.KeyAvailable) {
+            $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+            $keyPressed = $true
+            Write-Host "`nKey pressed. Continuing..." -ForegroundColor Green
+        } else {
+            # Show countdown
+            $remaining = 60 - [math]::Floor($stopwatch.Elapsed.TotalSeconds)
+            if ($remaining % 10 -eq 0 -and $remaining -ne 60) {
+                Write-Host "  Auto-continue in $remaining seconds..." -ForegroundColor Gray
+            }
+            Start-Sleep -Milliseconds 100
+        }
+    }
+    
+    if (-not $keyPressed) {
+        Write-Host "`nTimeout reached. Continuing automatically..." -ForegroundColor Yellow
+    }
+    
+    return $true
+}
+
+
+# Call it ONCE at the very beginning
+Initialize-ProjectPortablePaths
+
+# ====================================================================
+# SECTION 2: GLOBAL VARIABLES (KEEP AS IS)
+# ====================================================================
 
 # Global variables
 $WorkerProcess = $null
@@ -39,76 +284,76 @@ $PIDTracking = @{
 
 # Please check and udate path below
 
-$Config = @{
-    # Worker script path
-    WorkerScript = "C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\maskDetect.ps1"
+# $Config = @{
+#     # Worker script path
+#     WorkerScript = "C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\maskDetect.ps1"
     
-    # Schedule (24-hour format)
-    StartTime = "08:50"    # 3:08 PM
-    EndTime = "13:16"      # 3:15 PM
+#     # Schedule (24-hour format)
+#     StartTime = "08:50"    # 3:08 PM
+#     EndTime = "13:16"      # 3:15 PM
     
-    # Paths for validation
-    RunsBasePath = "C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\logs-running\towerCPU"
-    OutputFolderPattern = "TowerCPU_Process_MaskDetect_*"
+#     # Paths for validation
+#     RunsBasePath = "C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\logs-running\towerCPU"
+#     OutputFolderPattern = "TowerCPU_Process_MaskDetect_*"
     
-    # Process tracking
-    PythonProcessName = "python"  # The actual process we want to track
-    WorkerProcessName = "powershell"  # PowerShell wrapper process
-    PythonScriptPath = "C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-TowerCPU.py"
+#     # Process tracking
+#     PythonProcessName = "python"  # The actual process we want to track
+#     WorkerProcessName = "powershell"  # PowerShell wrapper process
+#     PythonScriptPath = "C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-TowerCPU.py"
     
-    # Expected folder structure
-    ExpectedSubfolders = @("logs", "script_output")
-    ExpectedFiles = @("metadata.json")
+#     # Expected folder structure
+#     ExpectedSubfolders = @("logs", "script_output")
+#     ExpectedFiles = @("metadata.json")
     
-    # Validation settings
-    MaxValidationRetries = 5
-    RetryDelaySeconds = 10
+#     # Validation settings
+#     MaxValidationRetries = 5
+#     RetryDelaySeconds = 10
     
-    # Process monitoring
-    ProcessCheckInterval = 15  # seconds (reduced for better tracking)
-    GracefulShutdownTimeout = 60  # seconds
+#     # Process monitoring
+#     ProcessCheckInterval = 15  # seconds (reduced for better tracking)
+#     GracefulShutdownTimeout = 60  # seconds
     
-    # PID tracking
-    PIDFilePath = "C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\logs-running\towerCPU\monitor_pid_magick.json"
-    MaxPIDFileAgeMinutes = 120  # Clean up old PID files
+#     # PID tracking
+#     PIDFilePath = "C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\logs-running\towerCPU\monitor_pid_magick.json"
+#     MaxPIDFileAgeMinutes = 120  # Clean up old PID files
     
-    # Logging
-    LogFile = "C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\logs-running\towerCPU\monitor_magick.log"
+#     # Logging
+#     LogFile = "C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\logs-running\towerCPU\monitor_magick.log"
 
     
-    # Email notifications for successful process COMPLETION
-    SendEmailOnCompletion = $true
+#     # Email notifications for successful process COMPLETION
+#     SendEmailOnCompletion = $true
     
-    # Recipients with language preference
-    EmailRecipients = @(
-        @{
-            Address = "faridraihan17@gmail.com"
-            Language = "English"  # English
-        },
-        @{
-            Address = "ikeepmypromiz@gmail.com"
-            Language = "Bahasa"  # Indonesian
-        }
-        # @{ 
-        #     Address = "itdiv@sinarcemaramasabadi.co.id" # Only un-comment this when the code is in production, because
-        #                                                 # this is formal IT email.
-        #     Language = "Bahasa"  # Indonesian
-        # }
-    )
+#     # Recipients with language preference
+#     EmailRecipients = @(
+#         @{
+#             Address = "faridraihan17@gmail.com"
+#             Language = "English"  # English
+#         },
+#         @{
+#             Address = "ikeepmypromiz@gmail.com"
+#             Language = "Bahasa"  # Indonesian
+#         }
+#         # @{ 
+#         #     Address = "itdiv@sinarcemaramasabadi.co.id" # Only un-comment this when the code is in production, because
+#         #                                                 # this is formal IT email.
+#         #     Language = "Bahasa"  # Indonesian
+#         # }
+#     )
     
-    # Email sender configuration
-    EmailFrom = "tester@gmail.com"  # Should match your Gmail address
-    EmailSubject = @{
-        English = "Face Recognition Process Completed Successfully"
-        Bahasa = "Proses Pengenalan Wajah Selesai dengan Sukses"
-    }
+#     # Email sender configuration
+#     EmailFrom = "tester@gmail.com"  # Should match your Gmail address
+#     EmailSubject = @{
+#         English = "Face Recognition Process Completed Successfully"
+#         Bahasa = "Proses Pengenalan Wajah Selesai dengan Sukses"
+#     }
     
-    # SMTP Configuration
-    SmtpServer = "smtp.gmail.com"
-    SmtpPort = 587
-    UseSSL = $true
-    EmailCredentialPath = "$env:USERPROFILE\.face-recog\email-credential.xml"
-}
+#     # SMTP Configuration
+#     SmtpServer = "smtp.gmail.com"
+#     SmtpPort = 587
+#     UseSSL = $true
+#     EmailCredentialPath = "$env:USERPROFILE\.face-recog\email-credential.xml"
+# }
 
 # Functions
 function Write-Log {

@@ -1,0 +1,44 @@
+{
+  "SendEmailOnCompletion": true,
+  "GracefulShutdownTimeout": 60,
+  "LogFile": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\Magick\\monitor_Magick.log",
+  "OutputFolderPattern": "Magick_Process_MaskDetect_*",
+  "ExpectedSubfolders": [
+    "logs",
+    "script_output"
+  ],
+  "RunsBasePath": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\Magick",
+  "MaxPIDFileAgeMinutes": 120,
+  "MaxValidationRetries": 5,
+  "EmailCredentialPath": "C:\\Users\\MIS2\\.face-recog\\email-credential.xml",
+  "PIDFilePath": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\Magick\\monitor_pid_Magick.json",
+  "WorkerProcessName": "powershell",
+  "StartTime": "08:00",
+  "EmailRecipients": [
+    {
+      "Language": "English",
+      "Address": "faridraihan17@gmail.com"
+    },
+    {
+      "Language": "Bahasa",
+      "Address": "ikeepmypromiz@gmail.com"
+    }
+  ],
+  "SmtpServer": "smtp.gmail.com",
+  "WorkerScript": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\projects\\maskRecog\\patterns\\scripts\\1_magick\\maskDetect.ps1",
+  "EmailFrom": "faridraihan17@gmail.com",
+  "EndTime": "16:14",
+  "ProcessCheckInterval": 15,
+  "RetryDelaySeconds": 10,
+  "UseSSL": true,
+  "EmailSubject": {
+    "Bahasa": "Proses Pengenalan Wajah Selesai dengan Sukses",
+    "English": "Face Recognition Process Completed Successfully"
+  },
+  "PythonScriptPath": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\projects\\maskRecog\\patterns\\algorithm\\entry_multi-USED-Magick.py",
+  "PythonProcessName": "python",
+  "SmtpPort": 587,
+  "ExpectedFiles": [
+    "metadata.json"
+  ]
+}

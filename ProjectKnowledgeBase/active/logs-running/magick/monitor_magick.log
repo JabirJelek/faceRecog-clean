@@ -1802,3 +1802,335 @@ Check the spelling of the name, or if a path was included, verify that the path 
 [2026-02-02 15:18:19] [INFO] Process completed. Stopping monitor as configured...
 [2026-02-02 15:18:19] [INFO] Cleaning up...
 [2026-02-02 15:18:19] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 15:47:20] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 15:47:20] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 15:47:20] [INFO] Start Time: 08:50
+[2026-02-02 15:47:20] [INFO] End Time: 15:18
+[2026-02-02 15:47:20] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 15:47:20] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 15:47:20] [INFO] Testing email configuration...
+[2026-02-02 15:47:20] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 15:47:20] [INFO] Configured languages: Bahasa, English
+[2026-02-02 15:47:20] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 15:47:20] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 15:47:21] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 15:47:21] [INFO] - SSL Enabled: True
+[2026-02-02 15:47:21] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 15:47:21] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 15:47:21] [SUCCESS] Email configuration valid
+[2026-02-02 15:47:21] [SUCCESS] Email configuration validated successfully
+[2026-02-02 15:47:21] [DEBUG] No PID tracking file found
+[2026-02-02 15:47:21] [DEBUG] Check: 15:47:21 | Window: Inactive | Python: Stopped
+[2026-02-02 15:47:23] [INFO] Cleaning up...
+[2026-02-02 15:47:23] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 15:47:30] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 15:47:30] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 15:47:30] [INFO] Start Time: 08:50
+[2026-02-02 15:47:30] [INFO] End Time: 15:48
+[2026-02-02 15:47:30] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 15:47:30] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 15:47:30] [INFO] Testing email configuration...
+[2026-02-02 15:47:30] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 15:47:30] [INFO] Configured languages: Bahasa, English
+[2026-02-02 15:47:30] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 15:47:30] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 15:47:30] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 15:47:30] [INFO] - SSL Enabled: True
+[2026-02-02 15:47:30] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 15:47:30] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 15:47:30] [SUCCESS] Email configuration valid
+[2026-02-02 15:47:30] [SUCCESS] Email configuration validated successfully
+[2026-02-02 15:47:30] [DEBUG] No PID tracking file found
+[2026-02-02 15:47:30] [DEBUG] Check: 15:47:30 | Window: Active | Python: Stopped
+[2026-02-02 15:47:30] [DEBUG] Check: 15:47:30 | Window: Active | Python: Stopped
+[2026-02-02 15:47:30] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 15:47:30] [DEBUG] Searching for Python process...
+[2026-02-02 15:47:32] [DEBUG] No Python process found matching criteria
+[2026-02-02 15:47:32] [INFO] Starting face recognition worker process...
+[2026-02-02 15:47:32] [SUCCESS] Worker process started (PID: 11756)
+[2026-02-02 15:47:32] [INFO] Waiting for Python process to start...
+[2026-02-02 15:47:32] [DEBUG] Searching for Python process...
+[2026-02-02 15:47:32] [DEBUG] No Python process found matching criteria
+[2026-02-02 15:47:34] [DEBUG] Searching for Python process...
+[2026-02-02 15:47:34] [SUCCESS] Found Python process with our script: PID=5960
+[2026-02-02 15:47:34] [SUCCESS] Python process found (PID: 5960)
+[2026-02-02 15:47:34] [DEBUG] PID tracking saved: WorkerPID=11756, PythonPID=5960
+[2026-02-02 15:47:34] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 15:47:34] [DEBUG] PID tracking saved: WorkerPID=11756, PythonPID=5960
+[2026-02-02 15:47:49] [DEBUG] Check: 15:47:49 | Window: Active | Python: Running (PID: 5960)
+[2026-02-02 15:47:49] [DEBUG] PID tracking saved: WorkerPID=11756, PythonPID=5960
+[2026-02-02 15:48:04] [DEBUG] Check: 15:48:04 | Window: Inactive | Python: Running (PID: 5960)
+[2026-02-02 15:48:04] [INFO] End time reached - stopping processes...
+[2026-02-02 15:48:04] [INFO] Stopping Python process (PID: 5960)...
+[2026-02-02 15:48:06] [WARN] Forcefully terminating Python process...
+[2026-02-02 15:48:06] [SUCCESS] Python process terminated
+[2026-02-02 15:48:06] [INFO] Stopping worker process (PID: 11756)...
+[2026-02-02 15:48:09] [SUCCESS] Worker process exited gracefully
+[2026-02-02 15:48:09] [DEBUG] Removed PID tracking file
+[2026-02-02 15:48:09] [INFO] Stopped processes: Python, Worker
+[2026-02-02 15:48:14] [INFO] Validating worker output...
+[2026-02-02 15:48:14] [INFO] Validating face recognition output structure...
+[2026-02-02 15:48:14] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-02_15-47-32
+[2026-02-02 15:48:14] [DEBUG] Found subfolder: logs
+[2026-02-02 15:48:14] [DEBUG] Found subfolder: script_output
+[2026-02-02 15:48:14] [DEBUG] Metadata file is valid JSON
+[2026-02-02 15:48:14] [DEBUG] Metadata file size: 1.33 KB
+[2026-02-02 15:48:14] [DEBUG] Found 3 log files
+[2026-02-02 15:48:14] [DEBUG] completion_summary.txt size: 4.4 KB
+[2026-02-02 15:48:14] [DEBUG] python_output.txt size: 35 KB
+[2026-02-02 15:48:14] [DEBUG] Latest run log: run_2026-02-02_15-47-32.log (2.64 KB)
+[2026-02-02 15:48:14] [DEBUG] Script output contains 1 items
+[2026-02-02 15:48:14] [DEBUG] Total folder size: 0.04 MB
+[2026-02-02 15:48:14] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-02 15:48:14] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-02 15:48:14] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-02_15-47-32
+[2026-02-02 15:48:14] [SUCCESS]   - Created: 02/02/2026 15:47:32
+[2026-02-02 15:48:14] [SUCCESS]   - Size: 0.04 MB
+[2026-02-02 15:48:14] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-02 15:48:14] [DEBUG] Configuration backed up to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\config_backup_20260202_154814.json
+[2026-02-02 15:48:14] [INFO] Preparing to send completion notifications to 2 recipient(s)...
+[2026-02-02 15:48:14] [DEBUG] Email credential loaded from C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-02 15:48:14] [DEBUG] Found latest run log: run_2026-02-02_15-47-32.log
+[2026-02-02 15:48:14] [DEBUG] Found metadata.json
+[2026-02-02 15:48:14] [INFO] Sending emails in 2 different language(s)
+[2026-02-02 15:48:14] [INFO] Sending Bahasa email to: ikeepmypromiz@gmail.com
+[2026-02-02 15:48:18] [SUCCESS] Successfully sent Bahasa email to 1 recipient(s)
+[2026-02-02 15:48:18] [INFO] Sending English email to: faridraihan17@gmail.com
+[2026-02-02 15:48:21] [SUCCESS] Successfully sent English email to 1 recipient(s)
+[2026-02-02 15:48:21] [SUCCESS] All emails sent successfully (2 total recipients)
+[2026-02-02 15:48:21] [SUCCESS] Completion emails sent successfully.
+[2026-02-02 15:48:21] [SUCCESS] Face recognition pipeline completed successfully!
+[2026-02-02 15:48:21] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 15:48:21] [INFO] Cleaning up...
+[2026-02-02 15:48:21] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 16:11:40] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 16:11:40] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 16:11:40] [INFO] Start Time: 08:00
+[2026-02-02 16:11:40] [INFO] End Time: 14:52
+[2026-02-02 16:11:40] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 16:11:40] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 16:11:40] [INFO] Testing email configuration...
+[2026-02-02 16:11:40] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 16:11:40] [INFO] Configured languages: Bahasa, English
+[2026-02-02 16:11:40] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 16:11:40] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 16:11:40] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 16:11:40] [INFO] - SSL Enabled: True
+[2026-02-02 16:11:40] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 16:11:40] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 16:11:40] [SUCCESS] Email configuration valid
+[2026-02-02 16:11:40] [SUCCESS] Email configuration validated successfully
+[2026-02-02 16:11:40] [DEBUG] No PID tracking file found
+[2026-02-02 16:11:40] [DEBUG] Check: 16:11:40 | Window: Inactive | Python: Stopped
+[2026-02-02 16:11:44] [INFO] Cleaning up...
+[2026-02-02 16:11:44] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 16:11:59] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 16:11:59] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 16:11:59] [INFO] Start Time: 08:00
+[2026-02-02 16:11:59] [INFO] End Time: 16:12
+[2026-02-02 16:11:59] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 16:11:59] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 16:11:59] [INFO] Testing email configuration...
+[2026-02-02 16:11:59] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 16:11:59] [INFO] Configured languages: Bahasa, English
+[2026-02-02 16:11:59] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 16:11:59] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 16:11:59] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 16:11:59] [INFO] - SSL Enabled: True
+[2026-02-02 16:12:00] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 16:12:00] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 16:12:00] [SUCCESS] Email configuration valid
+[2026-02-02 16:12:00] [SUCCESS] Email configuration validated successfully
+[2026-02-02 16:12:00] [DEBUG] No PID tracking file found
+[2026-02-02 16:12:00] [DEBUG] Check: 16:12:00 | Window: Inactive | Python: Stopped
+[2026-02-02 16:12:02] [INFO] Cleaning up...
+[2026-02-02 16:12:02] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 16:12:10] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 16:12:10] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 16:12:10] [INFO] Start Time: 08:00
+[2026-02-02 16:12:10] [INFO] End Time: 16:14
+[2026-02-02 16:12:10] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 16:12:10] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 16:12:10] [INFO] Testing email configuration...
+[2026-02-02 16:12:10] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 16:12:10] [INFO] Configured languages: Bahasa, English
+[2026-02-02 16:12:10] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 16:12:10] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 16:12:10] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 16:12:10] [INFO] - SSL Enabled: True
+[2026-02-02 16:12:10] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 16:12:10] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 16:12:10] [SUCCESS] Email configuration valid
+[2026-02-02 16:12:10] [SUCCESS] Email configuration validated successfully
+[2026-02-02 16:12:10] [DEBUG] No PID tracking file found
+[2026-02-02 16:12:10] [DEBUG] Check: 16:12:10 | Window: Active | Python: Stopped
+[2026-02-02 16:12:10] [DEBUG] Check: 16:12:10 | Window: Active | Python: Stopped
+[2026-02-02 16:12:10] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 16:12:10] [DEBUG] Searching for Python process...
+[2026-02-02 16:12:11] [DEBUG] No Python process found matching criteria
+[2026-02-02 16:12:11] [INFO] Starting face recognition worker process...
+[2026-02-02 16:12:11] [SUCCESS] Worker process started (PID: 11148)
+[2026-02-02 16:12:11] [INFO] Waiting for Python process to start...
+[2026-02-02 16:12:11] [DEBUG] Searching for Python process...
+[2026-02-02 16:12:12] [DEBUG] No Python process found matching criteria
+[2026-02-02 16:12:14] [DEBUG] Searching for Python process...
+[2026-02-02 16:12:14] [SUCCESS] Found Python process with our script: PID=33704
+[2026-02-02 16:12:14] [SUCCESS] Python process found (PID: 33704)
+[2026-02-02 16:12:14] [DEBUG] PID tracking saved: WorkerPID=11148, PythonPID=33704
+[2026-02-02 16:12:14] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 16:12:14] [DEBUG] PID tracking saved: WorkerPID=11148, PythonPID=33704
+[2026-02-02 16:12:29] [DEBUG] Check: 16:12:29 | Window: Active | Python: Running (PID: 33704)
+[2026-02-02 16:12:29] [DEBUG] PID tracking saved: WorkerPID=11148, PythonPID=33704
+[2026-02-02 16:12:44] [DEBUG] Check: 16:12:44 | Window: Active | Python: Running (PID: 33704)
+[2026-02-02 16:12:44] [DEBUG] PID tracking saved: WorkerPID=11148, PythonPID=33704
+[2026-02-02 16:12:59] [DEBUG] Check: 16:12:59 | Window: Active | Python: Running (PID: 33704)
+[2026-02-02 16:12:59] [DEBUG] PID tracking saved: WorkerPID=11148, PythonPID=33704
+[2026-02-02 16:13:14] [DEBUG] Check: 16:13:14 | Window: Active | Python: Running (PID: 33704)
+[2026-02-02 16:13:14] [DEBUG] PID tracking saved: WorkerPID=11148, PythonPID=33704
+[2026-02-02 16:13:29] [DEBUG] Check: 16:13:29 | Window: Active | Python: Running (PID: 33704)
+[2026-02-02 16:13:29] [DEBUG] PID tracking saved: WorkerPID=11148, PythonPID=33704
+[2026-02-02 16:13:44] [DEBUG] Check: 16:13:44 | Window: Active | Python: Running (PID: 33704)
+[2026-02-02 16:13:44] [DEBUG] PID tracking saved: WorkerPID=11148, PythonPID=33704
+[2026-02-02 16:14:00] [DEBUG] Check: 16:14:00 | Window: Inactive | Python: Running (PID: 33704)
+[2026-02-02 16:14:00] [INFO] End time reached - stopping processes...
+[2026-02-02 16:14:00] [INFO] Stopping Python process (PID: 33704)...
+[2026-02-02 16:14:02] [WARN] Forcefully terminating Python process...
+[2026-02-02 16:14:02] [SUCCESS] Python process terminated
+[2026-02-02 16:14:02] [INFO] Stopping worker process (PID: 11148)...
+[2026-02-02 16:14:04] [SUCCESS] Worker process exited gracefully
+[2026-02-02 16:14:04] [DEBUG] Removed PID tracking file
+[2026-02-02 16:14:04] [INFO] Stopped processes: Python, Worker
+[2026-02-02 16:14:09] [INFO] Validating worker output...
+[2026-02-02 16:14:09] [INFO] Validating face recognition output structure...
+[2026-02-02 16:14:09] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-02_16-12-12
+[2026-02-02 16:14:09] [DEBUG] Found subfolder: logs
+[2026-02-02 16:14:09] [DEBUG] Found subfolder: script_output
+[2026-02-02 16:14:09] [DEBUG] Metadata file is valid JSON
+[2026-02-02 16:14:09] [DEBUG] Metadata file size: 1.33 KB
+[2026-02-02 16:14:09] [DEBUG] Found 3 log files
+[2026-02-02 16:14:09] [DEBUG] completion_summary.txt size: 4.4 KB
+[2026-02-02 16:14:09] [DEBUG] python_output.txt size: 67.01 KB
+[2026-02-02 16:14:09] [DEBUG] Latest run log: run_2026-02-02_16-12-12.log (2.64 KB)
+[2026-02-02 16:14:09] [DEBUG] Script output contains 1 items
+[2026-02-02 16:14:09] [DEBUG] Total folder size: 0.07 MB
+[2026-02-02 16:14:09] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-02 16:14:09] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-02 16:14:09] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-02_16-12-12
+[2026-02-02 16:14:09] [SUCCESS]   - Created: 02/02/2026 16:12:12
+[2026-02-02 16:14:09] [SUCCESS]   - Size: 0.07 MB
+[2026-02-02 16:14:09] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-02 16:14:09] [DEBUG] Configuration backed up to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\config_backup_20260202_161409.json
+[2026-02-02 16:14:10] [INFO] Preparing to send completion notifications to 2 recipient(s)...
+[2026-02-02 16:14:10] [DEBUG] Email credential loaded from C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-02 16:14:10] [DEBUG] Found latest run log: run_2026-02-02_16-12-12.log
+[2026-02-02 16:14:10] [DEBUG] Found metadata.json
+[2026-02-02 16:14:10] [INFO] Sending emails in 2 different language(s)
+[2026-02-02 16:14:10] [INFO] Sending Bahasa email to: ikeepmypromiz@gmail.com
+[2026-02-02 16:14:13] [SUCCESS] Successfully sent Bahasa email to 1 recipient(s)
+[2026-02-02 16:14:13] [INFO] Sending English email to: faridraihan17@gmail.com
+[2026-02-02 16:14:17] [SUCCESS] Successfully sent English email to 1 recipient(s)
+[2026-02-02 16:14:17] [SUCCESS] All emails sent successfully (2 total recipients)
+[2026-02-02 16:14:17] [SUCCESS] Completion emails sent successfully.
+[2026-02-02 16:14:17] [SUCCESS] Face recognition pipeline completed successfully!
+[2026-02-02 16:14:17] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 16:14:17] [INFO] Cleaning up...
+[2026-02-02 16:14:17] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 16:18:05] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 16:18:05] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 16:18:05] [INFO] Start Time: 08:00
+[2026-02-02 16:18:05] [INFO] End Time: 16:14
+[2026-02-02 16:18:05] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 16:18:05] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 16:18:05] [INFO] Testing email configuration...
+[2026-02-02 16:18:05] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 16:18:05] [INFO] Configured languages: Bahasa, English
+[2026-02-02 16:18:05] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 16:18:05] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 16:18:05] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 16:18:05] [INFO] - SSL Enabled: True
+[2026-02-02 16:18:05] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 16:18:05] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 16:18:05] [SUCCESS] Email configuration valid
+[2026-02-02 16:18:05] [SUCCESS] Email configuration validated successfully
+[2026-02-02 16:18:05] [DEBUG] No PID tracking file found
+[2026-02-02 16:18:05] [DEBUG] Check: 16:18:05 | Window: Inactive | Python: Stopped
+[2026-02-02 16:18:13] [INFO] Cleaning up...
+[2026-02-02 16:18:13] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 16:18:41] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 16:18:41] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 16:18:41] [INFO] Start Time: 08:00
+[2026-02-02 16:18:41] [INFO] End Time: 16:19
+[2026-02-02 16:18:41] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 16:18:41] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 16:18:42] [INFO] Testing email configuration...
+[2026-02-02 16:18:42] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 16:18:42] [INFO] Configured languages: Bahasa, English
+[2026-02-02 16:18:42] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 16:18:42] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 16:18:42] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 16:18:42] [INFO] - SSL Enabled: True
+[2026-02-02 16:18:42] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 16:18:42] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 16:18:42] [SUCCESS] Email configuration valid
+[2026-02-02 16:18:42] [SUCCESS] Email configuration validated successfully
+[2026-02-02 16:18:42] [DEBUG] No PID tracking file found
+[2026-02-02 16:18:42] [DEBUG] Check: 16:18:42 | Window: Active | Python: Stopped
+[2026-02-02 16:18:42] [DEBUG] Check: 16:18:42 | Window: Active | Python: Stopped
+[2026-02-02 16:18:42] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 16:18:42] [DEBUG] Searching for Python process...
+[2026-02-02 16:18:43] [DEBUG] No Python process found matching criteria
+[2026-02-02 16:18:43] [INFO] Starting face recognition worker process...
+[2026-02-02 16:18:43] [SUCCESS] Worker process started (PID: 24080)
+[2026-02-02 16:18:43] [INFO] Waiting for Python process to start...
+[2026-02-02 16:18:43] [DEBUG] Searching for Python process...
+[2026-02-02 16:18:44] [DEBUG] No Python process found matching criteria
+[2026-02-02 16:18:46] [DEBUG] Searching for Python process...
+[2026-02-02 16:18:46] [SUCCESS] Found Python process with our script: PID=14096
+[2026-02-02 16:18:46] [SUCCESS] Python process found (PID: 14096)
+[2026-02-02 16:18:46] [DEBUG] PID tracking saved: WorkerPID=24080, PythonPID=14096
+[2026-02-02 16:18:46] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 16:18:46] [DEBUG] PID tracking saved: WorkerPID=24080, PythonPID=14096
+[2026-02-02 16:19:01] [DEBUG] Check: 16:19:01 | Window: Inactive | Python: Running (PID: 14096)
+[2026-02-02 16:19:01] [INFO] End time reached - stopping processes...
+[2026-02-02 16:19:01] [INFO] Stopping Python process (PID: 14096)...
+[2026-02-02 16:19:03] [WARN] Forcefully terminating Python process...
+[2026-02-02 16:19:03] [SUCCESS] Python process terminated
+[2026-02-02 16:19:03] [INFO] Stopping worker process (PID: 24080)...
+[2026-02-02 16:19:05] [SUCCESS] Worker process exited gracefully
+[2026-02-02 16:19:05] [DEBUG] Removed PID tracking file
+[2026-02-02 16:19:05] [INFO] Stopped processes: Python, Worker
+[2026-02-02 16:19:10] [INFO] Validating worker output...
+[2026-02-02 16:19:10] [INFO] Validating face recognition output structure...
+[2026-02-02 16:19:10] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-02_16-18-43
+[2026-02-02 16:19:10] [DEBUG] Found subfolder: logs
+[2026-02-02 16:19:10] [DEBUG] Found subfolder: script_output
+[2026-02-02 16:19:10] [DEBUG] Metadata file is valid JSON
+[2026-02-02 16:19:10] [DEBUG] Metadata file size: 1.33 KB
+[2026-02-02 16:19:10] [DEBUG] Found 3 log files
+[2026-02-02 16:19:10] [DEBUG] completion_summary.txt size: 4.4 KB
+[2026-02-02 16:19:10] [DEBUG] python_output.txt size: 18.87 KB
+[2026-02-02 16:19:10] [DEBUG] Latest run log: run_2026-02-02_16-18-43.log (2.64 KB)
+[2026-02-02 16:19:10] [DEBUG] Script output contains 1 items
+[2026-02-02 16:19:10] [DEBUG] Total folder size: 0.03 MB
+[2026-02-02 16:19:10] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-02 16:19:10] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-02 16:19:10] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-02_16-18-43
+[2026-02-02 16:19:10] [SUCCESS]   - Created: 02/02/2026 16:18:43
+[2026-02-02 16:19:10] [SUCCESS]   - Size: 0.03 MB
+[2026-02-02 16:19:10] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-02 16:19:11] [DEBUG] Configuration backed up to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\config_backup_20260202_161911.json
+[2026-02-02 16:19:11] [INFO] Preparing to send completion notifications to 2 recipient(s)...
+[2026-02-02 16:19:11] [DEBUG] Email credential loaded from C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-02 16:19:11] [DEBUG] Found latest run log: run_2026-02-02_16-18-43.log
+[2026-02-02 16:19:11] [DEBUG] Found metadata.json
+[2026-02-02 16:19:11] [INFO] Sending emails in 2 different language(s)
+[2026-02-02 16:19:11] [INFO] Sending Bahasa email to: ikeepmypromiz@gmail.com
+[2026-02-02 16:19:14] [SUCCESS] Successfully sent Bahasa email to 1 recipient(s)
+[2026-02-02 16:19:14] [INFO] Sending English email to: faridraihan17@gmail.com
+[2026-02-02 16:19:18] [SUCCESS] Successfully sent English email to 1 recipient(s)
+[2026-02-02 16:19:18] [SUCCESS] All emails sent successfully (2 total recipients)
+[2026-02-02 16:19:18] [SUCCESS] Completion emails sent successfully.
+[2026-02-02 16:19:18] [SUCCESS] Face recognition pipeline completed successfully!
+[2026-02-02 16:19:18] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 16:19:18] [INFO] Cleaning up...
+[2026-02-02 16:19:18] [INFO] === Face Recognition Monitor Stopped ===

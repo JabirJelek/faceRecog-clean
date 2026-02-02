@@ -1,20 +1,3 @@
-#### Important
-
-- Maintain the codebase structure, while still implement other stuff if necesssary.
-- Utilzie references below
-- Check instructions
-- Check result-output
-
-#### Instruction
-
-Currently, when the monitor is running, there will be unexpected crashes or accidental ctrl + c from user. For as long as the end time has not reached, or if the user attempt for force close twice, the monitor will keep on running until end time and will store knowledge regarding each time the file that will be send to email will be send at the same time when the end time was reached.
-
-#### Expected output of the codebase
-
-When the end time was reached, the monitor will collect each created file that will be send via email in the start-end time and send all of it.
-
-#### The Codebase
-
 
 <#
 .SYNOPSIS
@@ -1637,15 +1620,3 @@ finally {
     Write-Log "=== Face Recognition Monitor Stopped ===" -Level "INFO"
     Write-Host "Monitor stopped. Log file: $($Config.LogFile)" -ForegroundColor Yellow
 }
-
-#### Tips
-
-Keep the structure of the codebase as is, provide enhancement based on instructions above.
-
-#### References
-
-Use this as references.
-
-https://learn.microsoft.com/en-us/powershell/
-
-https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.5
