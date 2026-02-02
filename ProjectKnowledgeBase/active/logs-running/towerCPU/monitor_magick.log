@@ -44,3 +44,53 @@ at <ScriptBlock>, C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\activ
 [2026-02-02 10:12:05] [DEBUG] Removed PID tracking file
 [2026-02-02 10:12:05] [INFO] Stopped processes: Python, Worker
 [2026-02-02 10:12:05] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 11:33:19] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 11:33:19] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 11:33:19] [INFO] Start Time: 
+[2026-02-02 11:33:19] [INFO] End Time: 
+[2026-02-02 11:33:19] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\maskDetect.ps1
+[2026-02-02 11:33:19] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-TowerCPU.py
+[2026-02-02 11:33:19] [INFO] Testing email configuration...
+[2026-02-02 11:33:19] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 11:33:19] [INFO] Configured languages: Bahasa, English
+[2026-02-02 11:33:19] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 11:33:19] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 11:33:19] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 11:33:19] [INFO] - SSL Enabled: True
+[2026-02-02 11:33:19] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 11:33:19] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 11:33:19] [SUCCESS] Email configuration valid
+[2026-02-02 11:33:19] [SUCCESS] Email configuration validated successfully
+[2026-02-02 11:33:19] [DEBUG] No PID tracking file found
+[2026-02-02 11:33:19] [ERROR] Invalid time format: 
+[2026-02-02 11:33:19] [ERROR] Invalid time format: 
+[2026-02-02 11:33:19] [ERROR] Invalid time format: 
+[2026-02-02 11:33:20] [ERROR] Invalid time format: 
+[2026-02-02 11:33:20] [DEBUG] Check: 11:33:19 | Window: Inactive | Python: Stopped
+[2026-02-02 11:33:25] [INFO] Cleaning up...
+[2026-02-02 11:33:26] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 11:36:07] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 11:36:07] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 11:36:07] [INFO] Start Time: 
+[2026-02-02 11:36:07] [INFO] End Time: 
+[2026-02-02 11:36:07] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\maskDetect.ps1
+[2026-02-02 11:36:07] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-TowerCPU.py
+[2026-02-02 11:36:07] [INFO] Testing email configuration...
+[2026-02-02 11:36:07] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 11:36:07] [INFO] Configured languages: Bahasa, English
+[2026-02-02 11:36:07] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 11:36:07] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 11:36:07] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 11:36:07] [INFO] - SSL Enabled: True
+[2026-02-02 11:36:07] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 11:36:07] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 11:36:07] [SUCCESS] Email configuration valid
+[2026-02-02 11:36:07] [SUCCESS] Email configuration validated successfully
+[2026-02-02 11:36:07] [DEBUG] No PID tracking file found
+[2026-02-02 11:36:07] [ERROR] Invalid time format: 
+[2026-02-02 11:36:07] [ERROR] Invalid time format: 
+[2026-02-02 11:36:07] [ERROR] Invalid time format: 
+[2026-02-02 11:36:07] [ERROR] Invalid time format: 
+[2026-02-02 11:36:07] [DEBUG] Check: 11:36:07 | Window: Inactive | Python: Stopped
+[2026-02-02 11:36:13] [INFO] Cleaning up...
+[2026-02-02 11:36:13] [INFO] === Face Recognition Monitor Stopped ===

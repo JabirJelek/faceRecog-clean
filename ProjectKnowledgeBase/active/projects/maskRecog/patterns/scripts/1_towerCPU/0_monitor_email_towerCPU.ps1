@@ -179,7 +179,7 @@ function Send-CompletionEmail {
         
         # Find and prepare attachments (same as before)
         $attachments = @()
-        $completionSummaryPath = Join-Path $RunFolder "logs\completion_summary.txt"
+        $completionSummaryPath = Join-Path $RunFolder "TowerCPU_Process_*\logs\completion_summary.txt"
         if (Test-Path $completionSummaryPath) {
             $attachments += $completionSummaryPath
             Write-Log "Found completion_summary.txt" -Level "DEBUG"
@@ -321,10 +321,23 @@ function Test-TimeWindow {
 }
 
 function Save-PIDTracking {
+    # FIX: Ensure valid DateTime values before saving
+    $workerStartString = if ($WorkerStartTime -and ($WorkerStartTime -is [DateTime]) -and ($WorkerStartTime.ToString("yyyy-MM-dd HH:mm:ss") -ne "-")) {
+        $WorkerStartTime.ToString("yyyy-MM-dd HH:mm:ss")
+    } else {
+        $null
+    }
+    
+    $pythonStartString = if ($PythonStartTime -and ($PythonStartTime -is [DateTime]) -and ($PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss") -ne "-")) {
+        $PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss")
+    } else {
+        $null
+    }
+    
     $PIDTracking.WorkerPID = $WorkerPID
     $PIDTracking.PythonPID = $PythonPID
-    $PIDTracking.WorkerStartTime = if ($WorkerStartTime) { $WorkerStartTime.ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
-    $PIDTracking.PythonStartTime = if ($PythonStartTime) { $PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
+    $PIDTracking.WorkerStartTime = $workerStartString
+    $PIDTracking.PythonStartTime = $pythonStartString
     $PIDTracking.RunFolder = $CurrentRunFolder
     $PIDTracking.LastUpdate = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
     
@@ -335,6 +348,7 @@ function Save-PIDTracking {
         Write-Log "Failed to save PID tracking: $_" -Level "ERROR"
     }
 }
+
 
 function Load-PIDTracking {
     if (-not (Test-Path $Config.PIDFilePath)) {
@@ -377,12 +391,23 @@ function Load-PIDTracking {
             $global:WorkerPID = $loaded.WorkerPID
             $global:PythonPID = $loaded.PythonPID
             
-            if ($loaded.WorkerStartTime) {
-                $global:WorkerStartTime = [DateTime]::ParseExact($loaded.WorkerStartTime, "yyyy-MM-dd HH:mm:ss", $null)
+            # FIX: Handle invalid DateTime values
+            if ($loaded.WorkerStartTime -and $loaded.WorkerStartTime -ne "-") {
+                try {
+                    $global:WorkerStartTime = [DateTime]::ParseExact($loaded.WorkerStartTime, "yyyy-MM-dd HH:mm:ss", $null)
+                } catch {
+                    Write-Log "Invalid WorkerStartTime in PID file: $($loaded.WorkerStartTime)" -Level "WARN"
+                    $global:WorkerStartTime = $null
+                }
             }
             
-            if ($loaded.PythonStartTime) {
-                $global:PythonStartTime = [DateTime]::ParseExact($loaded.PythonStartTime, "yyyy-MM-dd HH:mm:ss", $null)
+            if ($loaded.PythonStartTime -and $loaded.PythonStartTime -ne "-") {
+                try {
+                    $global:PythonStartTime = [DateTime]::ParseExact($loaded.PythonStartTime, "yyyy-MM-dd HH:mm:ss", $null)
+                } catch {
+                    Write-Log "Invalid PythonStartTime in PID file: $($loaded.PythonStartTime)" -Level "WARN"
+                    $global:PythonStartTime = $null
+                }
             }
             
             $global:CurrentRunFolder = $loaded.RunFolder
@@ -400,6 +425,7 @@ function Load-PIDTracking {
         return $false
     }
 }
+
 
 function Find-PythonProcess {
     # Try to find the Python process running our specific script
@@ -1239,9 +1265,17 @@ function Show-StatusBanner {
     if ($status.PythonRunning) {
         Write-Host "PYTHON STATUS: RUNNING" -ForegroundColor Green
         Write-Host "  PID: $PythonPID" -ForegroundColor White
-        if ($PythonStartTime) {
-            $runtime = [math]::Round((Get-Date - $PythonStartTime).TotalMinutes, 1)
-            Write-Host "  Runtime: $runtime minutes" -ForegroundColor White
+        
+        # FIX: Add validation for PythonStartTime
+        if ($PythonStartTime -and ($PythonStartTime -is [DateTime]) -and ($PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss") -ne "-")) {
+            try {
+                $runtime = [math]::Round((Get-Date - $PythonStartTime).TotalMinutes, 1)
+                Write-Host "  Runtime: $runtime minutes" -ForegroundColor White
+            } catch {
+                Write-Host "  Runtime: Calculating..." -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "  Runtime: Starting..." -ForegroundColor Yellow
         }
     } else {
         Write-Host "PYTHON STATUS: STOPPED" -ForegroundColor Red
@@ -1274,6 +1308,7 @@ function Show-StatusBanner {
     Write-Host "================================================" -ForegroundColor Cyan
     Write-Host "Press Ctrl+C to stop monitor" -ForegroundColor Gray
 }
+
 
 # Main execution
 try {
