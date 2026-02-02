@@ -44,3 +44,984 @@ at <ScriptBlock>, C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\activ
 [2026-02-02 10:12:05] [DEBUG] Removed PID tracking file
 [2026-02-02 10:12:05] [INFO] Stopped processes: Python, Worker
 [2026-02-02 10:12:05] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 10:30:52] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 10:30:52] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 10:30:52] [INFO] Start Time: 08:50
+[2026-02-02 10:30:52] [INFO] End Time: 11:46
+[2026-02-02 10:30:52] [INFO] Worker Script: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\maskDetect.ps1
+[2026-02-02 10:30:52] [INFO] Python Script: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-TowerCPU.py
+[2026-02-02 10:30:52] [INFO] Testing email configuration...
+[2026-02-02 10:30:52] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 10:30:52] [INFO] Configured languages: Bahasa, English
+[2026-02-02 10:30:52] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 10:30:52] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 10:30:52] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 10:30:52] [INFO] - SSL Enabled: True
+[2026-02-02 10:30:52] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 10:30:52] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 10:30:52] [SUCCESS] Email configuration valid
+[2026-02-02 10:30:52] [SUCCESS] Email configuration validated successfully
+[2026-02-02 10:30:52] [DEBUG] No PID tracking file found
+[2026-02-02 10:30:52] [DEBUG] Check: 10:30:52 | Window: Active | Python: Stopped
+[2026-02-02 10:30:52] [DEBUG] Check: 10:30:52 | Window: Active | Python: Stopped
+[2026-02-02 10:30:52] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:30:52] [DEBUG] Searching for Python process...
+[2026-02-02 10:30:52] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:30:52] [INFO] Starting face recognition worker process...
+[2026-02-02 10:30:52] [SUCCESS] Worker process started (PID: 28804)
+[2026-02-02 10:30:52] [INFO] Waiting for Python process to start...
+[2026-02-02 10:30:52] [DEBUG] Searching for Python process...
+[2026-02-02 10:30:52] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:30:54] [DEBUG] Searching for Python process...
+[2026-02-02 10:30:56] [SUCCESS] Found Python process with our script: PID=13648
+[2026-02-02 10:30:56] [SUCCESS] Python process found (PID: 13648)
+[2026-02-02 10:30:56] [DEBUG] PID tracking saved: WorkerPID=28804, PythonPID=13648
+[2026-02-02 10:30:56] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 10:30:56] [DEBUG] PID tracking saved: WorkerPID=28804, PythonPID=13648
+[2026-02-02 10:31:11] [DEBUG] Check: 10:31:11 | Window: Active | Python: Running (PID: 13648)
+[2026-02-02 10:31:11] [DEBUG] PID tracking saved: WorkerPID=28804, PythonPID=13648
+[2026-02-02 10:31:26] [DEBUG] Check: 10:31:26 | Window: Active | Python: Running (PID: 13648)
+[2026-02-02 10:31:26] [DEBUG] PID tracking saved: WorkerPID=28804, PythonPID=13648
+[2026-02-02 10:31:41] [DEBUG] Check: 10:31:41 | Window: Active | Python: Running (PID: 13648)
+[2026-02-02 10:31:41] [DEBUG] PID tracking saved: WorkerPID=28804, PythonPID=13648
+[2026-02-02 10:31:56] [DEBUG] Check: 10:31:56 | Window: Active | Python: Running (PID: 13648)
+[2026-02-02 10:31:56] [DEBUG] PID tracking saved: WorkerPID=28804, PythonPID=13648
+[2026-02-02 10:32:12] [DEBUG] Check: 10:32:12 | Window: Active | Python: Running (PID: 13648)
+[2026-02-02 10:32:12] [DEBUG] PID tracking saved: WorkerPID=28804, PythonPID=13648
+[2026-02-02 10:32:27] [DEBUG] Check: 10:32:27 | Window: Active | Python: Running (PID: 13648)
+[2026-02-02 10:32:27] [DEBUG] PID tracking saved: WorkerPID=28804, PythonPID=13648
+[2026-02-02 10:32:42] [DEBUG] Searching for Python process...
+[2026-02-02 10:32:42] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:32:42] [DEBUG] Check: 10:32:42 | Window: Active | Python: Stopped
+[2026-02-02 10:32:42] [DEBUG] Check: 10:32:42 | Window: Active | Python: Stopped
+[2026-02-02 10:32:42] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:32:42] [DEBUG] Searching for Python process...
+[2026-02-02 10:32:42] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:32:42] [INFO] Starting face recognition worker process...
+[2026-02-02 10:32:42] [SUCCESS] Worker process started (PID: 17764)
+[2026-02-02 10:32:42] [INFO] Waiting for Python process to start...
+[2026-02-02 10:32:42] [DEBUG] Searching for Python process...
+[2026-02-02 10:32:42] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:32:44] [DEBUG] Searching for Python process...
+[2026-02-02 10:32:44] [SUCCESS] Found Python process with our script: PID=10808
+[2026-02-02 10:32:44] [SUCCESS] Python process found (PID: 10808)
+[2026-02-02 10:32:44] [DEBUG] PID tracking saved: WorkerPID=17764, PythonPID=10808
+[2026-02-02 10:32:44] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 10:32:44] [DEBUG] PID tracking saved: WorkerPID=17764, PythonPID=10808
+[2026-02-02 10:32:59] [DEBUG] Searching for Python process...
+[2026-02-02 10:32:59] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:32:59] [DEBUG] Check: 10:32:59 | Window: Active | Python: Stopped
+[2026-02-02 10:32:59] [DEBUG] Check: 10:32:59 | Window: Active | Python: Stopped
+[2026-02-02 10:32:59] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:32:59] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:33:14] [DEBUG] Check: 10:33:14 | Window: Active | Python: Stopped
+[2026-02-02 10:33:14] [DEBUG] Check: 10:33:14 | Window: Active | Python: Stopped
+[2026-02-02 10:33:14] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:33:14] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:33:29] [DEBUG] Check: 10:33:29 | Window: Active | Python: Stopped
+[2026-02-02 10:33:29] [DEBUG] Check: 10:33:29 | Window: Active | Python: Stopped
+[2026-02-02 10:33:29] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:33:29] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:33:44] [DEBUG] Check: 10:33:44 | Window: Active | Python: Stopped
+[2026-02-02 10:33:44] [DEBUG] Check: 10:33:44 | Window: Active | Python: Stopped
+[2026-02-02 10:33:44] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:33:44] [DEBUG] Searching for Python process...
+[2026-02-02 10:33:44] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:33:44] [INFO] Starting face recognition worker process...
+[2026-02-02 10:33:44] [SUCCESS] Worker process started (PID: 18448)
+[2026-02-02 10:33:44] [INFO] Waiting for Python process to start...
+[2026-02-02 10:33:44] [DEBUG] Searching for Python process...
+[2026-02-02 10:33:45] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:33:47] [DEBUG] Searching for Python process...
+[2026-02-02 10:33:47] [SUCCESS] Found Python process with our script: PID=32564
+[2026-02-02 10:33:47] [SUCCESS] Python process found (PID: 32564)
+[2026-02-02 10:33:47] [DEBUG] PID tracking saved: WorkerPID=18448, PythonPID=32564
+[2026-02-02 10:33:47] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 10:33:47] [DEBUG] PID tracking saved: WorkerPID=18448, PythonPID=32564
+[2026-02-02 10:34:02] [DEBUG] Searching for Python process...
+[2026-02-02 10:34:02] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:34:02] [DEBUG] Check: 10:34:02 | Window: Active | Python: Stopped
+[2026-02-02 10:34:02] [DEBUG] Check: 10:34:02 | Window: Active | Python: Stopped
+[2026-02-02 10:34:02] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:34:02] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:34:17] [DEBUG] Check: 10:34:17 | Window: Active | Python: Stopped
+[2026-02-02 10:34:17] [DEBUG] Check: 10:34:17 | Window: Active | Python: Stopped
+[2026-02-02 10:34:17] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:34:17] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:34:32] [DEBUG] Check: 10:34:32 | Window: Active | Python: Stopped
+[2026-02-02 10:34:32] [DEBUG] Check: 10:34:32 | Window: Active | Python: Stopped
+[2026-02-02 10:34:32] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:34:32] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:34:47] [DEBUG] Check: 10:34:47 | Window: Active | Python: Stopped
+[2026-02-02 10:34:47] [DEBUG] Check: 10:34:47 | Window: Active | Python: Stopped
+[2026-02-02 10:34:47] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:34:47] [DEBUG] Searching for Python process...
+[2026-02-02 10:34:47] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:34:47] [INFO] Starting face recognition worker process...
+[2026-02-02 10:34:47] [SUCCESS] Worker process started (PID: 37792)
+[2026-02-02 10:34:47] [INFO] Waiting for Python process to start...
+[2026-02-02 10:34:47] [DEBUG] Searching for Python process...
+[2026-02-02 10:34:47] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:34:49] [DEBUG] Searching for Python process...
+[2026-02-02 10:34:49] [SUCCESS] Found Python process with our script: PID=11480
+[2026-02-02 10:34:49] [SUCCESS] Python process found (PID: 11480)
+[2026-02-02 10:34:49] [DEBUG] PID tracking saved: WorkerPID=37792, PythonPID=11480
+[2026-02-02 10:34:49] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 10:34:49] [DEBUG] PID tracking saved: WorkerPID=37792, PythonPID=11480
+[2026-02-02 10:35:04] [DEBUG] Searching for Python process...
+[2026-02-02 10:35:04] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:35:04] [DEBUG] Check: 10:35:04 | Window: Active | Python: Stopped
+[2026-02-02 10:35:04] [DEBUG] Check: 10:35:04 | Window: Active | Python: Stopped
+[2026-02-02 10:35:05] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:35:05] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:35:20] [DEBUG] Check: 10:35:20 | Window: Active | Python: Stopped
+[2026-02-02 10:35:20] [DEBUG] Check: 10:35:20 | Window: Active | Python: Stopped
+[2026-02-02 10:35:20] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:35:20] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:35:35] [DEBUG] Check: 10:35:35 | Window: Active | Python: Stopped
+[2026-02-02 10:35:35] [DEBUG] Check: 10:35:35 | Window: Active | Python: Stopped
+[2026-02-02 10:35:35] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:35:35] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:35:50] [DEBUG] Check: 10:35:50 | Window: Active | Python: Stopped
+[2026-02-02 10:35:50] [DEBUG] Check: 10:35:50 | Window: Active | Python: Stopped
+[2026-02-02 10:35:50] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:35:50] [DEBUG] Searching for Python process...
+[2026-02-02 10:35:50] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:35:50] [INFO] Starting face recognition worker process...
+[2026-02-02 10:35:50] [SUCCESS] Worker process started (PID: 18932)
+[2026-02-02 10:35:50] [INFO] Waiting for Python process to start...
+[2026-02-02 10:35:50] [DEBUG] Searching for Python process...
+[2026-02-02 10:35:50] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:35:52] [DEBUG] Searching for Python process...
+[2026-02-02 10:35:52] [SUCCESS] Found Python process with our script: PID=1728
+[2026-02-02 10:35:52] [SUCCESS] Python process found (PID: 1728)
+[2026-02-02 10:35:52] [DEBUG] PID tracking saved: WorkerPID=18932, PythonPID=1728
+[2026-02-02 10:35:52] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 10:35:52] [DEBUG] PID tracking saved: WorkerPID=18932, PythonPID=1728
+[2026-02-02 10:36:07] [DEBUG] Searching for Python process...
+[2026-02-02 10:36:07] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:36:07] [DEBUG] Check: 10:36:07 | Window: Active | Python: Stopped
+[2026-02-02 10:36:07] [DEBUG] Check: 10:36:07 | Window: Active | Python: Stopped
+[2026-02-02 10:36:07] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:36:07] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:36:22] [DEBUG] Check: 10:36:22 | Window: Active | Python: Stopped
+[2026-02-02 10:36:22] [DEBUG] Check: 10:36:22 | Window: Active | Python: Stopped
+[2026-02-02 10:36:22] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:36:22] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:36:37] [DEBUG] Check: 10:36:37 | Window: Active | Python: Stopped
+[2026-02-02 10:36:37] [DEBUG] Check: 10:36:37 | Window: Active | Python: Stopped
+[2026-02-02 10:36:37] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:36:37] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:36:52] [DEBUG] Check: 10:36:52 | Window: Active | Python: Stopped
+[2026-02-02 10:36:52] [DEBUG] Check: 10:36:52 | Window: Active | Python: Stopped
+[2026-02-02 10:36:52] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:36:52] [DEBUG] Searching for Python process...
+[2026-02-02 10:36:52] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:36:52] [INFO] Starting face recognition worker process...
+[2026-02-02 10:36:52] [SUCCESS] Worker process started (PID: 25444)
+[2026-02-02 10:36:52] [INFO] Waiting for Python process to start...
+[2026-02-02 10:36:52] [DEBUG] Searching for Python process...
+[2026-02-02 10:36:52] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:36:55] [DEBUG] Searching for Python process...
+[2026-02-02 10:36:55] [SUCCESS] Found Python process with our script: PID=13800
+[2026-02-02 10:36:55] [SUCCESS] Python process found (PID: 13800)
+[2026-02-02 10:36:55] [DEBUG] PID tracking saved: WorkerPID=25444, PythonPID=13800
+[2026-02-02 10:36:55] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 10:36:55] [DEBUG] PID tracking saved: WorkerPID=25444, PythonPID=13800
+[2026-02-02 10:37:10] [DEBUG] Check: 10:37:10 | Window: Active | Python: Running (PID: 13800)
+[2026-02-02 10:37:10] [DEBUG] PID tracking saved: WorkerPID=25444, PythonPID=13800
+[2026-02-02 10:37:25] [DEBUG] Searching for Python process...
+[2026-02-02 10:37:25] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:37:25] [DEBUG] Check: 10:37:25 | Window: Active | Python: Stopped
+[2026-02-02 10:37:25] [DEBUG] Check: 10:37:25 | Window: Active | Python: Stopped
+[2026-02-02 10:37:25] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:37:25] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:37:27] [INFO] Cleaning up...
+[2026-02-02 10:37:27] [INFO] Stopping Python process (PID: 13800)...
+[2026-02-02 10:37:27] [ERROR] Error stopping Python process: Cannot find a process with the process identifier 13800.
+[2026-02-02 10:37:27] [INFO] Stopping worker process (PID: 25444)...
+[2026-02-02 10:37:27] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 25444.
+[2026-02-02 10:37:27] [DEBUG] Removed PID tracking file
+[2026-02-02 10:37:27] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 10:42:44] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 10:42:44] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 10:42:44] [INFO] Start Time: 08:50
+[2026-02-02 10:42:44] [INFO] End Time: 11:46
+[2026-02-02 10:42:44] [INFO] Worker Script: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\maskDetect.ps1
+[2026-02-02 10:42:44] [INFO] Python Script: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-TowerCPU.py
+[2026-02-02 10:42:44] [INFO] Testing email configuration...
+[2026-02-02 10:42:44] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 10:42:44] [INFO] Configured languages: Bahasa, English
+[2026-02-02 10:42:44] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 10:42:44] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 10:42:44] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 10:42:44] [INFO] - SSL Enabled: True
+[2026-02-02 10:42:44] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 10:42:44] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 10:42:45] [SUCCESS] Email configuration valid
+[2026-02-02 10:42:45] [SUCCESS] Email configuration validated successfully
+[2026-02-02 10:42:45] [DEBUG] No PID tracking file found
+[2026-02-02 10:42:45] [DEBUG] Check: 10:42:45 | Window: Active | Python: Stopped
+[2026-02-02 10:42:45] [DEBUG] Check: 10:42:45 | Window: Active | Python: Stopped
+[2026-02-02 10:42:45] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:42:45] [DEBUG] Searching for Python process...
+[2026-02-02 10:42:45] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:42:45] [INFO] Starting face recognition worker process...
+[2026-02-02 10:42:45] [SUCCESS] Worker process started (PID: 25668)
+[2026-02-02 10:42:45] [INFO] Waiting for Python process to start...
+[2026-02-02 10:42:45] [DEBUG] Searching for Python process...
+[2026-02-02 10:42:45] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:42:47] [DEBUG] Searching for Python process...
+[2026-02-02 10:42:48] [SUCCESS] Found Python process with our script: PID=14640
+[2026-02-02 10:42:48] [SUCCESS] Python process found (PID: 14640)
+[2026-02-02 10:42:49] [DEBUG] PID tracking saved: WorkerPID=25668, PythonPID=14640
+[2026-02-02 10:42:49] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 10:42:49] [DEBUG] PID tracking saved: WorkerPID=25668, PythonPID=14640
+[2026-02-02 10:43:04] [DEBUG] Searching for Python process...
+[2026-02-02 10:43:04] [SUCCESS] Found Python process with our script: PID=14640
+[2026-02-02 10:43:04] [DEBUG] PID tracking saved: WorkerPID=25668, PythonPID=14640
+[2026-02-02 10:43:04] [DEBUG] Check: 10:43:04 | Window: Active | Python: Stopped
+[2026-02-02 10:43:04] [DEBUG] Check: 10:43:04 | Window: Active | Python: Stopped
+[2026-02-02 10:43:04] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:43:04] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:43:04] [DEBUG] PID tracking saved: WorkerPID=25668, PythonPID=14640
+[2026-02-02 10:43:19] [DEBUG] Searching for Python process...
+[2026-02-02 10:43:19] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:43:19] [DEBUG] Check: 10:43:19 | Window: Active | Python: Stopped
+[2026-02-02 10:43:19] [DEBUG] Check: 10:43:19 | Window: Active | Python: Stopped
+[2026-02-02 10:43:19] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:43:19] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:43:34] [DEBUG] Check: 10:43:34 | Window: Active | Python: Stopped
+[2026-02-02 10:43:34] [DEBUG] Check: 10:43:34 | Window: Active | Python: Stopped
+[2026-02-02 10:43:34] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:43:34] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 10:43:49] [DEBUG] Check: 10:43:49 | Window: Active | Python: Stopped
+[2026-02-02 10:43:49] [DEBUG] Check: 10:43:49 | Window: Active | Python: Stopped
+[2026-02-02 10:43:49] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:43:49] [DEBUG] Searching for Python process...
+[2026-02-02 10:43:49] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:43:49] [INFO] Starting face recognition worker process...
+[2026-02-02 10:43:49] [SUCCESS] Worker process started (PID: 22648)
+[2026-02-02 10:43:49] [INFO] Waiting for Python process to start...
+[2026-02-02 10:43:49] [DEBUG] Searching for Python process...
+[2026-02-02 10:43:49] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:43:51] [DEBUG] Searching for Python process...
+[2026-02-02 10:43:52] [SUCCESS] Found Python process with our script: PID=23780
+[2026-02-02 10:43:52] [SUCCESS] Python process found (PID: 23780)
+[2026-02-02 10:43:52] [DEBUG] PID tracking saved: WorkerPID=22648, PythonPID=23780
+[2026-02-02 10:43:52] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 10:43:52] [DEBUG] PID tracking saved: WorkerPID=22648, PythonPID=23780
+[2026-02-02 10:43:55] [INFO] Cleaning up...
+[2026-02-02 10:43:55] [INFO] Stopping Python process (PID: 23780)...
+[2026-02-02 10:43:57] [WARN] Forcefully terminating Python process...
+[2026-02-02 10:43:57] [SUCCESS] Python process terminated
+[2026-02-02 10:43:57] [INFO] Stopping worker process (PID: 22648)...
+[2026-02-02 10:43:59] [SUCCESS] Worker process exited gracefully
+[2026-02-02 10:43:59] [DEBUG] Removed PID tracking file
+[2026-02-02 10:43:59] [INFO] Stopped processes: Python, Worker
+[2026-02-02 10:44:00] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 10:45:48] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 10:45:48] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 10:45:48] [INFO] Start Time: 08:50
+[2026-02-02 10:45:48] [INFO] End Time: 11:46
+[2026-02-02 10:45:48] [INFO] Worker Script: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\maskDetect.ps1
+[2026-02-02 10:45:48] [INFO] Python Script: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-TowerCPU.py
+[2026-02-02 10:45:48] [INFO] Testing email configuration...
+[2026-02-02 10:45:48] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 10:45:48] [INFO] Configured languages: Bahasa, English
+[2026-02-02 10:45:48] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 10:45:48] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 10:45:48] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 10:45:48] [INFO] - SSL Enabled: True
+[2026-02-02 10:45:48] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 10:45:48] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 10:45:48] [SUCCESS] Email configuration valid
+[2026-02-02 10:45:48] [SUCCESS] Email configuration validated successfully
+[2026-02-02 10:45:48] [DEBUG] No PID tracking file found
+[2026-02-02 10:45:48] [DEBUG] Check: 10:45:48 | Window: Active | Python: Stopped
+[2026-02-02 10:45:48] [DEBUG] Check: 10:45:48 | Window: Active | Python: Stopped
+[2026-02-02 10:45:48] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:45:48] [DEBUG] Searching for Python process...
+[2026-02-02 10:45:48] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:45:48] [INFO] Starting face recognition worker process...
+[2026-02-02 10:45:48] [SUCCESS] Worker process started (PID: 20252)
+[2026-02-02 10:45:48] [INFO] Waiting for Python process to start...
+[2026-02-02 10:45:49] [DEBUG] Searching for Python process...
+[2026-02-02 10:45:49] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:45:51] [DEBUG] Searching for Python process...
+[2026-02-02 10:45:52] [SUCCESS] Found Python process with our script: PID=25508
+[2026-02-02 10:45:52] [SUCCESS] Python process found (PID: 25508)
+[2026-02-02 10:45:52] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:45:52] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 10:45:52] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:46:07] [DEBUG] Check: 10:46:07 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:46:07] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:46:22] [DEBUG] Check: 10:46:22 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:46:23] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:46:38] [DEBUG] Check: 10:46:38 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:46:38] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:46:53] [DEBUG] Check: 10:46:53 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:46:53] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:47:08] [DEBUG] Check: 10:47:08 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:47:08] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:47:23] [DEBUG] Check: 10:47:23 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:47:23] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:47:38] [DEBUG] Check: 10:47:38 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:47:38] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:47:53] [DEBUG] Check: 10:47:53 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:47:53] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:48:08] [DEBUG] Check: 10:48:08 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:48:09] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:48:24] [DEBUG] Check: 10:48:24 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:48:24] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:48:39] [DEBUG] Check: 10:48:39 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:48:39] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:48:54] [DEBUG] Check: 10:48:54 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:48:54] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:49:09] [DEBUG] Check: 10:49:09 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:49:09] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:49:24] [DEBUG] Check: 10:49:24 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:49:24] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:49:39] [DEBUG] Check: 10:49:39 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:49:39] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:49:54] [DEBUG] Check: 10:49:54 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:49:54] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:50:09] [DEBUG] Check: 10:50:09 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:50:09] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:50:24] [DEBUG] Check: 10:50:24 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:50:25] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:50:40] [DEBUG] Check: 10:50:40 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:50:40] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:50:55] [DEBUG] Check: 10:50:55 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:50:55] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:51:10] [DEBUG] Check: 10:51:10 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:51:10] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:51:25] [DEBUG] Check: 10:51:25 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:51:25] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:51:40] [DEBUG] Check: 10:51:40 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:51:40] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:51:55] [DEBUG] Check: 10:51:55 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:51:55] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:52:10] [DEBUG] Check: 10:52:10 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:52:10] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:52:25] [DEBUG] Check: 10:52:25 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:52:25] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:52:41] [DEBUG] Check: 10:52:40 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:52:41] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:52:56] [DEBUG] Check: 10:52:56 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:52:56] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:53:11] [DEBUG] Check: 10:53:11 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:53:11] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:53:26] [DEBUG] Check: 10:53:26 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:53:26] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:53:41] [DEBUG] Check: 10:53:41 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:53:41] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:53:56] [DEBUG] Check: 10:53:56 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:53:56] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:54:11] [DEBUG] Check: 10:54:11 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:54:11] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:54:26] [DEBUG] Check: 10:54:26 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:54:26] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:54:41] [DEBUG] Check: 10:54:41 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:54:41] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:54:56] [DEBUG] Check: 10:54:56 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:54:57] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:55:12] [DEBUG] Check: 10:55:12 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:55:12] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:55:27] [DEBUG] Check: 10:55:27 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:55:27] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:55:42] [DEBUG] Check: 10:55:42 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:55:42] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:55:57] [DEBUG] Check: 10:55:57 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:55:57] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:56:12] [DEBUG] Check: 10:56:12 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:56:12] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:56:27] [DEBUG] Check: 10:56:27 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:56:27] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:56:42] [DEBUG] Check: 10:56:42 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:56:42] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:56:57] [DEBUG] Check: 10:56:57 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:56:57] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:57:12] [DEBUG] Check: 10:57:12 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:57:12] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:57:27] [DEBUG] Check: 10:57:27 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:57:27] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:57:43] [DEBUG] Check: 10:57:43 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:57:43] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:57:58] [DEBUG] Check: 10:57:58 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:57:58] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:58:13] [DEBUG] Check: 10:58:13 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:58:13] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:58:28] [DEBUG] Check: 10:58:28 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:58:28] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:58:43] [DEBUG] Check: 10:58:43 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:58:43] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:58:58] [DEBUG] Check: 10:58:58 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:58:58] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:59:13] [DEBUG] Check: 10:59:13 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:59:13] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:59:28] [DEBUG] Check: 10:59:28 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:59:28] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:59:43] [DEBUG] Check: 10:59:43 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:59:43] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 10:59:59] [DEBUG] Check: 10:59:59 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 10:59:59] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:00:14] [DEBUG] Check: 11:00:14 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:00:14] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:00:29] [DEBUG] Check: 11:00:29 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:00:29] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:00:44] [DEBUG] Check: 11:00:44 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:00:44] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:00:59] [DEBUG] Check: 11:00:59 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:00:59] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:01:14] [DEBUG] Check: 11:01:14 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:01:14] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:01:29] [DEBUG] Check: 11:01:29 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:01:29] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:01:44] [DEBUG] Check: 11:01:44 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:01:44] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:01:59] [DEBUG] Check: 11:01:59 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:01:59] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:02:14] [DEBUG] Check: 11:02:14 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:02:14] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:02:29] [DEBUG] Check: 11:02:29 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:02:29] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:02:45] [DEBUG] Check: 11:02:45 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:02:45] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:03:00] [DEBUG] Check: 11:03:00 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:03:00] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:03:15] [DEBUG] Check: 11:03:15 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:03:15] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:03:30] [DEBUG] Check: 11:03:30 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:03:30] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:03:45] [DEBUG] Check: 11:03:45 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:03:45] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:04:00] [DEBUG] Check: 11:04:00 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:04:00] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:04:15] [DEBUG] Check: 11:04:15 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:04:15] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:04:30] [DEBUG] Check: 11:04:30 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:04:30] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:04:45] [DEBUG] Check: 11:04:45 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:04:45] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:05:00] [DEBUG] Check: 11:05:00 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:05:01] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:05:16] [DEBUG] Check: 11:05:16 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:05:16] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:05:31] [DEBUG] Check: 11:05:31 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:05:31] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:05:46] [DEBUG] Check: 11:05:46 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:05:46] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:06:01] [DEBUG] Check: 11:06:01 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:06:01] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:06:16] [DEBUG] Check: 11:06:16 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:06:16] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:06:31] [DEBUG] Check: 11:06:31 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:06:31] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:06:46] [DEBUG] Check: 11:06:46 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:06:46] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:07:01] [DEBUG] Check: 11:07:01 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:07:01] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:07:16] [DEBUG] Check: 11:07:16 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:07:17] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:07:32] [DEBUG] Check: 11:07:32 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:07:32] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:07:47] [DEBUG] Check: 11:07:47 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:07:47] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:08:02] [DEBUG] Check: 11:08:02 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:08:02] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:08:17] [DEBUG] Check: 11:08:17 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:08:17] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:08:32] [DEBUG] Check: 11:08:32 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:08:32] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:08:47] [DEBUG] Check: 11:08:47 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:08:47] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:09:02] [DEBUG] Check: 11:09:02 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:09:02] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:09:17] [DEBUG] Check: 11:09:17 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:09:17] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:09:32] [DEBUG] Check: 11:09:32 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:09:33] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:09:48] [DEBUG] Check: 11:09:48 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:09:48] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:10:03] [DEBUG] Check: 11:10:03 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:10:03] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:10:18] [DEBUG] Check: 11:10:18 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:10:18] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:10:33] [DEBUG] Check: 11:10:33 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:10:33] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:10:48] [DEBUG] Check: 11:10:48 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:10:48] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:11:03] [DEBUG] Check: 11:11:03 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:11:03] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:11:18] [DEBUG] Check: 11:11:18 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:11:18] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:11:33] [DEBUG] Check: 11:11:33 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:11:33] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:11:49] [DEBUG] Check: 11:11:49 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:11:49] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:12:04] [DEBUG] Check: 11:12:04 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:12:04] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:12:19] [DEBUG] Check: 11:12:19 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:12:19] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:12:34] [DEBUG] Check: 11:12:34 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:12:34] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:12:49] [DEBUG] Check: 11:12:49 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:12:49] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:13:04] [DEBUG] Check: 11:13:04 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:13:04] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:13:19] [DEBUG] Check: 11:13:19 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:13:19] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:13:34] [DEBUG] Check: 11:13:34 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:13:34] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:13:49] [DEBUG] Check: 11:13:49 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:13:49] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:14:04] [DEBUG] Check: 11:14:04 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:14:04] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:14:19] [DEBUG] Check: 11:14:19 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:14:20] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:14:35] [DEBUG] Check: 11:14:35 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:14:35] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:14:50] [DEBUG] Check: 11:14:50 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:14:50] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:15:05] [DEBUG] Check: 11:15:05 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:15:05] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:15:20] [DEBUG] Check: 11:15:20 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:15:20] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:15:35] [DEBUG] Check: 11:15:35 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:15:35] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:15:50] [DEBUG] Check: 11:15:50 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:15:50] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:16:05] [DEBUG] Check: 11:16:05 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:16:05] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:16:20] [DEBUG] Check: 11:16:20 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:16:20] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:16:35] [DEBUG] Check: 11:16:35 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:16:35] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:16:50] [DEBUG] Check: 11:16:50 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:16:50] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:17:06] [DEBUG] Check: 11:17:06 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:17:06] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:17:21] [DEBUG] Check: 11:17:21 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:17:21] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:17:36] [DEBUG] Check: 11:17:36 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:17:36] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:17:51] [DEBUG] Check: 11:17:51 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:17:51] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:18:06] [DEBUG] Check: 11:18:06 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:18:06] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:18:21] [DEBUG] Check: 11:18:21 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:18:21] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:18:36] [DEBUG] Check: 11:18:36 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:18:36] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:18:51] [DEBUG] Check: 11:18:51 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:18:51] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:19:06] [DEBUG] Check: 11:19:06 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:19:06] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:19:21] [DEBUG] Check: 11:19:21 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:19:21] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:19:36] [DEBUG] Check: 11:19:36 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:19:37] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:19:52] [DEBUG] Check: 11:19:52 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:19:52] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:20:07] [DEBUG] Check: 11:20:07 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:20:07] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:20:22] [DEBUG] Check: 11:20:22 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:20:22] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:20:37] [DEBUG] Check: 11:20:37 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:20:37] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:20:52] [DEBUG] Check: 11:20:52 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:20:52] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:21:07] [DEBUG] Check: 11:21:07 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:21:07] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:21:22] [DEBUG] Check: 11:21:22 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:21:22] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:21:37] [DEBUG] Check: 11:21:37 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:21:37] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:21:52] [DEBUG] Check: 11:21:52 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:21:52] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:22:07] [DEBUG] Check: 11:22:07 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:22:07] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:22:22] [DEBUG] Check: 11:22:22 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:22:23] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:22:38] [DEBUG] Check: 11:22:38 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:22:38] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:22:53] [DEBUG] Check: 11:22:53 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:22:53] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:23:08] [DEBUG] Check: 11:23:08 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:23:08] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:23:23] [DEBUG] Check: 11:23:23 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:23:23] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:23:38] [DEBUG] Check: 11:23:38 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:23:38] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:23:53] [DEBUG] Check: 11:23:53 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:23:53] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:24:08] [DEBUG] Check: 11:24:08 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:24:08] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:24:23] [DEBUG] Check: 11:24:23 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:24:23] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:24:38] [DEBUG] Check: 11:24:38 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:24:39] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:24:54] [DEBUG] Check: 11:24:54 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:24:54] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:25:09] [DEBUG] Check: 11:25:09 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:25:09] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:25:24] [DEBUG] Check: 11:25:24 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:25:24] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:25:39] [DEBUG] Check: 11:25:39 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:25:39] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:25:54] [DEBUG] Check: 11:25:54 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:25:54] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:26:09] [DEBUG] Check: 11:26:09 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:26:09] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:26:24] [DEBUG] Check: 11:26:24 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:26:24] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:26:39] [DEBUG] Check: 11:26:39 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:26:39] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:26:54] [DEBUG] Check: 11:26:54 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:26:54] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:27:09] [DEBUG] Check: 11:27:09 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:27:09] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:27:25] [DEBUG] Check: 11:27:25 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:27:25] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:27:40] [DEBUG] Check: 11:27:40 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:27:40] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:27:55] [DEBUG] Check: 11:27:55 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:27:55] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:28:10] [DEBUG] Check: 11:28:10 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:28:10] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:28:25] [DEBUG] Check: 11:28:25 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:28:25] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:28:40] [DEBUG] Check: 11:28:40 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:28:40] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:28:55] [DEBUG] Check: 11:28:55 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:28:55] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:29:10] [DEBUG] Check: 11:29:10 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:29:10] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:29:25] [DEBUG] Check: 11:29:25 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:29:25] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:29:40] [DEBUG] Check: 11:29:40 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:29:40] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:29:56] [DEBUG] Check: 11:29:56 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:29:56] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:30:11] [DEBUG] Check: 11:30:11 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:30:11] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:30:26] [DEBUG] Check: 11:30:26 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:30:26] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:30:41] [DEBUG] Check: 11:30:41 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:30:41] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:30:56] [DEBUG] Check: 11:30:56 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:30:56] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:31:11] [DEBUG] Check: 11:31:11 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:31:11] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:31:26] [DEBUG] Check: 11:31:26 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:31:26] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:31:41] [DEBUG] Check: 11:31:41 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:31:41] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:31:56] [DEBUG] Check: 11:31:56 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:31:56] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:32:11] [DEBUG] Check: 11:32:11 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:32:11] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:32:27] [DEBUG] Check: 11:32:27 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:32:27] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:32:42] [DEBUG] Check: 11:32:42 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:32:42] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:32:57] [DEBUG] Check: 11:32:57 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:32:57] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:33:12] [DEBUG] Check: 11:33:12 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:33:12] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:33:27] [DEBUG] Check: 11:33:27 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:33:27] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:33:42] [DEBUG] Check: 11:33:42 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:33:42] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:33:57] [DEBUG] Check: 11:33:57 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:33:57] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:34:12] [DEBUG] Check: 11:34:12 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:34:12] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:34:27] [DEBUG] Check: 11:34:27 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:34:27] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:34:42] [DEBUG] Check: 11:34:42 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:34:42] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:34:57] [DEBUG] Check: 11:34:57 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:34:57] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:35:13] [DEBUG] Check: 11:35:13 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:35:13] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:35:28] [DEBUG] Check: 11:35:28 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:35:28] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:35:43] [DEBUG] Check: 11:35:43 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:35:43] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:35:58] [DEBUG] Check: 11:35:58 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:35:58] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:36:13] [DEBUG] Check: 11:36:13 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:36:13] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:36:28] [DEBUG] Check: 11:36:28 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:36:28] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:36:43] [DEBUG] Check: 11:36:43 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:36:43] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:36:58] [DEBUG] Check: 11:36:58 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:36:58] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:37:13] [DEBUG] Check: 11:37:13 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:37:13] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:37:28] [DEBUG] Check: 11:37:28 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:37:28] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:37:43] [DEBUG] Check: 11:37:43 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:37:43] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:37:59] [DEBUG] Check: 11:37:59 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:37:59] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:38:14] [DEBUG] Check: 11:38:14 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:38:14] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:38:29] [DEBUG] Check: 11:38:29 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:38:29] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:38:44] [DEBUG] Check: 11:38:44 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:38:44] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:38:59] [DEBUG] Check: 11:38:59 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:38:59] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:39:14] [DEBUG] Check: 11:39:14 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:39:15] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:39:30] [DEBUG] Check: 11:39:30 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:39:30] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:39:45] [DEBUG] Check: 11:39:45 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:39:45] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:40:00] [DEBUG] Check: 11:40:00 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:40:00] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:40:15] [DEBUG] Check: 11:40:15 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:40:15] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:40:30] [DEBUG] Check: 11:40:30 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:40:31] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:40:46] [DEBUG] Check: 11:40:46 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:40:46] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:41:01] [DEBUG] Check: 11:41:01 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:41:01] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:41:16] [DEBUG] Check: 11:41:16 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:41:16] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:41:31] [DEBUG] Check: 11:41:31 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:41:31] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:41:46] [DEBUG] Check: 11:41:46 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:41:46] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:42:02] [DEBUG] Check: 11:42:02 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:42:02] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:42:17] [DEBUG] Check: 11:42:17 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:42:17] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:42:32] [DEBUG] Check: 11:42:32 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:42:32] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:42:47] [DEBUG] Check: 11:42:47 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:42:47] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:43:02] [DEBUG] Check: 11:43:02 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:43:02] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:43:17] [DEBUG] Check: 11:43:17 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:43:17] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:43:32] [DEBUG] Check: 11:43:32 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:43:32] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:43:47] [DEBUG] Check: 11:43:47 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:43:48] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:44:03] [DEBUG] Check: 11:44:03 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:44:03] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:44:18] [DEBUG] Check: 11:44:18 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:44:18] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:44:33] [DEBUG] Check: 11:44:33 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:44:33] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:44:48] [DEBUG] Check: 11:44:48 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:44:48] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:45:03] [DEBUG] Check: 11:45:03 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:45:03] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:45:18] [DEBUG] Check: 11:45:18 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:45:18] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:45:33] [DEBUG] Check: 11:45:33 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:45:33] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:45:48] [DEBUG] Check: 11:45:48 | Window: Active | Python: Running (PID: 25508)
+[2026-02-02 11:45:49] [DEBUG] PID tracking saved: WorkerPID=20252, PythonPID=25508
+[2026-02-02 11:46:04] [DEBUG] Check: 11:46:04 | Window: Inactive | Python: Running (PID: 25508)
+[2026-02-02 11:46:04] [INFO] End time reached - stopping processes...
+[2026-02-02 11:46:04] [INFO] Stopping Python process (PID: 25508)...
+[2026-02-02 11:46:06] [WARN] Forcefully terminating Python process...
+[2026-02-02 11:46:06] [SUCCESS] Python process terminated
+[2026-02-02 11:46:06] [INFO] Stopping worker process (PID: 20252)...
+[2026-02-02 11:46:08] [SUCCESS] Worker process exited gracefully
+[2026-02-02 11:46:09] [DEBUG] Removed PID tracking file
+[2026-02-02 11:46:09] [INFO] Stopped processes: Python, Worker
+[2026-02-02 11:46:14] [INFO] Validating worker output...
+[2026-02-02 11:46:14] [INFO] Validating face recognition output structure...
+[2026-02-02 11:46:14] [INFO] Validating folder structure for: TowerCPU_Process_MaskDetect_2026-02-02_10-45-49
+[2026-02-02 11:46:14] [DEBUG] Found subfolder: logs
+[2026-02-02 11:46:14] [DEBUG] Found subfolder: script_output
+[2026-02-02 11:46:14] [DEBUG] Metadata file is valid JSON
+[2026-02-02 11:46:14] [DEBUG] Metadata file size: 1.36 KB
+[2026-02-02 11:46:14] [DEBUG] Found 3 log files
+[2026-02-02 11:46:14] [DEBUG] completion_summary.txt size: 4.47 KB
+[2026-02-02 11:46:14] [DEBUG] python_output.txt size: 1491.26 KB
+[2026-02-02 11:46:14] [DEBUG] Latest run log: run_2026-02-02_10-45-49.log (3.08 KB)
+[2026-02-02 11:46:14] [DEBUG] Script output contains 2 items
+[2026-02-02 11:46:14] [DEBUG] Total folder size: 1.47 MB
+[2026-02-02 11:46:14] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-02 11:46:14] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-02 11:46:14] [SUCCESS]   - Path: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\logs-running\towerCPU\TowerCPU_Process_MaskDetect_2026-02-02_10-45-49
+[2026-02-02 11:46:14] [SUCCESS]   - Created: 02/02/2026 10:45:49
+[2026-02-02 11:46:14] [SUCCESS]   - Size: 1.47 MB
+[2026-02-02 11:46:14] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-02 11:46:14] [DEBUG] Configuration backed up to: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\logs-running\towerCPU\config_backup_20260202_114614.json
+[2026-02-02 11:46:14] [INFO] Preparing to send completion notifications to 2 recipient(s)...
+[2026-02-02 11:46:14] [DEBUG] Email credential loaded from C:\Users\cctv2scma\.face-recog\email-credential.xml
+[2026-02-02 11:46:14] [DEBUG] Found latest run log: run_2026-02-02_10-45-49.log
+[2026-02-02 11:46:14] [DEBUG] Found metadata.json
+[2026-02-02 11:46:14] [INFO] Sending emails in 2 different language(s)
+[2026-02-02 11:46:14] [INFO] Sending Bahasa email to: ikeepmypromiz@gmail.com
+[2026-02-02 11:46:16] [ERROR] Failed to send Bahasa email to 1 recipient(s): The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+[2026-02-02 11:46:16] [INFO] Sending English email to: faridraihan17@gmail.com
+[2026-02-02 11:46:18] [ERROR] Failed to send English email to 1 recipient(s): The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+[2026-02-02 11:46:18] [ERROR] All emails failed to send
+[2026-02-02 11:46:18] [WARN] Failed to send some or all completion emails, but process completed successfully.
+[2026-02-02 11:46:18] [SUCCESS] Face recognition pipeline completed successfully!
+[2026-02-02 11:46:18] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 11:46:18] [INFO] Cleaning up...
+[2026-02-02 11:46:18] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 13:13:14] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 13:13:14] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 13:13:14] [INFO] Start Time: 08:50
+[2026-02-02 13:13:14] [INFO] End Time: 16:46
+[2026-02-02 13:13:14] [INFO] Worker Script: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\maskDetect.ps1
+[2026-02-02 13:13:14] [INFO] Python Script: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-TowerCPU.py
+[2026-02-02 13:13:14] [INFO] Testing email configuration...
+[2026-02-02 13:13:14] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 13:13:14] [INFO] Configured languages: Bahasa, English
+[2026-02-02 13:13:14] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 13:13:14] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 13:13:14] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 13:13:14] [INFO] - SSL Enabled: True
+[2026-02-02 13:13:14] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 13:13:14] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 13:13:14] [SUCCESS] Email configuration valid
+[2026-02-02 13:13:14] [SUCCESS] Email configuration validated successfully
+[2026-02-02 13:13:14] [DEBUG] No PID tracking file found
+[2026-02-02 13:13:14] [DEBUG] Check: 13:13:14 | Window: Active | Python: Stopped
+[2026-02-02 13:13:14] [DEBUG] Check: 13:13:14 | Window: Active | Python: Stopped
+[2026-02-02 13:13:14] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 13:13:14] [DEBUG] Searching for Python process...
+[2026-02-02 13:13:14] [DEBUG] No Python process found matching criteria
+[2026-02-02 13:13:14] [INFO] Starting face recognition worker process...
+[2026-02-02 13:13:14] [SUCCESS] Worker process started (PID: 25436)
+[2026-02-02 13:13:14] [INFO] Waiting for Python process to start...
+[2026-02-02 13:13:14] [DEBUG] Searching for Python process...
+[2026-02-02 13:13:15] [DEBUG] No Python process found matching criteria
+[2026-02-02 13:13:17] [DEBUG] Searching for Python process...
+[2026-02-02 13:13:18] [SUCCESS] Found Python process with our script: PID=26996
+[2026-02-02 13:13:18] [SUCCESS] Python process found (PID: 26996)
+[2026-02-02 13:13:18] [DEBUG] PID tracking saved: WorkerPID=25436, PythonPID=26996
+[2026-02-02 13:13:18] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 13:13:18] [DEBUG] PID tracking saved: WorkerPID=25436, PythonPID=26996
+[2026-02-02 13:13:33] [DEBUG] Check: 13:13:33 | Window: Active | Python: Running (PID: 26996)
+[2026-02-02 13:13:33] [DEBUG] PID tracking saved: WorkerPID=25436, PythonPID=26996
+[2026-02-02 13:13:49] [DEBUG] Check: 13:13:49 | Window: Active | Python: Running (PID: 26996)
+[2026-02-02 13:13:49] [DEBUG] PID tracking saved: WorkerPID=25436, PythonPID=26996
+[2026-02-02 13:14:04] [DEBUG] Check: 13:14:04 | Window: Active | Python: Running (PID: 26996)
+[2026-02-02 13:14:04] [DEBUG] PID tracking saved: WorkerPID=25436, PythonPID=26996
+[2026-02-02 13:14:19] [DEBUG] Searching for Python process...
+[2026-02-02 13:14:19] [DEBUG] No Python process found matching criteria
+[2026-02-02 13:14:19] [DEBUG] Check: 13:14:19 | Window: Active | Python: Stopped
+[2026-02-02 13:14:19] [DEBUG] Check: 13:14:19 | Window: Active | Python: Stopped
+[2026-02-02 13:14:19] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 13:14:19] [DEBUG] Searching for Python process...
+[2026-02-02 13:14:19] [DEBUG] No Python process found matching criteria
+[2026-02-02 13:14:19] [INFO] Starting face recognition worker process...
+[2026-02-02 13:14:19] [SUCCESS] Worker process started (PID: 18184)
+[2026-02-02 13:14:19] [INFO] Waiting for Python process to start...
+[2026-02-02 13:14:19] [DEBUG] Searching for Python process...
+[2026-02-02 13:14:19] [DEBUG] No Python process found matching criteria
+[2026-02-02 13:14:21] [DEBUG] Searching for Python process...
+[2026-02-02 13:14:21] [SUCCESS] Found Python process with our script: PID=3176
+[2026-02-02 13:14:21] [SUCCESS] Python process found (PID: 3176)
+[2026-02-02 13:14:21] [DEBUG] PID tracking saved: WorkerPID=18184, PythonPID=3176
+[2026-02-02 13:14:21] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 13:14:21] [DEBUG] PID tracking saved: WorkerPID=18184, PythonPID=3176
+[2026-02-02 13:14:34] [INFO] Cleaning up...
+[2026-02-02 13:14:34] [INFO] Stopping Python process (PID: 3176)...
+[2026-02-02 13:14:36] [WARN] Forcefully terminating Python process...
+[2026-02-02 13:14:36] [SUCCESS] Python process terminated
+[2026-02-02 13:14:36] [INFO] Stopping worker process (PID: 18184)...
+[2026-02-02 13:14:38] [SUCCESS] Worker process exited gracefully
+[2026-02-02 13:14:38] [DEBUG] Removed PID tracking file
+[2026-02-02 13:14:38] [INFO] Stopped processes: Python, Worker
+[2026-02-02 13:14:38] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 13:14:58] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 13:14:58] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 13:14:58] [INFO] Start Time: 08:50
+[2026-02-02 13:14:58] [INFO] End Time: 13:16
+[2026-02-02 13:14:58] [INFO] Worker Script: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\maskDetect.ps1
+[2026-02-02 13:14:58] [INFO] Python Script: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-TowerCPU.py
+[2026-02-02 13:14:58] [INFO] Testing email configuration...
+[2026-02-02 13:14:59] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 13:14:59] [INFO] Configured languages: Bahasa, English
+[2026-02-02 13:14:59] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 13:14:59] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 13:14:59] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 13:14:59] [INFO] - SSL Enabled: True
+[2026-02-02 13:14:59] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 13:14:59] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 13:14:59] [SUCCESS] Email configuration valid
+[2026-02-02 13:14:59] [SUCCESS] Email configuration validated successfully
+[2026-02-02 13:14:59] [DEBUG] No PID tracking file found
+[2026-02-02 13:14:59] [DEBUG] Check: 13:14:59 | Window: Active | Python: Stopped
+[2026-02-02 13:14:59] [DEBUG] Check: 13:14:59 | Window: Active | Python: Stopped
+[2026-02-02 13:14:59] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 13:14:59] [DEBUG] Searching for Python process...
+[2026-02-02 13:14:59] [DEBUG] No Python process found matching criteria
+[2026-02-02 13:14:59] [INFO] Starting face recognition worker process...
+[2026-02-02 13:14:59] [SUCCESS] Worker process started (PID: 26724)
+[2026-02-02 13:14:59] [INFO] Waiting for Python process to start...
+[2026-02-02 13:14:59] [DEBUG] Searching for Python process...
+[2026-02-02 13:14:59] [DEBUG] No Python process found matching criteria
+[2026-02-02 13:15:01] [DEBUG] Searching for Python process...
+[2026-02-02 13:15:03] [SUCCESS] Found Python process with our script: PID=8980
+[2026-02-02 13:15:03] [SUCCESS] Python process found (PID: 8980)
+[2026-02-02 13:15:03] [DEBUG] PID tracking saved: WorkerPID=26724, PythonPID=8980
+[2026-02-02 13:15:03] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 13:15:03] [DEBUG] PID tracking saved: WorkerPID=26724, PythonPID=8980
+[2026-02-02 13:15:18] [DEBUG] Check: 13:15:18 | Window: Active | Python: Running (PID: 8980)
+[2026-02-02 13:15:18] [DEBUG] PID tracking saved: WorkerPID=26724, PythonPID=8980
+[2026-02-02 13:15:33] [DEBUG] Check: 13:15:33 | Window: Active | Python: Running (PID: 8980)
+[2026-02-02 13:15:33] [DEBUG] PID tracking saved: WorkerPID=26724, PythonPID=8980
+[2026-02-02 13:15:48] [DEBUG] Check: 13:15:48 | Window: Active | Python: Running (PID: 8980)
+[2026-02-02 13:15:48] [DEBUG] PID tracking saved: WorkerPID=26724, PythonPID=8980
+[2026-02-02 13:16:03] [DEBUG] Check: 13:16:03 | Window: Inactive | Python: Running (PID: 8980)
+[2026-02-02 13:16:03] [INFO] End time reached - stopping processes...
+[2026-02-02 13:16:03] [INFO] Stopping Python process (PID: 8980)...
+[2026-02-02 13:16:05] [WARN] Forcefully terminating Python process...
+[2026-02-02 13:16:05] [SUCCESS] Python process terminated
+[2026-02-02 13:16:06] [INFO] Stopping worker process (PID: 26724)...
+[2026-02-02 13:16:08] [SUCCESS] Worker process exited gracefully
+[2026-02-02 13:16:08] [DEBUG] Removed PID tracking file
+[2026-02-02 13:16:08] [INFO] Stopped processes: Python, Worker
+[2026-02-02 13:16:13] [INFO] Validating worker output...
+[2026-02-02 13:16:13] [INFO] Validating face recognition output structure...
+[2026-02-02 13:16:13] [INFO] Validating folder structure for: TowerCPU_Process_MaskDetect_2026-02-02_13-14-59
+[2026-02-02 13:16:13] [DEBUG] Found subfolder: logs
+[2026-02-02 13:16:13] [DEBUG] Found subfolder: script_output
+[2026-02-02 13:16:13] [DEBUG] Metadata file is valid JSON
+[2026-02-02 13:16:13] [DEBUG] Metadata file size: 1.36 KB
+[2026-02-02 13:16:13] [DEBUG] Found 3 log files
+[2026-02-02 13:16:13] [DEBUG] completion_summary.txt size: 4.47 KB
+[2026-02-02 13:16:13] [DEBUG] python_output.txt size: 55.29 KB
+[2026-02-02 13:16:13] [DEBUG] Latest run log: run_2026-02-02_13-14-59.log (3.08 KB)
+[2026-02-02 13:16:13] [DEBUG] Script output contains 2 items
+[2026-02-02 13:16:13] [DEBUG] Total folder size: 0.06 MB
+[2026-02-02 13:16:13] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-02 13:16:13] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-02 13:16:13] [SUCCESS]   - Path: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\logs-running\towerCPU\TowerCPU_Process_MaskDetect_2026-02-02_13-14-59
+[2026-02-02 13:16:13] [SUCCESS]   - Created: 02/02/2026 13:14:59
+[2026-02-02 13:16:13] [SUCCESS]   - Size: 0.06 MB
+[2026-02-02 13:16:13] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-02 13:16:13] [DEBUG] Configuration backed up to: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\logs-running\towerCPU\config_backup_20260202_131613.json
+[2026-02-02 13:16:13] [INFO] Preparing to send completion notifications to 2 recipient(s)...
+[2026-02-02 13:16:13] [DEBUG] Email credential loaded from C:\Users\cctv2scma\.face-recog\email-credential.xml
+[2026-02-02 13:16:13] [DEBUG] Found latest run log: run_2026-02-02_13-14-59.log
+[2026-02-02 13:16:13] [DEBUG] Found metadata.json
+[2026-02-02 13:16:13] [INFO] Sending emails in 2 different language(s)
+[2026-02-02 13:16:13] [INFO] Sending English email to: faridraihan17@gmail.com
+[2026-02-02 13:16:15] [ERROR] Failed to send English email to 1 recipient(s): The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+[2026-02-02 13:16:15] [INFO] Sending Bahasa email to: ikeepmypromiz@gmail.com
+[2026-02-02 13:16:17] [ERROR] Failed to send Bahasa email to 1 recipient(s): The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.7.0 Authentication Required. For more information, go to
+[2026-02-02 13:16:17] [ERROR] All emails failed to send
+[2026-02-02 13:16:17] [WARN] Failed to send some or all completion emails, but process completed successfully.
+[2026-02-02 13:16:17] [SUCCESS] Face recognition pipeline completed successfully!
+[2026-02-02 13:16:17] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 13:16:17] [INFO] Cleaning up...
+[2026-02-02 13:16:17] [INFO] === Face Recognition Monitor Stopped ===

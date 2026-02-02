@@ -18,8 +18,8 @@ class BaseProcessor:
         self.config = config
         
         # Initialize performance management system
-        from face_recog_modular23.streaming.performance_manager import PerformanceManager
-        from face_recog_modular23.processing.scene_analysis import ContextAwareDynamicScaling
+        from ..streaming.performance_manager import PerformanceManager
+        from ..processing.scene_analysis import ContextAwareDynamicScaling
         
         self.performance_manager = PerformanceManager(config)
         self.context_scaling = ContextAwareDynamicScaling(config)
