@@ -1,0 +1,13 @@
+==================================================
+RUN STARTED: 2026-01-31 11:05:45
+Run Folder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-01-31_11-05-45
+PowerShell Script: maskDetect.ps1
+Virtual Environment: D:\RaihanFarid\Dokumen\faceRecog\.venv
+Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+Arguments: --multi-source
+Number of arguments: 1
+==================================================
+
+Execution started at: 2026-01-31 11:05:45
+"D:\RaihanFarid\Dokumen\faceRecog\.venv\Scripts\python.exe" "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py" --multi-source
+

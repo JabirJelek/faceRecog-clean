@@ -1,0 +1,13 @@
+{
+  "arguments": "--multi-source",
+  "arguments_count": 1,
+  "python_script": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\patterns\\algorithm\\entry_multi-USED-Magick.py",
+  "run_folder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\Magick_Process_MaskDetect_2026-01-31_11-05-30",
+  "start_time": "2026-01-31 11:05:30",
+  "powershell_script": "maskDetect.ps1",
+  "run_id": "2026-01-31_11-05-30",
+  "virtual_env": "D:\\RaihanFarid\\Dokumen\\faceRecog\\.venv",
+  "end_time": "2026-01-31 11:05:30",
+  "duration": "00:00:00",
+  "exit_code": 2
+}

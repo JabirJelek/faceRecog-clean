@@ -1,0 +1,58 @@
+mask-recog/
+├── __init__.py
+├── config/
+│   ├── __init__.py
+│   ├── config_manager.py               # ConfigManager class
+│   └── validation_rules.py             # Configuration validation rules
+│ 
+├── processing/
+│   ├── __init__.py
+│   ├── face_detection.py               # Face detection related classes
+│   ├── quality_assessment.py           # FaceQualityAssessor, AdaptiveThresholdManager
+│   ├── temporal_processing.py          # TemporalFusion, MultiScaleFaceProcessor
+│   └── scene_analysis.py               # SceneContextAnalyzer, ContextAwareDynamicScaling
+│ 
+├── recognition/
+│   ├── __init__.py
+│   ├── base_system.py                  # FaceRecognitionSystem
+│   ├── voyager_system.py               # VoyagerFaceRecognitionSystem, VoyagerPerformanceMonitor
+│   ├── robust_system.py                # RobustFaceRecognitionSystem
+│   └── chroma_system.py                # ChromaFaceRecognitionSystem
+│ 
+├── alerting/
+│   ├── __init__.py
+│   ├── alert_manager.py                # AlertManager, DurationAwareAlertManager
+│   └── voice_interface.py              # Voice alert functionality
+│ 
+├── tracking/
+│   ├── __init__.py
+│   ├── face_tracker.py                 # SimpleFaceTracker
+│   ├── fairness_controller.py          # FairnessController
+│   ├── progressive_mask_detector.py    # ProgressiveMaskDetector
+│   └── tracking_manager.py             # TrackingManager
+│ 
+├── visualization/
+│   ├── __init__.py
+│   ├── display_resizer.py              # DisplayResizer
+│   └── annotation_renderer.py          # Drawing functions for results
+│ 
+├── streaming/
+│   ├── __init__.py
+│   ├── base_processor.py               # BaseProcessor
+│   ├── control_handler.py              # ControlHandler
+│   ├── frame_utils.py                  # FrameUtils
+│   ├── multi_realtime.py               # MultiSourceRealTimeProcessor
+│   ├── performance_manager.py          # PerformanceManager
+│   ├── realtime_processor.py           # RealTimeProcessor
+│   ├── stream_manager.py               # Stream initialization and management
+│   └── realtime_processor_headless.py  # RealTimeProcessorHeadless
+│ 
+├── logging/
+│   ├── __init__.py
+│   ├── data_logger.py                  # CSV logging functionality
+│   └── image_logger.py                 # Image logging functionality
+│ 
+└── utils/
+    ├── __init__.py
+    ├── common_types.py                 # Type definitions
+    └── performance_utils.py            # Performance monitoring utilities

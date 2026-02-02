@@ -1,12 +1,16 @@
-# main/multi_example.py
+# main/entry_multi.py
 
- 
-from face_recog_modular23 import create_system, ConfigManager
-from face_recog_modular23.streaming.multi_realtime import MultiSourceRealTimeProcessor
- 
-from face_recog_modular3 import create_system, ConfigManager
-from face_recog_modular3.streaming.universal_processor import UniversalStreamProcessor
- 
+
+import sys
+import os
+from pathlib import Path
+
+# Get the project root (go up 2 levels from current file)
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.append(str(PROJECT_ROOT))
+
+from structure import create_system, ConfigManager
+from structure.streaming.multi_realtime import MultiSourceRealTimeProcessor
 import time
 import os
 from typing import Dict
@@ -17,12 +21,8 @@ def test_multi_stream_connections(sources_config: Dict[str, Dict]) -> bool:
     """Test if we can connect to all streams before starting main processing"""
     print(f"\n🔍 Testing multi-stream connections for {len(sources_config)} sources...")
     
- 
     # FIXED: Use the correct module name
-    from face_recog_modular23.streaming.stream_manager import StreamManager
- 
-    from  face_recog_modular3.streaming.stream_manager import StreamManager
- 
+    from structure.streaming.stream_manager import StreamManager
     
     successful_sources = []
     failed_sources = []
@@ -213,53 +213,130 @@ def get_default_config():
     """Return the complete default configuration"""
     return {
         # ========== MODEL PATHS ==========        
- 
         'detection_model_path': r'A:\SCMA\3-APD\fromAraya\Computer-Vision-CV\3.1_FaceRecog\run_py\modular\0_0_model\yolov12m-face.pt',
-        'embeddings_db_path': r'A:\SCMA\3-APD\fromAraya\Computer-Vision-CV\3.1_FaceRecog\run_py\modular\0_dataset\arcface_person_512.json',
-        'mask_model_path': r'A:\SCMA\3-APD\fromAraya\Computer-Vision-CV\3.1_FaceRecog\run_py\modular\0_0_model\md_base3.onnx',
+        'embeddings_db_path': r'A:\SCMA\3-APD\fromAraya\Computer-Vision-CV\3.1_FaceRecog\run_py\modular\0_dataset\person_512.json',
+        'mask_model_path': r'A:\SCMA\3-APD\fromAraya\Computer-Vision-CV\3.1_FaceRecog\run_py\modular\0_0_model\mask_detector_cus4.onnx',
         
                                                 # PLEASE FIX THE STABILITY OF THE VERIFICATION 
                                                 # VALUE BEFORE TRYING TO CHANGE THE TYPE OF mask MODEL USED.        
- 
-        'detection_model_path': r'D:\RaihanFarid\Dokumen\Object Detection\3.1_FaceRecog\run_py\modular\0_0_model\yolov12m-face.pt',
-        'embeddings_db_path': r'D:\RaihanFarid\Dokumen\Object Detection\3.1_FaceRecog\run_py\modular\0_dataset\arcface_person_512.json',
-        'mask_model_path': r'D:\RaihanFarid\Dokumen\Object Detection\3.1_FaceRecog\run_py\modular\0_0_model\mask_detector_cus5.onnx',
- 
         
         # ========== CORE DETECTION PARAMETERS ==========
         'detection_confidence': 0.5,
         'recognition_threshold': 0.8,
- 
         'mask_detection_threshold': 0.6,  # INCREASED from 0.5 - makes mask detection more conservative
         'detection_iou': 0.3,
         'min_face_size': 10, # Min face height in pixels
- 
-        'mask_detection_threshold': 0.6,
-        'detection_iou': 0.3,
-        'min_face_size': 10,
- 
         'max_faces_per_frame': 15,
         'enable_person_detection': True,
         'person_detection_confidence_threshold': 0.4,        
         
-        # ========== PROCESSING PARAMETERS ==========
-        'processing_interval': 7,
-        'buffer_size': 200,
+    # ========== FRAME PROCESSING CONFIGURATION ==========
+    'frame_processing': {
+        # Basic processing parameters
+        'processing_width': 640,
+        'processing_height': 480,
         'min_processing_scale': 0.3,
         'max_processing_scale': 4.5,
-        'adaptive_check_interval': 30,
-        'default_processing_width': 1280,
-        'default_processing_height': 1080,
         'default_processing_scale': 1.0,
+        
+        # Color and normalization settings
+        'convert_to_rgb': True,  # Convert BGR to RGB for models that expect RGB
+        'normalize_values': False,  # Normalize pixel values to [0, 1]
+        'apply_mean_std_normalization': False,  # Apply ImageNet mean/std normalization
+        
+        # Normalization values (ImageNet standard)
+        'normalization_mean': [0.485, 0.456, 0.406],
+        'normalization_std': [0.229, 0.224, 0.225],
+        
+        # Debug and validation
+        'debug_mode': False,
+        'validate_frames': True,  # Enable frame validation
+        'frame_validation_threshold': 0.1,  # Reject frames with brightness < 10% or > 90%
+        
+        # Frame statistics collection
+        'collect_frame_stats': True,
+        'stats_update_interval': 30.0,  # Update stats every 30 seconds
+        
+        # Contrast enhancement
+        'contrast_enhancement': {
+            'enabled': True,
+            'method': 'clahe',  # 'clahe', 'histogram', or 'none'
+            'clahe_clip_limit': 3.0,
+            'clahe_grid_size': 8,
+        },
+        
+        # Region of interest (ROI) extraction
+        'roi_extraction': {
+            'enabled': True,
+            'default_padding': 10,  # Pixels to add around bbox
+            'min_roi_size': 32,  # Minimum ROI size in pixels
+        },
+        
+        # Multi-source composite settings
+        'composite_creation': {
+            'grid_target_width': 480,
+            'grid_target_height': 360,
+            'horizontal_target_height': 360,
+            'vertical_target_width': 480,
+            'maintain_aspect_ratio': True,
+            'max_composite_width': 1920,
+            'max_composite_height': 1080,
+        },
+        
+        # Frame buffering and queuing
+        'frame_buffer': {
+            'buffer_size': 3,
+            'queue_timeout': 0.1,  # seconds
+            'max_queue_size': 100,
+            'drop_old_frames': True,  # Drop old frames when queue is full
+        },
+        
+        # Frame quality assessment
+        'quality_assessment': {
+            'enabled': True,
+            'min_brightness': 20.0,
+            'max_brightness': 235.0,
+            'min_contrast': 10.0,
+            'blur_threshold': 100.0,  # Laplacian variance threshold
+        },
+        
+        # Performance optimization
+        'performance': {
+            'use_half_precision': False,  # Use float16 for processing
+            'enable_caching': True,
+            'cache_size': 10,  # Number of frames to cache
+            'optimize_for_size': True,  # Optimize memory usage
+        },
+        
+        # Frame preprocessing pipeline
+        'preprocessing_pipeline': [
+            'validate_frame',
+            'resize_for_processing',
+            'convert_color_space',
+            'enhance_contrast',
+            'normalize_if_needed'
+        ],
+        
+        # Color space conversion options
+        'color_space_conversion': {
+            'input_format': 'bgr',  # OpenCV default
+            'output_format': 'rgb',  # Most models expect RGB
+            'conversion_method': 'opencv',  # 'opencv', 'numpy', or 'manual'
+        },
+        
+        # Dynamic scaling parameters
+        'dynamic_scaling': {
+            'enabled': True,
+            'min_face_size': 50,  # Minimum face size for scaling decisions
+            'max_face_size': 300,  # Maximum face size for scaling decisions
+            'scale_adjustment_step': 0.1,
+            'stability_threshold': 0.8,  # Confidence threshold for stable scaling
+        },
+    },
         
         # ========== CCTV CONFIGURATION ==========
         'cctv_name': 'Default',  
- 
-        # ========== UNIVERSAL PROCESSOR CONFIGURATION ==========
-        'multi_source_mode': False,  # Will be set based on command line argument
-        'headless_mode': False,      # Will be set based on command line argument
         
- 
         # ========== MULTI-SOURCE DISPLAY CONFIGURATION ==========
         'display_layout': 'grid',  # 'grid', 'horizontal', 'vertical'
         'max_display_sources': 4,
@@ -352,10 +429,7 @@ def get_default_config():
             
             # ByteTrack person tracking configuration
             'enable_person_tracking': True,
- 
             'enabled':True,
-           'enabled': True,
- 
             'person_track_confidence': 0.55,
             'person_track_max_age': 90,
             'person_iou_threshold': 0.3,
@@ -366,23 +440,7 @@ def get_default_config():
             
             # 🎯 Progressive mask detection configuration
             'progressive_mask': {          
- 
                 
-                # Buffer and temporal parameters
-                'mask_buffer_size': 200,
-                'min_mask_frames': 10,
-                'occlusion_timeout': 3.0,
-                
-                # Confidence and stability thresholds  
-                'mask_confidence_threshold': 0.6,
-                'mask_consistency_threshold': 0.6,
-                
-                # Require higher stability before committing
-                'min_stability_to_commit': 0.15,
-                
-                # State holding parameters
-                'state_hold_duration': 10.0,
- 
                 # Buffer and temporal parameters
                 'mask_buffer_size': 200,
                 'min_mask_frames': 2,
@@ -393,11 +451,10 @@ def get_default_config():
                 'mask_consistency_threshold': 0.1,
                 
                 # Require higher stability before committing
-                'min_stability_to_commit': 0.1,
+                'min_stability_to_commit': 0.15,
                 
                 # State holding parameters
                 'state_hold_duration': 15.0,
- 
                 'verification_grace_ratio': 0.1,
                 
                 # Spatial consistency parameters
@@ -413,11 +470,7 @@ def get_default_config():
                 'initial_mask_weight': 0.2,
                 'initial_no_mask_weight': 0.2,
                 
- 
                 # Weight adjustment parameters (NEW - optional to expose)
- 
-                # Weight adjustment parameters
- 
                 'weight_increase_high_conf': 0.4,
                 'weight_decrease_low_conf': 0.3,
                 'weight_increase_opposite': 0.1,
@@ -425,25 +478,17 @@ def get_default_config():
                 'confidence_smoothing_factor': 0.3,
                 'stability_smoothing_factor': 0.2,                
             },
- 
+            
             # 🎯 **MODIFIED** Violation verification configuration
             'violation_verification_enabled': True,
             'min_violation_duration': 1,       # DECREASED from 20.0 - quicker to detect violations
-            'min_violation_frames': 5,           # DECREASED from 35 - quicker to detect violations
+            'min_violation_frames': 1,           # DECREASED from 35 - quicker to detect violations
             'violation_confidence_threshold': 0.15, # DECREASED from 0.9 - more sensitive to violations
- 
-            # Violation verification configuration
-            'violation_verification_enabled': True,
-            'min_violation_duration': 1,
-            'min_violation_frames': 1,
-            'violation_confidence_threshold': 0.15,
- 
         },    
         
         # ========== VIOLATION VERIFICATION CONFIGURATION ==========
         'violation_verification': {
             'enabled': True,
- 
             'min_duration_seconds': 0.1,           # DECREASED from 30 - faster verification
             'min_frames': 1 ,                     # DECREASED from 50 - faster verification
             'confidence_threshold': 0.1,         # DECREASED from 0.85 - more sensitive
@@ -455,21 +500,7 @@ def get_default_config():
             'verification_levels': {
                 'low': {'duration': 1.5, 'frames': 1},      # Quicker initial detection
                 'medium': {'duration': 2.0, 'frames': 2},  # Medium confidence
-                'high': {'duration': 3.0, 'frames': 3},    # High confidence (verified)
- 
-            'min_duration_seconds': 0.1,
-            'min_frames': 1,
-            'confidence_threshold': 0.1,
-            'progressive_verification': True,
-            'log_unverified_violations': True,
-            'unverified_log_cooldown': 10,
-            'false_negative_monitoring': True,
-            # Multi-level verification
-            'verification_levels': {
-                'low': {'duration': 1.5, 'frames': 1},
-                'medium': {'duration': 2.0, 'frames': 2},
-                'high': {'duration': 3.0, 'frames': 3}
- 
+                'high': {'duration': 3.0, 'frames': 3}    # High confidence (verified)
             }
         },  
                 
@@ -486,11 +517,7 @@ def get_default_config():
         'server_endpoint': 'https://vps.casda.my.id/accounting/public/api/submit_ai_detection',
         'server_push_cooldown': 5,
         'server_timeout': 10,
- 
-        'server_retry_attempts': 1,
- 
         'server_retry_attempts': 10,
- 
         'server_retry_delay': 2,
         
         # ========== IMAGE RESIZE CONFIGURATION ==========
@@ -502,33 +529,19 @@ def get_default_config():
         # ========== ALERT CONFIGURATION ==========
         'enable_voice_alerts': True,
         'alert_server_url': "https://vps.casda.my.id/actions/a_notifikasi_suara_speaker.php",
-  
         'alert_cooldown_seconds': 15,            # DECREASED from 20 - more responsive alerts
         'min_violation_frames': 1,              # DECREASED from 20 - more sensitive
         'min_violation_seconds': 1,              # DECREASED from 12 - faster alerts
         'max_gap_frames': 10,                    # INCREASED from 8 - more tolerant to gaps
- 
-        'alert_cooldown_seconds': 15,
-        'min_violation_frames': 1,
-        'min_violation_seconds': 1,
-        'max_gap_frames': 10,
-  
         'alert_language': 'id',
         'alert_style': 'formal',
         'enable_individual_alerts': True,
         'enable_group_alerts': True,
- 
         'alert_timeout_seconds': 2,              # DECREASED from 3 - faster alert processing
         # 🆕 Modified alert verification requirements
         'alert_verification_required': True,
         'min_alert_confidence': 0.85,            # DECREASED from 0.9 - more sensitive alerts
         'alert_buffer_size': 100,                 # DECREASED from 25 - faster alert decisions
- 
-        'alert_timeout_seconds': 2,
-        'alert_verification_required': True,
-        'min_alert_confidence': 0.85,
-        'alert_buffer_size': 100,
- 
         
         # ========== STREAM MANAGEMENT CONFIGURATION ==========
         'stream_manager': {
@@ -580,10 +593,7 @@ def get_default_config():
         'base64_quality': 50,
         
         # ========== SYSTEM MODE ==========
- 
         'headless_mode': False,
- 
- 
         'use_gpu': False,
         'gpu_device': 0,
         
@@ -604,65 +614,55 @@ def get_default_config():
         }
     }
     
-    def get_advanced_sources_config():
-        """Return advanced sources configuration with parameters"""
-        return {
-            '1': {
-    
-                'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/501',
-                'description': 'Ruang Lab',
-                'priority': 'medium',
-                'processing_scale': 1,
-                'buffer_size': 100,
-                'cctv_name':None,            
-            },
-            
-            
-            # '2': {
-            #     'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/601',
-            #     'description': 'Area Produksi',
-            #     'priority': 'medium',
-            #     'processing_scale':1,            
-            #     'buffer_size': 100,
-            #     'cctv_name':None,
-            # },
-            
-            # '3': {
-            #     'url': 'rtsp://admin:admin@192.168.110.124:1935',
-            #     'description': 'Rtsp HP',
-            #     'priority': 'medium',
-            #     'processing_scale':1,            
-            #     'buffer_size': 100,
-            #     'cctv_name':None,
-            # },
-            
-            # '4': {
-            #     'url': 'rtsp://admin:admin888@192.168.110.36:554/Streaming/Channels/601',
-            #     'description': 'Rtsp HP',
-            #     'priority': 'medium',
-            #     'processing_scale':1,            
-            #     'buffer_size': 100,
-            #     'cctv_name':None,
-            # },                
-                '2':{
-                'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/601',
-                'description': 'Dekat meja IT',
-                'priority': 'low',
-                'processing_scale': 1,
-                'buffer_size': 100,
-                'cctv_name': None,            
-            },
-            
-            '3': {
-                'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/501',
-                'description': 'Dekat meja bu Dyah',
-                'priority': 'medium',
-                'processing_scale': 1,            
-                'buffer_size': 100,
-                'cctv_name': None,
-            },
-    
-        }
+def get_advanced_sources_config():
+    """Return advanced sources configuration with parameters"""
+    return {
+        # '1': {
+        #     'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/601',
+        #     'description': 'Dekat meja IT',
+        #     'priority': 'low',
+        #     'processing_scale': 1,
+        #     'buffer_size': 100,
+        #     'cctv_name':None,            
+        # },
+        
+        
+        # '2': {
+        #     'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/501',
+        #     'description': 'Dekat meja bu Dyah',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },
+        
+        # '3': {
+        #     'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/101',
+        #     'description': 'Atas Server Gedangan',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },
+        
+        # '4': {
+        #     'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/601',
+        #     'description': 'Ruang Produksi',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },                
+        
+        '5': {
+            'url': '0',
+            'description': 'Main Camera',
+            'priority': 'medium',
+            'processing_scale':1,            
+            'buffer_size': 100,
+            'cctv_name':None,
+        },           
+    }
         
 def load_custom_config(config_path: str = None) -> Dict:
     """Load custom configuration from file if provided"""
@@ -764,15 +764,37 @@ def print_verification_summary(processor):
             print(f"   Currently Verified: {aggregate.get('currently_verified', 0)}")
             
             # Calculate rates
+            # Calculate rates - SIMPLIFIED CLEAR VERSION
             total_detected = max(1, aggregate.get('total_detected', 1))
-            verification_rate = (aggregate.get('total_verified', 0) / total_detected) * 100
-            rejection_rate = (aggregate.get('total_rejected', 0) / total_detected) * 100
-            prevention_rate = (aggregate.get('false_positives_prevented', 0) / total_detected) * 100
+            total_verified = aggregate.get('total_verified', 0)
+            total_rejected = aggregate.get('total_rejected', 0)
+            false_positives_prevented = aggregate.get('false_positives_prevented', 0)
+            
+            print(f"\n📈 VERIFICATION SYSTEM METRICS:")
+            
+            # 1. What percentage of detections were verified?
+            verification_success_rate = (total_verified / total_detected) * 100
+            print(f"   Verified Detections: {verification_success_rate:.1f}%")
+            
+            # 2. What percentage of detections were rejected?
+            rejection_rate = (total_rejected / total_detected) * 100
+            print(f"   Rejected Detections: {rejection_rate:.1f}%")
+            
+            # 3. Of the rejected detections, how many were false positives?
+            if total_rejected > 0:
+                false_positive_catch_rate = (false_positives_prevented / total_rejected) * 100
+                print(f"   False Positives Caught: {false_positive_catch_rate:.1f}%")
+            
+            # 4. Overall system accuracy (if we assume verified = correct)
+            total_decisions = total_verified + total_rejected
+            if total_decisions > 0:
+                accuracy = ((total_verified + false_positives_prevented) / total_decisions) * 100
+                print(f"   System Accuracy: {accuracy:.1f}%")
             
             print(f"\n📈 VERIFICATION RATES:")
-            print(f"   Verification Rate: {verification_rate:.1f}%")
+            print(f"   Verification Rate: {verification_success_rate:.1f}%")
             print(f"   Rejection Rate: {rejection_rate:.1f}%")
-            print(f"   False Positive Prevention Rate: {prevention_rate:.1f}%")
+            print(f"   False Positive Prevention Rate: {false_positives_prevented:.1f}%")
             
             # Per-source stats
             per_source = stats.get('per_source', {})
@@ -823,7 +845,6 @@ def main():
     parser = argparse.ArgumentParser(description='Run modular face recognition system')
     parser.add_argument('--config', type=str, help='Path to custom configuration JSON file')
     parser.add_argument('--multi-source', action='store_true', help='Enable multi-camera processing')
-    parser.add_argument('--headless', action='store_true', help='Run in headless mode (no display windows)')
     parser.add_argument('--sources-config', type=str, help='Path to multi-source configuration JSON file')
     parser.add_argument('--camera', type=str, default='0', help='Camera source (default: 0)')
     parser.add_argument('--rtsp', type=str, help='RTSP stream URL')
@@ -845,13 +866,6 @@ def main():
     if args.no_server_push:
         config['server_push_enabled'] = False
         print("📤 Server push disabled via command line")
-    
-    # Determine headless mode
-    headless_mode = args.headless or config.get('headless_mode', False)
-    print(f"🎯 Mode: {'HEADLESS' if headless_mode else 'WINDOWED'}")
-    
-    # Determine multi-source mode
-    config['multi_source_mode'] = args.multi_source
     
     # Print system information
     print_system_info(config)
@@ -896,7 +910,6 @@ def main():
             return
     else:
         # Single source mode
- 
         #camera_source = args.camera
         rtsp_source = args.rtsp
 
@@ -904,24 +917,21 @@ def main():
         print(f"CURRENTLY DISABLED!")
         #print(f"   Camera Source: {camera_source}")
         print(f"   RTSP Source: {rtsp_source}")
- 
-        if args.rtsp:
-            source_url = args.rtsp
-            source_type = "RTSP"
-        else:
-            source_url = args.camera
-            source_type = "Camera"
- 
         
-        print(f"\n📹 Single Source Mode:")
-        print(f"   {source_type} Source: {source_url}")
-        
-        # For single source, pass the URL directly
-        sources_config = source_url
+        # For single source, create a sources_config with one entry
+        sources_config = {
+            'main_camera': {
+                'url': rtsp_source,
+                'description': 'Main Camera',
+                'priority': 'high',
+                'processing_scale': 1.0,
+                'buffer_size': 3,
+                'cctv_name': args.cctv_name or config.get('cctv_name', 'Main-Camera')
+            }
+        }
         
         # Test single stream connection
-        test_config = {'main_camera': {'url': source_url}} if isinstance(source_url, str) else source_url
-        if not test_multi_stream_connections(test_config if isinstance(test_config, dict) else {'main': {'url': test_config}}):
+        if not test_multi_stream_connections(sources_config):
             print("❌ Stream connection test failed.")
             return
     
@@ -951,7 +961,7 @@ def main():
         print("🔄 Falling back to CPU mode...")
         config['use_gpu'] = False
         face_system = create_system(config, system_type="robust")
- 
+    
     # Apply multi-source specific configurations
     multi_source_config = {
         'display_layout': config.get('display_layout', 'grid'),
@@ -997,31 +1007,7 @@ def main():
     print("🎯 MULTI-SOURCE SYSTEM CONFIGURATION STATUS")
     print("="*60)
     print(f"📊 Sources: {len(sources_config)} cameras configured")
- 
-    # ========== SIMPLIFIED: Initialize UniversalStreamProcessor ==========
-    print("\n🎯 Initializing UniversalStreamProcessor...")
-    
-    # Initialize the Universal Processor once
-    processor = UniversalStreamProcessor(
-        face_system=face_system,
-        config=config,
-        headless_mode=headless_mode
-    )
-    
-    # Set debug flags directly from config
-    processor.debug_mode = config['debug']['enabled']
-    processor.show_performance_stats = config['display']['show_performance_stats']
-    processor.show_resize_info = config['display']['show_resize_info']
-    processor.show_detection_debug = config['debug'].get('show_detection_debug', False)
-    
-    # Print comprehensive configuration status
-    print("\n" + "="*60)
-    print("🎯 UNIVERSAL PROCESSOR CONFIGURATION STATUS")
-    print("="*60)
-    print(f"🎮 Mode: {'Multi-source' if args.multi_source else 'Single source'}")
-    print(f"📊 Display: {'Headless' if headless_mode else 'Windowed'}")
- 
-    print(f"📊 Processing: Interval={config['processing_interval']}, Buffer={config['buffer_size']}")
+    #print(f"📊 Processing: Interval={config['processing_interval']}, Buffer={config['buffer_size']}")
     print(f"🔍 Detection: Confidence={config['detection_confidence']}, Recognition Threshold={config['recognition_threshold']}")
     print(f"🎯 Face Tracking: {'ENABLED' if config['tracking']['enabled'] else 'DISABLED'}")
     
@@ -1038,20 +1024,17 @@ def main():
     print(f"🔊 Alerts: {'ENABLED' if config['enable_voice_alerts'] else 'DISABLED'}")
     print(f"📤 Server Push: {'ENABLED' if config['server_push_enabled'] else 'DISABLED'}")
     print(f"🐛 Debug: {'ENABLED' if config['debug']['enabled'] else 'DISABLED'}")
- 
     print(f"🖼️  Display Layout: {getattr(processor, 'display_layout', 'grid')}")
- 
     print(f"🎮 GPU Acceleration: {'ENABLED' if config['use_gpu'] else 'DISABLED'}")
     if config['use_gpu']:
         print(f"🎮 GPU Device: {config['gpu_device']}")
     print("="*60)
     
- 
+    
     # Print server push details if enabled
     if config.get('server_push_enabled', False):
         print_server_push_info(config)
     
- 
     # Print module-specific status
     processor.print_tracking_status()
     processor.print_alert_status()
@@ -1081,20 +1064,12 @@ def main():
     print(f"📹 Sources: {len(sources_config)} cameras ready")
     for source_id in sources_config.keys():
         print(f"   - {source_id}")
- 
-    # Final system readiness check
-    print("\n🔍 FINAL SYSTEM READINESS CHECK")
-    print("="*40)
-    print(f"🎯 Processor: UniversalStreamProcessor READY")
-    print(f"📹 Mode: {'Multi-source' if args.multi_source else 'Single source'}")
- 
     print(f"🎮 GPU: {'READY' if config['use_gpu'] else 'CPU MODE'}")
     print(f"📤 Server Push: {'READY' if config['server_push_enabled'] else 'DISABLED'}")
     print(f"🔊 Audio Alerts: {'READY' if config['enable_voice_alerts'] else 'DISABLED'}")
     print(f"🎯 Tracking: {'READY' if config['tracking']['enabled'] else 'DISABLED'}")
     print(f"✅ Violation Verification: {'READY' if config['tracking'].get('violation_verification_enabled', False) else 'DISABLED'}")
     print("="*40)
- 
     
     # 🆕 NEW: Print verification-specific controls
     print("\n🎮 VERIFICATION CONTROLS:")
@@ -1112,13 +1087,11 @@ def main():
     print("   [p] - Toggle performance stats")
     print("   [d] - Toggle debug mode")
     print("   [q] - Quit")
- 
     
     # Add a small delay to ensure everything is ready
-    print("\n⏳ Starting processing in 3 seconds...")
+    print("\n⏳ Starting multi-source processing in 3 seconds...")
     time.sleep(3)
     
- 
     # 🆕 CRITICAL: Ensure ImageLoggers are created for all sources
     print("\n🔍 ENSURING IMAGE LOGGERS ARE CREATED FOR ALL SOURCES")
     for source_id in sources_config.keys():
@@ -1187,22 +1160,6 @@ def main():
         
         # Run the multi-source processing
         processor.run_multi_source_stable(sources_config)
- 
-    # ========== SIMPLIFIED: Run the processor ==========
-    try:
-        # 🆕 NEW: Use context manager for automatic cleanup
-        print("\n🎬 Starting UniversalStreamProcessor...")
-        
-        # Streamline the run() call
-        if args.multi_source:
-            # Use your existing sources_config dictionary directly
-            print(f"🚀 Starting multi-source processing with {len(sources_config)} sources")
-            processor.run(sources_config)
-        else:
-            # Single source mode - pass the URL directly
-            print(f"🚀 Starting single source processing: {sources_config}")
-            processor.run(sources_config)
- 
         
     except KeyboardInterrupt:
         print("\n🛑 Shutting down by user request...")
@@ -1216,8 +1173,7 @@ def main():
         import traceback
         traceback.print_exc()
     finally:
-        # Clean shutdown is handled automatically by the processor
-        print("🛑 Processing completed")
+        processor.stop_all_sources()
 
 if __name__ == "__main__":
     main()

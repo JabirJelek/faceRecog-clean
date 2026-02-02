@@ -1,0 +1,1166 @@
+[2026-01-31 08:44:37] [INFO] === Face Recognition Monitor Started ===
+[2026-01-31 08:44:37] [INFO] Start Time: 08:16
+[2026-01-31 08:44:37] [INFO] End Time: 08:20
+[2026-01-31 08:44:37] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\scripts\1_magick\maskDetect.ps1
+[2026-01-31 08:44:37] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-01-31 08:44:37] [INFO] Testing email configuration...
+[2026-01-31 08:44:37] [SUCCESS] Found 2 email recipient(s)
+[2026-01-31 08:44:37] [INFO] Configured languages: Bahasa, English
+[2026-01-31 08:44:37] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-31 08:44:38] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-31 08:44:38] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-31 08:44:38] [INFO] - SSL Enabled: True
+[2026-01-31 08:44:38] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-31 08:44:38] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-31 08:44:38] [SUCCESS] Email configuration valid
+[2026-01-31 08:44:38] [DEBUG] No PID tracking file found
+[2026-01-31 08:44:38] [DEBUG] Check: 08:44:38 | Window: Inactive | Python: Stopped
+[2026-01-31 08:44:40] [INFO] Cleaning up...
+[2026-01-31 08:44:40] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-31 08:44:52] [INFO] === Face Recognition Monitor Started ===
+[2026-01-31 08:44:52] [INFO] Start Time: 08:44
+[2026-01-31 08:44:52] [INFO] End Time: 08:46
+[2026-01-31 08:44:52] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\scripts\1_magick\maskDetect.ps1
+[2026-01-31 08:44:52] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-01-31 08:44:52] [INFO] Testing email configuration...
+[2026-01-31 08:44:52] [SUCCESS] Found 2 email recipient(s)
+[2026-01-31 08:44:52] [INFO] Configured languages: Bahasa, English
+[2026-01-31 08:44:52] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-31 08:44:52] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-31 08:44:52] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-31 08:44:52] [INFO] - SSL Enabled: True
+[2026-01-31 08:44:52] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-31 08:44:52] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-31 08:44:52] [SUCCESS] Email configuration valid
+[2026-01-31 08:44:52] [DEBUG] No PID tracking file found
+[2026-01-31 08:44:52] [DEBUG] Check: 08:44:52 | Window: Active | Python: Stopped
+[2026-01-31 08:44:52] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 08:44:52] [DEBUG] Searching for Python process...
+[2026-01-31 08:44:54] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:44:54] [INFO] Starting face recognition worker process...
+[2026-01-31 08:44:54] [SUCCESS] Worker process started (PID: 38428)
+[2026-01-31 08:44:54] [INFO] Waiting for Python process to start...
+[2026-01-31 08:44:54] [DEBUG] Searching for Python process...
+[2026-01-31 08:44:54] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:44:56] [DEBUG] Searching for Python process...
+[2026-01-31 08:44:56] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:44:58] [DEBUG] Searching for Python process...
+[2026-01-31 08:44:58] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:45:00] [DEBUG] Searching for Python process...
+[2026-01-31 08:45:00] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:45:02] [INFO] Cleaning up...
+[2026-01-31 08:45:02] [INFO] Stopping worker process (PID: 38428)...
+[2026-01-31 08:45:02] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 38428.
+[2026-01-31 08:45:02] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-31 08:50:45] [INFO] === Face Recognition Monitor Started ===
+[2026-01-31 08:50:45] [INFO] Start Time: 08:50
+[2026-01-31 08:50:45] [INFO] End Time: 08:52
+[2026-01-31 08:50:45] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\scripts\1_magick\maskDetect.ps1
+[2026-01-31 08:50:45] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-01-31 08:50:45] [INFO] Testing email configuration...
+[2026-01-31 08:50:45] [SUCCESS] Found 2 email recipient(s)
+[2026-01-31 08:50:45] [INFO] Configured languages: Bahasa, English
+[2026-01-31 08:50:45] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-31 08:50:45] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-31 08:50:45] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-31 08:50:45] [INFO] - SSL Enabled: True
+[2026-01-31 08:50:45] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-31 08:50:45] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-31 08:50:45] [SUCCESS] Email configuration valid
+[2026-01-31 08:50:45] [DEBUG] No PID tracking file found
+[2026-01-31 08:50:45] [DEBUG] Check: 08:50:45 | Window: Active | Python: Stopped
+[2026-01-31 08:50:45] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [INFO] Starting face recognition worker process...
+[2026-01-31 08:50:45] [SUCCESS] Worker process started (PID: 12612)
+[2026-01-31 08:50:45] [INFO] Waiting for Python process to start...
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [DEBUG] Searching for Python process...
+[2026-01-31 08:50:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:50:45] [INFO] Cleaning up...
+[2026-01-31 08:50:45] [INFO] Stopping worker process (PID: 12612)...
+[2026-01-31 08:50:45] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 12612.
+[2026-01-31 08:50:45] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-31 08:52:37] [INFO] === Face Recognition Monitor Started ===
+[2026-01-31 08:52:37] [INFO] Start Time: 08:50
+[2026-01-31 08:52:37] [INFO] End Time: 08:52
+[2026-01-31 08:52:37] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\scripts\1_magick\maskDetect.ps1
+[2026-01-31 08:52:37] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-01-31 08:52:37] [INFO] Testing email configuration...
+[2026-01-31 08:52:37] [SUCCESS] Found 2 email recipient(s)
+[2026-01-31 08:52:37] [INFO] Configured languages: Bahasa, English
+[2026-01-31 08:52:37] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-31 08:52:37] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-31 08:52:37] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-31 08:52:37] [INFO] - SSL Enabled: True
+[2026-01-31 08:52:37] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-31 08:52:37] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-31 08:52:37] [SUCCESS] Email configuration valid
+[2026-01-31 08:52:37] [DEBUG] No PID tracking file found
+[2026-01-31 08:52:37] [DEBUG] Check: 08:52:37 | Window: Inactive | Python: Stopped
+[2026-01-31 08:52:37] [INFO] Cleaning up...
+[2026-01-31 08:52:37] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-31 08:53:41] [INFO] === Face Recognition Monitor Started ===
+[2026-01-31 08:53:41] [INFO] Start Time: 08:50
+[2026-01-31 08:53:41] [INFO] End Time: 08:54
+[2026-01-31 08:53:41] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\scripts\1_magick\maskDetect.ps1
+[2026-01-31 08:53:41] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-01-31 08:53:41] [INFO] Testing email configuration...
+[2026-01-31 08:53:41] [SUCCESS] Found 2 email recipient(s)
+[2026-01-31 08:53:41] [INFO] Configured languages: Bahasa, English
+[2026-01-31 08:53:41] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-31 08:53:41] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-31 08:53:41] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-31 08:53:41] [INFO] - SSL Enabled: True
+[2026-01-31 08:53:41] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-31 08:53:41] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-31 08:53:41] [SUCCESS] Email configuration valid
+[2026-01-31 08:53:41] [DEBUG] No PID tracking file found
+[2026-01-31 08:53:41] [DEBUG] Check: 08:53:41 | Window: Active | Python: Stopped
+[2026-01-31 08:53:41] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 08:53:41] [DEBUG] Searching for Python process...
+[2026-01-31 08:53:41] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:53:41] [INFO] Starting face recognition worker process...
+[2026-01-31 08:53:41] [SUCCESS] Worker process started (PID: 11192)
+[2026-01-31 08:53:41] [INFO] Waiting for Python process to start...
+[2026-01-31 08:53:41] [DEBUG] Searching for Python process...
+[2026-01-31 08:53:41] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:53:41] [DEBUG] Searching for Python process...
+[2026-01-31 08:53:41] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:53:41] [DEBUG] Searching for Python process...
+[2026-01-31 08:53:41] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:53:41] [DEBUG] Searching for Python process...
+[2026-01-31 08:53:41] [DEBUG] No Python process found matching criteria
+[2026-01-31 08:53:41] [INFO] Cleaning up...
+[2026-01-31 08:53:41] [INFO] Stopping worker process (PID: 11192)...
+[2026-01-31 08:53:41] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 11192.
+[2026-01-31 08:53:41] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-31 09:02:19] [INFO] === Face Recognition Monitor Started ===
+[2026-01-31 09:02:19] [INFO] Start Time: 08:50
+[2026-01-31 09:02:19] [INFO] End Time: 08:54
+[2026-01-31 09:02:19] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\scripts\1_magick\maskDetect.ps1
+[2026-01-31 09:02:19] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-01-31 09:02:19] [INFO] Testing email configuration...
+[2026-01-31 09:02:19] [SUCCESS] Found 2 email recipient(s)
+[2026-01-31 09:02:19] [INFO] Configured languages: Bahasa, English
+[2026-01-31 09:02:19] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-31 09:02:19] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-31 09:02:19] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-31 09:02:19] [INFO] - SSL Enabled: True
+[2026-01-31 09:02:19] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-31 09:02:19] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-31 09:02:19] [SUCCESS] Email configuration valid
+[2026-01-31 09:02:19] [DEBUG] No PID tracking file found
+[2026-01-31 09:02:19] [DEBUG] Check: 09:02:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:02:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:02:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:02:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:02:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:03:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:03:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:03:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:03:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:03:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:03:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:04:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:04:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:04:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:04:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:04:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:04:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:05:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:05:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:05:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:05:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:05:50 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:06:00 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:06:10 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:06:20 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:06:30 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:06:40 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:06:50 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:07:00 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:07:10 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:07:20 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:07:30 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:07:40 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:07:50 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:08:00 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:08:10 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:08:20 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:08:30 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:08:40 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:08:50 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:09:00 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:09:10 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:09:20 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:09:30 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:09:40 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:09:50 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:10:00 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:10:10 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:10:20 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:10:30 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:10:40 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:10:50 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:11:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:11:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:11:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:11:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:11:41 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:11:51 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:12:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:12:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:12:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:12:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:12:41 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:12:51 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:13:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:13:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:13:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:13:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:13:41 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:13:51 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:14:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:14:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:14:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:14:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:14:41 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:14:51 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:15:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:15:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:15:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:15:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:15:41 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:15:51 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:16:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:16:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:16:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:16:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:16:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:16:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:17:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:17:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:17:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:17:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:17:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:17:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:18:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:18:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:18:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:18:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:18:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:18:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:19:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:19:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:19:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:19:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:19:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:19:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:20:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:20:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:20:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:20:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:20:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:20:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:21:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:21:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:21:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:21:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:21:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:21:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:22:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:22:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:22:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:22:33 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:22:43 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:22:53 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:23:03 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:23:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:23:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:23:33 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:23:43 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:23:53 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:24:03 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:24:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:24:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:24:33 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:24:43 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:24:53 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:25:03 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:25:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:25:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:25:33 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:25:43 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:25:53 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:26:03 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:26:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:26:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:26:33 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:26:43 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:26:53 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:27:03 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:27:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:27:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:27:33 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:27:43 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:27:53 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:28:03 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:28:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:28:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:28:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:28:44 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:28:54 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:29:04 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:29:14 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:29:24 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:29:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:29:44 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:29:54 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:30:04 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:30:14 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:30:24 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:30:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:30:44 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:30:54 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:31:04 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:31:14 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:31:24 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:31:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:31:44 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:31:54 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:32:04 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:32:14 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:32:24 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:32:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:32:44 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:32:54 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:33:04 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:33:14 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:33:24 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:33:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:33:44 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:33:54 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:34:04 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:34:14 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:34:24 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:34:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:34:45 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:34:55 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:35:05 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:35:15 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:35:25 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:35:35 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:35:45 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:35:55 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:36:05 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:36:15 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:36:25 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:36:35 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:36:45 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:36:55 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:37:05 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:37:15 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:37:25 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:37:35 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:37:45 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:37:55 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:38:05 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:38:15 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:38:25 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:38:35 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:38:45 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:38:55 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:39:05 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:39:15 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:39:25 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:39:35 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:39:45 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:39:55 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:40:05 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:40:15 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:40:25 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:40:36 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:40:46 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:40:56 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:41:06 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:41:16 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:41:26 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:41:36 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:41:46 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:41:56 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:42:06 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:42:16 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:42:26 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:42:36 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:42:46 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:42:56 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:43:06 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:43:16 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:43:26 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:43:36 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:43:46 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:43:56 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:44:06 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:44:16 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:44:26 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:44:36 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:44:46 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:44:56 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:45:06 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:45:16 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:45:26 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:45:36 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:45:46 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:45:56 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:46:06 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:46:16 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:46:26 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:46:37 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:46:47 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:46:57 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:47:07 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:47:17 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:47:27 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:47:37 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:47:47 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:47:57 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:48:07 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:48:17 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:48:27 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:48:37 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:48:47 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:48:57 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:49:07 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:49:17 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:49:27 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:49:37 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:49:47 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:49:57 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:50:07 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:50:17 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:50:27 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:50:37 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:50:47 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:50:57 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:51:07 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:51:17 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:51:27 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:51:37 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:51:47 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:51:57 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:52:07 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:52:17 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:52:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:52:38 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:52:48 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:52:58 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:53:08 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:53:18 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:53:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:53:38 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:53:48 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:53:58 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:54:08 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:54:18 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:54:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:54:38 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:54:48 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:54:58 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:55:08 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:55:18 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:55:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:55:38 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:55:48 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:55:58 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:56:08 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:56:18 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:56:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:56:38 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:56:48 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:56:58 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:57:08 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:57:18 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:57:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:57:38 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:57:48 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:57:58 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:58:08 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:58:18 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:58:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:58:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:58:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:58:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:59:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:59:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:59:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:59:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:59:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 09:59:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:00:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:00:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:00:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:00:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:00:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:00:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:01:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:01:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:01:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:01:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:01:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:01:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:02:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:02:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:02:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:02:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:02:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:02:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:03:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:03:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:03:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:03:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:03:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:03:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:04:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:04:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:04:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:04:40 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:04:50 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:05:00 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:05:10 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:05:20 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:05:30 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:05:40 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:05:50 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:06:00 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:06:10 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:06:20 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:06:30 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:06:40 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:06:50 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:07:00 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:07:10 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:07:20 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:07:30 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:07:40 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:07:50 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:08:00 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:08:10 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:08:20 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:08:30 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:08:40 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:08:50 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:09:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:09:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:09:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:09:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:09:41 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:09:51 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:10:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:10:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:10:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:10:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:10:41 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:10:51 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:11:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:11:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:11:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:11:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:11:41 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:11:51 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:12:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:12:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:12:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:12:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:12:41 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:12:51 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:13:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:13:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:13:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:13:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:13:41 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:13:51 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:14:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:14:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:14:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:14:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:14:41 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:14:51 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:15:01 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:15:11 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:15:21 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:15:31 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:15:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:15:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:16:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:16:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:16:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:16:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:16:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:16:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:17:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:17:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:17:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:17:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:17:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:17:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:18:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:18:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:18:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:18:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:18:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:18:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:19:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:19:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:19:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:19:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:19:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:19:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:20:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:20:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:20:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:20:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:20:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:20:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:21:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:21:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:21:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:21:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:21:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:21:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:22:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:22:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:22:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:22:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:22:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:22:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:23:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:23:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:23:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:23:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:23:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:23:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:24:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:24:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:24:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:24:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:24:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:24:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:25:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:25:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:25:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:25:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:25:42 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:25:52 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:26:02 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:26:12 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:26:22 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:26:32 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:26:43 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:26:53 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:27:03 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:27:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:27:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:27:33 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:27:43 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:27:53 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:28:03 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:28:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:28:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:28:33 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:28:43 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:28:53 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:29:03 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:29:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:29:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:29:33 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:29:43 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:29:53 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:30:03 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:30:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:30:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:30:33 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:30:43 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:30:53 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:31:03 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:31:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:31:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:31:33 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:31:43 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:31:53 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:32:03 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:32:13 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:32:23 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:32:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:32:44 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:32:54 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:33:04 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:33:14 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:33:24 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:33:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:33:44 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:33:54 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:34:04 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:34:14 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:34:24 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:34:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:34:44 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:34:54 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:35:04 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:35:14 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:35:24 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:35:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:35:44 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:35:54 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:36:04 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:36:14 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:36:24 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:36:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:36:44 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:36:54 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:37:04 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:37:14 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:37:24 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:37:34 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:37:44 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:37:54 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:38:04 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:38:15 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:38:25 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:38:35 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:38:45 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:38:55 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:39:05 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:39:15 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:39:25 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:39:35 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:39:45 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:39:55 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:40:05 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:40:15 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:40:25 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:40:35 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:40:45 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:40:55 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:41:05 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:41:15 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:41:25 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:41:35 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:41:45 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:41:55 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:42:05 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:42:15 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:42:25 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:42:35 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:42:45 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:42:55 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:43:05 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:43:15 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:43:25 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:43:35 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:43:45 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:43:55 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:44:06 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:44:16 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:44:26 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:44:36 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:44:46 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:44:56 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:45:06 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:45:16 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:45:26 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:45:36 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:45:46 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:45:56 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:46:06 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:46:16 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:46:26 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:46:36 | Window: Inactive | Python: Stopped
+[2026-01-31 10:46:45] [INFO] === Face Recognition Monitor Started ===
+[2026-01-31 10:46:45] [INFO] Start Time: 08:50
+[2026-01-31 10:46:45] [INFO] End Time: 10:48
+[2026-01-31 10:46:45] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\script-run\1_magick\maskDetect.ps1
+[2026-01-31 10:46:45] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-01-31 10:46:45] [INFO] Testing email configuration...
+[2026-01-31 10:46:45] [SUCCESS] Found 2 email recipient(s)
+[2026-01-31 10:46:45] [INFO] Configured languages: Bahasa, English
+[2026-01-31 10:46:45] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-31 10:46:45] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-31 10:46:45] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-31 10:46:45] [INFO] - SSL Enabled: True
+[2026-01-31 10:46:45] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-31 10:46:45] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-31 10:46:45] [SUCCESS] Email configuration valid
+[2026-01-31 10:46:45] [DEBUG] No PID tracking file found
+[2026-01-31 10:46:45] [DEBUG] Check: 10:46:45 | Window: Active | Python: Stopped
+[2026-01-31 10:46:45] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 10:46:45] [DEBUG] Searching for Python process...
+[2026-01-31 09:02:19] [DEBUG] Check: 10:46:46 | Window: Inactive | Python: Stopped
+[2026-01-31 10:46:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 10:46:45] [INFO] Starting face recognition worker process...
+[2026-01-31 10:46:45] [SUCCESS] Worker process started (PID: 19108)
+[2026-01-31 10:46:45] [INFO] Waiting for Python process to start...
+[2026-01-31 10:46:45] [DEBUG] Searching for Python process...
+[2026-01-31 10:46:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 10:46:45] [DEBUG] Searching for Python process...
+[2026-01-31 10:46:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 10:46:45] [DEBUG] Searching for Python process...
+[2026-01-31 10:46:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 10:46:45] [DEBUG] Searching for Python process...
+[2026-01-31 10:46:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 10:46:45] [DEBUG] Searching for Python process...
+[2026-01-31 09:02:19] [DEBUG] Check: 10:46:56 | Window: Inactive | Python: Stopped
+[2026-01-31 10:46:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 10:46:45] [DEBUG] Searching for Python process...
+[2026-01-31 10:46:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 10:46:45] [DEBUG] Searching for Python process...
+[2026-01-31 10:46:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 10:46:45] [DEBUG] Searching for Python process...
+[2026-01-31 10:46:45] [DEBUG] No Python process found matching criteria
+[2026-01-31 10:46:45] [INFO] Cleaning up...
+[2026-01-31 10:46:45] [INFO] Stopping worker process (PID: 19108)...
+[2026-01-31 10:46:45] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 19108.
+[2026-01-31 10:46:45] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-31 09:02:19] [DEBUG] Check: 10:47:06 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:47:16 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:47:26 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:47:36 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:47:46 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:47:56 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:48:06 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:48:16 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:48:26 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:48:36 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:48:46 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:48:56 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:49:06 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:49:16 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:49:26 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:49:36 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:49:46 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:49:56 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:50:07 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:50:17 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:50:27 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:50:37 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:50:47 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:50:57 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:51:07 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:51:17 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:51:27 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:51:37 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:51:47 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:51:57 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:52:07 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:52:17 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:52:27 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:52:37 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:52:47 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:52:57 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:53:07 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:53:17 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:53:27 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:53:37 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:53:47 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:53:57 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:54:07 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:54:17 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:54:27 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:54:37 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:54:47 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:54:57 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:55:07 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:55:17 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:55:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:55:38 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:55:48 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:55:58 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:56:08 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:56:18 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:56:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:56:38 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:56:48 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:56:58 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:57:08 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:57:18 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:57:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:57:38 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:57:48 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:57:58 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:58:08 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:58:18 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:58:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:58:38 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:58:48 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:58:58 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:59:08 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:59:18 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:59:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:59:38 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:59:48 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 10:59:58 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:00:08 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:00:18 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:00:28 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:00:38 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:00:48 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:00:58 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:01:08 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:01:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:01:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:01:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:01:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:01:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:02:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:02:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:02:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:02:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:02:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:02:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:03:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:03:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:03:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:03:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:03:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:03:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:04:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:04:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:04:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:04:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:04:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:04:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:05:09 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:05:19 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:05:29 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:05:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:05:49 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:05:59 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [DEBUG] Check: 11:06:09 | Window: Inactive | Python: Stopped
+[2026-01-31 11:06:17] [INFO] === Face Recognition Monitor Started ===
+[2026-01-31 11:06:17] [INFO] Start Time: 08:50
+[2026-01-31 11:06:17] [INFO] End Time: 11:08
+[2026-01-31 11:06:17] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\script-run\1_magick\maskDetect.ps1
+[2026-01-31 11:06:17] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-01-31 11:06:17] [INFO] Testing email configuration...
+[2026-01-31 11:06:17] [SUCCESS] Found 2 email recipient(s)
+[2026-01-31 11:06:17] [INFO] Configured languages: Bahasa, English
+[2026-01-31 11:06:17] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-31 11:06:17] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-31 11:06:17] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-31 11:06:17] [INFO] - SSL Enabled: True
+[2026-01-31 11:06:17] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-31 11:06:17] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-31 11:06:17] [SUCCESS] Email configuration valid
+[2026-01-31 11:06:17] [DEBUG] No PID tracking file found
+[2026-01-31 11:06:17] [DEBUG] Check: 11:06:18 | Window: Active | Python: Stopped
+[2026-01-31 11:06:17] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 11:06:17] [DEBUG] Searching for Python process...
+[2026-01-31 11:06:17] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:06:17] [INFO] Starting face recognition worker process...
+[2026-01-31 11:06:17] [SUCCESS] Worker process started (PID: 16300)
+[2026-01-31 11:06:17] [INFO] Waiting for Python process to start...
+[2026-01-31 11:06:17] [DEBUG] Searching for Python process...
+[2026-01-31 11:06:17] [DEBUG] No Python process found matching criteria
+[2026-01-31 09:02:19] [DEBUG] Check: 11:06:19 | Window: Inactive | Python: Stopped
+[2026-01-31 11:06:17] [DEBUG] Searching for Python process...
+[2026-01-31 11:06:17] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:06:17] [DEBUG] Searching for Python process...
+[2026-01-31 11:06:17] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:06:17] [DEBUG] Searching for Python process...
+[2026-01-31 11:06:17] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:06:17] [DEBUG] Searching for Python process...
+[2026-01-31 11:06:17] [DEBUG] No Python process found matching criteria
+[2026-01-31 09:02:19] [DEBUG] Check: 11:06:29 | Window: Inactive | Python: Stopped
+[2026-01-31 11:06:17] [DEBUG] Searching for Python process...
+[2026-01-31 11:06:17] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:06:17] [DEBUG] Searching for Python process...
+[2026-01-31 11:06:17] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:06:17] [DEBUG] Searching for Python process...
+[2026-01-31 11:06:17] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:06:17] [DEBUG] Searching for Python process...
+[2026-01-31 11:06:17] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:06:17] [INFO] Cleaning up...
+[2026-01-31 11:06:17] [INFO] Stopping worker process (PID: 16300)...
+[2026-01-31 11:06:17] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 16300.
+[2026-01-31 11:06:17] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-31 09:02:19] [DEBUG] Check: 11:06:39 | Window: Inactive | Python: Stopped
+[2026-01-31 09:02:19] [INFO] Cleaning up...
+[2026-01-31 09:02:19] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-31 11:07:08] [INFO] === Face Recognition Monitor Started ===
+[2026-01-31 11:07:08] [INFO] Start Time: 08:50
+[2026-01-31 11:07:08] [INFO] End Time: 11:08
+[2026-01-31 11:07:08] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\script-run\1_magick\maskDetect.ps1
+[2026-01-31 11:07:08] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-01-31 11:07:08] [INFO] Testing email configuration...
+[2026-01-31 11:07:08] [SUCCESS] Found 2 email recipient(s)
+[2026-01-31 11:07:08] [INFO] Configured languages: Bahasa, English
+[2026-01-31 11:07:08] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-31 11:07:08] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-31 11:07:08] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-31 11:07:08] [INFO] - SSL Enabled: True
+[2026-01-31 11:07:08] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-31 11:07:08] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-31 11:07:08] [SUCCESS] Email configuration valid
+[2026-01-31 11:07:08] [DEBUG] No PID tracking file found
+[2026-01-31 11:07:08] [DEBUG] Check: 11:07:08 | Window: Active | Python: Stopped
+[2026-01-31 11:07:08] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 11:07:08] [DEBUG] Searching for Python process...
+[2026-01-31 11:07:08] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:07:08] [INFO] Starting face recognition worker process...
+[2026-01-31 11:07:08] [SUCCESS] Worker process started (PID: 7744)
+[2026-01-31 11:07:08] [INFO] Waiting for Python process to start...
+[2026-01-31 11:07:08] [DEBUG] Searching for Python process...
+[2026-01-31 11:07:08] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:07:08] [DEBUG] Searching for Python process...
+[2026-01-31 11:07:08] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:07:08] [INFO] Cleaning up...
+[2026-01-31 11:07:08] [INFO] Stopping worker process (PID: 7744)...
+[2026-01-31 11:07:08] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 7744.
+[2026-01-31 11:07:08] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-31 11:22:58] [INFO] === Face Recognition Monitor Started ===
+[2026-01-31 11:22:59] [INFO] Start Time: 08:50
+[2026-01-31 11:22:59] [INFO] End Time: 11:08
+[2026-01-31 11:22:59] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\script-run\1_magick\maskDetect.ps1
+[2026-01-31 11:22:59] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-01-31 11:22:59] [ERROR] FATAL ERROR: The term 'Test-EmailConfiguration' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+[2026-01-31 11:22:59] [ERROR] at <ScriptBlock>, D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\monitor_email_magick1.ps1: line 1024
+[2026-01-31 11:22:59] [INFO] Cleaning up...
+[2026-01-31 11:22:59] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-31 11:43:47] [INFO] === Face Recognition Monitor Started ===
+[2026-01-31 11:43:47] [INFO] Monitor Version: 2.0 (Stable)
+[2026-01-31 11:43:47] [INFO] Start Time: 08:50
+[2026-01-31 11:43:47] [INFO] End Time: 11:32
+[2026-01-31 11:43:47] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-01-31 11:43:47] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-01-31 11:43:47] [INFO] Testing email configuration...
+[2026-01-31 11:43:47] [SUCCESS] Found 2 email recipient(s)
+[2026-01-31 11:43:47] [INFO] Configured languages: Bahasa, English
+[2026-01-31 11:43:47] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-31 11:43:47] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-31 11:43:47] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-31 11:43:47] [INFO] - SSL Enabled: True
+[2026-01-31 11:43:47] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-31 11:43:47] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-31 11:43:47] [SUCCESS] Email configuration valid
+[2026-01-31 11:43:47] [SUCCESS] Email configuration validated successfully
+[2026-01-31 11:43:47] [DEBUG] No PID tracking file found
+[2026-01-31 11:43:47] [DEBUG] Check: 11:43:47 | Window: Inactive | Python: Stopped
+[2026-01-31 11:43:52] [INFO] Cleaning up...
+[2026-01-31 11:43:52] [INFO] === Face Recognition Monitor Stopped ===
+[2026-01-31 11:44:05] [INFO] === Face Recognition Monitor Started ===
+[2026-01-31 11:44:05] [INFO] Monitor Version: 2.0 (Stable)
+[2026-01-31 11:44:05] [INFO] Start Time: 08:50
+[2026-01-31 11:44:05] [INFO] End Time: 11:46
+[2026-01-31 11:44:05] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-01-31 11:44:05] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-01-31 11:44:05] [INFO] Testing email configuration...
+[2026-01-31 11:44:05] [SUCCESS] Found 2 email recipient(s)
+[2026-01-31 11:44:05] [INFO] Configured languages: Bahasa, English
+[2026-01-31 11:44:05] [SUCCESS] Email credential file found and loaded successfully
+[2026-01-31 11:44:05] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-01-31 11:44:05] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-01-31 11:44:05] [INFO] - SSL Enabled: True
+[2026-01-31 11:44:05] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-01-31 11:44:05] [INFO] - Gmail attachment limit: 25 MB total
+[2026-01-31 11:44:05] [SUCCESS] Email configuration valid
+[2026-01-31 11:44:05] [SUCCESS] Email configuration validated successfully
+[2026-01-31 11:44:05] [DEBUG] No PID tracking file found
+[2026-01-31 11:44:05] [DEBUG] Check: 11:44:05 | Window: Active | Python: Stopped
+[2026-01-31 11:44:05] [DEBUG] Check: 11:44:05 | Window: Active | Python: Stopped
+[2026-01-31 11:44:05] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 11:44:05] [DEBUG] Searching for Python process...
+[2026-01-31 11:44:06] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:44:06] [INFO] Starting face recognition worker process...
+[2026-01-31 11:44:07] [SUCCESS] Worker process started (PID: 31488)
+[2026-01-31 11:44:07] [INFO] Waiting for Python process to start...
+[2026-01-31 11:44:07] [DEBUG] Searching for Python process...
+[2026-01-31 11:44:07] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:44:09] [DEBUG] Searching for Python process...
+[2026-01-31 11:44:09] [SUCCESS] Found Python process with our script: PID=6248
+[2026-01-31 11:44:09] [SUCCESS] Python process found (PID: 6248)
+[2026-01-31 11:44:09] [DEBUG] PID tracking saved: WorkerPID=31488, PythonPID=6248
+[2026-01-31 11:44:09] [SUCCESS] Worker started. Monitoring Python process...
+[2026-01-31 11:44:09] [DEBUG] PID tracking saved: WorkerPID=31488, PythonPID=6248
+[2026-01-31 11:44:24] [DEBUG] Searching for Python process...
+[2026-01-31 11:44:24] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:44:24] [DEBUG] Check: 11:44:24 | Window: Active | Python: Stopped
+[2026-01-31 11:44:24] [DEBUG] Check: 11:44:24 | Window: Active | Python: Stopped
+[2026-01-31 11:44:24] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 11:44:24] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-01-31 11:44:39] [DEBUG] Check: 11:44:39 | Window: Active | Python: Stopped
+[2026-01-31 11:44:39] [DEBUG] Check: 11:44:39 | Window: Active | Python: Stopped
+[2026-01-31 11:44:39] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 11:44:39] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-01-31 11:44:54] [DEBUG] Check: 11:44:54 | Window: Active | Python: Stopped
+[2026-01-31 11:44:54] [DEBUG] Check: 11:44:54 | Window: Active | Python: Stopped
+[2026-01-31 11:44:54] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 11:44:54] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-01-31 11:45:09] [DEBUG] Check: 11:45:09 | Window: Active | Python: Stopped
+[2026-01-31 11:45:10] [DEBUG] Check: 11:45:09 | Window: Active | Python: Stopped
+[2026-01-31 11:45:10] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 11:45:10] [DEBUG] Searching for Python process...
+[2026-01-31 11:45:10] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:45:10] [INFO] Starting face recognition worker process...
+[2026-01-31 11:45:10] [SUCCESS] Worker process started (PID: 20880)
+[2026-01-31 11:45:10] [INFO] Waiting for Python process to start...
+[2026-01-31 11:45:10] [DEBUG] Searching for Python process...
+[2026-01-31 11:45:10] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:45:12] [DEBUG] Searching for Python process...
+[2026-01-31 11:45:12] [SUCCESS] Found Python process with our script: PID=27148
+[2026-01-31 11:45:12] [SUCCESS] Python process found (PID: 27148)
+[2026-01-31 11:45:12] [DEBUG] PID tracking saved: WorkerPID=20880, PythonPID=27148
+[2026-01-31 11:45:12] [SUCCESS] Worker started. Monitoring Python process...
+[2026-01-31 11:45:12] [DEBUG] PID tracking saved: WorkerPID=20880, PythonPID=27148
+[2026-01-31 11:45:27] [DEBUG] Searching for Python process...
+[2026-01-31 11:45:27] [DEBUG] No Python process found matching criteria
+[2026-01-31 11:45:27] [DEBUG] Check: 11:45:27 | Window: Active | Python: Stopped
+[2026-01-31 11:45:27] [DEBUG] Check: 11:45:27 | Window: Active | Python: Stopped
+[2026-01-31 11:45:27] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 11:45:27] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-01-31 11:45:42] [DEBUG] Check: 11:45:42 | Window: Active | Python: Stopped
+[2026-01-31 11:45:42] [DEBUG] Check: 11:45:42 | Window: Active | Python: Stopped
+[2026-01-31 11:45:42] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 11:45:42] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-01-31 11:45:57] [DEBUG] Check: 11:45:57 | Window: Active | Python: Stopped
+[2026-01-31 11:45:57] [DEBUG] Check: 11:45:57 | Window: Active | Python: Stopped
+[2026-01-31 11:45:58] [INFO] Time window active and no Python process running - starting worker...
+[2026-01-31 11:45:58] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-01-31 11:46:13] [DEBUG] Check: 11:46:13 | Window: Inactive | Python: Stopped
+[2026-01-31 11:46:28] [DEBUG] Check: 11:46:28 | Window: Inactive | Python: Stopped
+[2026-01-31 11:46:43] [DEBUG] Check: 11:46:43 | Window: Inactive | Python: Stopped
+[2026-01-31 11:46:58] [DEBUG] Check: 11:46:58 | Window: Inactive | Python: Stopped
+[2026-01-31 11:47:13] [DEBUG] Check: 11:47:13 | Window: Inactive | Python: Stopped
+[2026-01-31 11:47:28] [DEBUG] Check: 11:47:28 | Window: Inactive | Python: Stopped
+[2026-01-31 11:47:43] [DEBUG] Check: 11:47:43 | Window: Inactive | Python: Stopped
+[2026-01-31 11:47:43] [INFO] Cleaning up...
+[2026-01-31 11:47:43] [INFO] Stopping Python process (PID: 27148)...
+[2026-01-31 11:47:43] [ERROR] Error stopping Python process: Cannot find a process with the process identifier 27148.
+[2026-01-31 11:47:43] [INFO] Stopping worker process (PID: 20880)...
+[2026-01-31 11:47:43] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 20880.
+[2026-01-31 11:47:43] [DEBUG] Removed PID tracking file
+[2026-01-31 11:47:43] [INFO] === Face Recognition Monitor Stopped ===
