@@ -1,5 +1,3 @@
-
-
 <#
 .SYNOPSIS
 Time-based process monitor for Face Recognition pipeline with proper PID tracking.
@@ -12,9 +10,266 @@ Tracks the actual Python process spawned by the worker script.
 Configured for C:\RaihanFarid\Dokumen\faceRecog\process-run output structure
 #>
 
-# Configuration for face recognition pipeline
+<#
+.SYNOPSIS
+Sets up portable paths for the project and validates all components exist
+.DESCRIPTION
+This SINGLE function does 3 things:
+1. Finds the maskRecog project root
+2. Builds all paths relative to it
+3. Validates critical components exist
+#>
+function Initialize-ProjectPortablePaths {
+    [CmdletBinding()]
+    param()
+    
+    Write-Host "Initializing portable paths for maskRecog project..." -ForegroundColor Cyan
+    
+    # ====================================================================
+    # STEP 1: FIND THE PROJECT ROOT (maskRecog directory)
+    # ====================================================================
+    
+    # Method A: Check if we're already IN maskRecog directory
+    $scriptPath = $PSScriptRoot  # Where this script is located
+    $currentPath = $scriptPath
+    
+    # Look for maskRecog by going UP through parent directories
+    while ($currentPath -and (Split-Path $currentPath -Parent)) {
+        $currentDirName = Split-Path $currentPath -Leaf
+        
+        if ($currentDirName -eq "maskRecog") {
+            $projectRoot = $currentPath
+            break
+        }
+        
+        $parentPath = Split-Path $currentPath -Parent
+        # Stop if we reach drive root (like C:\) or can't go further
+        if (!$parentPath -or $parentPath -eq $currentPath) {
+            break
+        }
+        $currentPath = $parentPath
+    }
+    
+    # Method B: If not found above, check current directory name
+    if (!$projectRoot) {
+        $currentDir = Get-Location
+        if ((Split-Path $currentDir -Leaf) -eq "maskRecog") {
+            $projectRoot = $currentDir
+        }
+    }
+    
+    # Method C: Last resort - ask user
+    if (!$projectRoot) {
+        Write-Host "Could not automatically find 'maskRecog' directory." -ForegroundColor Yellow
+        $projectRoot = Read-Host "Please enter the full path to 'maskRecog' project root"
+        
+        if (!(Test-Path $projectRoot)) {
+            Write-Host "ERROR: Path '$projectRoot' does not exist!" -ForegroundColor Red
+            exit 1
+        }
+    }
 
-# Global variables
+    # Load shared configuration if it exists
+    $sharedConfigPath = Join-Path $projectRoot "project_config.psd1"
+    if (Test-Path $sharedConfigPath) {
+        try {
+            $sharedConfig = Import-PowerShellDataFile -Path $sharedConfigPath
+            Write-Host "Loaded shared configuration from: $sharedConfigPath" -ForegroundColor Green
+            # You can use $sharedConfig.Paths.patterns, etc.
+        } catch {
+            Write-Host "Note: Could not load shared configuration" -ForegroundColor Yellow
+        }
+    }
+    
+    # ====================================================================
+    # STEP 2: BUILD PATHS RELATIVE TO PROJECT ROOT
+    # ====================================================================
+    
+    # Store project root globally so all functions can use it
+    $global:ProjectRoot = $projectRoot
+    $global:ActiveRoot = Split-Path $projectRoot -Parent | Split-Path -Parent
+    
+    # Show what we found
+    Write-Host "Project Root: $ProjectRoot" -ForegroundColor Green
+    Write-Host "Active Root: $ActiveRoot" -ForegroundColor Green
+    
+    # ====================================================================
+    # STEP 3: UPDATE CONFIGURATION WITH RELATIVE PATHS
+    # ====================================================================
+    
+    # Get email credential from user profile
+    $emailCredentialPath = "$env:USERPROFILE\.face-recog\email-credential.xml"
+    if (!(Test-Path (Split-Path $emailCredentialPath -Parent))) {
+        New-Item -ItemType Directory -Path (Split-Path $emailCredentialPath -Parent) -Force | Out-Null
+    }
+    
+    # Update the $Config object with relative paths
+    $Script:Config = @{
+        # Schedule configuration (CRITICAL - was missing)
+        StartTime = "08:00"  # Default start time
+        EndTime = "14:52"    # Default end time
+        
+        # Worker script path - RELATIVE to project root
+        WorkerScript = Join-Path $ProjectRoot "patterns\scripts\1_magick\maskDetect.ps1"
+        
+        # Python script path - RELATIVE to project root  
+        PythonScriptPath = Join-Path $ProjectRoot "patterns\algorithm\entry_multi-USED-Magick.py"
+        
+        # Paths for validation - RELATIVE to active root
+        RunsBasePath = Join-Path $ActiveRoot "logs-running\Magick"
+        OutputFolderPattern = "Magick_Process_MaskDetect_*"
+        
+        # Process tracking
+        PythonProcessName = "python"
+        WorkerProcessName = "powershell"
+        
+        # Expected folder structure
+        ExpectedSubfolders = @("logs", "script_output")
+        ExpectedFiles = @("metadata.json")
+        
+        # Validation settings
+        MaxValidationRetries = 5
+        RetryDelaySeconds = 10
+        
+        # Process monitoring
+        ProcessCheckInterval = 15
+        GracefulShutdownTimeout = 60
+        
+        # PID tracking - RELATIVE to RunsBasePath
+        PIDFilePath = Join-Path (Join-Path $ActiveRoot "logs-running\Magick") "monitor_pid_Magick.json"
+        MaxPIDFileAgeMinutes = 120
+        
+        # Logging - RELATIVE to RunsBasePath
+        LogFile = Join-Path (Join-Path $ActiveRoot "logs-running\Magick") "monitor_Magick.log"
+        
+        # Email notifications (updated to use MailKit)
+        SendEmailOnCompletion = $true
+        EmailRecipients = @(
+            @{ Address = "faridraihan17@gmail.com"; Language = "English" },
+            @{ Address = "ikeepmypromiz@gmail.com"; Language = "Bahasa" }
+        )
+        EmailFrom = "faridraihan17@gmail.com"
+        EmailSubject = @{
+            English = "Face Recognition Process Completed Successfully"
+            Bahasa = "Proses Pengenalan Wajah Selesai dengan Sukses"
+        }
+        SmtpServer = "smtp.gmail.com"
+        SmtpPort = 587
+        UseSSL = $true
+        EmailCredentialPath = $emailCredentialPath
+    }
+    
+    # ====================================================================
+    # STEP 4: VALIDATE CRITICAL COMPONENTS EXIST
+    # ====================================================================
+    
+    Write-Host "`nValidating project components..." -ForegroundColor Yellow
+    
+    $criticalComponents = @(
+        @{ Name = "Worker Script"; Path = $Config.WorkerScript }
+        @{ Name = "Python Script"; Path = $Config.PythonScriptPath }
+        @{ Name = "Log Directory"; Path = (Split-Path $Config.LogFile -Parent) }
+        @{ Name = "PID File Directory"; Path = (Split-Path $Config.PIDFilePath -Parent) }
+    )
+    
+    $missingComponents = @()
+    $createdDirectories = @()
+    
+    foreach ($component in $criticalComponents) {
+        if (!(Test-Path $component.Path)) {
+            Write-Host "  [MISSING] $($component.Name): $($component.Path)" -ForegroundColor Red
+            
+            # Try to create missing directories
+            if ($component.Name -match "Directory") {
+                try {
+                    New-Item -ItemType Directory -Path $component.Path -Force | Out-Null
+                    Write-Host "  [CREATED] Directory: $($component.Path)" -ForegroundColor Yellow
+                    $createdDirectories += $component.Path
+                } catch {
+                    $missingComponents += $component.Name
+                }
+            } else {
+                $missingComponents += $component.Name
+            }
+        } else {
+            Write-Host "  [OK] $($component.Name)" -ForegroundColor Green
+        }
+    }
+    
+    # ====================================================================
+    # STEP 5: SUMMARY AND ERROR HANDLING
+    # ====================================================================
+    
+    if ($missingComponents.Count -gt 0) {
+        Write-Host "`nERROR: Missing critical components!" -ForegroundColor Red
+        foreach ($missing in $missingComponents) {
+            Write-Host "  - $missing" -ForegroundColor Red
+        }
+        
+        Write-Host "`nTroubleshooting:" -ForegroundColor Yellow
+        Write-Host "1. Ensure all scripts are in the correct locations" -ForegroundColor Yellow
+        Write-Host "2. Check that the maskRecog project structure is intact" -ForegroundColor Yellow
+        Write-Host "3. Verify you have read/write permissions" -ForegroundColor Yellow
+        
+        $continue = Read-Host "`nSome components are missing. Continue anyway? (Y/N)"
+        if ($continue -notmatch '^[Yy]') {
+            Write-Host "Exiting script..." -ForegroundColor Red
+            exit 1
+        }
+    }
+    
+    if ($createdDirectories.Count -gt 0) {
+        Write-Host "`nNote: Created missing directories:" -ForegroundColor Yellow
+        foreach ($dir in $createdDirectories) {
+            Write-Host "  - $dir" -ForegroundColor Yellow
+        }
+    }
+    
+    Write-Host "`nProject initialization complete!" -ForegroundColor Green
+    Write-Host "All paths are now portable and relative to:" -ForegroundColor Green
+    Write-Host "  Project Root: $ProjectRoot" -ForegroundColor White
+    
+    # ====================================================================
+    # STEP 6: MODIFIED - Wait for key press with 60-second timeout
+    # ====================================================================
+    
+    Write-Host "`nPress any key to continue with monitoring (waiting for 60 seconds)..." -ForegroundColor Cyan
+    
+    # Create a timeout mechanism for 60 seconds
+    $timeout = New-TimeSpan -Seconds 60
+    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+    $keyPressed = $false
+    
+    while ($stopwatch.Elapsed -lt $timeout -and -not $keyPressed) {
+        if ($Host.UI.RawUI.KeyAvailable) {
+            $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+            $keyPressed = $true
+            Write-Host "`nKey pressed. Continuing..." -ForegroundColor Green
+        } else {
+            # Show countdown
+            $remaining = 60 - [math]::Floor($stopwatch.Elapsed.TotalSeconds)
+            if ($remaining % 10 -eq 0 -and $remaining -ne 60) {
+                Write-Host "  Auto-continue in $remaining seconds..." -ForegroundColor Gray
+            }
+            Start-Sleep -Milliseconds 100
+        }
+    }
+    
+    if (-not $keyPressed) {
+        Write-Host "`nTimeout reached. Continuing automatically..." -ForegroundColor Yellow
+    }
+    
+    return $true
+}
+
+
+# Call it ONCE at the very beginning
+Initialize-ProjectPortablePaths
+
+# ====================================================================
+# SECTION 2: GLOBAL VARIABLES (KEEP AS IS)
+# ====================================================================
+
 $WorkerProcess = $null
 $WorkerPID = $null
 $PythonPID = $null
@@ -26,6 +281,7 @@ $WorkerIsRunning = $false
 $PythonIsRunning = $false
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 $LastWorkerAttempt = $null
+
 # PID tracking structure
 $PIDTracking = @{
     WorkerPID = $null
@@ -36,79 +292,54 @@ $PIDTracking = @{
     LastUpdate = $null
 }
 
-
-# Please check and udate path below
-
-$Config = @{
-    # Worker script path
-    WorkerScript = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1"
+function Validate-ProjectComponents {
+    Write-Host "Validating project components..." -ForegroundColor Yellow
     
-    # Schedule (24-hour format)
-    StartTime = "08:50"    # 3:08 PM
-    EndTime = "15:18"      # 3:15 PM
+    $missing = @()
     
-    # Paths for validation
-    RunsBasePath = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick"
-    OutputFolderPattern = "Magick_Process_MaskDetect_*"
-    
-    # Process tracking
-    PythonProcessName = "python"  # The actual process we want to track
-    WorkerProcessName = "powershell"  # PowerShell wrapper process
-    PythonScriptPath = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py"
-    
-    # Expected folder structure
-    ExpectedSubfolders = @("logs", "script_output")
-    ExpectedFiles = @("metadata.json")
-    
-    # Validation settings
-    MaxValidationRetries = 5
-    RetryDelaySeconds = 10
-    
-    # Process monitoring
-    ProcessCheckInterval = 15  # seconds (reduced for better tracking)
-    GracefulShutdownTimeout = 60  # seconds
-    
-    # PID tracking
-    PIDFilePath = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\monitor_pid_magick.json"
-    MaxPIDFileAgeMinutes = 120  # Clean up old PID files
-    
-    # Logging
-    LogFile = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\monitor_magick.log"
-
-    
-    # Email notifications for successful process COMPLETION
-    SendEmailOnCompletion = $true
-    
-    # Recipients with language preference
-    EmailRecipients = @(
-        @{
-            Address = "faridraihan17@gmail.com"
-            Language = "English"  # English
-        },
-        @{
-            Address = "ikeepmypromiz@gmail.com"
-            Language = "Bahasa"  # Indonesian
-        }
-        # @{ 
-        #     Address = "itdiv@sinarcemaramasabadi.co.id" # Only un-comment this when the code is in production, because
-        #                                                 # this is formal IT email.
-        #     Language = "Bahasa"  # Indonesian
-        # }
+    # Check critical components
+    $components = @(
+        @{ Name = "Worker Script"; Path = $Config.WorkerScript }
+        @{ Name = "Python Script"; Path = $Config.PythonScriptPath }
+        @{ Name = "Runs Base Path"; Path = $Config.RunsBasePath }
     )
     
-    # Email sender configuration
-    EmailFrom = "faridraihan17@gmail.com"  # Should match your Gmail address
-    EmailSubject = @{
-        English = "Face Recognition Process Completed Successfully"
-        Bahasa = "Proses Pengenalan Wajah Selesai dengan Sukses"
+    foreach ($component in $components) {
+        if (-not (Test-Path $component.Path)) {
+            $missing += "$($component.Name): $($component.Path)"
+        }
     }
     
-    # SMTP Configuration
-    SmtpServer = "smtp.gmail.com"
-    SmtpPort = 587
-    UseSSL = $true
-    EmailCredentialPath = "$env:USERPROFILE\.face-recog\email-credential.xml"
+    if ($missing.Count -gt 0) {
+        Write-Host "MISSING COMPONENTS:" -ForegroundColor Red
+        foreach ($item in $missing) {
+            Write-Host "  - $item" -ForegroundColor Red
+        }
+        
+        # Try to create missing directories
+        foreach ($path in @($Config.RunsBasePath, (Split-Path $Config.LogFile -Parent))) {
+            if (-not (Test-Path $path)) {
+                try {
+                    New-Item -ItemType Directory -Path $path -Force | Out-Null
+                    Write-Host "Created directory: $path" -ForegroundColor Yellow
+                } catch {
+                    Write-Host "Failed to create directory: $path" -ForegroundColor Red
+                }
+            }
+        }
+        
+        # Ask user if they want to continue
+        $response = Read-Host "Some components are missing. Continue anyway? (Y/N)"
+        if ($response -notmatch '^[Yy]') {
+            exit 1
+        }
+    } else {
+        Write-Host "All project components validated successfully!" -ForegroundColor Green
+    }
 }
+
+# Call validation after configuration is set
+Validate-ProjectComponents
 
 # Functions
 function Write-Log {
@@ -160,7 +391,7 @@ function Send-CompletionEmail {
     }
     
     try {
-        Write-Log "Preparing to send completion notifications to $($Config.EmailRecipients.Count) recipient(s)..." -Level "INFO"
+        Write-Log "Preparing to send completion notifications to $($Config.EmailRecipients.Count) recipient(s) using MailKit..." -Level "INFO"
         
         # Load credentials if available
         $credential = $null
@@ -211,7 +442,7 @@ function Send-CompletionEmail {
             $recipientsByLanguage[$lang] += $recipient.Address
         }
         
-        Write-Log "Sending emails in $(($recipientsByLanguage.Keys | Measure-Object).Count) different language(s)" -Level "INFO"
+        Write-Log "Sending emails in $(($recipientsByLanguage.Keys | Measure-Object).Count) different language(s) using MailKit" -Level "INFO"
         
         $successCount = 0
         $failCount = 0
@@ -227,32 +458,19 @@ function Send-CompletionEmail {
             $emailContent = Get-EmailContent -Language $language -RunFolder $RunFolder -ValidationResult $ValidationResult -Attachments $attachments
             
             try {
-                # Prepare email parameters
-                $mailParams = @{
-                    To          = $recipients  # Send to all recipients of this language at once
-                    From        = $Config.EmailFrom
-                    Subject     = $emailContent.Subject
-                    Body        = $emailContent.Body
-                    SmtpServer  = $Config.SmtpServer
-                    Port        = $Config.SmtpPort
-                    UseSsl      = $Config.UseSSL
-                    Credential  = $credential
-                    ErrorAction = 'Stop'
+                # Send email using MailKit
+                $emailSent = Send-MailKitEmail -To $recipients -From $Config.EmailFrom -Subject $emailContent.Subject -Body $emailContent.Body -SmtpServer $Config.SmtpServer -Port $Config.SmtpPort -UseSsl $Config.UseSSL -Credential $credential -Attachments $attachments
+                
+                if ($emailSent) {
+                    Write-Log "Successfully sent $language email to $($recipients.Count) recipient(s) using MailKit" -Level "SUCCESS"
+                    $successCount += $recipients.Count
+                } else {
+                    Write-Log "Failed to send $language email to $($recipients.Count) recipient(s) using MailKit" -Level "ERROR"
+                    $failCount += $recipients.Count
                 }
-                
-                # Add attachments if we have any
-                if ($attachments.Count -gt 0) {
-                    $mailParams.Attachments = $attachments
-                }
-                
-                # Send the email
-                Send-MailMessage @mailParams
-                
-                Write-Log "Successfully sent $language email to $($recipients.Count) recipient(s)" -Level "SUCCESS"
-                $successCount += $recipients.Count
                 
             } catch {
-                Write-Log "Failed to send $language email to $($recipients.Count) recipient(s): $($_.Exception.Message)" -Level "ERROR"
+                Write-Log "Failed to send $language email to $($recipients.Count) recipient(s) using MailKit: $($_.Exception.Message)" -Level "ERROR"
                 $failCount += $recipients.Count
             }
         }
@@ -260,18 +478,18 @@ function Send-CompletionEmail {
         # Summary
         $totalRecipients = $successCount + $failCount
         if ($failCount -eq 0) {
-            Write-Log "All emails sent successfully ($totalRecipients total recipients)" -Level "SUCCESS"
+            Write-Log "All emails sent successfully using MailKit ($totalRecipients total recipients)" -Level "SUCCESS"
             return $true
         } elseif ($successCount -gt 0) {
-            Write-Log "Partially successful: $successCount/$totalRecipients emails sent" -Level "WARN"
+            Write-Log "Partially successful: $successCount/$totalRecipients emails sent using MailKit" -Level "WARN"
             return $true  # Return true if at least some emails were sent
         } else {
-            Write-Log "All emails failed to send" -Level "ERROR"
+            Write-Log "All emails failed to send using MailKit" -Level "ERROR"
             return $false
         }
         
     } catch {
-        Write-Log "Failed to send completion emails: $($_.Exception.Message)" -Level "ERROR"
+        Write-Log "Failed to send completion emails using MailKit: $($_.Exception.Message)" -Level "ERROR"
         
         # Provide troubleshooting tips for Gmail
         if ($Config.SmtpServer -like "*gmail*") {
@@ -282,6 +500,143 @@ function Send-CompletionEmail {
             Write-Log "4. Make sure 'Allow less secure apps' is OFF (App Password replaces this)" -Level "WARN"
         }
         
+        return $false
+    }
+}
+
+function Send-MailKitEmail {
+    param(
+        [string[]]$To,
+        [string]$From,
+        [string]$Subject,
+        [string]$Body,
+        [string]$SmtpServer,
+        [int]$Port,
+        [bool]$UseSsl,
+        [System.Management.Automation.PSCredential]$Credential,
+        [string[]]$Attachments
+    )
+    
+    try {
+        # Load MailKit assembly
+        try {
+            Add-Type -Path "MailKit.dll" -ErrorAction Stop
+        } catch {
+            try {
+                # Try to load from NuGet packages directory or GAC
+                Add-Type -AssemblyName "MailKit" -ErrorAction Stop
+            } catch {
+                Write-Log "MailKit assembly not found. Attempting to load from common locations..." -Level "WARN"
+                
+                # Try to find MailKit in common locations
+                $possiblePaths = @(
+                    "$PSScriptRoot\MailKit.dll",
+                    "$env:USERPROFILE\.nuget\packages\mailkit\*\lib\netstandard2.0\MailKit.dll",
+                    "C:\Program Files\PackageManagement\NuGet\Packages\MailKit*\lib\netstandard2.0\MailKit.dll"
+                )
+                
+                $found = $false
+                foreach ($path in $possiblePaths) {
+                    if (Test-Path $path) {
+                        Add-Type -Path $path
+                        $found = $true
+                        break
+                    }
+                }
+                
+                if (-not $found) {
+                    throw "MailKit assembly not found. Please install MailKit via NuGet or copy MailKit.dll to the script directory."
+                }
+            }
+        }
+        
+        # Create MIME message
+        $message = New-Object MimeKit.MimeMessage
+        
+        # Set From address
+        $message.From.Add([MimeKit.InternetAddress]::Parse($From))
+        
+        # Set To addresses
+        foreach ($recipient in $To) {
+            $message.To.Add([MimeKit.InternetAddress]::Parse($recipient))
+        }
+        
+        # Set subject
+        $message.Subject = $Subject
+        
+        # Create body part
+        $bodyPart = New-Object MimeKit.TextPart
+        if ($Body -match '<.*>') {
+            # HTML content
+            $bodyPart.ContentType = New-Object MimeKit.ContentType('text', 'html')
+        } else {
+            # Plain text content
+            $bodyPart.ContentType = New-Object MimeKit.ContentType('text', 'plain')
+        }
+        $bodyPart.Text = $Body
+        
+        # Handle attachments
+        if ($Attachments.Count -gt 0) {
+            $multipart = New-Object MimeKit.Multipart('mixed')
+            $multipart.Add($bodyPart)
+            
+            foreach ($attachmentPath in $Attachments) {
+                if (Test-Path $attachmentPath) {
+                    $attachment = New-Object MimeKit.MimePart
+                    $attachment.Content = New-Object MimeKit.MimeContent([System.IO.File]::OpenRead($attachmentPath))
+                    $attachment.ContentDisposition = New-Object MimeKit.ContentDisposition([MimeKit.ContentDisposition]::Attachment)
+                    $attachment.ContentTransferEncoding = [MimeKit.ContentEncoding]::Base64
+                    $attachment.FileName = [System.IO.Path]::GetFileName($attachmentPath)
+                    
+                    $multipart.Add($attachment)
+                    Write-Log "Added attachment: $attachmentPath" -Level "DEBUG"
+                }
+            }
+            
+            $message.Body = $multipart
+        } else {
+            $message.Body = $bodyPart
+        }
+        
+        # Send email using MailKit SmtpClient
+        $client = New-Object MailKit.Net.Smtp.SmtpClient
+        
+        try {
+            # FIXED: Proper string interpolation to avoid the colon issue
+            Write-Log "Connecting to SMTP server ${SmtpServer}:${Port} (SSL: ${UseSsl})..." -Level "DEBUG"
+            
+            # Connect to SMTP server
+            $client.Connect($SmtpServer, $Port, $UseSsl)
+            
+            # Note: GMail requires OAuth2 or "Allow less secure apps" - we use credential
+            $networkCredential = $Credential.GetNetworkCredential()
+            Write-Log "Authenticating as $($networkCredential.UserName)..." -Level "DEBUG"
+            
+            # Authenticate
+            $client.Authenticate($networkCredential.UserName, $networkCredential.Password)
+            
+            # Send email
+            Write-Log "Sending email..." -Level "DEBUG"
+            $client.Send($message)
+            
+            # Disconnect
+            $client.Disconnect($true)
+            
+            Write-Log "Email sent successfully using MailKit" -Level "SUCCESS"
+            return $true
+            
+        } catch {
+            Write-Log "MailKit SMTP error: $($_.Exception.Message)" -Level "ERROR"
+            
+            # NO FALLBACK METHODS - Complete removal as requested
+            # Do not try alternative SMTP settings
+            Write-Log "No fallback SMTP methods available. Email sending failed." -Level "ERROR"
+            
+            return $false
+        }
+        
+    } catch {
+        Write-Log "Failed to send email using MailKit: $($_.Exception.Message)" -Level "ERROR"
         return $false
     }
 }
@@ -310,12 +665,18 @@ function Join-String {
 function Test-TimeWindow {
     param([string]$TargetTime)
     
+    # Handle empty time string
+    if ([string]::IsNullOrWhiteSpace($TargetTime)) {
+        Write-Log "Empty time string provided to Test-TimeWindow" -Level "DEBUG"
+        return $false
+    }
+    
     $now = Get-Date
     try {
-        $target = [DateTime]::ParseExact($TargetTime, "HH:mm", $null)
+        $target = [DateTime]::ParseExact($TargetTime.Trim(), "HH:mm", $null)
         return ($now.TimeOfDay -ge $target.TimeOfDay)
     } catch {
-        Write-Log "Invalid time format: $TargetTime" -Level "ERROR"
+        Write-Log "Invalid time format: '$TargetTime'. Expected format: HH:mm" -Level "ERROR"
         return $false
     }
 }
@@ -1222,6 +1583,25 @@ function Test-EmailConfiguration {
         $checksPassed = $false
     }
     
+    # Check if MailKit is available
+    try {
+        # Try to load MailKit
+        Add-Type -Path "MailKit.dll" -ErrorAction Stop
+        Write-Log "MailKit assembly loaded successfully" -Level "SUCCESS"
+    } catch {
+        Write-Log "WARNING: MailKit assembly not found. Attempting alternative loading methods..." -Level "WARN"
+        
+        # Try alternative loading methods
+        try {
+            Add-Type -AssemblyName "MailKit" -ErrorAction Stop
+            Write-Log "MailKit loaded from GAC/System" -Level "SUCCESS"
+        } catch {
+            Write-Log "ERROR: MailKit is not available. Please install MailKit via NuGet: Install-Package MailKit" -Level "ERROR"
+            Write-Log "You can also download MailKit.dll and place it in the script directory" -Level "ERROR"
+            $checksPassed = $false
+        }
+    }
+    
     # Gmail-specific warnings
     if ($Config.SmtpServer -like "*gmail*") {
         Write-Log "GMAIL CONFIGURATION NOTES:" -Level "INFO"
@@ -1232,7 +1612,7 @@ function Test-EmailConfiguration {
     }
     
     if ($checksPassed) {
-        Write-Log "Email configuration valid" -Level "SUCCESS"
+        Write-Log "Email configuration valid (MailKit ready)" -Level "SUCCESS"
         return $true
     } else {
         Write-Log "Email configuration invalid. Emails will not be sent." -Level "ERROR"
@@ -1386,48 +1766,49 @@ try {
             }
         }
         
+        # Check if end time has passed and we should stop
+        elseif ($endPassed) {
+            # If Python is running, stop it and send email
+            if ($processStatus.PythonRunning) {
+                Write-Log "End time reached - stopping processes..." -Level "INFO"
+                Stop-WorkerProcess
                 
-        # In the main loop, update the email section:
-        elseif ($endPassed -and $processStatus.PythonRunning) {
-            Write-Log "End time reached - stopping processes..." -Level "INFO"
-            Stop-WorkerProcess
-            
-            # Wait for cleanup
-            Start-Sleep -Seconds 5
-            
-            # Validate output
-            Write-Log "Validating worker output..." -Level "INFO"
-            $LastValidation = Validate-Output
-            
-            # Send completion email if validation was successful
-            if ($LastValidation -and $LastValidation.Success) {
-                if ($Config.SendEmailOnCompletion -and $EmailConfigValid) {
-                    # Backup original config before sending
-                    Backup-OriginalConfig
-                    
-                    $emailSent = Send-CompletionEmail -RunFolder $LastValidation.RunFolder -ValidationResult $LastValidation
-                    if ($emailSent) {
-                        Write-Log "Completion emails sent successfully." -Level "SUCCESS"
-                    } else {
-                        Write-Log "Failed to send some or all completion emails, but process completed successfully." -Level "WARN"
+                # Wait for cleanup and output generation
+                Write-Log "Waiting for output generation..." -Level "INFO"
+                Start-Sleep -Seconds 10
+                
+                # Validate output
+                Write-Log "Validating worker output..." -Level "INFO"
+                $LastValidation = Validate-Output
+                
+                # Send completion email if validation was successful
+                if ($LastValidation -and $LastValidation.Success) {
+                    if ($Config.SendEmailOnCompletion -and $EmailConfigValid) {
+                        # Backup original config before sending
+                        Backup-OriginalConfig
+                        
+                        $emailSent = Send-CompletionEmail -RunFolder $LastValidation.RunFolder -ValidationResult $LastValidation
+                        if ($emailSent) {
+                            Write-Log "Completion emails sent successfully." -Level "SUCCESS"
+                        } else {
+                            Write-Log "Failed to send some or all completion emails, but process completed successfully." -Level "WARN"
+                        }
+                    } elseif ($Config.SendEmailOnCompletion -and -not $EmailConfigValid) {
+                        Write-Log "Email configuration is invalid. Skipping email notification." -Level "WARN"
                     }
-                } elseif ($Config.SendEmailOnCompletion -and -not $EmailConfigValid) {
-                    Write-Log "Email configuration is invalid. Skipping email notification." -Level "WARN"
+                    
+                    Write-Log "Face recognition pipeline completed successfully!" -Level "SUCCESS"
+                } else {
+                    Write-Log "Pipeline completed with validation issues" -Level "WARN"
                 }
-                
-                Write-Log "Face recognition pipeline completed successfully!" -Level "SUCCESS"
             } else {
-                Write-Log "Pipeline completed with validation issues" -Level "WARN"
+                # No Python process running, just log and stop
+                Write-Log "End time reached - no active processes to stop" -Level "INFO"
             }
             
             # Stop the monitor
             Write-Log "Process completed. Stopping monitor as configured..." -Level "INFO"
             break
-        }
-        
-        # Save PID tracking periodically
-        if ($processStatus.PythonRunning -or $processStatus.WorkerRunning) {
-            Save-PIDTracking
         }
         
         # Wait before next check

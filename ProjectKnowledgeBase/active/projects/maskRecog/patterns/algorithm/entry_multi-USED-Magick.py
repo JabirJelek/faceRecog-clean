@@ -214,7 +214,7 @@ def get_default_config():
     """Return the complete default configuration"""
     return {
         # ========== MODEL PATHS ==========        
-        'detection_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\components\0_0_model\yolov12m-face.pt',
+        'detection_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\yolov12m-face.pt',
         'embeddings_db_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\dataset\person_512.json',
         'mask_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\mask_detector_cus4.onnx',
         

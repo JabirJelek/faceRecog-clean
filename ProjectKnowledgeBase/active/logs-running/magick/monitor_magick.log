@@ -1307,3 +1307,498 @@ Check the spelling of the name, or if a path was included, verify that the path 
 [2026-02-02 13:18:27] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 25256.
 [2026-02-02 13:18:27] [DEBUG] Removed PID tracking file
 [2026-02-02 13:18:27] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 13:53:21] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 13:53:21] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 13:53:21] [INFO] Start Time: 08:00
+[2026-02-02 13:53:21] [INFO] End Time: 13:17
+[2026-02-02 13:53:21] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 13:53:21] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 13:53:21] [INFO] Testing email configuration...
+[2026-02-02 13:53:21] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 13:53:21] [INFO] Configured languages: Bahasa, English
+[2026-02-02 13:53:21] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 13:53:21] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 13:53:21] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 13:53:21] [INFO] - SSL Enabled: True
+[2026-02-02 13:53:21] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 13:53:21] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 13:53:21] [SUCCESS] Email configuration valid
+[2026-02-02 13:53:21] [SUCCESS] Email configuration validated successfully
+[2026-02-02 13:53:21] [DEBUG] No PID tracking file found
+[2026-02-02 13:53:21] [DEBUG] Check: 13:53:21 | Window: Inactive | Python: Stopped
+[2026-02-02 13:53:21] [INFO] End time reached - no active processes to stop
+[2026-02-02 13:53:21] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 13:53:21] [INFO] Cleaning up...
+[2026-02-02 13:53:21] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 13:53:44] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 13:53:44] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 13:53:44] [INFO] Start Time: 08:00
+[2026-02-02 13:53:44] [INFO] End Time: 13:55
+[2026-02-02 13:53:44] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 13:53:44] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 13:53:44] [INFO] Testing email configuration...
+[2026-02-02 13:53:44] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 13:53:45] [INFO] Configured languages: Bahasa, English
+[2026-02-02 13:53:45] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 13:53:45] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 13:53:45] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 13:53:45] [INFO] - SSL Enabled: True
+[2026-02-02 13:53:45] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 13:53:45] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 13:53:45] [SUCCESS] Email configuration valid
+[2026-02-02 13:53:45] [SUCCESS] Email configuration validated successfully
+[2026-02-02 13:53:45] [DEBUG] No PID tracking file found
+[2026-02-02 13:53:45] [DEBUG] Check: 13:53:45 | Window: Active | Python: Stopped
+[2026-02-02 13:53:45] [DEBUG] Check: 13:53:45 | Window: Active | Python: Stopped
+[2026-02-02 13:53:45] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 13:53:45] [DEBUG] Searching for Python process...
+[2026-02-02 13:53:46] [DEBUG] No Python process found matching criteria
+[2026-02-02 13:53:46] [INFO] Starting face recognition worker process...
+[2026-02-02 13:53:46] [SUCCESS] Worker process started (PID: 17568)
+[2026-02-02 13:53:46] [INFO] Waiting for Python process to start...
+[2026-02-02 13:53:46] [DEBUG] Searching for Python process...
+[2026-02-02 13:53:47] [DEBUG] No Python process found matching criteria
+[2026-02-02 13:53:49] [DEBUG] Searching for Python process...
+[2026-02-02 13:53:49] [SUCCESS] Found Python process with our script: PID=2364
+[2026-02-02 13:53:49] [SUCCESS] Python process found (PID: 2364)
+[2026-02-02 13:53:49] [DEBUG] PID tracking saved: WorkerPID=17568, PythonPID=2364
+[2026-02-02 13:53:49] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 13:54:04] [DEBUG] Searching for Python process...
+[2026-02-02 13:54:04] [DEBUG] No Python process found matching criteria
+[2026-02-02 13:54:04] [DEBUG] Check: 13:54:04 | Window: Active | Python: Stopped
+[2026-02-02 13:54:04] [DEBUG] Check: 13:54:04 | Window: Active | Python: Stopped
+[2026-02-02 13:54:04] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 13:54:04] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 13:54:04] [DEBUG] Check: 13:54:04 | Window: Active | Python: Stopped
+[2026-02-02 13:54:04] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 13:54:04] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 13:54:19] [DEBUG] Check: 13:54:19 | Window: Active | Python: Stopped
+[2026-02-02 13:54:19] [DEBUG] Check: 13:54:19 | Window: Active | Python: Stopped
+[2026-02-02 13:54:19] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 13:54:20] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 13:54:20] [DEBUG] Check: 13:54:19 | Window: Active | Python: Stopped
+[2026-02-02 13:54:20] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 13:54:20] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 13:54:35] [DEBUG] Check: 13:54:35 | Window: Active | Python: Stopped
+[2026-02-02 13:54:35] [DEBUG] Check: 13:54:35 | Window: Active | Python: Stopped
+[2026-02-02 13:54:35] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 13:54:35] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 13:54:35] [DEBUG] Check: 13:54:35 | Window: Active | Python: Stopped
+[2026-02-02 13:54:35] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 13:54:35] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 13:54:50] [DEBUG] Check: 13:54:50 | Window: Active | Python: Stopped
+[2026-02-02 13:54:50] [DEBUG] Check: 13:54:50 | Window: Active | Python: Stopped
+[2026-02-02 13:54:50] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 13:54:50] [DEBUG] Searching for Python process...
+[2026-02-02 13:54:50] [DEBUG] No Python process found matching criteria
+[2026-02-02 13:54:50] [INFO] Starting face recognition worker process...
+[2026-02-02 13:54:50] [SUCCESS] Worker process started (PID: 29124)
+[2026-02-02 13:54:50] [INFO] Waiting for Python process to start...
+[2026-02-02 13:54:50] [DEBUG] Searching for Python process...
+[2026-02-02 13:54:50] [INFO] Found Python process started after worker: PID=2600
+[2026-02-02 13:54:50] [SUCCESS] Python process found (PID: 2600)
+[2026-02-02 13:54:50] [DEBUG] PID tracking saved: WorkerPID=29124, PythonPID=2600
+[2026-02-02 13:54:50] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 13:55:06] [DEBUG] Searching for Python process...
+[2026-02-02 13:55:06] [DEBUG] No Python process found matching criteria
+[2026-02-02 13:55:06] [DEBUG] Check: 13:55:06 | Window: Inactive | Python: Stopped
+[2026-02-02 13:55:06] [INFO] End time reached - no active processes to stop
+[2026-02-02 13:55:06] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 13:55:06] [INFO] Cleaning up...
+[2026-02-02 13:55:06] [INFO] Stopping Python process (PID: 2600)...
+[2026-02-02 13:55:06] [ERROR] Error stopping Python process: Cannot find a process with the process identifier 2600.
+[2026-02-02 13:55:06] [INFO] Stopping worker process (PID: 29124)...
+[2026-02-02 13:55:06] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 29124.
+[2026-02-02 13:55:06] [DEBUG] Removed PID tracking file
+[2026-02-02 13:55:06] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 14:06:11] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 14:06:11] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 14:06:11] [INFO] Start Time: 08:00
+[2026-02-02 14:06:11] [INFO] End Time: 13:17
+[2026-02-02 14:06:11] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 14:06:11] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 14:06:11] [INFO] Testing email configuration...
+[2026-02-02 14:06:11] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 14:06:11] [INFO] Configured languages: Bahasa, English
+[2026-02-02 14:06:11] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 14:06:11] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 14:06:11] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 14:06:11] [INFO] - SSL Enabled: True
+[2026-02-02 14:06:11] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 14:06:11] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 14:06:12] [SUCCESS] Email configuration valid
+[2026-02-02 14:06:12] [SUCCESS] Email configuration validated successfully
+[2026-02-02 14:06:12] [DEBUG] No PID tracking file found
+[2026-02-02 14:06:12] [DEBUG] Check: 14:06:12 | Window: Inactive | Python: Stopped
+[2026-02-02 14:06:12] [INFO] End time reached - no active processes to stop
+[2026-02-02 14:06:12] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 14:06:12] [INFO] Cleaning up...
+[2026-02-02 14:06:12] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 14:06:34] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 14:06:34] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 14:06:34] [INFO] Start Time: 08:00
+[2026-02-02 14:06:34] [INFO] End Time: 14:07
+[2026-02-02 14:06:34] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 14:06:34] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 14:06:34] [INFO] Testing email configuration...
+[2026-02-02 14:06:34] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 14:06:34] [INFO] Configured languages: Bahasa, English
+[2026-02-02 14:06:34] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 14:06:34] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 14:06:34] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 14:06:34] [INFO] - SSL Enabled: True
+[2026-02-02 14:06:34] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 14:06:34] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 14:06:34] [SUCCESS] Email configuration valid
+[2026-02-02 14:06:34] [SUCCESS] Email configuration validated successfully
+[2026-02-02 14:06:34] [DEBUG] No PID tracking file found
+[2026-02-02 14:06:34] [DEBUG] Check: 14:06:34 | Window: Active | Python: Stopped
+[2026-02-02 14:06:34] [DEBUG] Check: 14:06:34 | Window: Active | Python: Stopped
+[2026-02-02 14:06:34] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 14:06:34] [DEBUG] Searching for Python process...
+[2026-02-02 14:06:35] [DEBUG] No Python process found matching criteria
+[2026-02-02 14:06:35] [INFO] Starting face recognition worker process...
+[2026-02-02 14:06:35] [SUCCESS] Worker process started (PID: 10116)
+[2026-02-02 14:06:35] [INFO] Waiting for Python process to start...
+[2026-02-02 14:06:35] [DEBUG] Searching for Python process...
+[2026-02-02 14:06:36] [DEBUG] No Python process found matching criteria
+[2026-02-02 14:06:38] [DEBUG] Searching for Python process...
+[2026-02-02 14:06:38] [SUCCESS] Found Python process with our script: PID=18632
+[2026-02-02 14:06:38] [SUCCESS] Python process found (PID: 18632)
+[2026-02-02 14:06:38] [DEBUG] PID tracking saved: WorkerPID=10116, PythonPID=18632
+[2026-02-02 14:06:38] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 14:06:53] [DEBUG] Searching for Python process...
+[2026-02-02 14:06:53] [DEBUG] No Python process found matching criteria
+[2026-02-02 14:06:53] [DEBUG] Check: 14:06:53 | Window: Active | Python: Stopped
+[2026-02-02 14:06:53] [DEBUG] Check: 14:06:53 | Window: Active | Python: Stopped
+[2026-02-02 14:06:53] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 14:06:53] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 14:07:08] [DEBUG] Check: 14:07:08 | Window: Inactive | Python: Stopped
+[2026-02-02 14:07:08] [INFO] End time reached - no active processes to stop
+[2026-02-02 14:07:08] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 14:07:08] [INFO] Cleaning up...
+[2026-02-02 14:07:08] [INFO] Stopping Python process (PID: 18632)...
+[2026-02-02 14:07:08] [ERROR] Error stopping Python process: Cannot find a process with the process identifier 18632.
+[2026-02-02 14:07:08] [INFO] Stopping worker process (PID: 10116)...
+[2026-02-02 14:07:08] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 10116.
+[2026-02-02 14:07:08] [DEBUG] Removed PID tracking file
+[2026-02-02 14:07:08] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 14:36:04] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 14:36:04] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 14:36:04] [INFO] Start Time: 08:00
+[2026-02-02 14:36:04] [INFO] End Time: 14:07
+[2026-02-02 14:36:04] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 14:36:04] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 14:36:04] [INFO] Testing email configuration...
+[2026-02-02 14:36:04] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 14:36:04] [INFO] Configured languages: Bahasa, English
+[2026-02-02 14:36:04] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 14:36:04] [WARN] WARNING: MailKit assembly not found. Attempting alternative loading methods...
+[2026-02-02 14:36:04] [ERROR] ERROR: MailKit is not available. Please install MailKit via NuGet: Install-Package MailKit
+[2026-02-02 14:36:04] [ERROR] You can also download MailKit.dll and place it in the script directory
+[2026-02-02 14:36:04] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 14:36:04] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 14:36:04] [INFO] - SSL Enabled: True
+[2026-02-02 14:36:04] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 14:36:04] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 14:36:04] [ERROR] Email configuration invalid. Emails will not be sent.
+[2026-02-02 14:36:04] [DEBUG] No PID tracking file found
+[2026-02-02 14:36:04] [DEBUG] Check: 14:36:04 | Window: Inactive | Python: Stopped
+[2026-02-02 14:36:04] [INFO] End time reached - no active processes to stop
+[2026-02-02 14:36:04] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 14:36:04] [INFO] Cleaning up...
+[2026-02-02 14:36:04] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 14:39:52] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 14:39:52] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 14:39:52] [INFO] Start Time: 08:00
+[2026-02-02 14:39:52] [INFO] End Time: 14:07
+[2026-02-02 14:39:52] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 14:39:52] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 14:39:52] [INFO] Testing email configuration...
+[2026-02-02 14:39:52] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 14:39:52] [INFO] Configured languages: Bahasa, English
+[2026-02-02 14:39:52] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 14:39:52] [WARN] WARNING: MailKit assembly not found. Attempting alternative loading methods...
+[2026-02-02 14:39:52] [ERROR] ERROR: MailKit is not available. Please install MailKit via NuGet: Install-Package MailKit
+[2026-02-02 14:39:52] [ERROR] You can also download MailKit.dll and place it in the script directory
+[2026-02-02 14:39:52] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 14:39:52] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 14:39:52] [INFO] - SSL Enabled: True
+[2026-02-02 14:39:52] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 14:39:52] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 14:39:52] [ERROR] Email configuration invalid. Emails will not be sent.
+[2026-02-02 14:39:52] [DEBUG] No PID tracking file found
+[2026-02-02 14:39:52] [DEBUG] Check: 14:39:52 | Window: Inactive | Python: Stopped
+[2026-02-02 14:39:52] [INFO] End time reached - no active processes to stop
+[2026-02-02 14:39:52] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 14:39:52] [INFO] Cleaning up...
+[2026-02-02 14:39:52] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 14:49:55] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 14:49:55] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 14:49:55] [INFO] Start Time: 08:00
+[2026-02-02 14:49:55] [INFO] End Time: 14:07
+[2026-02-02 14:49:55] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 14:49:55] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 14:49:55] [INFO] Testing email configuration...
+[2026-02-02 14:49:55] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 14:49:55] [INFO] Configured languages: Bahasa, English
+[2026-02-02 14:49:55] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 14:49:55] [WARN] WARNING: MailKit assembly not found. Attempting alternative loading methods...
+[2026-02-02 14:49:55] [ERROR] ERROR: MailKit is not available. Please install MailKit via NuGet: Install-Package MailKit
+[2026-02-02 14:49:55] [ERROR] You can also download MailKit.dll and place it in the script directory
+[2026-02-02 14:49:55] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 14:49:55] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 14:49:55] [INFO] - SSL Enabled: True
+[2026-02-02 14:49:55] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 14:49:56] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 14:49:56] [ERROR] Email configuration invalid. Emails will not be sent.
+[2026-02-02 14:49:56] [DEBUG] No PID tracking file found
+[2026-02-02 14:49:56] [DEBUG] Check: 14:49:56 | Window: Inactive | Python: Stopped
+[2026-02-02 14:49:56] [INFO] End time reached - no active processes to stop
+[2026-02-02 14:49:56] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 14:49:56] [INFO] Cleaning up...
+[2026-02-02 14:49:56] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 14:50:20] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 14:50:20] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 14:50:20] [INFO] Start Time: 08:00
+[2026-02-02 14:50:20] [INFO] End Time: 14:52
+[2026-02-02 14:50:20] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 14:50:20] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 14:50:20] [INFO] Testing email configuration...
+[2026-02-02 14:50:20] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 14:50:20] [INFO] Configured languages: Bahasa, English
+[2026-02-02 14:50:20] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 14:50:20] [WARN] WARNING: MailKit assembly not found. Attempting alternative loading methods...
+[2026-02-02 14:50:20] [ERROR] ERROR: MailKit is not available. Please install MailKit via NuGet: Install-Package MailKit
+[2026-02-02 14:50:20] [ERROR] You can also download MailKit.dll and place it in the script directory
+[2026-02-02 14:50:20] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 14:50:20] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 14:50:20] [INFO] - SSL Enabled: True
+[2026-02-02 14:50:20] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 14:50:20] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 14:50:20] [ERROR] Email configuration invalid. Emails will not be sent.
+[2026-02-02 14:50:20] [DEBUG] No PID tracking file found
+[2026-02-02 14:50:20] [DEBUG] Check: 14:50:20 | Window: Active | Python: Stopped
+[2026-02-02 14:50:20] [DEBUG] Check: 14:50:20 | Window: Active | Python: Stopped
+[2026-02-02 14:50:20] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 14:50:20] [DEBUG] Searching for Python process...
+[2026-02-02 14:50:22] [DEBUG] No Python process found matching criteria
+[2026-02-02 14:50:22] [INFO] Starting face recognition worker process...
+[2026-02-02 14:50:22] [SUCCESS] Worker process started (PID: 37340)
+[2026-02-02 14:50:22] [INFO] Waiting for Python process to start...
+[2026-02-02 14:50:22] [DEBUG] Searching for Python process...
+[2026-02-02 14:50:22] [DEBUG] No Python process found matching criteria
+[2026-02-02 14:50:24] [DEBUG] Searching for Python process...
+[2026-02-02 14:50:24] [SUCCESS] Found Python process with our script: PID=27092
+[2026-02-02 14:50:24] [SUCCESS] Python process found (PID: 27092)
+[2026-02-02 14:50:24] [DEBUG] PID tracking saved: WorkerPID=37340, PythonPID=27092
+[2026-02-02 14:50:24] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 14:50:39] [DEBUG] Searching for Python process...
+[2026-02-02 14:50:40] [DEBUG] No Python process found matching criteria
+[2026-02-02 14:50:40] [DEBUG] Check: 14:50:40 | Window: Active | Python: Stopped
+[2026-02-02 14:50:40] [DEBUG] Check: 14:50:40 | Window: Active | Python: Stopped
+[2026-02-02 14:50:40] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 14:50:40] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 14:50:55] [DEBUG] Check: 14:50:55 | Window: Active | Python: Stopped
+[2026-02-02 14:50:55] [DEBUG] Check: 14:50:55 | Window: Active | Python: Stopped
+[2026-02-02 14:50:55] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 14:50:55] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 14:51:10] [DEBUG] Check: 14:51:10 | Window: Active | Python: Stopped
+[2026-02-02 14:51:10] [DEBUG] Check: 14:51:10 | Window: Active | Python: Stopped
+[2026-02-02 14:51:10] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 14:51:10] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 14:51:25] [DEBUG] Check: 14:51:25 | Window: Active | Python: Stopped
+[2026-02-02 14:51:25] [DEBUG] Check: 14:51:25 | Window: Active | Python: Stopped
+[2026-02-02 14:51:25] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 14:51:25] [DEBUG] Searching for Python process...
+[2026-02-02 14:51:25] [DEBUG] No Python process found matching criteria
+[2026-02-02 14:51:25] [INFO] Starting face recognition worker process...
+[2026-02-02 14:51:25] [SUCCESS] Worker process started (PID: 36436)
+[2026-02-02 14:51:25] [INFO] Waiting for Python process to start...
+[2026-02-02 14:51:25] [DEBUG] Searching for Python process...
+[2026-02-02 14:51:26] [DEBUG] No Python process found matching criteria
+[2026-02-02 14:51:28] [DEBUG] Searching for Python process...
+[2026-02-02 14:51:28] [SUCCESS] Found Python process with our script: PID=8688
+[2026-02-02 14:51:28] [SUCCESS] Python process found (PID: 8688)
+[2026-02-02 14:51:28] [DEBUG] PID tracking saved: WorkerPID=36436, PythonPID=8688
+[2026-02-02 14:51:28] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 14:51:43] [DEBUG] Searching for Python process...
+[2026-02-02 14:51:43] [DEBUG] No Python process found matching criteria
+[2026-02-02 14:51:43] [DEBUG] Check: 14:51:43 | Window: Active | Python: Stopped
+[2026-02-02 14:51:43] [DEBUG] Check: 14:51:43 | Window: Active | Python: Stopped
+[2026-02-02 14:51:43] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 14:51:43] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 14:51:58] [DEBUG] Check: 14:51:58 | Window: Active | Python: Stopped
+[2026-02-02 14:51:58] [DEBUG] Check: 14:51:58 | Window: Active | Python: Stopped
+[2026-02-02 14:51:58] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 14:51:58] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 14:52:13] [DEBUG] Check: 14:52:13 | Window: Inactive | Python: Stopped
+[2026-02-02 14:52:13] [INFO] End time reached - no active processes to stop
+[2026-02-02 14:52:13] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 14:52:13] [INFO] Cleaning up...
+[2026-02-02 14:52:13] [INFO] Stopping Python process (PID: 8688)...
+[2026-02-02 14:52:13] [ERROR] Error stopping Python process: Cannot find a process with the process identifier 8688.
+[2026-02-02 14:52:13] [INFO] Stopping worker process (PID: 36436)...
+[2026-02-02 14:52:13] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 36436.
+[2026-02-02 14:52:13] [DEBUG] Removed PID tracking file
+[2026-02-02 14:52:13] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 15:11:05] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 15:11:05] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 15:11:05] [INFO] Start Time: 08:50
+[2026-02-02 15:11:05] [INFO] End Time: 15:12
+[2026-02-02 15:11:05] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 15:11:05] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 15:11:05] [INFO] Testing email configuration...
+[2026-02-02 15:11:05] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 15:11:05] [INFO] Configured languages: Bahasa, English
+[2026-02-02 15:11:05] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 15:11:05] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 15:11:05] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 15:11:05] [INFO] - SSL Enabled: True
+[2026-02-02 15:11:05] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 15:11:05] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 15:11:05] [SUCCESS] Email configuration valid
+[2026-02-02 15:11:05] [SUCCESS] Email configuration validated successfully
+[2026-02-02 15:11:05] [DEBUG] No PID tracking file found
+[2026-02-02 15:11:05] [DEBUG] Check: 15:11:05 | Window: Active | Python: Stopped
+[2026-02-02 15:11:05] [DEBUG] Check: 15:11:05 | Window: Active | Python: Stopped
+[2026-02-02 15:11:05] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 15:11:05] [DEBUG] Searching for Python process...
+[2026-02-02 15:11:06] [DEBUG] No Python process found matching criteria
+[2026-02-02 15:11:06] [INFO] Starting face recognition worker process...
+[2026-02-02 15:11:06] [SUCCESS] Worker process started (PID: 29836)
+[2026-02-02 15:11:06] [INFO] Waiting for Python process to start...
+[2026-02-02 15:11:06] [DEBUG] Searching for Python process...
+[2026-02-02 15:11:07] [DEBUG] No Python process found matching criteria
+[2026-02-02 15:11:09] [DEBUG] Searching for Python process...
+[2026-02-02 15:11:09] [SUCCESS] Found Python process with our script: PID=16616
+[2026-02-02 15:11:09] [SUCCESS] Python process found (PID: 16616)
+[2026-02-02 15:11:09] [DEBUG] PID tracking saved: WorkerPID=29836, PythonPID=16616
+[2026-02-02 15:11:09] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 15:11:09] [DEBUG] PID tracking saved: WorkerPID=29836, PythonPID=16616
+[2026-02-02 15:11:24] [DEBUG] Searching for Python process...
+[2026-02-02 15:11:24] [DEBUG] No Python process found matching criteria
+[2026-02-02 15:11:24] [DEBUG] Check: 15:11:24 | Window: Active | Python: Stopped
+[2026-02-02 15:11:24] [DEBUG] Check: 15:11:24 | Window: Active | Python: Stopped
+[2026-02-02 15:11:24] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 15:11:24] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 15:11:39] [DEBUG] Check: 15:11:39 | Window: Active | Python: Stopped
+[2026-02-02 15:11:39] [DEBUG] Check: 15:11:39 | Window: Active | Python: Stopped
+[2026-02-02 15:11:39] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 15:11:40] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 15:11:55] [DEBUG] Check: 15:11:55 | Window: Active | Python: Stopped
+[2026-02-02 15:11:55] [DEBUG] Check: 15:11:55 | Window: Active | Python: Stopped
+[2026-02-02 15:11:55] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 15:11:55] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-02 15:12:10] [DEBUG] Check: 15:12:10 | Window: Inactive | Python: Stopped
+[2026-02-02 15:12:25] [DEBUG] Check: 15:12:25 | Window: Inactive | Python: Stopped
+[2026-02-02 15:12:40] [DEBUG] Check: 15:12:40 | Window: Inactive | Python: Stopped
+[2026-02-02 15:12:47] [INFO] Cleaning up...
+[2026-02-02 15:12:47] [INFO] Stopping Python process (PID: 16616)...
+[2026-02-02 15:12:47] [ERROR] Error stopping Python process: Cannot find a process with the process identifier 16616.
+[2026-02-02 15:12:47] [INFO] Stopping worker process (PID: 29836)...
+[2026-02-02 15:12:47] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 29836.
+[2026-02-02 15:12:47] [DEBUG] Removed PID tracking file
+[2026-02-02 15:12:47] [INFO] === Face Recognition Monitor Stopped ===
+[2026-02-02 15:16:25] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 15:16:25] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 15:16:25] [INFO] Start Time: 08:50
+[2026-02-02 15:16:25] [INFO] End Time: 15:18
+[2026-02-02 15:16:25] [INFO] Worker Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1
+[2026-02-02 15:16:25] [INFO] Python Script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-02 15:16:25] [INFO] Testing email configuration...
+[2026-02-02 15:16:25] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 15:16:25] [INFO] Configured languages: Bahasa, English
+[2026-02-02 15:16:25] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 15:16:25] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 15:16:25] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 15:16:25] [INFO] - SSL Enabled: True
+[2026-02-02 15:16:25] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 15:16:25] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 15:16:25] [SUCCESS] Email configuration valid
+[2026-02-02 15:16:25] [SUCCESS] Email configuration validated successfully
+[2026-02-02 15:16:25] [DEBUG] No PID tracking file found
+[2026-02-02 15:16:25] [DEBUG] Check: 15:16:25 | Window: Active | Python: Stopped
+[2026-02-02 15:16:25] [DEBUG] Check: 15:16:25 | Window: Active | Python: Stopped
+[2026-02-02 15:16:25] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 15:16:25] [DEBUG] Searching for Python process...
+[2026-02-02 15:16:27] [DEBUG] No Python process found matching criteria
+[2026-02-02 15:16:27] [INFO] Starting face recognition worker process...
+[2026-02-02 15:16:27] [SUCCESS] Worker process started (PID: 24244)
+[2026-02-02 15:16:27] [INFO] Waiting for Python process to start...
+[2026-02-02 15:16:27] [DEBUG] Searching for Python process...
+[2026-02-02 15:16:27] [DEBUG] No Python process found matching criteria
+[2026-02-02 15:16:29] [DEBUG] Searching for Python process...
+[2026-02-02 15:16:29] [SUCCESS] Found Python process with our script: PID=724
+[2026-02-02 15:16:29] [SUCCESS] Python process found (PID: 724)
+[2026-02-02 15:16:29] [DEBUG] PID tracking saved: WorkerPID=24244, PythonPID=724
+[2026-02-02 15:16:29] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 15:16:29] [DEBUG] PID tracking saved: WorkerPID=24244, PythonPID=724
+[2026-02-02 15:16:44] [DEBUG] Check: 15:16:44 | Window: Active | Python: Running (PID: 724)
+[2026-02-02 15:16:44] [DEBUG] PID tracking saved: WorkerPID=24244, PythonPID=724
+[2026-02-02 15:16:59] [DEBUG] Check: 15:16:59 | Window: Active | Python: Running (PID: 724)
+[2026-02-02 15:16:59] [DEBUG] PID tracking saved: WorkerPID=24244, PythonPID=724
+[2026-02-02 15:17:14] [DEBUG] Check: 15:17:14 | Window: Active | Python: Running (PID: 724)
+[2026-02-02 15:17:15] [DEBUG] PID tracking saved: WorkerPID=24244, PythonPID=724
+[2026-02-02 15:17:30] [DEBUG] Searching for Python process...
+[2026-02-02 15:17:30] [DEBUG] No Python process found matching criteria
+[2026-02-02 15:17:30] [DEBUG] Check: 15:17:30 | Window: Active | Python: Stopped
+[2026-02-02 15:17:30] [DEBUG] Check: 15:17:30 | Window: Active | Python: Stopped
+[2026-02-02 15:17:30] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 15:17:30] [DEBUG] Searching for Python process...
+[2026-02-02 15:17:30] [DEBUG] No Python process found matching criteria
+[2026-02-02 15:17:30] [INFO] Starting face recognition worker process...
+[2026-02-02 15:17:30] [SUCCESS] Worker process started (PID: 27500)
+[2026-02-02 15:17:30] [INFO] Waiting for Python process to start...
+[2026-02-02 15:17:30] [DEBUG] Searching for Python process...
+[2026-02-02 15:17:31] [INFO] Found Python process started after worker: PID=11396
+[2026-02-02 15:17:31] [SUCCESS] Python process found (PID: 11396)
+[2026-02-02 15:17:31] [DEBUG] PID tracking saved: WorkerPID=27500, PythonPID=11396
+[2026-02-02 15:17:31] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 15:17:31] [DEBUG] PID tracking saved: WorkerPID=27500, PythonPID=11396
+[2026-02-02 15:17:46] [DEBUG] Check: 15:17:46 | Window: Active | Python: Running (PID: 11396)
+[2026-02-02 15:17:46] [DEBUG] PID tracking saved: WorkerPID=27500, PythonPID=11396
+[2026-02-02 15:18:01] [DEBUG] Check: 15:18:01 | Window: Inactive | Python: Running (PID: 11396)
+[2026-02-02 15:18:01] [INFO] End time reached - stopping processes...
+[2026-02-02 15:18:01] [INFO] Stopping Python process (PID: 11396)...
+[2026-02-02 15:18:03] [WARN] Forcefully terminating Python process...
+[2026-02-02 15:18:03] [SUCCESS] Python process terminated
+[2026-02-02 15:18:03] [INFO] Stopping worker process (PID: 27500)...
+[2026-02-02 15:18:05] [SUCCESS] Worker process exited gracefully
+[2026-02-02 15:18:05] [DEBUG] Removed PID tracking file
+[2026-02-02 15:18:05] [INFO] Stopped processes: Python, Worker
+[2026-02-02 15:18:10] [INFO] Validating worker output...
+[2026-02-02 15:18:10] [INFO] Validating face recognition output structure...
+[2026-02-02 15:18:10] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-02_15-17-31
+[2026-02-02 15:18:10] [DEBUG] Found subfolder: logs
+[2026-02-02 15:18:10] [DEBUG] Found subfolder: script_output
+[2026-02-02 15:18:10] [DEBUG] Metadata file is valid JSON
+[2026-02-02 15:18:10] [DEBUG] Metadata file size: 1.33 KB
+[2026-02-02 15:18:10] [DEBUG] Found 3 log files
+[2026-02-02 15:18:10] [DEBUG] completion_summary.txt size: 4.4 KB
+[2026-02-02 15:18:10] [DEBUG] python_output.txt size: 34.99 KB
+[2026-02-02 15:18:10] [DEBUG] Latest run log: run_2026-02-02_15-17-31.log (2.64 KB)
+[2026-02-02 15:18:10] [DEBUG] Script output contains 1 items
+[2026-02-02 15:18:10] [DEBUG] Total folder size: 0.04 MB
+[2026-02-02 15:18:10] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-02 15:18:10] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-02 15:18:11] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-02_15-17-31
+[2026-02-02 15:18:11] [SUCCESS]   - Created: 02/02/2026 15:17:31
+[2026-02-02 15:18:11] [SUCCESS]   - Size: 0.04 MB
+[2026-02-02 15:18:11] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-02 15:18:11] [DEBUG] Configuration backed up to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\config_backup_20260202_151811.json
+[2026-02-02 15:18:11] [INFO] Preparing to send completion notifications to 2 recipient(s)...
+[2026-02-02 15:18:11] [DEBUG] Email credential loaded from C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-02 15:18:11] [DEBUG] Found latest run log: run_2026-02-02_15-17-31.log
+[2026-02-02 15:18:11] [DEBUG] Found metadata.json
+[2026-02-02 15:18:11] [INFO] Sending emails in 2 different language(s)
+[2026-02-02 15:18:11] [INFO] Sending English email to: faridraihan17@gmail.com
+[2026-02-02 15:18:15] [SUCCESS] Successfully sent English email to 1 recipient(s)
+[2026-02-02 15:18:15] [INFO] Sending Bahasa email to: ikeepmypromiz@gmail.com
+[2026-02-02 15:18:18] [SUCCESS] Successfully sent Bahasa email to 1 recipient(s)
+[2026-02-02 15:18:18] [SUCCESS] All emails sent successfully (2 total recipients)
+[2026-02-02 15:18:18] [SUCCESS] Completion emails sent successfully.
+[2026-02-02 15:18:19] [SUCCESS] Face recognition pipeline completed successfully!
+[2026-02-02 15:18:19] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-02 15:18:19] [INFO] Cleaning up...
+[2026-02-02 15:18:19] [INFO] === Face Recognition Monitor Stopped ===
