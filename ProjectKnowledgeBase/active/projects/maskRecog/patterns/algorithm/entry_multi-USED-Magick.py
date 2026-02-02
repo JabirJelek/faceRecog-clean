@@ -215,8 +215,8 @@ def get_default_config():
     return {
         # ========== MODEL PATHS ==========        
         'detection_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\components\0_0_model\yolov12m-face.pt',
-        'embeddings_db_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\components\0_dataset\person_512.json',
-        'mask_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\components\0_0_model\mask_detector_cus4.onnx',
+        'embeddings_db_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\dataset\person_512.json',
+        'mask_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\mask_detector_cus4.onnx',
         
                                                 # PLEASE FIX THE STABILITY OF THE VERIFICATION 
                                                 # VALUE BEFORE TRYING TO CHANGE THE TYPE OF mask MODEL USED.        
