@@ -4,8 +4,8 @@
 # ==============================================
 
 # ========== CONFIGURATION ==========
-$VENV_ROOT = "C:\raihan\dokumen\project\global-env\faceRecog\.venv"
-$PYTHON_SCRIPT = "C:\raihan\dokumen\project\global-env\faceRecog\run_py\modular\entry_multi-USED-TowerCPU.py"
+$VENV_ROOT = "C:\raihan\dokumen\project\faceRecog\.venv"
+$PYTHON_SCRIPT = "C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-TowerCPU.py"
 $POWERSHELL_SCRIPT_NAME = Split-Path -Leaf $MyInvocation.MyCommand.Path  # Added: Get current script name
 
 # ENHANCED: Use an array for multiple arguments
@@ -32,7 +32,7 @@ $PYTHON_PARAMS = @{
 }
 
 # Base path for all runs (outside virtual environment)
-$RUNS_BASE_PATH = "C:\raihan\dokumen\project\global-env\faceRecog\process-run"
+$RUNS_BASE_PATH = "C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\logs-running\towerCPU"
 # ===================================
 
 # Helper function to convert hashtable to argument array

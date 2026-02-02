@@ -1,0 +1,46 @@
+[2026-02-02 10:11:41] [INFO] === Face Recognition Monitor Started ===
+[2026-02-02 10:11:41] [INFO] Monitor Version: 2.0 (Stable)
+[2026-02-02 10:11:41] [INFO] Start Time: 08:50
+[2026-02-02 10:11:41] [INFO] End Time: 11:46
+[2026-02-02 10:11:41] [INFO] Worker Script: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\maskDetect.ps1
+[2026-02-02 10:11:41] [INFO] Python Script: C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-TowerCPU.py
+[2026-02-02 10:11:41] [INFO] Testing email configuration...
+[2026-02-02 10:11:41] [SUCCESS] Found 2 email recipient(s)
+[2026-02-02 10:11:41] [INFO] Configured languages: Bahasa, English
+[2026-02-02 10:11:41] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-02 10:11:41] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-02 10:11:41] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-02 10:11:41] [INFO] - SSL Enabled: True
+[2026-02-02 10:11:41] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-02 10:11:41] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-02 10:11:41] [SUCCESS] Email configuration valid
+[2026-02-02 10:11:41] [SUCCESS] Email configuration validated successfully
+[2026-02-02 10:11:41] [DEBUG] No PID tracking file found
+[2026-02-02 10:11:41] [DEBUG] Check: 10:11:41 | Window: Active | Python: Stopped
+[2026-02-02 10:11:41] [DEBUG] Check: 10:11:41 | Window: Active | Python: Stopped
+[2026-02-02 10:11:41] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-02 10:11:41] [DEBUG] Searching for Python process...
+[2026-02-02 10:11:41] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:11:41] [INFO] Starting face recognition worker process...
+[2026-02-02 10:11:41] [SUCCESS] Worker process started (PID: 5384)
+[2026-02-02 10:11:41] [INFO] Waiting for Python process to start...
+[2026-02-02 10:11:41] [DEBUG] Searching for Python process...
+[2026-02-02 10:11:41] [DEBUG] No Python process found matching criteria
+[2026-02-02 10:11:43] [DEBUG] Searching for Python process...
+[2026-02-02 10:11:45] [SUCCESS] Found Python process with our script: PID=6644
+[2026-02-02 10:11:45] [SUCCESS] Python process found (PID: 6644)
+[2026-02-02 10:11:45] [DEBUG] PID tracking saved: WorkerPID=5384, PythonPID=6644
+[2026-02-02 10:11:45] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-02 10:11:45] [DEBUG] PID tracking saved: WorkerPID=5384, PythonPID=6644
+[2026-02-02 10:12:00] [ERROR] FATAL ERROR: Cannot bind parameter 'Date'. Cannot convert value "-" to type "System.DateTime". Error: "String '-' was not recognized as a valid DateTime."
+[2026-02-02 10:12:00] [ERROR] at Show-StatusBanner, C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\0_monitor_email_towerCPU.ps1: line 1243
+at <ScriptBlock>, C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\0_monitor_email_towerCPU.ps1: line 1328
+[2026-02-02 10:12:00] [INFO] Cleaning up...
+[2026-02-02 10:12:00] [INFO] Stopping Python process (PID: 6644)...
+[2026-02-02 10:12:02] [WARN] Forcefully terminating Python process...
+[2026-02-02 10:12:03] [SUCCESS] Python process terminated
+[2026-02-02 10:12:03] [INFO] Stopping worker process (PID: 5384)...
+[2026-02-02 10:12:05] [SUCCESS] Worker process exited gracefully
+[2026-02-02 10:12:05] [DEBUG] Removed PID tracking file
+[2026-02-02 10:12:05] [INFO] Stopped processes: Python, Worker
+[2026-02-02 10:12:05] [INFO] === Face Recognition Monitor Stopped ===
