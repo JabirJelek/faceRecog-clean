@@ -515,7 +515,7 @@ def get_default_config():
         
         # ========== SERVER PUSH CONFIGURATION ==========        
         'server_push_enabled': True,
-        'server_endpoint': 'https://vps.casda.my.id/accounting/public/api/submit_ai_detection',
+        'server_endpoint': '',
         'server_push_cooldown': 5,
         'server_timeout': 10,
         'server_retry_attempts': 10,
@@ -529,7 +529,7 @@ def get_default_config():
         
         # ========== ALERT CONFIGURATION ==========
         'enable_voice_alerts': True,
-        'alert_server_url': "https://vps.casda.my.id/actions/a_notifikasi_suara_speaker.php",
+        'alert_server_url': " ",
         'alert_cooldown_seconds': 15,            # DECREASED from 20 - more responsive alerts
         'min_violation_frames': 1,              # DECREASED from 20 - more sensitive
         'min_violation_seconds': 1,              # DECREASED from 12 - faster alerts
@@ -543,6 +543,17 @@ def get_default_config():
         'alert_verification_required': True,
         'min_alert_confidence': 0.85,            # DECREASED from 0.9 - more sensitive alerts
         'alert_buffer_size': 100,                 # DECREASED from 25 - faster alert decisions
+        
+        # ========== FAISS SYSTEM CONFIGURATION ========== 
+        'use_faiss_gpu': True,  # Enable GPU acceleration for FAISS
+        'faiss_index_type': 'FlatL2',  # Options: 'FlatL2', 'FlatIP', 'IVFFlat', 'IVFPQ'
+        'faiss_nlist': 100,  # For IVF indices
+        'faiss_pq_m': 8,  # For IVFPQ: number of sub-vectors
+        'faiss_pq_bits': 8,  # For IVFPQ: bits per sub-vector
+        'faiss_max_l2_distance': 100.0,  # For L2 distance normalization
+        
+        # Model paths
+        'embedding_model': 'Facenet512',
         
         # ========== STREAM MANAGEMENT CONFIGURATION ==========
         'stream_manager': {
@@ -587,7 +598,7 @@ def get_default_config():
         'enable_multi_scale': True,
         'enable_temporal_fusion': True,
         'enable_quality_aware': True,
-        'embedding_model': 'Facenet512',
+ 
         
         # ========== BASE64 CONFIGURATION ==========
         'enable_base64_logging': True,
