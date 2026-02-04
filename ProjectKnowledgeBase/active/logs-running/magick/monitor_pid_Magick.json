@@ -1,0 +1,36 @@
+{
+  "PythonPID": 10508,
+  "WorkerPID": 14088,
+  "WorkerStartTime": "2026-02-04 08:37:44",
+  "EmailQueue": [
+    "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\Magick_Process_MaskDetect_2026-02-03_16-58-54\\logs\\run_2026-02-03_16-58-54.log",
+    "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\Magick_Process_MaskDetect_2026-02-03_16-58-54\\metadata.json"
+  ],
+  "ShutdownInitiated": false,
+  "PersistentTracking": {
+    "LastKnownRunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\Magick_Process_MaskDetect_2026-02-03_16-58-54",
+    "LastKnownPythonPID": 10508,
+    "LastKnownWorkerPID": 14088,
+    "DailyRunCount": 6,
+    "LastSuccessfulRun": {
+      "FileCount": 2,
+      "CollectionTime": "2026-02-04 08:37:44",
+      "Folder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\Magick_Process_MaskDetect_2026-02-03_16-58-54"
+    }
+  },
+  "CollectedFolders": [
+    {
+      "RunFolderName": "Magick_Process_MaskDetect_2026-02-03_16-58-54",
+      "TotalSizeMB": 0.0,
+      "CollectionTime": "2026-02-04 08:37:44",
+      "Attachments": [
+        "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\Magick_Process_MaskDetect_2026-02-03_16-58-54\\logs\\run_2026-02-03_16-58-54.log",
+        "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\Magick_Process_MaskDetect_2026-02-03_16-58-54\\metadata.json"
+      ],
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\Magick_Process_MaskDetect_2026-02-03_16-58-54"
+    }
+  ],
+  "PythonStartTime": "2026-02-04 08:37:48",
+  "LastUpdate": "2026-02-04 08:39:03",
+  "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\Magick_Process_MaskDetect_2026-02-03_16-58-54"
+}

@@ -1,0 +1,629 @@
+{
+  "ProcessStopHistory": [
+    {
+      "Reason": "Unexpected Process Stop",
+      "ForceStopAttempts": 0,
+      "PythonPID": 11676,
+      "Timestamp": "2026-02-04 09:45:08",
+      "StopType": "ProcessStop",
+      "WorkerPID": 35296,
+      "IsShuttingDown": false,
+      "PythonRunningBefore": true,
+      "WorkerRunningBefore": true,
+      "RunFolder": null,
+      "WasUnexpected": true
+    },
+    {
+      "PythonPID": 11676,
+      "WorkerRunning": true,
+      "ForceStopAttempts": 0,
+      "RunFolder": null,
+      "WorkerPID": 35296,
+      "PythonRunning": true,
+      "Timestamp": "2026-02-04 09:45:08"
+    },
+    {
+      "Reason": "Success",
+      "ForceStopAttempts": 0,
+      "PythonPID": 11676,
+      "Timestamp": "2026-02-04 09:45:08",
+      "StopType": "Validation",
+      "WorkerPID": 35296,
+      "IsShuttingDown": false,
+      "PythonRunningBefore": true,
+      "WorkerRunningBefore": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WasUnexpected": false
+    },
+    {
+      "PythonPID": 11676,
+      "WorkerRunning": true,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WorkerPID": 35296,
+      "PythonRunning": true,
+      "Timestamp": "2026-02-04 09:45:08"
+    },
+    {
+      "Reason": "Success",
+      "ForceStopAttempts": 0,
+      "PythonPID": 11676,
+      "Timestamp": "2026-02-04 09:45:08",
+      "StopType": "Validation",
+      "WorkerPID": 35296,
+      "IsShuttingDown": false,
+      "PythonRunningBefore": true,
+      "WorkerRunningBefore": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WasUnexpected": true
+    },
+    {
+      "PythonPID": 11676,
+      "WorkerRunning": true,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WorkerPID": 35296,
+      "PythonRunning": true,
+      "Timestamp": "2026-02-04 09:45:08"
+    },
+    {
+      "PythonPID": 11676,
+      "WorkerRunning": true,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WorkerPID": 35296,
+      "PythonRunning": true,
+      "Timestamp": "2026-02-04 09:45:08"
+    },
+    {
+      "PythonPID": 11676,
+      "WorkerRunning": true,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WorkerPID": 35296,
+      "PythonRunning": true,
+      "Timestamp": "2026-02-04 09:45:08"
+    },
+    {
+      "Reason": "Processes stopped: 2",
+      "ForceStopAttempts": 0,
+      "PythonPID": null,
+      "Timestamp": "2026-02-04 09:45:12",
+      "StopType": "ProcessStopComplete",
+      "WorkerPID": null,
+      "IsShuttingDown": false,
+      "PythonRunningBefore": false,
+      "WorkerRunningBefore": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WasUnexpected": true
+    },
+    {
+      "PythonPID": null,
+      "WorkerRunning": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WorkerPID": null,
+      "PythonRunning": false,
+      "Timestamp": "2026-02-04 09:45:12"
+    },
+    {
+      "Reason": "Success",
+      "ForceStopAttempts": 0,
+      "PythonPID": null,
+      "Timestamp": "2026-02-04 09:45:18",
+      "StopType": "Validation",
+      "WorkerPID": null,
+      "IsShuttingDown": false,
+      "PythonRunningBefore": false,
+      "WorkerRunningBefore": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WasUnexpected": false
+    },
+    {
+      "PythonPID": null,
+      "WorkerRunning": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WorkerPID": null,
+      "PythonRunning": false,
+      "Timestamp": "2026-02-04 09:45:18"
+    },
+    {
+      "Reason": "Normal Shutdown",
+      "ForceStopAttempts": 0,
+      "PythonPID": null,
+      "Timestamp": "2026-02-04 09:45:25",
+      "StopType": "ProcessStop",
+      "WorkerPID": null,
+      "IsShuttingDown": false,
+      "PythonRunningBefore": false,
+      "WorkerRunningBefore": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WasUnexpected": false
+    },
+    {
+      "PythonPID": null,
+      "WorkerRunning": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WorkerPID": null,
+      "PythonRunning": false,
+      "Timestamp": "2026-02-04 09:45:25"
+    },
+    {
+      "Reason": "Processes stopped: 0",
+      "ForceStopAttempts": 0,
+      "PythonPID": null,
+      "Timestamp": "2026-02-04 09:45:26",
+      "StopType": "ProcessStopComplete",
+      "WorkerPID": null,
+      "IsShuttingDown": false,
+      "PythonRunningBefore": false,
+      "WorkerRunningBefore": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WasUnexpected": false
+    },
+    {
+      "PythonPID": null,
+      "WorkerRunning": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WorkerPID": null,
+      "PythonRunning": false,
+      "Timestamp": "2026-02-04 09:45:26"
+    },
+    {
+      "Reason": "Monitor stopping",
+      "ForceStopAttempts": 0,
+      "PythonPID": null,
+      "Timestamp": "2026-02-04 09:45:26",
+      "StopType": "Shutdown",
+      "WorkerPID": null,
+      "IsShuttingDown": false,
+      "PythonRunningBefore": false,
+      "WorkerRunningBefore": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WasUnexpected": false
+    },
+    {
+      "PythonPID": null,
+      "WorkerRunning": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WorkerPID": null,
+      "PythonRunning": false,
+      "Timestamp": "2026-02-04 09:45:26"
+    },
+    {
+      "PythonPID": null,
+      "WorkerRunning": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WorkerPID": null,
+      "PythonRunning": false,
+      "Timestamp": "2026-02-04 09:45:26"
+    },
+    {
+      "PythonPID": null,
+      "WasUnexpected": false,
+      "Reason": "Success",
+      "WorkerPID": null,
+      "Timestamp": "2026-02-04 09:46:09",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": false,
+      "PythonRunningBefore": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "StopType": "Validation"
+    },
+    {
+      "Timestamp": "2026-02-04 09:46:09",
+      "PythonPID": null,
+      "ForceStopAttempts": 0,
+      "WorkerPID": null,
+      "WorkerRunning": false,
+      "PythonRunning": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "Timestamp": "2026-02-04 09:46:09",
+      "PythonPID": null,
+      "ForceStopAttempts": 0,
+      "WorkerPID": null,
+      "WorkerRunning": false,
+      "PythonRunning": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "Timestamp": "2026-02-04 09:46:13",
+      "PythonPID": 9956,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 29556,
+      "WorkerRunning": true,
+      "PythonRunning": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "Timestamp": "2026-02-04 09:46:13",
+      "PythonPID": 9956,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 29556,
+      "WorkerRunning": true,
+      "PythonRunning": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "Timestamp": "2026-02-04 09:46:28",
+      "PythonPID": 9956,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 29556,
+      "WorkerRunning": true,
+      "PythonRunning": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "PythonPID": 9956,
+      "WasUnexpected": false,
+      "Reason": "Success",
+      "WorkerPID": 29556,
+      "Timestamp": "2026-02-04 09:46:44",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": false,
+      "PythonRunningBefore": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "StopType": "Validation"
+    },
+    {
+      "Timestamp": "2026-02-04 09:46:44",
+      "PythonPID": 9956,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 29556,
+      "WorkerRunning": false,
+      "PythonRunning": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "Timestamp": "2026-02-04 09:46:44",
+      "PythonPID": 9956,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 29556,
+      "WorkerRunning": false,
+      "PythonRunning": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "Timestamp": "2026-02-04 09:46:44",
+      "PythonPID": 9956,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 29556,
+      "WorkerRunning": false,
+      "PythonRunning": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "Timestamp": "2026-02-04 09:47:17",
+      "PythonPID": 22404,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 41500,
+      "WorkerRunning": true,
+      "PythonRunning": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "Timestamp": "2026-02-04 09:47:17",
+      "PythonPID": 22404,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 41500,
+      "WorkerRunning": true,
+      "PythonRunning": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "Timestamp": "2026-02-04 09:47:32",
+      "PythonPID": 22404,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 41500,
+      "WorkerRunning": true,
+      "PythonRunning": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "Timestamp": "2026-02-04 09:47:47",
+      "PythonPID": 22404,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 41500,
+      "WorkerRunning": true,
+      "PythonRunning": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "PythonPID": 22404,
+      "WasUnexpected": true,
+      "Reason": "Unexpected Process Stop",
+      "WorkerPID": 41500,
+      "Timestamp": "2026-02-04 09:48:02",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": true,
+      "PythonRunningBefore": true,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "StopType": "ProcessStop"
+    },
+    {
+      "Timestamp": "2026-02-04 09:48:02",
+      "PythonPID": 22404,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 41500,
+      "WorkerRunning": true,
+      "PythonRunning": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "PythonPID": 22404,
+      "WasUnexpected": false,
+      "Reason": "Success",
+      "WorkerPID": 41500,
+      "Timestamp": "2026-02-04 09:48:02",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": true,
+      "PythonRunningBefore": true,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "StopType": "Validation"
+    },
+    {
+      "Timestamp": "2026-02-04 09:48:02",
+      "PythonPID": 22404,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 41500,
+      "WorkerRunning": true,
+      "PythonRunning": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "Timestamp": "2026-02-04 09:48:03",
+      "PythonPID": 22404,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 41500,
+      "WorkerRunning": true,
+      "PythonRunning": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "Timestamp": "2026-02-04 09:48:03",
+      "PythonPID": 22404,
+      "ForceStopAttempts": 0,
+      "WorkerPID": 41500,
+      "WorkerRunning": true,
+      "PythonRunning": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "PythonPID": null,
+      "WasUnexpected": true,
+      "Reason": "Processes stopped: 2",
+      "WorkerPID": null,
+      "Timestamp": "2026-02-04 09:48:07",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": false,
+      "PythonRunningBefore": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "StopType": "ProcessStopComplete"
+    },
+    {
+      "Timestamp": "2026-02-04 09:48:07",
+      "PythonPID": null,
+      "ForceStopAttempts": 0,
+      "WorkerPID": null,
+      "WorkerRunning": false,
+      "PythonRunning": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50"
+    },
+    {
+      "PythonPID": null,
+      "WasUnexpected": false,
+      "Reason": "Success",
+      "WorkerPID": null,
+      "Timestamp": "2026-02-04 09:48:12",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": false,
+      "PythonRunningBefore": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-47-15",
+      "StopType": "Validation"
+    },
+    {
+      "Timestamp": "2026-02-04 09:48:12",
+      "PythonPID": null,
+      "ForceStopAttempts": 0,
+      "WorkerPID": null,
+      "WorkerRunning": false,
+      "PythonRunning": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-47-15"
+    },
+    {
+      "PythonPID": null,
+      "WasUnexpected": false,
+      "Reason": "Normal Shutdown",
+      "WorkerPID": null,
+      "Timestamp": "2026-02-04 09:48:13",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": false,
+      "PythonRunningBefore": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-47-15",
+      "StopType": "ProcessStop"
+    },
+    {
+      "Timestamp": "2026-02-04 09:48:13",
+      "PythonPID": null,
+      "ForceStopAttempts": 0,
+      "WorkerPID": null,
+      "WorkerRunning": false,
+      "PythonRunning": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-47-15"
+    },
+    {
+      "PythonPID": null,
+      "WasUnexpected": false,
+      "Reason": "Processes stopped: 0",
+      "WorkerPID": null,
+      "Timestamp": "2026-02-04 09:48:13",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": false,
+      "PythonRunningBefore": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-47-15",
+      "StopType": "ProcessStopComplete"
+    },
+    {
+      "Timestamp": "2026-02-04 09:48:13",
+      "PythonPID": null,
+      "ForceStopAttempts": 0,
+      "WorkerPID": null,
+      "WorkerRunning": false,
+      "PythonRunning": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-47-15"
+    },
+    {
+      "PythonPID": null,
+      "WasUnexpected": false,
+      "Reason": "Monitor stopping",
+      "WorkerPID": null,
+      "Timestamp": "2026-02-04 09:48:13",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": false,
+      "PythonRunningBefore": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-47-15",
+      "StopType": "Shutdown"
+    },
+    {
+      "Timestamp": "2026-02-04 09:48:13",
+      "PythonPID": null,
+      "ForceStopAttempts": 0,
+      "WorkerPID": null,
+      "WorkerRunning": false,
+      "PythonRunning": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-47-15"
+    },
+    {
+      "Timestamp": "2026-02-04 09:48:13",
+      "PythonPID": null,
+      "ForceStopAttempts": 0,
+      "WorkerPID": null,
+      "WorkerRunning": false,
+      "PythonRunning": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-47-15"
+    }
+  ],
+  "LastKnownWorkerPID": null,
+  "LastKnownPythonPID": null,
+  "LastValidationTime": "2026-02-04 09:48:13",
+  "LastValidationResult": {
+    "Success": true,
+    "FolderName": "Magick_Process_MaskDetect_2026-02-04_09-47-15"
+  },
+  "LastKnownRunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-47-15",
+  "DailyRunCount": 7,
+  "LastSuccessfulRun": {
+    "FolderName": "Magick_Process_MaskDetect_2026-02-04_09-47-15",
+    "Folder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-47-15",
+    "Timestamp": "2026-02-04 09:48:12"
+  },
+  "ValidationHistory": [
+    {
+      "Reason": "Success",
+      "ForceStopAttempts": 0,
+      "PythonPID": 11676,
+      "Timestamp": "2026-02-04 09:45:08",
+      "StopType": "Validation",
+      "WorkerPID": 35296,
+      "IsShuttingDown": false,
+      "PythonRunningBefore": true,
+      "WorkerRunningBefore": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WasUnexpected": false
+    },
+    {
+      "Reason": "Success",
+      "ForceStopAttempts": 0,
+      "PythonPID": 11676,
+      "Timestamp": "2026-02-04 09:45:08",
+      "StopType": "Validation",
+      "WorkerPID": 35296,
+      "IsShuttingDown": false,
+      "PythonRunningBefore": true,
+      "WorkerRunningBefore": true,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WasUnexpected": true
+    },
+    {
+      "Reason": "Success",
+      "ForceStopAttempts": 0,
+      "PythonPID": null,
+      "Timestamp": "2026-02-04 09:45:18",
+      "StopType": "Validation",
+      "WorkerPID": null,
+      "IsShuttingDown": false,
+      "PythonRunningBefore": false,
+      "WorkerRunningBefore": false,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "WasUnexpected": false
+    },
+    {
+      "PythonPID": null,
+      "WasUnexpected": false,
+      "Reason": "Success",
+      "WorkerPID": null,
+      "Timestamp": "2026-02-04 09:46:09",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": false,
+      "PythonRunningBefore": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "StopType": "Validation"
+    },
+    {
+      "PythonPID": 9956,
+      "WasUnexpected": false,
+      "Reason": "Success",
+      "WorkerPID": 29556,
+      "Timestamp": "2026-02-04 09:46:44",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": false,
+      "PythonRunningBefore": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "StopType": "Validation"
+    },
+    {
+      "PythonPID": 22404,
+      "WasUnexpected": false,
+      "Reason": "Success",
+      "WorkerPID": 41500,
+      "Timestamp": "2026-02-04 09:48:02",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": true,
+      "PythonRunningBefore": true,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-44-50",
+      "StopType": "Validation"
+    },
+    {
+      "PythonPID": null,
+      "WasUnexpected": false,
+      "Reason": "Success",
+      "WorkerPID": null,
+      "Timestamp": "2026-02-04 09:48:12",
+      "IsShuttingDown": false,
+      "WorkerRunningBefore": false,
+      "PythonRunningBefore": false,
+      "ForceStopAttempts": 0,
+      "RunFolder": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\2026-02-04\\Magick_Process_MaskDetect_2026-02-04_09-47-15",
+      "StopType": "Validation"
+    }
+  ]
+}

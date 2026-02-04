@@ -2,146 +2,13 @@
 
 - Maintain the codebase structure, while still implement other stuff if necesssary.
 - Utilzie references below
-- Check instructions
-- Check result-output
+- Check explanation in every ####
 
 #### Instruction
 
-For the persistence tracking, it would be good to alter several things. First, rather than tried to keep the info, it would be great to re-validate each time the process is stopping, and tried to check the last created folder. Meaning, the information storing will be more robust, because it tried to store knowledge regarding last time it was runnning. Furthermore, utilization of validate output will re-run each time a process is suddenly stopped
+Currently, the first codebase already portable. Help me update the portability of the second codebase so that it capture the validation check from the first codebse.
 
-#### output of the codebase
-
-[2026-02-03 16:18:59] [INFO] === ENHANCED Face Recognition Monitor Started ===
-[2026-02-03 16:18:59] [INFO] Monitor Version: 3.0 (Resilient)
-[2026-02-03 16:18:59] [INFO] Start Time: 08:00
-[2026-02-03 16:18:59] [INFO] End Time: 16:21
-[2026-02-03 16:18:59] [INFO] Force stop threshold: 2 attempts within 5 seconds
-[2026-02-03 16:18:59] [DEBUG] Initializing resilience system...
-[2026-02-03 16:18:59] [INFO] Testing email configuration...
-[2026-02-03 16:18:59] [SUCCESS] Found 2 email recipient(s)
-[2026-02-03 16:18:59] [INFO] Configured languages: Bahasa, English
-[2026-02-03 16:18:59] [SUCCESS] Email credential file found and loaded successfully
-[2026-02-03 16:18:59] [INFO] GMAIL CONFIGURATION NOTES:
-[2026-02-03 16:18:59] [INFO] - Using SMTP: smtp.gmail.com:587
-[2026-02-03 16:18:59] [INFO] - SSL Enabled: True
-[2026-02-03 16:18:59] [INFO] - Make sure you're using an App Password, not your regular password
-[2026-02-03 16:18:59] [INFO] - Gmail attachment limit: 25 MB total
-[2026-02-03 16:18:59] [SUCCESS] Email configuration valid
-[2026-02-03 16:18:59] [SUCCESS] Email configuration validated successfully
-[2026-02-03 16:18:59] [DEBUG] No PID tracking file found
-[2026-02-03 16:18:59] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\resilience_state.json
-[2026-02-03 16:18:59] [DEBUG] Registering console control handler...
-[2026-02-03 16:18:59] [DEBUG] Console control handler registered
-[2026-02-03 16:18:59] [INFO] Entering main monitoring loop...
-[2026-02-03 16:18:59] [DEBUG] Check: 16:18:59 | Window: Active | Python: Stopped
-[2026-02-03 16:18:59] [DEBUG] Check: 16:18:59 | Window: Active | Python: Stopped
-[2026-02-03 16:18:59] [INFO] Time window active and no Python process running - starting worker...
-[2026-02-03 16:18:59] [DEBUG] Searching for Python process...
-[2026-02-03 16:19:00] [DEBUG] No Python process found matching criteria
-[2026-02-03 16:19:00] [INFO] Starting face recognition worker process...
-[2026-02-03 16:19:01] [SUCCESS] Worker process started (PID: 31384)
-[2026-02-03 16:19:01] [INFO] Waiting for Python process to start...
-[2026-02-03 16:19:01] [DEBUG] Searching for Python process...
-[2026-02-03 16:19:01] [INFO] Found Python process started after worker: PID=24212
-[2026-02-03 16:19:01] [SUCCESS] Python process found (PID: 24212)
-[2026-02-03 16:19:01] [DEBUG] Enhanced PID tracking saved with 0 collected folders
-[2026-02-03 16:19:01] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\resilience_state.json
-[2026-02-03 16:19:01] [SUCCESS] Worker started. Monitoring Python process...
-[2026-02-03 16:19:01] [DEBUG] Enhanced PID tracking saved with 0 collected folders
-[2026-02-03 16:19:01] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\resilience_state.json
-[2026-02-03 16:19:16] [DEBUG] Check: 16:19:16 | Window: Active | Python: Running (PID: 24212)
-[2026-02-03 16:19:16] [DEBUG] Enhanced PID tracking saved with 0 collected folders
-[2026-02-03 16:19:16] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\resilience_state.json
-[2026-02-03 16:19:31] [DEBUG] Check: 16:19:31 | Window: Active | Python: Running (PID: 24212)
-[2026-02-03 16:19:31] [DEBUG] Enhanced PID tracking saved with 0 collected folders
-[2026-02-03 16:19:31] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\resilience_state.json
-[2026-02-03 16:19:46] [DEBUG] Check: 16:19:46 | Window: Active | Python: Running (PID: 24212)
-[2026-02-03 16:19:46] [DEBUG] Enhanced PID tracking saved with 0 collected folders
-[2026-02-03 16:19:46] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\resilience_state.json
-[2026-02-03 16:20:01] [DEBUG] Searching for Python process...
-[2026-02-03 16:20:02] [DEBUG] No Python process found matching criteria
-[2026-02-03 16:20:02] [DEBUG] Check: 16:20:02 | Window: Active | Python: Stopped
-[2026-02-03 16:20:02] [DEBUG] Check: 16:20:02 | Window: Active | Python: Stopped
-[2026-02-03 16:20:02] [INFO] Time window active and no Python process running - starting worker...
-[2026-02-03 16:20:02] [DEBUG] Searching for Python process...
-[2026-02-03 16:20:02] [DEBUG] No Python process found matching criteria
-[2026-02-03 16:20:02] [INFO] Starting face recognition worker process...
-[2026-02-03 16:20:02] [SUCCESS] Worker process started (PID: 38044)
-[2026-02-03 16:20:02] [INFO] Waiting for Python process to start...
-[2026-02-03 16:20:02] [DEBUG] Searching for Python process...
-[2026-02-03 16:20:02] [INFO] Found Python process started after worker: PID=25080
-[2026-02-03 16:20:02] [SUCCESS] Python process found (PID: 25080)
-[2026-02-03 16:20:02] [DEBUG] Enhanced PID tracking saved with 0 collected folders
-[2026-02-03 16:20:02] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\resilience_state.json
-[2026-02-03 16:20:02] [SUCCESS] Worker started. Monitoring Python process...
-[2026-02-03 16:20:02] [DEBUG] Enhanced PID tracking saved with 0 collected folders
-[2026-02-03 16:20:02] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\resilience_state.json
-[2026-02-03 16:20:17] [DEBUG] Check: 16:20:17 | Window: Active | Python: Running (PID: 25080)
-[2026-02-03 16:20:17] [DEBUG] Enhanced PID tracking saved with 0 collected folders
-[2026-02-03 16:20:17] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\resilience_state.json
-[2026-02-03 16:20:32] [DEBUG] Check: 16:20:32 | Window: Active | Python: Running (PID: 25080)
-[2026-02-03 16:20:32] [DEBUG] Enhanced PID tracking saved with 0 collected folders
-[2026-02-03 16:20:33] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\resilience_state.json
-[2026-02-03 16:20:48] [DEBUG] Searching for Python process...
-[2026-02-03 16:20:48] [DEBUG] No Python process found matching criteria
-[2026-02-03 16:20:48] [DEBUG] Check: 16:20:48 | Window: Active | Python: Stopped
-[2026-02-03 16:20:48] [DEBUG] Check: 16:20:48 | Window: Active | Python: Stopped
-[2026-02-03 16:20:48] [INFO] Time window active and no Python process running - starting worker...
-[2026-02-03 16:20:48] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
-[2026-02-03 16:21:03] [DEBUG] Check: 16:21:03 | Window: Inactive | Python: Stopped
-[2026-02-03 16:21:03] [INFO] End time reached - initiating shutdown sequence...
-[2026-02-03 16:21:03] [INFO] Validating final worker output...
-[2026-02-03 16:21:03] [INFO] Validating face recognition output structure...
-[2026-02-03 16:21:03] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-03_16-20-02
-[2026-02-03 16:21:03] [DEBUG] Found subfolder: logs
-[2026-02-03 16:21:03] [DEBUG] Found subfolder: script_output
-[2026-02-03 16:21:03] [DEBUG] Metadata file is valid JSON
-[2026-02-03 16:21:03] [DEBUG] Metadata file size: 1.32 KB
-[2026-02-03 16:21:03] [DEBUG] Found 3 log files
-[2026-02-03 16:21:03] [DEBUG] completion_summary.txt size: 4.37 KB
-[2026-02-03 16:21:03] [DEBUG] python_output.txt size: 64.5 KB
-[2026-02-03 16:21:03] [DEBUG] Latest run log: run_2026-02-03_16-20-02.log (2.64 KB)
-[2026-02-03 16:21:03] [DEBUG] Script output contains 1 items
-[2026-02-03 16:21:03] [DEBUG] Total folder size: 0.07 MB
-[2026-02-03 16:21:03] [DEBUG] Total attachment size: 0.01 MB
-[2026-02-03 16:21:03] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
-[2026-02-03 16:21:03] [SUCCESS] - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-20-02
-[2026-02-03 16:21:03] [SUCCESS] - Created: 02/03/2026 16:20:02
-[2026-02-03 16:21:03] [SUCCESS] - Size: 0.07 MB
-[2026-02-03 16:21:03] [SUCCESS] - Attachments: 0.01 MB
-[2026-02-03 16:21:03] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-03_16-20-02
-[2026-02-03 16:21:03] [DEBUG] Found run log: run_2026-02-03_16-20-02.log
-[2026-02-03 16:21:03] [DEBUG] Found metadata.json
-[2026-02-03 16:21:03] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-03_16-20-02 (0 MB)
-[2026-02-03 16:21:03] [SUCCESS] Added final run to collection: Magick_Process_MaskDetect_2026-02-03_16-20-02
-[2026-02-03 16:21:03] [DEBUG] Configuration backed up to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\config_backup_20260203_162103.json
-[2026-02-03 16:21:03] [INFO] Preparing to send ENHANCED completion notifications with 1 collected runs...
-[2026-02-03 16:21:03] [DEBUG] Email credential loaded from C:\Users\MIS2\.face-recog\email-credential.xml
-[2026-02-03 16:21:03] [INFO] Total attachments to send: 2 files (0 MB)
-[2026-02-03 16:21:03] [INFO] Sending emails in 2 different language(s)
-[2026-02-03 16:21:04] [INFO] Sending Bahasa email to: ikeepmypromiz@gmail.com
-[2026-02-03 16:21:08] [SUCCESS] Successfully sent Bahasa email with 2 attachments to 1 recipient(s)
-[2026-02-03 16:21:08] [INFO] Sending English email to: faridraihan17@gmail.com
-[2026-02-03 16:21:12] [SUCCESS] Successfully sent English email with 2 attachments to 1 recipient(s)
-[2026-02-03 16:21:12] [SUCCESS] All enhanced emails sent successfully (2 total recipients)
-[2026-02-03 16:21:12] [SUCCESS] Enhanced completion emails sent successfully with 1 collected runs.
-[2026-02-03 16:21:12] [SUCCESS] Face recognition pipeline completed successfully! Processed 1 runs today.
-[2026-02-03 16:21:12] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\resilience_state.json
-[2026-02-03 16:21:12] [INFO] Daily process completed. Stopping monitor...
-[2026-02-03 16:21:12] [INFO] Cleaning up...
-[2026-02-03 16:21:12] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-03_16-20-02
-[2026-02-03 16:21:12] [DEBUG] Found run log: run_2026-02-03_16-20-02.log
-[2026-02-03 16:21:12] [DEBUG] Found metadata.json
-[2026-02-03 16:21:12] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-03_16-20-02 (0 MB)
-[2026-02-03 16:21:12] [INFO] Collected final run during cleanup: Magick_Process_MaskDetect_2026-02-03_16-20-02
-[2026-02-03 16:21:12] [INFO] Stopping Python process (PID: 25080)...
-[2026-02-03 16:21:12] [ERROR] Error stopping Python process: Cannot find a process with the process identifier 25080.
-[2026-02-03 16:21:12] [INFO] Stopping worker process (PID: 38044)...
-[2026-02-03 16:21:12] [ERROR] Error stopping worker process: Cannot find a process with the process identifier 38044.
-[2026-02-03 16:21:12] [DEBUG] Removed PID tracking file
-[2026-02-03 16:21:12] [INFO] === ENHANCED Face Recognition Monitor Stopped ===
-
-#### The codebase
+#### First codebase
 
 <#
 .SYNOPSIS
@@ -192,9 +59,15 @@ PythonPID = $PythonPID
 }
 
 function Backup-OriginalConfig {
-$backupPath = Join-Path (Split-Path $Config.LogFile -Parent) "config_backup_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
-$Config | ConvertTo-Json -Depth 10 | Out-File -FilePath $backupPath -Force
-Write-Log "Configuration backed up to: $backupPath" -Level "DEBUG"
+$backupDir = Join-Path (Split-Path $Config.LogFile -Parent) "backups"
+if (-not (Test-Path $backupDir)) {
+New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
+}
+
+    $backupPath = Join-Path $backupDir "config_backup_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
+    $Config | ConvertTo-Json -Depth 10 | Out-File -FilePath $backupPath -Force
+    Write-Log "Configuration backed up to: $backupPath" -Level "DEBUG"
+
 }
 
 function Validate-Output {
@@ -494,7 +367,34 @@ param()
     Write-Host "Active Root: $ActiveRoot" -ForegroundColor Green
 
     # ====================================================================
-    # STEP 3: UPDATE CONFIGURATION WITH RELATIVE PATHS
+    # STEP 3: CREATE DATE-BASED FOLDER STRUCTURE
+    # ====================================================================
+
+    # Get current date for folder structure
+    $currentDate = Get-Date -Format "yyyy-MM-dd"
+    $global:CurrentDateFolder = $currentDate  # Store globally for other functions
+
+    # Create the base Magick folder if it doesn't exist
+    $magickBasePath = Join-Path $ActiveRoot "logs-running\Magick"
+    if (-not (Test-Path $magickBasePath)) {
+        New-Item -ItemType Directory -Path $magickBasePath -Force | Out-Null
+        Write-Host "Created base Magick folder: $magickBasePath" -ForegroundColor Yellow
+    }
+
+    # Create date-specific folder
+    $dateBasedPath = Join-Path $magickBasePath $currentDate
+    if (-not (Test-Path $dateBasedPath)) {
+        New-Item -ItemType Directory -Path $dateBasedPath -Force | Out-Null
+        Write-Host "Created date-based folder: $dateBasedPath" -ForegroundColor Yellow
+    } else {
+        Write-Host "Using existing date-based folder: $dateBasedPath" -ForegroundColor Green
+    }
+
+    # Store the active date path globally
+    $global:ActiveDatePath = $dateBasedPath
+
+    # ====================================================================
+    # STEP 4: UPDATE CONFIGURATION WITH DATE-BASED PATHS
     # ====================================================================
 
     # Get email credential from user profile
@@ -503,11 +403,11 @@ param()
         New-Item -ItemType Directory -Path (Split-Path $emailCredentialPath -Parent) -Force | Out-Null
     }
 
-    # Update the $Config object with relative paths
+    # Update the $Config object with date-based paths
     $Script:Config = @{
         # Schedule configuration (CRITICAL - was missing)
         StartTime = "08:00"  # Default start time
-        EndTime = "16:21"    # Default end time
+        EndTime = "09:30"    # Default end time
 
         # Worker script path - RELATIVE to project root
         WorkerScript = Join-Path $ProjectRoot "patterns\scripts\1_magick\maskDetect.ps1"
@@ -515,8 +415,8 @@ param()
         # Python script path - RELATIVE to project root
         PythonScriptPath = Join-Path $ProjectRoot "patterns\algorithm\entry_multi-USED-Magick.py"
 
-        # Paths for validation - RELATIVE to active root
-        RunsBasePath = Join-Path $ActiveRoot "logs-running\Magick"
+        # Paths for validation - USING DATE-BASED PATH
+        RunsBasePath = $dateBasedPath  # Now points to date-specific folder
         OutputFolderPattern = "Magick_Process_MaskDetect_*"
 
         # Process tracking
@@ -535,12 +435,12 @@ param()
         ProcessCheckInterval = 15
         GracefulShutdownTimeout = 60
 
-        # PID tracking - RELATIVE to RunsBasePath
-        PIDFilePath = Join-Path (Join-Path $ActiveRoot "logs-running\magick") "monitor_pid_Magick.json"
+        # PID tracking - RELATIVE TO DATE-BASED PATH
+        PIDFilePath = Join-Path $dateBasedPath "monitor_pid_Magick.json"
         MaxPIDFileAgeMinutes = 120
 
-        # Logging - RELATIVE to RunsBasePath
-        LogFile = Join-Path (Join-Path $ActiveRoot "logs-running\magick") "monitor_Magick.log"
+        # Logging - RELATIVE TO DATE-BASED PATH
+        LogFile = Join-Path $dateBasedPath "monitor_Magick.log"
 
         # Email notifications (updated to use MailKit)
         SendEmailOnCompletion = $true
@@ -557,10 +457,14 @@ param()
         SmtpPort = 587
         UseSSL = $true
         EmailCredentialPath = $emailCredentialPath
+
+        # NEW: Date-based path tracking
+        CurrentDate = $currentDate
+        ActiveDatePath = $dateBasedPath
     }
 
     # ====================================================================
-    # STEP 4: VALIDATE CRITICAL COMPONENTS EXIST
+    # STEP 5: VALIDATE CRITICAL COMPONENTS EXIST
     # ====================================================================
 
     Write-Host "`nValidating project components..." -ForegroundColor Yellow
@@ -568,8 +472,8 @@ param()
     $criticalComponents = @(
         @{ Name = "Worker Script"; Path = $Config.WorkerScript }
         @{ Name = "Python Script"; Path = $Config.PythonScriptPath }
-        @{ Name = "Log Directory"; Path = (Split-Path $Config.LogFile -Parent) }
-        @{ Name = "PID File Directory"; Path = (Split-Path $Config.PIDFilePath -Parent) }
+        @{ Name = "Date-Based Log Directory"; Path = $dateBasedPath }
+        @{ Name = "PID File Directory"; Path = $dateBasedPath }
     )
 
     $missingComponents = @()
@@ -597,7 +501,7 @@ param()
     }
 
     # ====================================================================
-    # STEP 5: SUMMARY AND ERROR HANDLING
+    # STEP 6: SUMMARY AND ERROR HANDLING
     # ====================================================================
 
     if ($missingComponents.Count -gt 0) {
@@ -628,9 +532,10 @@ param()
     Write-Host "`nProject initialization complete!" -ForegroundColor Green
     Write-Host "All paths are now portable and relative to:" -ForegroundColor Green
     Write-Host "  Project Root: $ProjectRoot" -ForegroundColor White
+    Write-Host "  Active Date Path: $dateBasedPath" -ForegroundColor White
 
     # ====================================================================
-    # STEP 6: MODIFIED - Wait for key press with 60-second timeout
+    # STEP 7: MODIFIED - Wait for key press with 60-second timeout
     # ====================================================================
 
     Write-Host "`nPress any key to continue with monitoring (waiting for 60 seconds)..." -ForegroundColor Cyan
@@ -663,59 +568,62 @@ param()
 
 }
 
-# Call it ONCE at the very beginning
+function Write-Log {
+param(
+[string]$Message,
+        [string]$Level = "INFO"
+)
 
-Initialize-ProjectPortablePaths
+    # Get current timestamp for each log entry
+    $currentTimestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $logEntry = "[$currentTimestamp] [$Level] $Message"
 
-# ====================================================================
+    try {
+        # Use the log file from config (without timestamp in name for consistency)
+        Add-Content -Path $Config.LogFile -Value $logEntry -ErrorAction SilentlyContinue
+    } catch {
+        Write-Host "Log file write failed: $_" -ForegroundColor Yellow
+    }
 
-# SECTION 2.1: ENHANCED GLOBAL VARIABLES FOR RESILIENCE
+    switch ($Level) {
+        "ERROR" { Write-Host $logEntry -ForegroundColor Red }
+        "WARN" { Write-Host $logEntry -ForegroundColor Yellow }
+        "SUCCESS" { Write-Host $logEntry -ForegroundColor Green }
+        "DEBUG" { Write-Host $logEntry -ForegroundColor Gray }
+        default { Write-Host $logEntry -ForegroundColor White }
+    }
 
-# ====================================================================
-
-# Global variables (keep existing ones and add new ones)
-
-$WorkerProcess = $null
-$WorkerPID = $null
-$PythonPID = $null
-$WorkerStartTime = $null
-$PythonStartTime = $null
-$LastValidation = $null
-$CurrentRunFolder = $null
-$WorkerIsRunning = $false
-$PythonIsRunning = $false
-$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-$LastWorkerAttempt = $null
-
-# NEW: Enhanced tracking for resilience
-
-$global:ForceStopAttempts = 0
-$global:LastForceStopTime = $null
-$global:ForceStopThreshold = 2 # Require 2 Ctrl+C within 5 seconds to force stop
-$global:ForceStopWindowSeconds = 5
-$global:EmailAttachmentQueue = @()
-$global:CollectedRunFolders = @()
-$global:IsShuttingDown = $false
-
-# PID tracking structure
-
-$PIDTracking = @{
-WorkerPID = $null
-PythonPID = $null
-WorkerStartTime = $null
-PythonStartTime = $null
-RunFolder = $null
-LastUpdate = $null # NEW: Enhanced tracking
-EmailQueue = @()
-CollectedFolders = @()
-ShutdownInitiated = $false
 }
 
-# ====================================================================
+function Save-ResilienceState {
+<#
+.SYNOPSIS
+Saves the resilience state (collected folders, email queue, etc.)
+#>
 
-# SECTION 3.1: NEW FUNCTIONS FOR RESILIENCE AND FILE COLLECTION
+    $resilienceData = @{
+        EmailAttachmentQueue = $global:EmailAttachmentQueue
+        CollectedRunFolders = $global:CollectedRunFolders
+        ForceStopAttempts = $global:ForceStopAttempts
+        LastForceStopTime = if ($global:LastForceStopTime) {
+            $global:LastForceStopTime.ToString("yyyy-MM-dd HH:mm:ss")
+        } else {
+            $null
+        }
+        IsShuttingDown = $global:IsShuttingDown
+        LastSaveTime = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    }
 
-# ====================================================================
+    $resilienceFilePath = Join-Path (Split-Path $Config.LogFile -Parent) "resilience_state.json"
+
+    try {
+        $resilienceData | ConvertTo-Json -Depth 10 | Out-File -FilePath $resilienceFilePath -Force
+        Write-Log "Resilience state saved to: $resilienceFilePath" -Level "DEBUG"
+    } catch {
+        Write-Log "Failed to save resilience state: $_" -Level "ERROR"
+    }
+
+}
 
 function Test-EmailConfiguration {
 if (-not $Config.SendEmailOnCompletion) {
@@ -804,6 +712,56 @@ return $false
 
 }
 
+function Load-ResilienceState {
+<#
+.SYNOPSIS
+Loads the resilience state if it exists
+#>
+
+    $resilienceFilePath = Join-Path (Split-Path $Config.LogFile -Parent) "resilience_state.json"
+
+    if (Test-Path $resilienceFilePath) {
+        try {
+            $loadedData = Get-Content -Path $resilienceFilePath -Raw | ConvertFrom-Json
+
+            # Check if state is stale (older than 24 hours)
+            $lastSaveTime = [DateTime]::ParseExact($loadedData.LastSaveTime, "yyyy-MM-dd HH:mm:ss", $null)
+            $ageHours = ((Get-Date) - $lastSaveTime).TotalHours
+
+            if ($ageHours -gt 24) {
+                Write-Log "Resilience state is stale ($ageHours hours old), clearing" -Level "WARN"
+                Remove-Item -Path $resilienceFilePath -Force -ErrorAction SilentlyContinue
+                return $false
+            }
+
+            # Load the data
+            $global:EmailAttachmentQueue = @($loadedData.EmailAttachmentQueue)
+            $global:CollectedRunFolders = @($loadedData.CollectedRunFolders)
+            $global:ForceStopAttempts = $loadedData.ForceStopAttempts
+            $global:LastForceStopTime = if ($loadedData.LastForceStopTime) {
+                [DateTime]::ParseExact($loadedData.LastForceStopTime, "yyyy-MM-dd HH:mm:ss", $null)
+            } else {
+                $null
+            }
+            $global:IsShuttingDown = $loadedData.IsShuttingDown
+
+            Write-Log "Loaded resilience state with $($global:CollectedRunFolders.Count) collected folders" -Level "INFO"
+
+            # Clean up old file
+            Remove-Item -Path $resilienceFilePath -Force -ErrorAction SilentlyContinue
+
+            return $true
+        } catch {
+            Write-Log "Failed to load resilience state: $_" -Level "ERROR"
+            Remove-Item -Path $resilienceFilePath -Force -ErrorAction SilentlyContinue
+            return $false
+        }
+    }
+
+    return $false
+
+}
+
 function Register-ConsoleControlHandler {
 <#
 .SYNOPSIS
@@ -885,125 +843,144 @@ Registers a handler for console control events (Ctrl+C, Ctrl+Break)
 
 }
 
-function Write-Log {
-param(
-[string]$Message,
-        [string]$Level = "INFO"
-)
+function Test-TimeWindow {
+param([string]$TargetTime)
 
-    # Get current timestamp for each log entry
-    $currentTimestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logEntry = "[$currentTimestamp] [$Level] $Message"
-
+    $now = Get-Date
     try {
-        # Use the log file from config (without timestamp in name for consistency)
-        Add-Content -Path $Config.LogFile -Value $logEntry -ErrorAction SilentlyContinue
+        $target = [DateTime]::ParseExact($TargetTime, "HH:mm", $null)
+        return ($now.TimeOfDay -ge $target.TimeOfDay)
     } catch {
-        Write-Host "Log file write failed: $_" -ForegroundColor Yellow
-    }
-
-    switch ($Level) {
-        "ERROR" { Write-Host $logEntry -ForegroundColor Red }
-        "WARN" { Write-Host $logEntry -ForegroundColor Yellow }
-        "SUCCESS" { Write-Host $logEntry -ForegroundColor Green }
-        "DEBUG" { Write-Host $logEntry -ForegroundColor Gray }
-        default { Write-Host $logEntry -ForegroundColor White }
+        Write-Log "Invalid time format: $TargetTime" -Level "ERROR"
+        return $false
     }
 
 }
 
-function Stop-WorkerProcess {
-$stoppedProcesses = @()
+function Show-StatusBanner {
+$status = Get-ProcessStatus
 
-    # First, try to stop the Python process
-    if ($PythonPID -and $PythonPID -ne 0) {
-        Write-Log "Stopping Python process (PID: $PythonPID)..." -Level "INFO"
+    # Only show banner every 20 seconds to avoid flickering
+    $currentSecond = (Get-Date).Second
+    if ($currentSecond % 20 -ne 0) {
+        return
+    }
 
-        try {
-            $pythonProcess = Get-Process -Id $PythonPID -ErrorAction Stop
+    Clear-Host
+    Write-Host "================================================" -ForegroundColor Cyan
+    Write-Host "    FACE RECOGNITION PROCESS MONITOR" -ForegroundColor Cyan
+    Write-Host "================================================" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "Current Date: $($status.CurrentDate)" -ForegroundColor Yellow
+    Write-Host "Current Time: $($status.CurrentTime)" -ForegroundColor Yellow
+    Write-Host "Date Folder: $($Config.CurrentDate)" -ForegroundColor Yellow
+    Write-Host "Schedule: $($Config.StartTime) - $($Config.EndTime)" -ForegroundColor Yellow
+    Write-Host "Window: $(if ($status.Schedule.InWindow) { 'ACTIVE' } else { 'INACTIVE' })" `
+                -ForegroundColor $(if ($status.Schedule.InWindow) { 'Green' } else { 'Gray' })
+    Write-Host ""
 
-            if (-not $pythonProcess.HasExited) {
-                $pythonProcess.CloseMainWindow() | Out-Null
-                Start-Sleep -Seconds 2
+    if ($status.PythonRunning) {
+        Write-Host "PYTHON STATUS: RUNNING" -ForegroundColor Green
+        Write-Host "  PID: $PythonPID" -ForegroundColor White
 
-                if (-not $pythonProcess.HasExited) {
-                    Write-Log "Forcefully terminating Python process..." -Level "WARN"
-                    $pythonProcess.Kill()
-                    if ($pythonProcess.WaitForExit($Config.GracefulShutdownTimeout * 1000)) {
-                        $stoppedProcesses += "Python"
-                        Write-Log "Python process terminated" -Level "SUCCESS"
-                    }
-                } else {
-                    $stoppedProcesses += "Python"
-                    Write-Log "Python process exited gracefully" -Level "SUCCESS"
-                }
-            } else {
-                Write-Log "Python process already exited" -Level "INFO"
+        if ($PythonStartTime -and ($PythonStartTime -is [DateTime]) -and ($PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss") -ne "-")) {
+            try {
+                $runtime = [math]::Round((Get-Date - $PythonStartTime).TotalMinutes, 1)
+                Write-Host "  Runtime: $runtime minutes" -ForegroundColor White
+            } catch {
+                Write-Host "  Runtime: Calculating..." -ForegroundColor Yellow
             }
+        } else {
+            Write-Host "  Runtime: Starting..." -ForegroundColor Yellow
         }
-        catch [System.ComponentModel.Win32Exception] {
-            Write-Log "Access denied when trying to stop Python process (PID: $PythonPID)" -Level "WARN"
-        }
-        catch [System.ArgumentException] {
-            Write-Log "Python process (PID: $PythonPID) no longer exists" -Level "DEBUG"
-        }
-        catch {
-            Write-Log "Error stopping Python process: $_" -Level "ERROR"
-        }
+    } else {
+        Write-Host "PYTHON STATUS: STOPPED" -ForegroundColor Red
     }
 
-    # Then stop the worker PowerShell process
-    if ($WorkerPID -and $WorkerPID -ne 0) {
-        Write-Log "Stopping worker process (PID: $WorkerPID)..." -Level "INFO"
+    Write-Host ""
+    Write-Host "WORKER STATUS: $(if ($status.WorkerRunning) {'RUNNING'} else {'STOPPED'})" -ForegroundColor $(if ($status.WorkerRunning) {'Green'} else {'Red'})
+    if ($status.WorkerRunning) {
+        Write-Host "  PID: $WorkerPID" -ForegroundColor White
+    }
 
-        try {
-            $workerProcess = Get-Process -Id $WorkerPID -ErrorAction Stop
+    Write-Host ""
+    Write-Host "ACTIVE DATE PATH: $($Config.ActiveDatePath)" -ForegroundColor Gray
 
-            if (-not $workerProcess.HasExited) {
-                $workerProcess.CloseMainWindow() | Out-Null
-                Start-Sleep -Seconds 2
-
-                if (-not $workerProcess.HasExited) {
-                    Write-Log "Forcefully terminating worker process..." -Level "WARN"
-                    $workerProcess.Kill()
-                    if ($workerProcess.WaitForExit($Config.GracefulShutdownTimeout * 1000)) {
-                        $stoppedProcesses += "Worker"
-                        Write-Log "Worker process terminated" -Level "SUCCESS"
-                    }
-                } else {
-                    $stoppedProcesses += "Worker"
-                    Write-Log "Worker process exited gracefully" -Level "SUCCESS"
-                }
-            } else {
-                Write-Log "Worker process already exited" -Level "INFO"
+    if ($LastValidation) {
+        if ($LastValidation.Success) {
+            Write-Host "LAST VALIDATION: SUCCESS" -ForegroundColor Green
+            Write-Host "  Folder: $(Split-Path $LastValidation.RunFolder -Leaf)" -ForegroundColor White
+            if ($LastValidation.Warnings.Count -gt 0) {
+                Write-Host "  Warnings: $($LastValidation.Warnings.Count)" -ForegroundColor Yellow
             }
+        } else {
+            Write-Host "LAST VALIDATION: FAILED" -ForegroundColor Red
+            Write-Host "  Error: $($LastValidation.Error)" -ForegroundColor Red
         }
-        catch [System.ComponentModel.Win32Exception] {
-            Write-Log "Access denied when trying to stop worker process (PID: $WorkerPID)" -Level "WARN"
-        }
-        catch [System.ArgumentException] {
-            Write-Log "Worker process (PID: $WorkerPID) no longer exists" -Level "DEBUG"
-        }
-        catch {
-            Write-Log "Error stopping worker process: $_" -Level "ERROR"
-        }
+    } else {
+        Write-Host "LAST VALIDATION: Not yet performed" -ForegroundColor Gray
     }
 
-    # Clean up variables
-    $global:WorkerProcess = $null
-    $global:WorkerPID = $null
-    $global:PythonPID = $null
-    $global:WorkerIsRunning = $false
-    $global:PythonIsRunning = $false
+    Write-Host ""
+    Write-Host "Date-based runs path: $($Config.RunsBasePath)" -ForegroundColor Gray
+    Write-Host "================================================" -ForegroundColor Cyan
+    Write-Host "Press Ctrl+C to stop monitor" -ForegroundColor Gray
 
-    # Remove PID tracking file
-    if (Test-Path $Config.PIDFilePath) {
-        Remove-Item -Path $Config.PIDFilePath -Force -ErrorAction SilentlyContinue
-        Write-Log "Removed PID tracking file" -Level "DEBUG"
+}
+
+function Get-ProcessStatus {
+$status = @{
+MonitorRunning = $true
+WorkerRunning = $WorkerIsRunning
+PythonRunning = $PythonIsRunning
+CurrentTime = Get-Date -Format "HH:mm:ss"
+CurrentDate = Get-Date -Format "yyyy-MM-dd"
+CurrentDateFolder = $Config.CurrentDate
+Schedule = @{
+StartTime = $Config.StartTime
+EndTime = $Config.EndTime
+InWindow = $false
+}
+WorkerInfo = @{
+PID = $WorkerPID
+PythonPID = $PythonPID
+}
+LastValidation = $LastValidation
+PathInfo = @{
+ActiveDatePath = $Config.ActiveDatePath
+RunsBasePath = $Config.RunsBasePath
+}
+}
+
+    # Check time window
+    $startPassed = Test-TimeWindow -TargetTime $Config.StartTime
+    $endPassed = Test-TimeWindow -TargetTime $Config.EndTime
+    $status.Schedule.InWindow = ($startPassed -and !$endPassed)
+    $status.Schedule.StartPassed = $startPassed
+    $status.Schedule.EndPassed = $endPassed
+
+    return $status
+
+}
+
+function Find-LatestRunFolder {
+try {
+if (-not (Test-Path $Config.RunsBasePath)) {
+return $null
+}
+
+        $folders = Get-ChildItem -Path $Config.RunsBasePath -Directory -Filter $Config.OutputFolderPattern -ErrorAction SilentlyContinue
+
+        if (-not $folders) {
+            return $null
+        }
+
+        $latestFolder = $folders | Sort-Object CreationTime -Descending | Select-Object -First 1
+        return $latestFolder
     }
-
-    if ($stoppedProcesses.Count -gt 0) {
-        Write-Log "Stopped processes: $($stoppedProcesses -join ', ')" -Level "INFO"
+    catch {
+        Write-Log "Error finding run folders: $_" -Level "ERROR"
+        return $null
     }
 
 }
@@ -1090,83 +1067,161 @@ param(
 
 }
 
-function Save-ResilienceState {
+function Send-CompletionEmailEnhanced {
 <#
 .SYNOPSIS
-Saves the resilience state (collected folders, email queue, etc.)
+Enhanced email function that sends all collected files from the day
 #>
+param(
+[array]$AllRunData,
+        [object]$ValidationResult
+)
 
-    $resilienceData = @{
-        EmailAttachmentQueue = $global:EmailAttachmentQueue
-        CollectedRunFolders = $global:CollectedRunFolders
-        ForceStopAttempts = $global:ForceStopAttempts
-        LastForceStopTime = if ($global:LastForceStopTime) {
-            $global:LastForceStopTime.ToString("yyyy-MM-dd HH:mm:ss")
-        } else {
-            $null
-        }
-        IsShuttingDown = $global:IsShuttingDown
-        LastSaveTime = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    if (-not $Config.SendEmailOnCompletion) {
+        Write-Log "Email notification on completion is disabled" -Level "DEBUG"
+        return $false
     }
 
-    $resilienceFilePath = Join-Path (Split-Path $Config.LogFile -Parent) "resilience_state.json"
+    if ($null -eq $Config.EmailRecipients -or $Config.EmailRecipients.Count -eq 0) {
+        Write-Log "No email recipients configured" -Level "WARN"
+        return $false
+    }
+
+    if ([string]::IsNullOrWhiteSpace($Config.SmtpServer)) {
+        Write-Log "SMTP server not configured" -Level "WARN"
+        return $false
+    }
 
     try {
-        $resilienceData | ConvertTo-Json -Depth 10 | Out-File -FilePath $resilienceFilePath -Force
-        Write-Log "Resilience state saved to: $resilienceFilePath" -Level "DEBUG"
-    } catch {
-        Write-Log "Failed to save resilience state: $_" -Level "ERROR"
-    }
+        Write-Log "Preparing to send ENHANCED completion notifications with $($AllRunData.Count) collected runs..." -Level "INFO"
 
-}
-
-function Load-ResilienceState {
-<#
-.SYNOPSIS
-Loads the resilience state if it exists
-#>
-
-    $resilienceFilePath = Join-Path (Split-Path $Config.LogFile -Parent) "resilience_state.json"
-
-    if (Test-Path $resilienceFilePath) {
-        try {
-            $loadedData = Get-Content -Path $resilienceFilePath -Raw | ConvertFrom-Json
-
-            # Check if state is stale (older than 24 hours)
-            $lastSaveTime = [DateTime]::ParseExact($loadedData.LastSaveTime, "yyyy-MM-dd HH:mm:ss", $null)
-            $ageHours = ((Get-Date) - $lastSaveTime).TotalHours
-
-            if ($ageHours -gt 24) {
-                Write-Log "Resilience state is stale ($ageHours hours old), clearing" -Level "WARN"
-                Remove-Item -Path $resilienceFilePath -Force -ErrorAction SilentlyContinue
+        # Load credentials if available
+        $credential = $null
+        if (Test-Path $Config.EmailCredentialPath) {
+            try {
+                $credential = Import-Clixml -Path $Config.EmailCredentialPath
+                Write-Log "Email credential loaded from $($Config.EmailCredentialPath)" -Level "DEBUG"
+            } catch {
+                Write-Log "Failed to load email credential: $_" -Level "WARN"
                 return $false
             }
-
-            # Load the data
-            $global:EmailAttachmentQueue = @($loadedData.EmailAttachmentQueue)
-            $global:CollectedRunFolders = @($loadedData.CollectedRunFolders)
-            $global:ForceStopAttempts = $loadedData.ForceStopAttempts
-            $global:LastForceStopTime = if ($loadedData.LastForceStopTime) {
-                [DateTime]::ParseExact($loadedData.LastForceStopTime, "yyyy-MM-dd HH:mm:ss", $null)
-            } else {
-                $null
-            }
-            $global:IsShuttingDown = $loadedData.IsShuttingDown
-
-            Write-Log "Loaded resilience state with $($global:CollectedRunFolders.Count) collected folders" -Level "INFO"
-
-            # Clean up old file
-            Remove-Item -Path $resilienceFilePath -Force -ErrorAction SilentlyContinue
-
-            return $true
-        } catch {
-            Write-Log "Failed to load resilience state: $_" -Level "ERROR"
-            Remove-Item -Path $resilienceFilePath -Force -ErrorAction SilentlyContinue
+        } else {
+            Write-Log "Email credential file not found at $($Config.EmailCredentialPath)" -Level "WARN"
             return $false
         }
-    }
 
-    return $false
+        # Collect all attachments from all runs
+        $allAttachments = @()
+        foreach ($runData in $AllRunData) {
+            $allAttachments += $runData.Attachments
+        }
+
+        # Remove duplicates (in case same file appears in multiple runs)
+        $allAttachments = $allAttachments | Select-Object -Unique
+
+        # Check total attachment size
+        $totalAttachmentSize = 0
+        foreach ($attachment in $allAttachments) {
+            if (Test-Path $attachment) {
+                $totalAttachmentSize += (Get-Item $attachment).Length
+            }
+        }
+        $totalSizeMB = [math]::Round($totalAttachmentSize / 1MB, 2)
+
+        Write-Log "Total attachments to send: $($allAttachments.Count) files ($totalSizeMB MB)" -Level "INFO"
+
+        # Check Gmail limit (25MB)
+        if ($totalSizeMB -gt 25) {
+            Write-Log "WARNING: Total attachment size ($totalSizeMB MB) exceeds Gmail limit (25 MB)" -Level "WARN"
+            # We'll send anyway and let it fail if it's too large
+        }
+
+        # Group recipients by language
+        $recipientsByLanguage = @{}
+        foreach ($recipient in $Config.EmailRecipients) {
+            $lang = $recipient.Language
+            if (-not $recipientsByLanguage.ContainsKey($lang)) {
+                $recipientsByLanguage[$lang] = @()
+            }
+            $recipientsByLanguage[$lang] += $recipient.Address
+        }
+
+        Write-Log "Sending emails in $(($recipientsByLanguage.Keys | Measure-Object).Count) different language(s)" -Level "INFO"
+
+        $successCount = 0
+        $failCount = 0
+
+        # Send one email per language group
+        foreach ($language in $recipientsByLanguage.Keys) {
+            $recipients = $recipientsByLanguage[$language]
+            $recipientList = $recipients -join ", "
+
+            Write-Log "Sending $language email to: $recipientList" -Level "INFO"
+
+            # Get enhanced email content
+            $emailContent = Get-EmailContentEnhanced -Language $language -AllRunData $AllRunData -ValidationResult $ValidationResult
+
+            try {
+                # Prepare email parameters
+                $mailParams = @{
+                    To          = $recipients
+                    From        = $Config.EmailFrom
+                    Subject     = $emailContent.Subject
+                    Body        = $emailContent.Body
+                    SmtpServer  = $Config.SmtpServer
+                    Port        = $Config.SmtpPort
+                    UseSsl      = $Config.UseSSL
+                    Credential  = $credential
+                    ErrorAction = 'Stop'
+                }
+
+                # Add all attachments if we have any
+                if ($allAttachments.Count -gt 0) {
+                    $mailParams.Attachments = $allAttachments
+                }
+
+                # Send the email
+                Send-MailMessage @mailParams
+
+                Write-Log "Successfully sent $language email with $($allAttachments.Count) attachments to $($recipients.Count) recipient(s)" -Level "SUCCESS"
+                $successCount += $recipients.Count
+
+            } catch {
+                Write-Log "Failed to send $language email: $($_.Exception.Message)" -Level "ERROR"
+                $failCount += $recipients.Count
+
+                # If attachments are too large, try sending without them
+                if ($_.Exception.Message -like "*size*" -or $_.Exception.Message -like "*large*") {
+                    Write-Log "Attempting to send without attachments due to size limit..." -Level "WARN"
+                    try {
+                        Send-MailMessage @mailParams -Body ($emailContent.Body + "`n`n[NOTE: Attachments omitted due to size limitations]")
+                        Write-Log "Email sent without attachments" -Level "SUCCESS"
+                        $successCount += $recipients.Count
+                        $failCount -= $recipients.Count
+                    } catch {
+                        Write-Log "Failed to send even without attachments: $($_.Exception.Message)" -Level "ERROR"
+                    }
+                }
+            }
+        }
+
+        # Summary
+        $totalRecipients = $successCount + $failCount
+        if ($failCount -eq 0) {
+            Write-Log "All enhanced emails sent successfully ($totalRecipients total recipients)" -Level "SUCCESS"
+            return $true
+        } elseif ($successCount -gt 0) {
+            Write-Log "Partially successful: $successCount/$totalRecipients enhanced emails sent" -Level "WARN"
+            return $true
+        } else {
+            Write-Log "All enhanced emails failed to send" -Level "ERROR"
+            return $false
+        }
+
+    } catch {
+        Write-Log "Failed to send enhanced completion emails: $($_.Exception.Message)" -Level "ERROR"
+        return $false
+    }
 
 }
 
@@ -1476,108 +1531,6 @@ param(
 
 }
 
-function Test-TimeWindow {
-param([string]$TargetTime)
-
-    $now = Get-Date
-    try {
-        $target = [DateTime]::ParseExact($TargetTime, "HH:mm", $null)
-        return ($now.TimeOfDay -ge $target.TimeOfDay)
-    } catch {
-        Write-Log "Invalid time format: $TargetTime" -Level "ERROR"
-        return $false
-    }
-
-}
-
-function Test-IsEndTimeReached {
-<#
-.SYNOPSIS
-Checks if the configured end time has been reached
-#>
-$endPassed = Test-TimeWindow -TargetTime $Config.EndTime
-return $endPassed
-}
-
-# ====================================================================
-
-# SECTION 4: ENHANCED SAVE-PIDTRACKING FUNCTION
-
-# ====================================================================
-
-function Save-PIDTracking { # Enhanced to include resilience data
-$workerStartString = if ($WorkerStartTime -and ($WorkerStartTime -is [DateTime]) -and ($WorkerStartTime.ToString("yyyy-MM-dd HH:mm:ss") -ne "-")) {
-$WorkerStartTime.ToString("yyyy-MM-dd HH:mm:ss")
-} else {
-$null
-}
-
-    $pythonStartString = if ($PythonStartTime -and ($PythonStartTime -is [DateTime]) -and ($PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss") -ne "-")) {
-        $PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss")
-    } else {
-        $null
-    }
-
-    $PIDTracking.WorkerPID = $WorkerPID
-    $PIDTracking.PythonPID = $PythonPID
-    $PIDTracking.WorkerStartTime = $workerStartString
-    $PIDTracking.PythonStartTime = $pythonStartString
-    $PIDTracking.RunFolder = $CurrentRunFolder
-    $PIDTracking.LastUpdate = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
-
-    # NEW: Add resilience data
-    $PIDTracking.EmailQueue = $global:EmailAttachmentQueue
-    $PIDTracking.CollectedFolders = $global:CollectedRunFolders
-    $PIDTracking.ShutdownInitiated = $global:IsShuttingDown
-
-    try {
-        $PIDTracking | ConvertTo-Json -Depth 10 | Out-File -FilePath $Config.PIDFilePath -Force
-        Write-Log "Enhanced PID tracking saved with $($global:CollectedRunFolders.Count) collected folders" -Level "DEBUG"
-
-        # Also save resilience state separately
-        Save-ResilienceState
-    } catch {
-        Write-Log "Failed to save enhanced PID tracking: $_" -Level "ERROR"
-    }
-
-}
-
-# ====================================================================
-
-# SECTION 5: ENHANCED LOAD-PIDTRACKING FUNCTION
-
-# ====================================================================
-
-function Get-ProcessStatus {
-$status = @{
-MonitorRunning = $true
-WorkerRunning = $WorkerIsRunning
-PythonRunning = $PythonIsRunning
-CurrentTime = Get-Date -Format "HH:mm:ss"
-CurrentDate = Get-Date -Format "yyyy-MM-dd"
-Schedule = @{
-StartTime = $Config.StartTime
-EndTime = $Config.EndTime
-InWindow = $false
-}
-WorkerInfo = @{
-PID = $WorkerPID
-PythonPID = $PythonPID
-}
-LastValidation = $LastValidation
-}
-
-    # Check time window
-    $startPassed = Test-TimeWindow -TargetTime $Config.StartTime
-    $endPassed = Test-TimeWindow -TargetTime $Config.EndTime
-    $status.Schedule.InWindow = ($startPassed -and !$endPassed)
-    $status.Schedule.StartPassed = $startPassed
-    $status.Schedule.EndPassed = $endPassed
-
-    return $status
-
-}
-
 function Start-WorkerProcess { # Check if we already have a running Python process
 $existingPythonPID = Find-PythonProcess
     if ($existingPythonPID) {
@@ -1712,28 +1665,6 @@ Write-Log "Searching for Python process..." -Level "DEBUG"
 
 }
 
-function Find-LatestRunFolder {
-try {
-if (-not (Test-Path $Config.RunsBasePath)) {
-return $null
-}
-
-        $folders = Get-ChildItem -Path $Config.RunsBasePath -Directory -Filter $Config.OutputFolderPattern -ErrorAction SilentlyContinue
-
-        if (-not $folders) {
-            return $null
-        }
-
-        $latestFolder = $folders | Sort-Object CreationTime -Descending | Select-Object -First 1
-        return $latestFolder
-    }
-    catch {
-        Write-Log "Error finding run folders: $_" -Level "ERROR"
-        return $null
-    }
-
-}
-
 function Is-ProcessRunning {
 param(
 [int]$ProcessId, 
@@ -1756,12 +1687,684 @@ param(
 
 }
 
+function Get-DateBasedPath {
+<#
+.SYNOPSIS
+Gets or creates a date-based folder path for the current day
+#>
+param(
+[string]$BasePath = (Join-Path $ActiveRoot "logs-running\Magick"),
+        [DateTime]$Date = (Get-Date)
+)
+
+    $dateString = $Date.ToString("yyyy-MM-dd")
+    $datePath = Join-Path $BasePath $dateString
+
+    # Create the directory if it doesn't exist
+    if (-not (Test-Path $datePath)) {
+        try {
+            New-Item -ItemType Directory -Path $datePath -Force | Out-Null
+            Write-Log "Created date-based folder: $datePath" -Level "INFO"
+        } catch {
+            Write-Log "Failed to create date-based folder: $_" -Level "ERROR"
+            throw
+        }
+    }
+
+    return $datePath
+
+}
+
+function Update-ConfigForCurrentDate {
+<#
+.SYNOPSIS
+Updates configuration paths for the current date folder
+#>
+
+    $currentDate = Get-Date -Format "yyyy-MM-dd"
+
+    # Update paths in config to use date-based folder
+    $dateBasedPath = Get-DateBasedPath -Date (Get-Date)
+
+    $Script:Config.RunsBasePath = $dateBasedPath
+    $Script:Config.PIDFilePath = Join-Path $dateBasedPath "monitor_pid_Magick.json"
+    $Script:Config.LogFile = Join-Path $dateBasedPath "monitor_Magick.log"
+    $Script:Config.CurrentDate = $currentDate
+    $Script:Config.ActiveDatePath = $dateBasedPath
+
+    # Update global variables
+    $global:CurrentDateFolder = $currentDate
+    $global:ActiveDatePath = $dateBasedPath
+
+    Write-Log "Updated configuration for date: $currentDate" -Level "INFO"
+    Write-Log "Active date path: $dateBasedPath" -Level "DEBUG"
+
+}
+
+function Find-LatestRunFolder {
+<#
+.SYNOPSIS
+Finds the latest run folder within the current date's directory
+#>
+
+    try {
+        # First check the current date's path
+        $currentDatePath = $Config.RunsBasePath
+
+        if (-not (Test-Path $currentDatePath)) {
+            Write-Log "Current date path does not exist: $currentDatePath" -Level "WARN"
+            return $null
+        }
+
+        $folders = Get-ChildItem -Path $currentDatePath -Directory -Filter $Config.OutputFolderPattern -ErrorAction SilentlyContinue
+
+        if ($folders) {
+            $latestFolder = $folders | Sort-Object CreationTime -Descending | Select-Object -First 1
+            Write-Log "Found latest run folder in date-based path: $($latestFolder.Name)" -Level "DEBUG"
+            return $latestFolder
+        } else {
+            # If no folders in current date path, check if we're looking at the wrong day
+            # This handles the case where the script might run across midnight
+            $parentPath = Split-Path $currentDatePath -Parent
+            $allDateFolders = Get-ChildItem -Path $parentPath -Directory -Filter "????-??-??" | Sort-Object Name -Descending
+
+            foreach ($dateFolder in $allDateFolders) {
+                $checkPath = Join-Path $dateFolder.FullName "*"
+                $potentialFolders = Get-ChildItem -Path $checkPath -Directory -Filter $Config.OutputFolderPattern -ErrorAction SilentlyContinue
+
+                if ($potentialFolders) {
+                    $latestFolder = $potentialFolders | Sort-Object CreationTime -Descending | Select-Object -First 1
+                    Write-Log "Found run folder in different date folder: $($dateFolder.Name)" -Level "INFO"
+                    return $latestFolder
+                }
+            }
+
+            Write-Log "No run folders found in any date directory" -Level "DEBUG"
+            return $null
+        }
+    }
+    catch {
+        Write-Log "Error finding run folders: $_" -Level "ERROR"
+        return $null
+    }
+
+}
+
+# Call it ONCE at the very beginning
+
+Initialize-ProjectPortablePaths
+
+# ====================================================================
+
+# SECTION 2.1: ENHANCED GLOBAL VARIABLES FOR RESILIENCE
+
+# ====================================================================
+
+# Global variables (keep existing ones and add new ones)
+
+$WorkerProcess = $null
+$WorkerPID = $null
+$PythonPID = $null
+$WorkerStartTime = $null
+$PythonStartTime = $null
+$LastValidation = $null
+$CurrentRunFolder = $null
+$WorkerIsRunning = $false
+$PythonIsRunning = $false
+$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+$LastWorkerAttempt = $null
+
+# NEW: Enhanced tracking for resilience
+
+$global:ForceStopAttempts = 0
+$global:LastForceStopTime = $null
+$global:ForceStopThreshold = 2 # Require 2 Ctrl+C within 5 seconds to force stop
+$global:ForceStopWindowSeconds = 5
+$global:EmailAttachmentQueue = @()
+$global:CollectedRunFolders = @()
+$global:IsShuttingDown = $false
+
+# ENHANCED: Persistent tracking for last known state
+
+$global:PersistentTracking = @{
+LastKnownRunFolder = $null
+LastKnownPythonPID = $null
+LastKnownWorkerPID = $null
+LastValidationTime = $null
+LastValidationResult = $null
+ProcessStopHistory = @()
+ValidationHistory = @()
+DailyRunCount = 0
+LastSuccessfulRun = $null
+}
+
+# PID tracking structure
+
+$PIDTracking = @{
+WorkerPID = $null
+PythonPID = $null
+WorkerStartTime = $null
+PythonStartTime = $null
+RunFolder = $null
+LastUpdate = $null # NEW: Enhanced tracking
+EmailQueue = @()
+CollectedFolders = @()
+ShutdownInitiated = $false # ENHANCED: Persistent tracking data
+PersistentTracking = $null
+}
+
+# ====================================================================
+
+# SECTION 3.2: ENHANCED PERSISTENCE TRACKING FUNCTIONS
+
+# ====================================================================
+
+function Save-PersistentTracking {
+<#
+.SYNOPSIS
+Saves persistent tracking data to disk for recovery
+#>
+
+    $persistentFilePath = Join-Path (Split-Path $Config.LogFile -Parent) "persistent_tracking.json"
+
+    # Update persistent tracking data
+    $global:PersistentTracking.LastKnownRunFolder = $CurrentRunFolder
+    $global:PersistentTracking.LastKnownPythonPID = $PythonPID
+    $global:PersistentTracking.LastKnownWorkerPID = $WorkerPID
+    $global:PersistentTracking.LastValidationTime = if ($LastValidation) { (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
+    $global:PersistentTracking.LastValidationResult = if ($LastValidation) { @{ Success = $LastValidation.Success; FolderName = $LastValidation.FolderName } } else { $null }
+
+    # Add current process state to history if it's significant
+    $currentState = @{
+        Timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+        PythonPID = $PythonPID
+        WorkerPID = $WorkerPID
+        RunFolder = $CurrentRunFolder
+        PythonRunning = $PythonIsRunning
+        WorkerRunning = $WorkerIsRunning
+        ForceStopAttempts = $global:ForceStopAttempts
+    }
+
+    $global:PersistentTracking.ProcessStopHistory += $currentState
+
+    # Keep only last 50 entries to prevent file bloat
+    if ($global:PersistentTracking.ProcessStopHistory.Count -gt 50) {
+        $global:PersistentTracking.ProcessStopHistory = $global:PersistentTracking.ProcessStopHistory | Select-Object -Last 50
+    }
+
+    try {
+        $global:PersistentTracking | ConvertTo-Json -Depth 10 | Out-File -FilePath $persistentFilePath -Force
+        Write-Log "Persistent tracking saved to: $persistentFilePath" -Level "DEBUG"
+        return $true
+    } catch {
+        Write-Log "Failed to save persistent tracking: $_" -Level "ERROR"
+        return $false
+    }
+
+}
+
+function Load-PersistentTracking {
+<#
+.SYNOPSIS
+Loads persistent tracking data from disk
+#>
+
+    $persistentFilePath = Join-Path (Split-Path $Config.LogFile -Parent) "persistent_tracking.json"
+
+    if (Test-Path $persistentFilePath) {
+        try {
+            $loadedData = Get-Content -Path $persistentFilePath -Raw | ConvertFrom-Json
+
+            # Check if data is stale (older than 7 days)
+            if ($loadedData.ProcessStopHistory.Count -gt 0) {
+                $lastEntry = $loadedData.ProcessStopHistory[-1]
+                $lastTimestamp = [DateTime]::ParseExact($lastEntry.Timestamp, "yyyy-MM-dd HH:mm:ss", $null)
+                $ageDays = ((Get-Date) - $lastTimestamp).TotalDays
+
+                if ($ageDays -gt 7) {
+                    Write-Log "Persistent tracking data is old ($ageDays days), starting fresh" -Level "WARN"
+                    # Start fresh but keep the file for reference
+                    $backupPath = "$persistentFilePath.backup_$(Get-Date -Format 'yyyyMMdd')"
+                    Copy-Item -Path $persistentFilePath -Destination $backupPath -Force
+                    return $false
+                }
+            }
+
+            # Load the data
+            $global:PersistentTracking = @{
+                LastKnownRunFolder = $loadedData.LastKnownRunFolder
+                LastKnownPythonPID = $loadedData.LastKnownPythonPID
+                LastKnownWorkerPID = $loadedData.LastKnownWorkerPID
+                LastValidationTime = $loadedData.LastValidationTime
+                LastValidationResult = $loadedData.LastValidationResult
+                ProcessStopHistory = @($loadedData.ProcessStopHistory)
+                ValidationHistory = @($loadedData.ValidationHistory)
+                DailyRunCount = $loadedData.DailyRunCount
+                LastSuccessfulRun = $loadedData.LastSuccessfulRun
+            }
+
+            Write-Log "Loaded persistent tracking with $($global:PersistentTracking.ProcessStopHistory.Count) history entries" -Level "INFO"
+
+            # Check if there was an unexpected stop in previous session
+            if ($global:PersistentTracking.ProcessStopHistory.Count -gt 0) {
+                $lastStop = $global:PersistentTracking.ProcessStopHistory[-1]
+
+                # If last session ended with running processes, we should check for orphaned runs
+                if ($lastStop.PythonRunning -or $lastStop.WorkerRunning) {
+                    Write-Log "Previous session appears to have ended unexpectedly. Checking for orphaned runs..." -Level "WARN"
+                    Check-OrphanedRuns -LastKnownFolder $lastStop.RunFolder
+                }
+            }
+
+            return $true
+        } catch {
+            Write-Log "Failed to load persistent tracking: $_" -Level "ERROR"
+            return $false
+        }
+    }
+
+    return $false
+
+}
+
+function Check-OrphanedRuns {
+<#
+.SYNOPSIS
+Checks for orphaned runs that might have been left behind by crashes
+#>
+param(
+[string]$LastKnownFolder
+)
+
+    Write-Log "Checking for orphaned runs..." -Level "INFO"
+
+    # First, check the last known folder
+    if ($LastKnownFolder -and (Test-Path $LastKnownFolder)) {
+        Write-Log "Validating last known folder: $(Split-Path $LastKnownFolder -Leaf)" -Level "DEBUG"
+        $validation = Validate-Output -RunFolder $LastKnownFolder -RetryCount 0
+
+        if ($validation.Success) {
+            # Collect this orphaned run
+            $runData = Collect-RunFolderAttachments -RunFolder $LastKnownFolder
+            if ($runData.Attachments.Count -gt 0) {
+                $global:CollectedRunFolders += $runData
+                $global:EmailAttachmentQueue += $runData.Attachments
+                Write-Log "Collected orphaned run from previous session: $($runData.RunFolderName)" -Level "SUCCESS"
+
+                # Update persistent tracking
+                $global:PersistentTracking.LastSuccessfulRun = @{
+                    Folder = $runData.RunFolder
+                    CollectionTime = $runData.CollectionTime
+                    FileCount = $runData.Attachments.Count
+                }
+                Save-PersistentTracking
+            }
+        }
+    }
+
+    # Check all run folders in the base path
+    $allRunFolders = Get-ChildItem -Path $Config.RunsBasePath -Directory -Filter $Config.OutputFolderPattern -ErrorAction SilentlyContinue
+
+    if ($allRunFolders) {
+        Write-Log "Found $($allRunFolders.Count) total run folders" -Level "DEBUG"
+
+        # Check each folder for completeness
+        foreach ($folder in $allRunFolders) {
+            # Skip if this is the last known folder we already processed
+            if ($folder.FullName -eq $LastKnownFolder) {
+                continue
+            }
+
+            # Check if folder has completion marker
+            $completionPath = Join-Path $folder.FullName "Magick_Process_*\logs\completion_summary.txt"
+            $metadataPath = Join-Path $folder.FullName "metadata.json"
+
+            if ((Test-Path $completionPath) -and (Test-Path $metadataPath)) {
+                # Check if we already collected this folder
+                $alreadyCollected = $global:CollectedRunFolders | Where-Object { $_.RunFolder -eq $folder.FullName }
+
+                if (-not $alreadyCollected) {
+                    Write-Log "Found uncollected completed run: $(Split-Path $folder.FullName -Leaf)" -Level "INFO"
+                    $runData = Collect-RunFolderAttachments -RunFolder $folder.FullName
+                    if ($runData.Attachments.Count -gt 0) {
+                        $global:CollectedRunFolders += $runData
+                        $global:EmailAttachmentQueue += $runData.Attachments
+                        Write-Log "Collected previously uncollected run: $($runData.RunFolderName)" -Level "SUCCESS"
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+function Record-ProcessStop {
+<#
+.SYNOPSIS
+Records detailed information when a process stops
+#>
+param(
+[string]$StopType,
+        [string]$Reason,
+[bool]$WasUnexpected = $false
+)
+
+    $stopRecord = @{
+        Timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+        StopType = $StopType
+        Reason = $Reason
+        WasUnexpected = $WasUnexpected
+        PythonPID = $PythonPID
+        WorkerPID = $WorkerPID
+        RunFolder = $CurrentRunFolder
+        PythonRunningBefore = $PythonIsRunning
+        WorkerRunningBefore = $WorkerIsRunning
+        ForceStopAttempts = $global:ForceStopAttempts
+        IsShuttingDown = $global:IsShuttingDown
+    }
+
+    # Add to validation history if this was a validation event
+    if ($StopType -eq "Validation") {
+        $global:PersistentTracking.ValidationHistory += $stopRecord
+        if ($global:PersistentTracking.ValidationHistory.Count -gt 100) {
+            $global:PersistentTracking.ValidationHistory = $global:PersistentTracking.ValidationHistory | Select-Object -Last 100
+        }
+    }
+
+    # Always add to process stop history
+    $global:PersistentTracking.ProcessStopHistory += $stopRecord
+    if ($global:PersistentTracking.ProcessStopHistory.Count -gt 100) {
+        $global:PersistentTracking.ProcessStopHistory = $global:PersistentTracking.ProcessStopHistory | Select-Object -Last 100
+    }
+
+    # Update daily run count if this was a successful validation
+    if ($StopType -eq "Validation" -and $Reason -eq "Success") {
+        $global:PersistentTracking.DailyRunCount++
+
+        # Update last successful run
+        if ($CurrentRunFolder) {
+            $global:PersistentTracking.LastSuccessfulRun = @{
+                Folder = $CurrentRunFolder
+                Timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+                FolderName = Split-Path $CurrentRunFolder -Leaf
+            }
+        }
+    }
+
+    Write-Log "Process stop recorded: $StopType - $Reason (Unexpected: $WasUnexpected)" -Level "DEBUG"
+    Save-PersistentTracking
+
+}
+
+function Validate-And-Collect-OnStop {
+<#
+.SYNOPSIS
+Validates and collects run data when a process stops unexpectedly
+#>
+param(
+[string]$StopReason = "Unexpected Stop"
+)
+
+    Write-Log "Performing validation on stop: $StopReason" -Level "INFO"
+
+    # Always try to validate the current run folder
+    if ($CurrentRunFolder -and (Test-Path $CurrentRunFolder)) {
+        Write-Log "Validating current run folder on stop: $(Split-Path $CurrentRunFolder -Leaf)" -Level "DEBUG"
+        $validation = Validate-Output -RunFolder $CurrentRunFolder -RetryCount 0
+
+        if ($validation.Success) {
+            # Collect the run data
+            $runData = Collect-RunFolderAttachments -RunFolder $CurrentRunFolder
+            if ($runData.Attachments.Count -gt 0) {
+                # Check if we already have this folder
+                $existingIndex = $global:CollectedRunFolders |
+                    Where-Object { $_.RunFolder -eq $runData.RunFolder } |
+                    Select-Object -First 1
+
+                if (-not $existingIndex) {
+                    $global:CollectedRunFolders += $runData
+                    $global:EmailAttachmentQueue += $runData.Attachments
+                    Write-Log "Collected run on stop: $($runData.RunFolderName)" -Level "SUCCESS"
+                    Record-ProcessStop -StopType "Validation" -Reason "Success" -WasUnexpected $true
+                }
+            }
+        } else {
+            Write-Log "Validation failed for run folder on stop" -Level "WARN"
+            Record-ProcessStop -StopType "Validation" -Reason "Failed: $($validation.Error)" -WasUnexpected $true
+        }
+    } else {
+        # If no current run folder, try to find the latest one
+        Write-Log "No current run folder, finding latest..." -Level "DEBUG"
+        $latestFolder = Find-LatestRunFolder
+        if ($latestFolder) {
+            Write-Log "Validating latest run folder on stop: $(Split-Path $latestFolder.FullName -Leaf)" -Level "DEBUG"
+            $validation = Validate-Output -RunFolder $latestFolder.FullName -RetryCount 0
+
+            if ($validation.Success) {
+                $runData = Collect-RunFolderAttachments -RunFolder $latestFolder.FullName
+                if ($runData.Attachments.Count -gt 0) {
+                    # Check if we already have this folder
+                    $existingIndex = $global:CollectedRunFolders |
+                        Where-Object { $_.RunFolder -eq $runData.RunFolder } |
+                        Select-Object -First 1
+
+                    if (-not $existingIndex) {
+                        $global:CollectedRunFolders += $runData
+                        $global:EmailAttachmentQueue += $runData.Attachments
+                        Write-Log "Collected latest run on stop: $($runData.RunFolderName)" -Level "SUCCESS"
+                        Record-ProcessStop -StopType "Validation" -Reason "Success" -WasUnexpected $true
+                    }
+                }
+            }
+        } else {
+            Write-Log "No run folders found to validate on stop" -Level "WARN"
+            Record-ProcessStop -StopType "Validation" -Reason "No folders found" -WasUnexpected $true
+        }
+    }
+
+    # Save all state
+    Save-PIDTracking
+    Save-ResilienceState
+    Save-PersistentTracking
+
+}
+
+# ====================================================================
+
+# SECTION 4.1: ENHANCED STOP-WORKERPROCESS FUNCTION
+
+# ====================================================================
+
+function Stop-WorkerProcess {
+$stoppedProcesses = @()
+$stopReason = "Normal Shutdown"
+$wasUnexpected = $false
+
+    # Determine if this is an unexpected stop
+    if ($global:IsShuttingDown -and $global:ForceStopAttempts -ge $global:ForceStopThreshold) {
+        $stopReason = "Force Stop by User"
+        $wasUnexpected = $true
+    } elseif (-not $global:IsShuttingDown -and ($PythonIsRunning -or $WorkerIsRunning)) {
+        $stopReason = "Unexpected Process Stop"
+        $wasUnexpected = $true
+    }
+
+    Write-Log "Stopping worker process. Reason: $stopReason" -Level "INFO"
+
+    # Record the stop event
+    Record-ProcessStop -StopType "ProcessStop" -Reason $stopReason -WasUnexpected $wasUnexpected
+
+    # If this was unexpected, validate and collect before stopping
+    if ($wasUnexpected) {
+        Write-Log "Unexpected stop detected - validating and collecting current run..." -Level "WARN"
+        Validate-And-Collect-OnStop -StopReason $stopReason
+    }
+
+    # First, try to stop the Python process
+    if ($PythonPID -and $PythonPID -ne 0) {
+        Write-Log "Stopping Python process (PID: $PythonPID)..." -Level "INFO"
+
+        try {
+            $pythonProcess = Get-Process -Id $PythonPID -ErrorAction Stop
+
+            if (-not $pythonProcess.HasExited) {
+                $pythonProcess.CloseMainWindow() | Out-Null
+                Start-Sleep -Seconds 2
+
+                if (-not $pythonProcess.HasExited) {
+                    Write-Log "Forcefully terminating Python process..." -Level "WARN"
+                    $pythonProcess.Kill()
+                    if ($pythonProcess.WaitForExit($Config.GracefulShutdownTimeout * 1000)) {
+                        $stoppedProcesses += "Python"
+                        Write-Log "Python process terminated" -Level "SUCCESS"
+                    }
+                } else {
+                    $stoppedProcesses += "Python"
+                    Write-Log "Python process exited gracefully" -Level "SUCCESS"
+                }
+            } else {
+                Write-Log "Python process already exited" -Level "INFO"
+            }
+        }
+        catch [System.ComponentModel.Win32Exception] {
+            Write-Log "Access denied when trying to stop Python process (PID: $PythonPID)" -Level "WARN"
+        }
+        catch [System.ArgumentException] {
+            Write-Log "Python process (PID: $PythonPID) no longer exists" -Level "DEBUG"
+        }
+        catch {
+            Write-Log "Error stopping Python process: $_" -Level "ERROR"
+        }
+    }
+
+    # Then stop the worker PowerShell process
+    if ($WorkerPID -and $WorkerPID -ne 0) {
+        Write-Log "Stopping worker process (PID: $WorkerPID)..." -Level "INFO"
+
+        try {
+            $workerProcess = Get-Process -Id $WorkerPID -ErrorAction Stop
+
+            if (-not $workerProcess.HasExited) {
+                $workerProcess.CloseMainWindow() | Out-Null
+                Start-Sleep -Seconds 2
+
+                if (-not $workerProcess.HasExited) {
+                    Write-Log "Forcefully terminating worker process..." -Level "WARN"
+                    $workerProcess.Kill()
+                    if ($workerProcess.WaitForExit($Config.GracefulShutdownTimeout * 1000)) {
+                        $stoppedProcesses += "Worker"
+                        Write-Log "Worker process terminated" -Level "SUCCESS"
+                    }
+                } else {
+                    $stoppedProcesses += "Worker"
+                    Write-Log "Worker process exited gracefully" -Level "SUCCESS"
+                }
+            } else {
+                Write-Log "Worker process already exited" -Level "INFO"
+            }
+        }
+        catch [System.ComponentModel.Win32Exception] {
+            Write-Log "Access denied when trying to stop worker process (PID: $WorkerPID)" -Level "WARN"
+        }
+        catch [System.ArgumentException] {
+            Write-Log "Worker process (PID: $WorkerPID) no longer exists" -Level "DEBUG"
+        }
+        catch {
+            Write-Log "Error stopping worker process: $_" -Level "ERROR"
+        }
+    }
+
+    # Clean up variables
+    $global:WorkerProcess = $null
+    $global:WorkerPID = $null
+    $global:PythonPID = $null
+    $global:WorkerIsRunning = $false
+    $global:PythonIsRunning = $false
+
+    # Remove PID tracking file
+    if (Test-Path $Config.PIDFilePath) {
+        Remove-Item -Path $Config.PIDFilePath -Force -ErrorAction SilentlyContinue
+        Write-Log "Removed PID tracking file" -Level "DEBUG"
+    }
+
+    if ($stoppedProcesses.Count -gt 0) {
+        Write-Log "Stopped processes: $($stoppedProcesses -join ', ')" -Level "INFO"
+    }
+
+    # Record final stop event
+    Record-ProcessStop -StopType "ProcessStopComplete" -Reason "Processes stopped: $($stoppedProcesses.Count)" -WasUnexpected $wasUnexpected
+
+}
+
+# ====================================================================
+
+# SECTION 4.2: ENHANCED SAVE-PIDTRACKING FUNCTION
+
+# ====================================================================
+
+function Save-PIDTracking { # Enhanced to include resilience data
+$workerStartString = if ($WorkerStartTime -and ($WorkerStartTime -is [DateTime]) -and ($WorkerStartTime.ToString("yyyy-MM-dd HH:mm:ss") -ne "-")) {
+$WorkerStartTime.ToString("yyyy-MM-dd HH:mm:ss")
+} else {
+$null
+}
+
+    $pythonStartString = if ($PythonStartTime -and ($PythonStartTime -is [DateTime]) -and ($PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss") -ne "-")) {
+        $PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss")
+    } else {
+        $null
+    }
+
+    $PIDTracking.WorkerPID = $WorkerPID
+    $PIDTracking.PythonPID = $PythonPID
+    $PIDTracking.WorkerStartTime = $workerStartString
+    $PIDTracking.PythonStartTime = $pythonStartString
+    $PIDTracking.RunFolder = $CurrentRunFolder
+    $PIDTracking.LastUpdate = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+
+    # NEW: Add resilience data
+    $PIDTracking.EmailQueue = $global:EmailAttachmentQueue
+    $PIDTracking.CollectedFolders = $global:CollectedRunFolders
+    $PIDTracking.ShutdownInitiated = $global:IsShuttingDown
+
+    # ENHANCED: Add persistent tracking data
+    $PIDTracking.PersistentTracking = @{
+        LastKnownRunFolder = $CurrentRunFolder
+        LastKnownPythonPID = $PythonPID
+        LastKnownWorkerPID = $WorkerPID
+        DailyRunCount = $global:PersistentTracking.DailyRunCount
+        LastSuccessfulRun = $global:PersistentTracking.LastSuccessfulRun
+    }
+
+    try {
+        $PIDTracking | ConvertTo-Json -Depth 10 | Out-File -FilePath $Config.PIDFilePath -Force
+        Write-Log "Enhanced PID tracking saved with $($global:CollectedRunFolders.Count) collected folders" -Level "DEBUG"
+
+        # Also save resilience state and persistent tracking separately
+        Save-ResilienceState
+        Save-PersistentTracking
+    } catch {
+        Write-Log "Failed to save enhanced PID tracking: $_" -Level "ERROR"
+    }
+
+}
+
+# ====================================================================
+
+# SECTION 5.1: ENHANCED LOAD-PIDTRACKING FUNCTION
+
+# ====================================================================
+
 function Load-PIDTracking {
 if (-not (Test-Path $Config.PIDFilePath)) {
 Write-Log "No PID tracking file found" -Level "DEBUG"
 
         # Try to load resilience state separately
         Load-ResilienceState | Out-Null
+        Load-PersistentTracking | Out-Null
+
+        # Check for orphaned runs
+        Check-OrphanedRuns -LastKnownFolder $global:PersistentTracking.LastKnownRunFolder
 
         return $false
     }
@@ -1775,6 +2378,13 @@ Write-Log "No PID tracking file found" -Level "DEBUG"
 
         if ($ageMinutes -gt $Config.MaxPIDFileAgeMinutes) {
             Write-Log "PID file is too old ($ageMinutes minutes), cleaning up" -Level "WARN"
+
+            # Before removing, try to validate and collect any ongoing run
+            if ($loaded.RunFolder) {
+                Write-Log "Attempting to validate stale run folder before cleanup..." -Level "INFO"
+                Validate-And-Collect-OnStop -StopReason "Stale PID File"
+            }
+
             Remove-Item -Path $Config.PIDFilePath -Force -ErrorAction SilentlyContinue
             return $false
         }
@@ -1833,28 +2443,45 @@ Write-Log "No PID tracking file found" -Level "DEBUG"
                 $global:IsShuttingDown = $loaded.ShutdownInitiated
             }
 
+            # ENHANCED: Load persistent tracking data from PID file
+            if ($loaded.PSObject.Properties.Name -contains "PersistentTracking") {
+                $global:PersistentTracking.LastKnownRunFolder = $loaded.PersistentTracking.LastKnownRunFolder
+                $global:PersistentTracking.LastKnownPythonPID = $loaded.PersistentTracking.LastKnownPythonPID
+                $global:PersistentTracking.LastKnownWorkerPID = $loaded.PersistentTracking.LastKnownWorkerPID
+                $global:PersistentTracking.DailyRunCount = $loaded.PersistentTracking.DailyRunCount
+                $global:PersistentTracking.LastSuccessfulRun = $loaded.PersistentTracking.LastSuccessfulRun
+            }
+
             Write-Log "Enhanced PID tracking loaded: WorkerPID=$WorkerPID (Alive: $workerAlive), $($global:CollectedRunFolders.Count) collected folders" -Level "INFO"
+
+            # Also load separate persistent tracking file for history
+            Load-PersistentTracking | Out-Null
+
             return $true
         } else {
             Write-Log "Loaded PIDs are no longer running, cleaning up" -Level "INFO"
 
-            # NEW: Collect final data before cleaning up
+            # ENHANCED: Validate and collect before cleaning up
             if ($loaded.RunFolder) {
-                $runData = Collect-RunFolderAttachments -RunFolder $loaded.RunFolder
-                if ($runData.Attachments.Count -gt 0) {
-                    $global:CollectedRunFolders += $runData
-                    $global:EmailAttachmentQueue += $runData.Attachments
-                    Write-Log "Collected final run folder before cleanup" -Level "INFO"
-                }
+                Write-Log "Validating and collecting run folder before cleanup..." -Level "INFO"
+                Validate-And-Collect-OnStop -StopReason "Processes Dead on Load"
             }
 
             Remove-Item -Path $Config.PIDFilePath -Force -ErrorAction SilentlyContinue
+
+            # Load persistent tracking separately
+            Load-PersistentTracking | Out-Null
             Save-ResilienceState
+
             return $false
         }
     } catch {
         Write-Log "Failed to load enhanced PID tracking: $_" -Level "ERROR"
         Remove-Item -Path $Config.PIDFilePath -Force -ErrorAction SilentlyContinue
+
+        # Try to load persistent tracking anyway
+        Load-PersistentTracking | Out-Null
+
         return $false
     }
 
@@ -1862,95 +2489,313 @@ Write-Log "No PID tracking file found" -Level "DEBUG"
 
 # ====================================================================
 
-# SECTION 6: ENHANCED SHOW-STATUSBANNER FUNCTION
+# SECTION 6.1: ENHANCED CHECK-PROCESSSTATUS FUNCTION
 
 # ====================================================================
 
-function Show-StatusBanner {
-$status = Get-ProcessStatus
+function Check-ProcessStatus {
+$status = @{
+WorkerRunning = $false
+PythonRunning = $false
+WorkerPID = $WorkerPID
+PythonPID = $PythonPID
+}
 
-    # Only show banner every 20 seconds to avoid flickering
-    $currentSecond = (Get-Date).Second
-    if ($currentSecond % 20 -ne 0) {
-        return
+    # Check worker process
+    if ($WorkerPID -and $WorkerPID -ne 0) {
+        $status.WorkerRunning = Is-ProcessRunning -ProcessId $WorkerPID -ProcessName $Config.WorkerProcessName
     }
 
-    Clear-Host
-    Write-Host "================================================" -ForegroundColor Cyan
-    Write-Host "    ENHANCED FACE RECOGNITION PROCESS MONITOR" -ForegroundColor Cyan
-    Write-Host "================================================" -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host "Current Time: $($status.CurrentTime)" -ForegroundColor Yellow
-    Write-Host "Schedule: $($Config.StartTime) - $($Config.EndTime)" -ForegroundColor Yellow
-    Write-Host "Window: $(if ($status.Schedule.InWindow) { 'ACTIVE' } else { 'INACTIVE' })" `
-                -ForegroundColor $(if ($status.Schedule.InWindow) { 'Green' } else { 'Gray' })
-
-    # NEW: Show collected runs
-    Write-Host "Collected Runs: $($global:CollectedRunFolders.Count)" -ForegroundColor $(if ($global:CollectedRunFolders.Count -gt 0) { 'Green' } else { 'Gray' })
-    if ($global:CollectedRunFolders.Count -gt 0) {
-        $totalSize = ($global:CollectedRunFolders | ForEach-Object { $_.TotalSizeMB } | Measure-Object -Sum).Sum
-        Write-Host "Total Size: $( [math]::Round($totalSize, 2) ) MB" -ForegroundColor White
+    # Check Python process
+    if ($PythonPID -and $PythonPID -ne 0) {
+        $status.PythonRunning = Is-ProcessRunning -ProcessId $PythonPID -ProcessName $Config.PythonProcessName
     }
 
-    Write-Host ""
-
-    if ($status.PythonRunning) {
-        Write-Host "PYTHON STATUS: RUNNING" -ForegroundColor Green
-        Write-Host "  PID: $PythonPID" -ForegroundColor White
-
-        if ($PythonStartTime -and ($PythonStartTime -is [DateTime]) -and ($PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss") -ne "-")) {
-            try {
-                $runtime = [math]::Round((Get-Date - $PythonStartTime).TotalMinutes, 1)
-                Write-Host "  Runtime: $runtime minutes" -ForegroundColor White
-            } catch {
-                Write-Host "  Runtime: Calculating..." -ForegroundColor Yellow
-            }
-        } else {
-            Write-Host "  Runtime: Starting..." -ForegroundColor Yellow
+    # If we think Python is running but PID is null, try to find it
+    if ((-not $status.PythonRunning) -and $WorkerIsRunning) {
+        $foundPID = Find-PythonProcess
+        if ($foundPID) {
+            $global:PythonPID = $foundPID
+            $status.PythonPID = $foundPID
+            $status.PythonRunning = Is-ProcessRunning -ProcessId $foundPID -ProcessName $Config.PythonProcessName
+            Save-PIDTracking
         }
-    } else {
-        Write-Host "PYTHON STATUS: STOPPED" -ForegroundColor Red
     }
 
-    Write-Host ""
-    Write-Host "WORKER STATUS: $(if ($status.WorkerRunning) {'RUNNING'} else {'STOPPED'})" -ForegroundColor $(if ($status.WorkerRunning) {'Green'} else {'Red'})
-    if ($status.WorkerRunning) {
-        Write-Host "  PID: $WorkerPID" -ForegroundColor White
-    }
+    # ENHANCED: Check for unexpected process stops
+    $previousWorkerRunning = $global:WorkerIsRunning
+    $previousPythonRunning = $global:PythonIsRunning
 
-    Write-Host ""
-    Write-Host "FORCE STOP: $global:ForceStopAttempts/$global:ForceStopThreshold attempts" -ForegroundColor $(if ($global:ForceStopAttempts -gt 0) {'Yellow'} else {'Gray'})
-    Write-Host ""
+    # Update global state
+    $global:WorkerIsRunning = $status.WorkerRunning
+    $global:PythonIsRunning = $status.PythonRunning
 
-    if ($LastValidation) {
-        if ($LastValidation.Success) {
-            Write-Host "LAST VALIDATION: SUCCESS" -ForegroundColor Green
-            Write-Host "  Folder: $(Split-Path $LastValidation.RunFolder -Leaf)" -ForegroundColor White
-            if ($LastValidation.Warnings.Count -gt 0) {
-                Write-Host "  Warnings: $($LastValidation.Warnings.Count)" -ForegroundColor Yellow
-            }
-        } else {
-            Write-Host "LAST VALIDATION: FAILED" -ForegroundColor Red
-            Write-Host "  Error: $($LastValidation.Error)" -ForegroundColor Red
+    # Detect unexpected stops
+    if (($previousWorkerRunning -and -not $status.WorkerRunning) -or
+        ($previousPythonRunning -and -not $status.PythonRunning)) {
+
+        Write-Log "Detected unexpected process stop. Worker: $previousWorkerRunning -> $($status.WorkerRunning), Python: $previousPythonRunning -> $($status.PythonRunning)" -Level "WARN"
+
+        # Only trigger validation if we're in the active time window
+        $inWindow = Test-TimeWindow -TargetTime $Config.StartTime -and (-not (Test-TimeWindow -TargetTime $Config.EndTime))
+
+        if ($inWindow -and $CurrentRunFolder) {
+            Write-Log "Validating run due to unexpected process stop in active window..." -Level "INFO"
+            Validate-And-Collect-OnStop -StopReason "Unexpected Process Stop"
         }
-    } else {
-        Write-Host "LAST VALIDATION: Not yet performed" -ForegroundColor Gray
     }
 
-    Write-Host ""
-    Write-Host "Runs Base Path: $($Config.RunsBasePath)" -ForegroundColor Gray
-    Write-Host "================================================" -ForegroundColor Cyan
-    Write-Host "Ctrl+C: Single press = Continue, Double press = Force stop" -ForegroundColor Gray
+    return $status
 
 }
 
 # ====================================================================
 
-# SECTION 7: FIXED ENHANCED MAIN EXECUTION
+# SECTION 7.1: ENHANCED VALIDATE-OUTPUT FUNCTION WITH RUNFOLDER PARAM
 
 # ====================================================================
 
-# Main execution - Fixed to ensure resilience system is properly initialized
+function Validate-Output {
+param(
+[string]$RunFolder,
+        [int]$RetryCount = 0
+)
+
+    # If no RunFolder specified, use the latest one
+    if ([string]::IsNullOrEmpty($RunFolder)) {
+        Write-Log "No run folder specified, finding latest..." -Level "DEBUG"
+        $latestFolder = Find-LatestRunFolder
+        if ($latestFolder) {
+            $RunFolder = $latestFolder.FullName
+        } else {
+            if ($RetryCount -lt $Config.MaxValidationRetries) {
+                Write-Log "No output folder found. Retrying in $($Config.RetryDelaySeconds) seconds... (Attempt $($RetryCount + 1)/$($Config.MaxValidationRetries))" -Level "WARN"
+                Start-Sleep -Seconds $Config.RetryDelaySeconds
+                return Validate-Output -RunFolder $null -RetryCount ($RetryCount + 1)
+            } else {
+                Write-Log "VALIDATION FAILED: No output folder found after $($Config.MaxValidationRetries) retries" -Level "ERROR"
+                return @{
+                    Success = $false;
+                    Error = "No output folder created";
+                    RunFolder = $null
+                }
+            }
+        }
+    }
+
+    $Global:CurrentRunFolder = $RunFolder
+
+    # Perform folder structure validation
+    $validationResult = @{
+        Success = $true
+        RunFolder = $RunFolder
+        FolderName = Split-Path $RunFolder -Leaf
+        CreationTime = if (Test-Path $RunFolder) { (Get-Item $RunFolder).CreationTime } else { $null }
+        MissingItems = @()
+        Errors = @()
+        Warnings = @()
+        Details = @{
+            FileSizes = @{}
+            AttachmentFiles = @()
+        }
+    }
+
+    Write-Log "Validating folder structure for: $($validationResult.FolderName)" -Level "INFO"
+
+    # Check for expected subfolders
+    foreach ($item in $Config.ExpectedSubfolders) {
+        $itemPath = Join-Path $RunFolder $item
+
+        if (-not (Test-Path $itemPath)) {
+            $validationResult.MissingItems += $item
+            $validationResult.Success = $false
+            Write-Log "Missing expected subfolder: $item" -Level "WARN"
+        } else {
+            Write-Log "Found subfolder: $item" -Level "DEBUG"
+        }
+    }
+
+    # Check for expected files
+    foreach ($item in $Config.ExpectedFiles) {
+        $itemPath = Join-Path $RunFolder $item
+
+        if (-not (Test-Path $itemPath)) {
+            $validationResult.MissingItems += $item
+            $validationResult.Success = $false
+            Write-Log "Missing expected file: $item" -Level "WARN"
+        } else {
+            # Special handling for metadata.json
+            if ($item -eq "metadata.json") {
+                try {
+                    $metadataContent = Get-Content $itemPath -Raw | ConvertFrom-Json
+                    $validationResult.Details["metadata"] = @{
+                        RunID = $metadataContent.run_id
+                        StartTime = $metadataContent.start_time
+                        ExitCode = $metadataContent.exit_code
+                    }
+                    Write-Log "Metadata file is valid JSON" -Level "DEBUG"
+
+                    # Check file size
+                    $fileSize = (Get-Item $itemPath).Length
+                    $validationResult.Details.FileSizes[$item] = $fileSize
+                    Write-Log "Metadata file size: $([math]::Round($fileSize/1KB, 2)) KB" -Level "DEBUG"
+
+                } catch {
+                    $validationResult.Errors += $item + ": Invalid JSON format"
+                    $validationResult.Success = $false
+                    Write-Log "Metadata file contains invalid JSON" -Level "WARN"
+                }
+            }
+        }
+    }
+
+    # Check log files
+    $logPath = Join-Path $RunFolder "logs"
+    if (Test-Path $logPath) {
+        $logFiles = Get-ChildItem -Path $logPath -File -ErrorAction SilentlyContinue
+        $validationResult.Details["LogFiles"] = @($logFiles | ForEach-Object { $_.Name })
+
+        if ($logFiles.Count -eq 0) {
+            $validationResult.Warnings += "No log files found in logs folder"
+            Write-Log "No log files found in logs folder" -Level "WARN"
+        } else {
+            Write-Log "Found $($logFiles.Count) log files" -Level "DEBUG"
+
+            # Check for critical log files
+            $expectedLogs = @("completion_summary.txt", "python_output.txt")
+            foreach ($log in $expectedLogs) {
+                $logFile = $logFiles | Where-Object { $_.Name -eq $log }
+                if (-not $logFile) {
+                    $validationResult.Warnings += "Missing log file: $log"
+                    Write-Log "Missing log file: $log" -Level "WARN"
+                } else {
+                    # Check file sizes for potential email attachments
+                    $fileSize = $logFile.Length
+                    $validationResult.Details.FileSizes[$log] = $fileSize
+                    Write-Log "$log size: $([math]::Round($fileSize/1KB, 2)) KB" -Level "DEBUG"
+
+                    if ($logFile.Name -eq "completion_summary.txt") {
+                        $validationResult.Details.AttachmentFiles += $logFile.FullName
+                    }
+                }
+            }
+
+            # Find run_*.log files
+            $runLogs = $logFiles | Where-Object { $_.Name -like "run_*.log" } | Sort-Object LastWriteTime -Descending
+            if ($runLogs.Count -gt 0) {
+                $latestRunLog = $runLogs[0]
+                $validationResult.Details.AttachmentFiles += $latestRunLog.FullName
+                $fileSize = $latestRunLog.Length
+                $validationResult.Details.FileSizes[$latestRunLog.Name] = $fileSize
+                Write-Log "Latest run log: $($latestRunLog.Name) ($([math]::Round($fileSize/1KB, 2)) KB)" -Level "DEBUG"
+            }
+        }
+    }
+
+    # Check script_output folder
+    $scriptOutputPath = Join-Path $RunFolder "script_output"
+    if (Test-Path $scriptOutputPath) {
+        $outputItems = Get-ChildItem -Path $scriptOutputPath -ErrorAction SilentlyContinue
+        $itemCount = $outputItems.Count
+        $validationResult.Details["ScriptOutput"] = @{
+            ItemCount = $itemCount
+            Items = @($outputItems | ForEach-Object { $_.Name })
+        }
+        Write-Log "Script output contains $itemCount items" -Level "DEBUG"
+
+        if ($itemCount -eq 0) {
+            $validationResult.Warnings += "script_output folder is empty"
+            Write-Log "script_output folder is empty" -Level "WARN"
+        }
+    }
+
+    # Calculate folder size
+    try {
+        $files = Get-ChildItem -Path $RunFolder -Recurse -File -ErrorAction SilentlyContinue
+        if ($files) {
+            $folderSize = ($files | Measure-Object -Property Length -Sum).Sum
+            $sizeMB = [math]::Round($folderSize / 1MB, 2)
+            $validationResult.Details["TotalSizeMB"] = $sizeMB
+
+            # Check attachment sizes for email (Gmail limit is 25MB total)
+            $attachmentSize = 0
+            foreach ($attachment in $validationResult.Details.AttachmentFiles) {
+                if (Test-Path $attachment) {
+                    $attachmentSize += (Get-Item $attachment).Length
+                }
+            }
+
+            $metadataSize = (Test-Path (Join-Path $RunFolder "metadata.json")) ? (Get-Item (Join-Path $RunFolder "metadata.json")).Length : 0
+            $attachmentSize += $metadataSize
+
+            $attachmentSizeMB = [math]::Round($attachmentSize / 1MB, 2)
+            $validationResult.Details["AttachmentSizeMB"] = $attachmentSizeMB
+
+            Write-Log "Total folder size: $sizeMB MB" -Level "DEBUG"
+            Write-Log "Total attachment size: $attachmentSizeMB MB" -Level "DEBUG"
+
+            if ($attachmentSizeMB -gt 20) { # Warning at 20MB, Gmail limit is 25MB
+                $validationResult.Warnings += "Attachment files are large ($attachmentSizeMB MB). Email may fail if total exceeds 25MB."
+                Write-Log "WARNING: Attachments are large ($attachmentSizeMB MB)" -Level "WARN"
+            }
+        } else {
+            $validationResult.Warnings += "Could not calculate folder size (no files found)"
+            Write-Log "Could not calculate folder size (no files found)" -Level "WARN"
+        }
+    } catch {
+        $validationResult.Warnings += "Error calculating folder size: $_"
+        Write-Log "Could not calculate folder size: $_" -Level "WARN"
+    }
+
+    # ENHANCED: Record validation in persistent tracking
+    if ($validationResult.Success) {
+        Record-ProcessStop -StopType "Validation" -Reason "Success"
+    } else {
+        Record-ProcessStop -StopType "Validation" -Reason "Failed: $($validationResult.Errors -join ', ')"
+    }
+
+    # Summary
+    if ($validationResult.Success) {
+        if ($validationResult.Warnings.Count -gt 0) {
+            Write-Log "VALIDATION SUCCESS with warnings:" -Level "SUCCESS"
+            foreach ($warning in $validationResult.Warnings) {
+                Write-Log "  Warning: $warning" -Level "WARN"
+            }
+        } else {
+            Write-Log "VALIDATION SUCCESS: Folder structure complete" -Level "SUCCESS"
+        }
+        Write-Log "  - Path: $($validationResult.RunFolder)" -Level "SUCCESS"
+        Write-Log "  - Created: $($validationResult.CreationTime)" -Level "SUCCESS"
+        if ($validationResult.Details.ContainsKey("TotalSizeMB")) {
+            Write-Log "  - Size: $($validationResult.Details['TotalSizeMB']) MB" -Level "SUCCESS"
+        }
+        if ($validationResult.Details.ContainsKey("AttachmentSizeMB")) {
+            Write-Log "  - Attachments: $($validationResult.Details['AttachmentSizeMB']) MB" -Level "SUCCESS"
+        }
+    } else {
+        Write-Log "VALIDATION FAILED:" -Level "ERROR"
+        if ($validationResult.MissingItems.Count -gt 0) {
+            Write-Log "  Missing items: $($validationResult.MissingItems -join ', ')" -Level "ERROR"
+        }
+        if ($validationResult.Errors.Count -gt 0) {
+            Write-Log "  Errors: $($validationResult.Errors -join ', ')" -Level "ERROR"
+        }
+        if ($validationResult.Warnings.Count -gt 0) {
+            Write-Log "  Warnings: $($validationResult.Warnings -join ', ')" -Level "WARN"
+        }
+    }
+
+    return $validationResult
+
+}
+
+# ====================================================================
+
+# SECTION 8.1: ENHANCED MAIN EXECUTION WITH PERSISTENT TRACKING
+
+# ====================================================================
+
+# Main execution - Enhanced with persistent tracking
 
 try { # Create log directory if it doesn't exist
 $logDir = Split-Path $Config.LogFile -Parent
@@ -1959,12 +2804,12 @@ New-Item -ItemType Directory -Path $logDir -Force | Out-Null
 }
 
     Write-Log "=== ENHANCED Face Recognition Monitor Started ===" -Level "INFO"
-    Write-Log "Monitor Version: 3.0 (Resilient)" -Level "INFO"
+    Write-Log "Monitor Version: 3.1 (Persistent Tracking)" -Level "INFO"
     Write-Log "Start Time: $($Config.StartTime)" -Level "INFO"
     Write-Log "End Time: $($Config.EndTime)" -Level "INFO"
     Write-Log "Force stop threshold: $global:ForceStopThreshold attempts within $global:ForceStopWindowSeconds seconds" -Level "INFO"
 
-    # CRITICAL FIX: Initialize resilience state BEFORE registering handler
+    # Initialize resilience state BEFORE registering handler
     Write-Log "Initializing resilience system..." -Level "DEBUG"
 
     # Ensure resilience variables are properly initialized
@@ -1974,14 +2819,31 @@ New-Item -ItemType Directory -Path $logDir -Force | Out-Null
     $global:CollectedRunFolders = @()
     $global:IsShuttingDown = $false
 
+    # Initialize persistent tracking
+    $global:PersistentTracking = @{
+        LastKnownRunFolder = $null
+        LastKnownPythonPID = $null
+        LastKnownWorkerPID = $null
+        LastValidationTime = $null
+        LastValidationResult = $null
+        ProcessStopHistory = @()
+        ValidationHistory = @()
+        DailyRunCount = 0
+        LastSuccessfulRun = $null
+    }
+
     # Test email configuration ONCE at startup
     $EmailConfigValid = Test-EmailConfiguration
     if ($EmailConfigValid) {
         Write-Log "Email configuration validated successfully" -Level "SUCCESS"
     }
 
-    # Load existing PID tracking AND resilience state
-    if (Load-PIDTracking) {
+    # Load existing PID tracking, resilience state, AND persistent tracking
+    Write-Log "Loading persistence data..." -Level "INFO"
+    $pidLoaded = Load-PIDTracking
+    $persistentLoaded = Load-PersistentTracking
+
+    if ($pidLoaded) {
         Write-Log "Resumed monitoring of existing processes" -Level "SUCCESS"
         Write-Log "Loaded $($global:CollectedRunFolders.Count) previously collected folders" -Level "INFO"
         # Update process status
@@ -1989,9 +2851,10 @@ New-Item -ItemType Directory -Path $logDir -Force | Out-Null
     } else {
         # Initialize fresh resilience state if none loaded
         Save-ResilienceState
+        Save-PersistentTracking
     }
 
-    # CRITICAL FIX: Register console control handler AFTER state is initialized
+    # Register console control handler AFTER state is initialized
     Write-Log "Registering console control handler..." -Level "DEBUG"
     Register-ConsoleControlHandler
 
@@ -2026,7 +2889,7 @@ New-Item -ItemType Directory -Path $logDir -Force | Out-Null
                 }
             }
 
-            # Check process status
+            # Check process status (now includes unexpected stop detection)
             $processStatus = Check-ProcessStatus
 
             # Get time window status
@@ -2081,7 +2944,7 @@ New-Item -ItemType Directory -Path $logDir -Force | Out-Null
                 $LastValidation = Validate-Output
 
                 # Collect data from the last run
-                if ($LastValidation -and $LastValidation.RunFolder) {
+                if ($LastValidation -and $LastValidation.Success -and $LastValidation.RunFolder) {
                     $runData = Collect-RunFolderAttachments -RunFolder $LastValidation.RunFolder
                     if ($runData.Attachments.Count -gt 0) {
                         # Check if we already have this folder
@@ -2161,6 +3024,10 @@ New-Item -ItemType Directory -Path $logDir -Force | Out-Null
             # Save state before potentially crashing
             Save-PIDTracking
             Save-ResilienceState
+            Save-PersistentTracking
+
+            # Record error in persistent tracking
+            Record-ProcessStop -StopType "Error" -Reason $_ -WasUnexpected $true
 
             # Continue monitoring unless it's a critical error
             if ($_.Exception.Message -like "*fatal*" -or $_.Exception.Message -like "*critical*") {
@@ -2180,6 +3047,10 @@ Write-Log "Attempting to save state and continue..." -Level "INFO"
     # Save state and try to continue
     Save-PIDTracking
     Save-ResilienceState
+    Save-PersistentTracking
+
+    # Record the host exception
+    Record-ProcessStop -StopType "HostException" -Reason "Ctrl+C or similar" -WasUnexpected $true
 
     # Don't break - continue from the top of the while loop
     # The console handler should prevent this from being reached
@@ -2191,6 +3062,7 @@ Write-Log $_.ScriptStackTrace -Level "ERROR"
 
     # Save state before exiting
     Save-ResilienceState
+    Save-PersistentTracking
 
 }
 finally {
@@ -2207,17 +3079,323 @@ Write-Log "Cleaning up..." -Level "INFO"
 
     Stop-WorkerProcess
 
+    # Record final shutdown
+    Record-ProcessStop -StopType "Shutdown" -Reason "Monitor stopping" -WasUnexpected $false
+
     # Clear resilience state
     $resilienceFilePath = Join-Path (Split-Path $Config.LogFile -Parent) "resilience_state.json"
     if (Test-Path $resilienceFilePath) {
         Remove-Item -Path $resilienceFilePath -Force -ErrorAction SilentlyContinue
     }
 
+    # Keep persistent tracking for next time
+    Save-PersistentTracking
+
     Write-Log "=== ENHANCED Face Recognition Monitor Stopped ===" -Level "INFO"
     Write-Host "Monitor stopped. Processed $($global:CollectedRunFolders.Count) runs today." -ForegroundColor Yellow
+    Write-Host "Daily run count: $($global:PersistentTracking.DailyRunCount)" -ForegroundColor Yellow
+    Write-Host "Persistent tracking saved for recovery." -ForegroundColor Green
     Write-Host "Log file: $($Config.LogFile)" -ForegroundColor Yellow
 
 }
+
+#### Second codebase
+
+# secondScipt.ps1
+
+# ==============================================
+
+# Organized version with unified folder structure
+
+# ==============================================
+
+# ========== CONFIGURATION ==========
+
+$VENV_ROOT = "D:\RaihanFarid\Dokumen\faceRecog\.venv"
+$PYTHON_SCRIPT = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py"
+$POWERSHELL_SCRIPT_NAME = Split-Path -Leaf $MyInvocation.MyCommand.Path # Added: Get current script name
+
+# Base path for all runs (outside virtual environment)
+
+$RUNS_BASE_PATH = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick"
+
+# Alternative: Use hashtable for named parameters (more readable)
+
+$PYTHON_PARAMS = @{ # "--database" = "D:\RaihanFarid\Dokumen\0_classified_with_deepface\temp\current_database-Copy" # "--input" = "D:\RaihanFarid\Dokumen\0_classified_with_deepface\temp\process-run\Run_Classified2026-01-21_15-11-08\script_output\classified_output"
+"--multi-source" = $null #Null is for Flag parameter
+
+}
+
+# ===================================
+
+# Helper function to convert hashtable to argument array
+
+function Convert-HashtableToArgs {
+param([hashtable]$Params)
+
+    $argsArray = @()
+    foreach ($key in $Params.Keys) {
+        $argsArray += $key
+        if ($Params[$key] -ne $null) {
+            $argsArray += $Params[$key]
+        }
+    }
+    return $argsArray
+
+}
+
+# If using hashtable approach, convert to array
+
+$PYTHON_ARGS = Convert-HashtableToArgs -Params $PYTHON_PARAMS
+
+# Create runs base directory if it doesn't exist
+
+if (-not (Test-Path $RUNS_BASE_PATH)) {
+New-Item -ItemType Directory -Path $RUNS_BASE_PATH -Force | Out-Null
+Write-Host "Created runs base directory: $RUNS_BASE_PATH"
+}
+
+# Generate run folder with timestamp
+
+$timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+$RUN*FOLDER_NAME = "Magick_Process_MaskDetect*$timestamp"
+$RUN_FOLDER_PATH = Join-Path $RUNS_BASE_PATH $RUN_FOLDER_NAME
+
+# Create run folder structure
+
+$RUN_LOGS_PATH = Join-Path $RUN_FOLDER_PATH "logs"
+$RUN_SCRIPT_OUTPUT_PATH = Join-Path $RUN_FOLDER_PATH "script_output"
+$RUN_METADATA_PATH = Join-Path $RUN_FOLDER_PATH "metadata.json"
+
+try { # Create all directories
+New-Item -ItemType Directory -Path $RUN_FOLDER_PATH -Force | Out-Null
+New-Item -ItemType Directory -Path $RUN_LOGS_PATH -Force | Out-Null
+New-Item -ItemType Directory -Path $RUN_SCRIPT_OUTPUT_PATH -Force | Out-Null
+
+    Write-Host "Created run folder structure at: $RUN_FOLDER_PATH"
+
+} catch {
+Write-Error "Failed to create run folder structure: $\_"
+exit 1
+}
+
+# ========== LOG FILE SETUP ==========
+
+$MAIN_LOG_FILE = Join-Path $RUN_LOGS_PATH "run_$timestamp.log"
+$PYTHON_OUTPUT_FILE = Join-Path $RUN_LOGS_PATH "python_output.txt"
+$COMPLETION_SUMMARY_FILE = Join-Path $RUN_LOGS_PATH "completion_summary.txt"
+
+# Format arguments for logging
+
+$argsString = $PYTHON_ARGS -join " "
+
+# Write initial log header
+
+"==================================================" | Out-File $MAIN_LOG_FILE
+"RUN STARTED: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" | Out-File $MAIN_LOG_FILE -Append
+"Run Folder: $RUN_FOLDER_PATH" | Out-File $MAIN_LOG_FILE -Append
+"PowerShell Script: $POWERSHELL_SCRIPT_NAME" | Out-File $MAIN_LOG_FILE -Append  # Added: Script name
+"Virtual Environment: $VENV_ROOT" | Out-File $MAIN_LOG_FILE -Append
+"Python Script: $PYTHON_SCRIPT" | Out-File $MAIN_LOG_FILE -Append
+"Arguments: $argsString" | Out-File $MAIN_LOG_FILE -Append
+"Number of arguments: $($PYTHON_ARGS.Count)" | Out-File $MAIN_LOG_FILE -Append
+"==================================================" | Out-File $MAIN_LOG_FILE -Append
+"" | Out-File $MAIN_LOG_FILE -Append
+
+# ========== CREATE METADATA FILE ==========
+
+$metadata = @{
+run_id = $timestamp
+start_time = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+powershell_script = $POWERSHELL_SCRIPT_NAME # Added: Script name
+virtual_env = $VENV_ROOT
+python_script = $PYTHON_SCRIPT
+arguments = $PYTHON_ARGS
+arguments_count = $PYTHON_ARGS.Count
+run_folder = $RUN_FOLDER_PATH
+}
+
+$metadata | ConvertTo-Json | Out-File $RUN_METADATA_PATH
+Write-Host "Created metadata file: $RUN_METADATA_PATH"
+
+# ========== EXECUTION ==========
+
+Write-Host "Starting Python script execution..."
+Write-Host "Run folder: $RUN_FOLDER_PATH"
+Write-Host "Arguments: $argsString"
+Write-Host ""
+
+$pythonExe = "$VENV_ROOT\Scripts\python.exe"
+
+if (-not (Test-Path $pythonExe)) {
+$errorMsg = "ERROR: Python executable not found at $pythonExe"
+$errorMsg | Out-File $MAIN_LOG_FILE -Append
+Write-Error $errorMsg
+exit 1
+}
+
+# Capture start time
+
+$startTime = Get-Date
+"Execution started at: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))" | Out-File $MAIN_LOG_FILE -Append
+
+try { # Prepare the command for logging
+$commandString = "`"$pythonExe`" `"$PYTHON_SCRIPT`" $argsString"
+Write-Host "Executing: $commandString"
+$commandString | Out-File $MAIN_LOG_FILE -Append
+"" | Out-File $MAIN_LOG_FILE -Append
+
+    Write-Host "Python output will be saved to: $PYTHON_OUTPUT_FILE"
+
+    # ========== KEY CHANGE: Run Python with working directory set to script_output ==========
+    # This ensures Python creates its output folder inside our organized structure
+    $originalLocation = Get-Location
+    Set-Location $RUN_SCRIPT_OUTPUT_PATH
+
+    # Run Python with array of arguments (PowerShell will handle them properly)
+    & $pythonExe $PYTHON_SCRIPT $PYTHON_ARGS 2>&1 | Tee-Object -FilePath $PYTHON_OUTPUT_FILE
+
+    $exitCode = $LASTEXITCODE
+
+    # Return to original location
+    Set-Location $originalLocation
+
+} catch {
+$errorMessage = $\_.Exception.Message
+"EXCEPTION: $errorMessage" | Out-File $MAIN_LOG_FILE -Append
+$errorMessage | Out-File $PYTHON_OUTPUT_FILE -Append
+Write-Error "Exception during Python script execution: $errorMessage"
+}
+
+# Capture end time
+
+$endTime = Get-Date
+$duration = $endTime - $startTime
+$durationFormatted = "{0:D2}:{1:D2}:{2:D2}" -f $duration.Hours, $duration.Minutes, $duration.Seconds
+
+# ========== POST-EXECUTION LOGGING ==========
+
+"" | Out-File $MAIN_LOG_FILE -Append
+"==================================================" | Out-File $MAIN_LOG_FILE -Append
+"EXECUTION SUMMARY" | Out-File $MAIN_LOG_FILE -Append
+"==================================================" | Out-File $MAIN_LOG_FILE -Append
+"PowerShell Script: $POWERSHELL_SCRIPT_NAME" | Out-File $MAIN_LOG_FILE -Append  # Added: Script name
+"Exit code: $exitCode" | Out-File $MAIN_LOG_FILE -Append
+"Start time: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))" | Out-File $MAIN_LOG_FILE -Append
+"End time: $($endTime.ToString('yyyy-MM-dd HH:mm:ss'))" | Out-File $MAIN_LOG_FILE -Append
+"Duration: $durationFormatted" | Out-File $MAIN_LOG_FILE -Append
+
+# Detailed argument logging
+
+"Arguments passed to Python script:" | Out-File $MAIN_LOG_FILE -Append
+for ($i = 0; $i -lt $PYTHON_ARGS.Count; $i++) {
+    "  [$i]: $($PYTHON_ARGS[$i])" | Out-File $MAIN_LOG_FILE -Append
+}
+
+# Find what Python script created (look for newly created folders in script_output)
+
+try {
+$createdFolders = Get-ChildItem -Path $RUN*SCRIPT_OUTPUT_PATH -Directory |
+Where-Object { $*.CreationTime -ge $startTime } |
+Select-Object -ExpandProperty FullName
+
+    if ($createdFolders) {
+        "Python script created folders:" | Out-File $MAIN_LOG_FILE -Append
+        foreach ($folder in $createdFolders) {
+            "  - $folder" | Out-File $MAIN_LOG_FILE -Append
+        }
+    } else {
+        "No new folders were created by Python script in: $RUN_SCRIPT_OUTPUT_PATH" | Out-File $MAIN_LOG_FILE -Append
+    }
+
+} catch {
+"Could not analyze created folders: $\_" | Out-File $MAIN_LOG_FILE -Append
+}
+
+# ========== CREATE COMPLETION SUMMARY ==========
+
+# $completionSummary = @"
+
+# RUN COMPLETION SUMMARY
+
+Completion Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
+Run ID: $timestamp
+PowerShell Script: $POWERSHELL_SCRIPT_NAME
+Status: $(if ($exitCode -eq 0) { "SUCCESS" } else { "FAILED (Exit code: $exitCode)" })
+
+# FOLDER STRUCTURE
+
+Run Folder: $RUN_FOLDER_PATH
+├── logs\
+│   ├── run_$timestamp.log (This main log file)
+│ ├── python_output.txt (Full Python script output)
+│ └── completion_summary.txt (This summary)
+├── script_output\ (Python script's working directory)
+│ └── [Output folders created by Python]
+└── metadata.json (Run configuration metadata)
+
+# EXECUTION DETAILS
+
+PowerShell Script: $POWERSHELL_SCRIPT_NAME
+Virtual Environment: $VENV_ROOT
+Python Script: $PYTHON_SCRIPT
+Start Time: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))
+End Time: $($endTime.ToString('yyyy-MM-dd HH:mm:ss'))
+Duration: $durationFormatted
+
+# ARGUMENTS PASSED
+
+$($PYTHON*ARGS | ForEach-Object { " $*" } | Out-String)
+
+# LOG FILES
+
+1. Main Execution Log: $MAIN_LOG_FILE
+2. Python Output: $PYTHON_OUTPUT_FILE
+3. Python Exit Code: $exitCode
+
+# SCRIPT OUTPUT LOCATION
+
+Any folders/files created by the Python script should be located in:
+$RUN_SCRIPT_OUTPUT_PATH
+
+# NOTE: For debugging, check python_output.txt for detailed error messages.
+
+"@
+
+$completionSummary | Out-File $COMPLETION_SUMMARY_FILE
+
+# Update metadata with completion info
+
+$completionMetadata = Get-Content $RUN_METADATA_PATH | ConvertFrom-Json
+$completionMetadata | Add-Member -NotePropertyName "end_time" -NotePropertyValue (Get-Date -Format "yyyy-MM-dd HH:mm:ss") -Force
+$completionMetadata | Add-Member -NotePropertyName "duration" -NotePropertyValue $durationFormatted -Force
+$completionMetadata | Add-Member -NotePropertyName "exit_code" -NotePropertyValue $exitCode -Force
+$completionMetadata | ConvertTo-Json | Out-File $RUN_METADATA_PATH
+
+# ========== FINAL OUTPUT ==========
+
+Write-Host ""
+Write-Host "=================================================="
+Write-Host "RUN COMPLETED"
+Write-Host "=================================================="
+Write-Host "PowerShell Script: $POWERSHELL_SCRIPT_NAME"  # Added: Script name
+Write-Host "Run Folder: $RUN_FOLDER_PATH"
+Write-Host "Main Log: $MAIN_LOG_FILE"
+Write-Host "Python Output: $PYTHON_OUTPUT_FILE"
+Write-Host "Completion Summary: $COMPLETION_SUMMARY_FILE"
+Write-Host "Metadata: $RUN_METADATA_PATH"
+Write-Host ""
+Write-Host "Arguments used:"
+$PYTHON*ARGS | ForEach-Object { Write-Host " $*" }
+Write-Host ""
+Write-Host "All logs and outputs are organized in the run folder."
+Write-Host "Exit code: $exitCode"
+Write-Host "Duration: $durationFormatted"
+Write-Host "=================================================="
+
+# Exit with Python's exit code
+
+exit $exitCode
 
 #### Tips
 

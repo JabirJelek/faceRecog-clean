@@ -47,7 +47,12 @@ function Check-ProcessStatus {
 }
 
 function Backup-OriginalConfig {
-    $backupPath = Join-Path (Split-Path $Config.LogFile -Parent) "config_backup_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
+    $backupDir = Join-Path (Split-Path $Config.LogFile -Parent) "backups"
+    if (-not (Test-Path $backupDir)) {
+        New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
+    }
+    
+    $backupPath = Join-Path $backupDir "config_backup_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
     $Config | ConvertTo-Json -Depth 10 | Out-File -FilePath $backupPath -Force
     Write-Log "Configuration backed up to: $backupPath" -Level "DEBUG"
 }
@@ -348,7 +353,34 @@ function Initialize-ProjectPortablePaths {
     Write-Host "Active Root: $ActiveRoot" -ForegroundColor Green
     
     # ====================================================================
-    # STEP 3: UPDATE CONFIGURATION WITH RELATIVE PATHS
+    # STEP 3: CREATE DATE-BASED FOLDER STRUCTURE
+    # ====================================================================
+    
+    # Get current date for folder structure
+    $currentDate = Get-Date -Format "yyyy-MM-dd"
+    $global:CurrentDateFolder = $currentDate  # Store globally for other functions
+    
+    # Create the base Magick folder if it doesn't exist
+    $magickBasePath = Join-Path $ActiveRoot "logs-running\Magick"
+    if (-not (Test-Path $magickBasePath)) {
+        New-Item -ItemType Directory -Path $magickBasePath -Force | Out-Null
+        Write-Host "Created base Magick folder: $magickBasePath" -ForegroundColor Yellow
+    }
+    
+    # Create date-specific folder
+    $dateBasedPath = Join-Path $magickBasePath $currentDate
+    if (-not (Test-Path $dateBasedPath)) {
+        New-Item -ItemType Directory -Path $dateBasedPath -Force | Out-Null
+        Write-Host "Created date-based folder: $dateBasedPath" -ForegroundColor Yellow
+    } else {
+        Write-Host "Using existing date-based folder: $dateBasedPath" -ForegroundColor Green
+    }
+    
+    # Store the active date path globally
+    $global:ActiveDatePath = $dateBasedPath
+    
+    # ====================================================================
+    # STEP 4: UPDATE CONFIGURATION WITH DATE-BASED PATHS
     # ====================================================================
     
     # Get email credential from user profile
@@ -357,20 +389,20 @@ function Initialize-ProjectPortablePaths {
         New-Item -ItemType Directory -Path (Split-Path $emailCredentialPath -Parent) -Force | Out-Null
     }
     
-    # Update the $Config object with relative paths
+    # Update the $Config object with date-based paths
     $Script:Config = @{
         # Schedule configuration (CRITICAL - was missing)
         StartTime = "08:00"  # Default start time
-        EndTime = "16:21"    # Default end time
+        EndTime = "09:48"    # Default end time
         
         # Worker script path - RELATIVE to project root
-        WorkerScript = Join-Path $ProjectRoot "patterns\scripts\1_magick\maskDetect.ps1"
+        WorkerScript = Join-Path $ProjectRoot "patterns\scripts\1_magick\maskDetect-exp.ps1"
         
         # Python script path - RELATIVE to project root  
         PythonScriptPath = Join-Path $ProjectRoot "patterns\algorithm\entry_multi-USED-Magick.py"
         
-        # Paths for validation - RELATIVE to active root
-        RunsBasePath = Join-Path $ActiveRoot "logs-running\Magick"
+        # Paths for validation - USING DATE-BASED PATH
+        RunsBasePath = $dateBasedPath  # Now points to date-specific folder
         OutputFolderPattern = "Magick_Process_MaskDetect_*"
         
         # Process tracking
@@ -389,15 +421,15 @@ function Initialize-ProjectPortablePaths {
         ProcessCheckInterval = 15
         GracefulShutdownTimeout = 60
         
-        # PID tracking - RELATIVE to RunsBasePath
-        PIDFilePath = Join-Path (Join-Path $ActiveRoot "logs-running\magick") "monitor_pid_Magick.json"
+        # PID tracking - RELATIVE TO DATE-BASED PATH
+        PIDFilePath = Join-Path $dateBasedPath "monitor_pid_Magick.json"
         MaxPIDFileAgeMinutes = 120
         
-        # Logging - RELATIVE to RunsBasePath
-        LogFile = Join-Path (Join-Path $ActiveRoot "logs-running\magick") "monitor_Magick.log"
+        # Logging - RELATIVE TO DATE-BASED PATH
+        LogFile = Join-Path $dateBasedPath "monitor_Magick.log"
         
         # Email notifications (updated to use MailKit)
-        SendEmailOnCompletion = $true
+        SendEmailOnCompletion = $false # Toggle Email send
         EmailRecipients = @(
             @{ Address = "faridraihan17@gmail.com"; Language = "English" },
             @{ Address = "ikeepmypromiz@gmail.com"; Language = "Bahasa" }
@@ -411,10 +443,14 @@ function Initialize-ProjectPortablePaths {
         SmtpPort = 587
         UseSSL = $true
         EmailCredentialPath = $emailCredentialPath
+        
+        # NEW: Date-based path tracking
+        CurrentDate = $currentDate
+        ActiveDatePath = $dateBasedPath
     }
     
     # ====================================================================
-    # STEP 4: VALIDATE CRITICAL COMPONENTS EXIST
+    # STEP 5: VALIDATE CRITICAL COMPONENTS EXIST
     # ====================================================================
     
     Write-Host "`nValidating project components..." -ForegroundColor Yellow
@@ -422,8 +458,8 @@ function Initialize-ProjectPortablePaths {
     $criticalComponents = @(
         @{ Name = "Worker Script"; Path = $Config.WorkerScript }
         @{ Name = "Python Script"; Path = $Config.PythonScriptPath }
-        @{ Name = "Log Directory"; Path = (Split-Path $Config.LogFile -Parent) }
-        @{ Name = "PID File Directory"; Path = (Split-Path $Config.PIDFilePath -Parent) }
+        @{ Name = "Date-Based Log Directory"; Path = $dateBasedPath }
+        @{ Name = "PID File Directory"; Path = $dateBasedPath }
     )
     
     $missingComponents = @()
@@ -451,7 +487,7 @@ function Initialize-ProjectPortablePaths {
     }
     
     # ====================================================================
-    # STEP 5: SUMMARY AND ERROR HANDLING
+    # STEP 6: SUMMARY AND ERROR HANDLING
     # ====================================================================
     
     if ($missingComponents.Count -gt 0) {
@@ -482,9 +518,10 @@ function Initialize-ProjectPortablePaths {
     Write-Host "`nProject initialization complete!" -ForegroundColor Green
     Write-Host "All paths are now portable and relative to:" -ForegroundColor Green
     Write-Host "  Project Root: $ProjectRoot" -ForegroundColor White
+    Write-Host "  Active Date Path: $dateBasedPath" -ForegroundColor White
     
     # ====================================================================
-    # STEP 6: MODIFIED - Wait for key press with 60-second timeout
+    # STEP 7: MODIFIED - Wait for key press with 60-second timeout
     # ====================================================================
     
     Write-Host "`nPress any key to continue with monitoring (waiting for 60 seconds)..." -ForegroundColor Cyan
@@ -515,6 +552,7 @@ function Initialize-ProjectPortablePaths {
     
     return $true
 }
+
 
 
 function Write-Log {
@@ -813,7 +851,9 @@ function Show-StatusBanner {
     Write-Host "    FACE RECOGNITION PROCESS MONITOR" -ForegroundColor Cyan
     Write-Host "================================================" -ForegroundColor Cyan
     Write-Host ""
+    Write-Host "Current Date: $($status.CurrentDate)" -ForegroundColor Yellow
     Write-Host "Current Time: $($status.CurrentTime)" -ForegroundColor Yellow
+    Write-Host "Date Folder: $($Config.CurrentDate)" -ForegroundColor Yellow
     Write-Host "Schedule: $($Config.StartTime) - $($Config.EndTime)" -ForegroundColor Yellow
     Write-Host "Window: $(if ($status.Schedule.InWindow) { 'ACTIVE' } else { 'INACTIVE' })" `
                 -ForegroundColor $(if ($status.Schedule.InWindow) { 'Green' } else { 'Gray' })
@@ -823,7 +863,6 @@ function Show-StatusBanner {
         Write-Host "PYTHON STATUS: RUNNING" -ForegroundColor Green
         Write-Host "  PID: $PythonPID" -ForegroundColor White
         
-        # FIX: Add validation for PythonStartTime
         if ($PythonStartTime -and ($PythonStartTime -is [DateTime]) -and ($PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss") -ne "-")) {
             try {
                 $runtime = [math]::Round((Get-Date - $PythonStartTime).TotalMinutes, 1)
@@ -845,6 +884,8 @@ function Show-StatusBanner {
     }
     
     Write-Host ""
+    Write-Host "ACTIVE DATE PATH: $($Config.ActiveDatePath)" -ForegroundColor Gray
+    
     if ($LastValidation) {
         if ($LastValidation.Success) {
             Write-Host "LAST VALIDATION: SUCCESS" -ForegroundColor Green
@@ -861,10 +902,11 @@ function Show-StatusBanner {
     }
     
     Write-Host ""
-    Write-Host "Runs Base Path: $($Config.RunsBasePath)" -ForegroundColor Gray
+    Write-Host "Date-based runs path: $($Config.RunsBasePath)" -ForegroundColor Gray
     Write-Host "================================================" -ForegroundColor Cyan
     Write-Host "Press Ctrl+C to stop monitor" -ForegroundColor Gray
 }
+
 
 function Get-ProcessStatus {
     $status = @{
@@ -873,6 +915,7 @@ function Get-ProcessStatus {
         PythonRunning = $PythonIsRunning
         CurrentTime = Get-Date -Format "HH:mm:ss"
         CurrentDate = Get-Date -Format "yyyy-MM-dd"
+        CurrentDateFolder = $Config.CurrentDate
         Schedule = @{
             StartTime = $Config.StartTime
             EndTime = $Config.EndTime
@@ -883,6 +926,10 @@ function Get-ProcessStatus {
             PythonPID = $PythonPID
         }
         LastValidation = $LastValidation
+        PathInfo = @{
+            ActiveDatePath = $Config.ActiveDatePath
+            RunsBasePath = $Config.RunsBasePath
+        }
     }
     
     # Check time window
@@ -1453,6 +1500,262 @@ function Send-CompletionEmailEnhanced {
     } catch {
         Write-Log "Failed to send enhanced completion emails: $($_.Exception.Message)" -Level "ERROR"
         return $false
+    }
+}
+
+function Start-WorkerProcess {
+    # Check if we already have a running Python process
+    $existingPythonPID = Find-PythonProcess
+    if ($existingPythonPID) {
+        Write-Log "Found existing Python process (PID: $existingPythonPID), not starting new one" -Level "WARN"
+        $global:PythonPID = $existingPythonPID
+        $global:PythonIsRunning = $true
+        $global:PythonStartTime = Get-Date
+        Save-PIDTracking
+        return $true
+    }
+    
+    try {
+        Write-Log "Starting face recognition worker process..." -Level "INFO"
+        
+        # Use the stable approach from older codebase
+        $arguments = @(
+            "-NoProfile",
+            "-ExecutionPolicy", "Bypass",
+            "-File", "`"$($Config.WorkerScript)`""
+        )
+        
+        # Start the worker process
+        $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+        $processInfo.FileName = "powershell.exe"
+        $processInfo.Arguments = $arguments
+        $processInfo.RedirectStandardOutput = $false
+        $processInfo.RedirectStandardError = $false
+        $processInfo.UseShellExecute = $false
+        $processInfo.CreateNoWindow = $true
+        
+        $WorkerProcess = New-Object System.Diagnostics.Process
+        $WorkerProcess.StartInfo = $processInfo
+        
+        if ($WorkerProcess.Start()) {
+            $global:WorkerPID = $WorkerProcess.Id
+            $global:WorkerStartTime = Get-Date
+            $global:WorkerIsRunning = $true
+            
+            Write-Log "Worker process started (PID: $WorkerPID)" -Level "SUCCESS"
+            
+            # Wait for Python process to start
+            Write-Log "Waiting for Python process to start..." -Level "INFO"
+            $maxWaitTime = 30
+            $waitInterval = 2
+            $waited = 0
+            
+            while ($waited -lt $maxWaitTime) {
+                $foundPID = Find-PythonProcess
+                if ($foundPID) {
+                    $global:PythonPID = $foundPID
+                    $global:PythonIsRunning = $true
+                    $global:PythonStartTime = Get-Date
+                    Write-Log "Python process found (PID: $PythonPID)" -Level "SUCCESS"
+                    Save-PIDTracking
+                    return $true
+                }
+                
+                Start-Sleep -Seconds $waitInterval
+                $waited += $waitInterval
+            }
+            
+            Write-Log "Python process did not start within $maxWaitTime seconds" -Level "WARN"
+            Save-PIDTracking
+            return $true
+        } else {
+            Write-Log "Failed to start worker process" -Level "ERROR"
+            return $false
+        }
+    }
+    catch {
+        Write-Log "ERROR: Failed to start worker process: $_" -Level "ERROR"
+        return $false
+    }
+}
+
+function Find-PythonProcess {
+    # Try to find the Python process running our specific script
+    Write-Log "Searching for Python process..." -Level "DEBUG"
+    
+    # Method 1: Check for processes with our script path in command line
+    $pythonProcesses = Get-Process -Name "python*" -ErrorAction SilentlyContinue | 
+        Where-Object { $_.Path -like "*python*" }
+    
+    foreach ($proc in $pythonProcesses) {
+        try {
+            $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
+            if ($cmdLine -like "*$($Config.PythonScriptPath)*") {
+                Write-Log "Found Python process with our script: PID=$($proc.Id)" -Level "SUCCESS"
+                return $proc.Id
+            }
+        } catch { }
+    }
+    
+    # Method 2: Check for Python processes started after our worker
+    if ($WorkerStartTime) {
+        $pythonProcs = Get-Process -Name "python*" -ErrorAction SilentlyContinue |
+            Where-Object { $_.StartTime -gt $WorkerStartTime }
+        
+        if ($pythonProcs) {
+            # Take the first one started after our worker
+            $foundPID = $pythonProcs[0].Id
+            Write-Log "Found Python process started after worker: PID=$foundPID" -Level "INFO"
+            return $foundPID
+        }
+    }
+    
+    # Method 3: Look in the latest run folder's metadata for PID
+    $runFolder = Find-LatestRunFolder
+    if ($runFolder) {
+        $metadataPath = Join-Path $runFolder.FullName "metadata.json"
+        if (Test-Path $metadataPath) {
+            try {
+                $metadata = Get-Content $metadataPath -Raw | ConvertFrom-Json
+                if ($metadata.PSObject.Properties.Name -contains "python_pid") {
+                    $foundPID = $metadata.python_pid
+                    Write-Log "Found Python PID in metadata: $foundPID" -Level "INFO"
+                    
+                    # Verify the process still exists
+                    try {
+                        Get-Process -Id $foundPID -ErrorAction Stop | Out-Null
+                        return $foundPID
+                    } catch {
+                        Write-Log "Python PID from metadata no longer exists: $foundPID" -Level "WARN"
+                    }
+                }
+            } catch { }
+        }
+    }
+    
+    Write-Log "No Python process found matching criteria" -Level "DEBUG"
+    return $null
+}
+
+function Is-ProcessRunning {
+    param(
+        [int]$ProcessId, 
+        [string]$ProcessName
+    )
+    
+    if (-not $ProcessId -or $ProcessId -eq 0) {
+        return $false
+    }
+    
+    try {
+        $process = Get-Process -Id $ProcessId -ErrorAction Stop
+        if ($ProcessName) {
+            return ($process.ProcessName -like "*$ProcessName*" -and (-not $process.HasExited))
+        }
+        return (-not $process.HasExited)
+    } catch {
+        return $false
+    }
+}
+
+function Get-DateBasedPath {
+    <#
+    .SYNOPSIS
+    Gets or creates a date-based folder path for the current day
+    #>
+    param(
+        [string]$BasePath = (Join-Path $ActiveRoot "logs-running\Magick"),
+        [DateTime]$Date = (Get-Date)
+    )
+    
+    $dateString = $Date.ToString("yyyy-MM-dd")
+    $datePath = Join-Path $BasePath $dateString
+    
+    # Create the directory if it doesn't exist
+    if (-not (Test-Path $datePath)) {
+        try {
+            New-Item -ItemType Directory -Path $datePath -Force | Out-Null
+            Write-Log "Created date-based folder: $datePath" -Level "INFO"
+        } catch {
+            Write-Log "Failed to create date-based folder: $_" -Level "ERROR"
+            throw
+        }
+    }
+    
+    return $datePath
+}
+
+function Update-ConfigForCurrentDate {
+    <#
+    .SYNOPSIS
+    Updates configuration paths for the current date folder
+    #>
+    
+    $currentDate = Get-Date -Format "yyyy-MM-dd"
+    
+    # Update paths in config to use date-based folder
+    $dateBasedPath = Get-DateBasedPath -Date (Get-Date)
+    
+    $Script:Config.RunsBasePath = $dateBasedPath
+    $Script:Config.PIDFilePath = Join-Path $dateBasedPath "monitor_pid_Magick.json"
+    $Script:Config.LogFile = Join-Path $dateBasedPath "monitor_Magick.log"
+    $Script:Config.CurrentDate = $currentDate
+    $Script:Config.ActiveDatePath = $dateBasedPath
+    
+    # Update global variables
+    $global:CurrentDateFolder = $currentDate
+    $global:ActiveDatePath = $dateBasedPath
+    
+    Write-Log "Updated configuration for date: $currentDate" -Level "INFO"
+    Write-Log "Active date path: $dateBasedPath" -Level "DEBUG"
+}
+
+
+function Find-LatestRunFolder {
+    <#
+    .SYNOPSIS
+    Finds the latest run folder within the current date's directory
+    #>
+    
+    try {
+        # First check the current date's path
+        $currentDatePath = $Config.RunsBasePath
+        
+        if (-not (Test-Path $currentDatePath)) {
+            Write-Log "Current date path does not exist: $currentDatePath" -Level "WARN"
+            return $null
+        }
+        
+        $folders = Get-ChildItem -Path $currentDatePath -Directory -Filter $Config.OutputFolderPattern -ErrorAction SilentlyContinue
+        
+        if ($folders) {
+            $latestFolder = $folders | Sort-Object CreationTime -Descending | Select-Object -First 1
+            Write-Log "Found latest run folder in date-based path: $($latestFolder.Name)" -Level "DEBUG"
+            return $latestFolder
+        } else {
+            # If no folders in current date path, check if we're looking at the wrong day
+            # This handles the case where the script might run across midnight
+            $parentPath = Split-Path $currentDatePath -Parent
+            $allDateFolders = Get-ChildItem -Path $parentPath -Directory -Filter "????-??-??" | Sort-Object Name -Descending
+            
+            foreach ($dateFolder in $allDateFolders) {
+                $checkPath = Join-Path $dateFolder.FullName "*"
+                $potentialFolders = Get-ChildItem -Path $checkPath -Directory -Filter $Config.OutputFolderPattern -ErrorAction SilentlyContinue
+                
+                if ($potentialFolders) {
+                    $latestFolder = $potentialFolders | Sort-Object CreationTime -Descending | Select-Object -First 1
+                    Write-Log "Found run folder in different date folder: $($dateFolder.Name)" -Level "INFO"
+                    return $latestFolder
+                }
+            }
+            
+            Write-Log "No run folders found in any date directory" -Level "DEBUG"
+            return $null
+        }
+    }
+    catch {
+        Write-Log "Error finding run folders: $_" -Level "ERROR"
+        return $null
     }
 }
 

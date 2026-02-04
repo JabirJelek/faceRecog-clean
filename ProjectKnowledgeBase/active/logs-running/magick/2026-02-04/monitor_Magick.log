@@ -1,0 +1,618 @@
+[2026-02-04 09:22:15] [INFO] === ENHANCED Face Recognition Monitor Started ===
+[2026-02-04 09:22:15] [INFO] Monitor Version: 3.1 (Persistent Tracking)
+[2026-02-04 09:22:15] [INFO] Start Time: 08:00
+[2026-02-04 09:22:15] [INFO] End Time: 08:40
+[2026-02-04 09:22:15] [INFO] Force stop threshold: 2 attempts within 5 seconds
+[2026-02-04 09:22:15] [DEBUG] Initializing resilience system...
+[2026-02-04 09:22:15] [INFO] Testing email configuration...
+[2026-02-04 09:22:15] [SUCCESS] Found 2 email recipient(s)
+[2026-02-04 09:22:15] [INFO] Configured languages: Bahasa, English
+[2026-02-04 09:22:15] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-04 09:22:15] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-04 09:22:15] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-04 09:22:15] [INFO] - SSL Enabled: True
+[2026-02-04 09:22:15] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-04 09:22:15] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-04 09:22:15] [SUCCESS] Email configuration valid
+[2026-02-04 09:22:15] [SUCCESS] Email configuration validated successfully
+[2026-02-04 09:22:15] [INFO] Loading persistence data...
+[2026-02-04 09:22:15] [DEBUG] No PID tracking file found
+[2026-02-04 09:22:15] [INFO] Checking for orphaned runs...
+[2026-02-04 09:22:15] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:22:15] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:22:15] [DEBUG] Registering console control handler...
+[2026-02-04 09:22:16] [DEBUG] Console control handler registered
+[2026-02-04 09:22:16] [INFO] Entering main monitoring loop...
+[2026-02-04 09:22:16] [DEBUG] Check: 09:22:16 | Window: Inactive | Python: Stopped
+[2026-02-04 09:22:16] [INFO] End time reached - initiating shutdown sequence...
+[2026-02-04 09:22:16] [INFO] Validating final worker output...
+[2026-02-04 09:22:16] [DEBUG] No run folder specified, finding latest...
+[2026-02-04 09:22:16] [DEBUG] No run folders found in any date directory
+[2026-02-04 09:22:16] [WARN] No output folder found. Retrying in 10 seconds... (Attempt 1/5)
+[2026-02-04 09:22:38] [INFO] === ENHANCED Face Recognition Monitor Started ===
+[2026-02-04 09:22:38] [INFO] Monitor Version: 3.1 (Persistent Tracking)
+[2026-02-04 09:22:38] [INFO] Start Time: 08:00
+[2026-02-04 09:22:38] [INFO] End Time: 09:30
+[2026-02-04 09:22:38] [INFO] Force stop threshold: 2 attempts within 5 seconds
+[2026-02-04 09:22:38] [DEBUG] Initializing resilience system...
+[2026-02-04 09:22:38] [INFO] Testing email configuration...
+[2026-02-04 09:22:38] [SUCCESS] Found 2 email recipient(s)
+[2026-02-04 09:22:38] [INFO] Configured languages: Bahasa, English
+[2026-02-04 09:22:38] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-04 09:22:38] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-04 09:22:38] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-04 09:22:38] [INFO] - SSL Enabled: True
+[2026-02-04 09:22:38] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-04 09:22:38] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-04 09:22:38] [SUCCESS] Email configuration valid
+[2026-02-04 09:22:38] [SUCCESS] Email configuration validated successfully
+[2026-02-04 09:22:39] [INFO] Loading persistence data...
+[2026-02-04 09:22:39] [DEBUG] No PID tracking file found
+[2026-02-04 09:22:39] [INFO] Loaded resilience state with 0 collected folders
+[2026-02-04 09:22:39] [INFO] Loaded persistent tracking with 1 history entries
+[2026-02-04 09:22:39] [INFO] Checking for orphaned runs...
+[2026-02-04 09:22:39] [INFO] Loaded persistent tracking with 1 history entries
+[2026-02-04 09:22:39] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:22:39] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:22:39] [DEBUG] Registering console control handler...
+[2026-02-04 09:22:39] [DEBUG] Console control handler registered
+[2026-02-04 09:22:39] [INFO] Entering main monitoring loop...
+[2026-02-04 09:22:39] [DEBUG] Check: 09:22:39 | Window: Active | Python: Stopped
+[2026-02-04 09:22:39] [DEBUG] Check: 09:22:39 | Window: Active | Python: Stopped
+[2026-02-04 09:22:39] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-04 09:22:39] [DEBUG] Searching for Python process...
+[2026-02-04 09:22:39] [DEBUG] No run folders found in any date directory
+[2026-02-04 09:22:39] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:22:39] [INFO] Starting face recognition worker process...
+[2026-02-04 09:22:39] [SUCCESS] Worker process started (PID: 10160)
+[2026-02-04 09:22:39] [INFO] Waiting for Python process to start...
+[2026-02-04 09:22:39] [DEBUG] Searching for Python process...
+[2026-02-04 09:22:39] [DEBUG] No run folders found in any date directory
+[2026-02-04 09:22:39] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:22:41] [DEBUG] Searching for Python process...
+[2026-02-04 09:22:43] [SUCCESS] Found Python process with our script: PID=27924
+[2026-02-04 09:22:43] [SUCCESS] Python process found (PID: 27924)
+[2026-02-04 09:22:43] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:22:43] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:22:43] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:22:43] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-04 09:22:43] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:22:43] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:22:43] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:22:58] [DEBUG] Check: 09:22:58 | Window: Active | Python: Running (PID: 27924)
+[2026-02-04 09:22:58] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:22:58] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:22:58] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:23:13] [DEBUG] Check: 09:23:13 | Window: Active | Python: Running (PID: 27924)
+[2026-02-04 09:23:13] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:23:13] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:23:13] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:23:28] [DEBUG] Check: 09:23:28 | Window: Active | Python: Running (PID: 27924)
+[2026-02-04 09:23:28] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:23:28] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:23:28] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:23:43] [DEBUG] Searching for Python process...
+[2026-02-04 09:23:43] [DEBUG] No run folders found in any date directory
+[2026-02-04 09:23:43] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:23:43] [WARN] Detected unexpected process stop. Worker: True -> False, Python: True -> False
+[2026-02-04 09:23:43] [DEBUG] Check: 09:23:43 | Window: Active | Python: Stopped
+[2026-02-04 09:23:43] [DEBUG] Check: 09:23:43 | Window: Active | Python: Stopped
+[2026-02-04 09:23:43] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-04 09:23:43] [DEBUG] Searching for Python process...
+[2026-02-04 09:23:43] [DEBUG] No run folders found in any date directory
+[2026-02-04 09:23:43] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:23:43] [INFO] Starting face recognition worker process...
+[2026-02-04 09:23:43] [SUCCESS] Worker process started (PID: 31644)
+[2026-02-04 09:23:43] [INFO] Waiting for Python process to start...
+[2026-02-04 09:23:43] [DEBUG] Searching for Python process...
+[2026-02-04 09:23:43] [DEBUG] No run folders found in any date directory
+[2026-02-04 09:23:43] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:23:45] [DEBUG] Searching for Python process...
+[2026-02-04 09:23:45] [SUCCESS] Found Python process with our script: PID=6772
+[2026-02-04 09:23:45] [SUCCESS] Python process found (PID: 6772)
+[2026-02-04 09:23:45] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:23:45] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:23:46] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:23:46] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-04 09:23:46] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:23:46] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:23:46] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:43:42] [INFO] === ENHANCED Face Recognition Monitor Started ===
+[2026-02-04 09:43:42] [INFO] Monitor Version: 3.1 (Persistent Tracking)
+[2026-02-04 09:43:42] [INFO] Start Time: 08:00
+[2026-02-04 09:43:42] [INFO] End Time: 09:30
+[2026-02-04 09:43:42] [INFO] Force stop threshold: 2 attempts within 5 seconds
+[2026-02-04 09:43:42] [DEBUG] Initializing resilience system...
+[2026-02-04 09:43:42] [INFO] Testing email configuration...
+[2026-02-04 09:43:42] [SUCCESS] Found 2 email recipient(s)
+[2026-02-04 09:43:42] [INFO] Configured languages: Bahasa, English
+[2026-02-04 09:43:42] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-04 09:43:42] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-04 09:43:42] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-04 09:43:42] [INFO] - SSL Enabled: True
+[2026-02-04 09:43:42] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-04 09:43:42] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-04 09:43:42] [SUCCESS] Email configuration valid
+[2026-02-04 09:43:42] [SUCCESS] Email configuration validated successfully
+[2026-02-04 09:43:42] [INFO] Loading persistence data...
+[2026-02-04 09:43:42] [INFO] Loaded PIDs are no longer running, cleaning up
+[2026-02-04 09:43:43] [INFO] Loaded persistent tracking with 9 history entries
+[2026-02-04 09:43:43] [WARN] Previous session appears to have ended unexpectedly. Checking for orphaned runs...
+[2026-02-04 09:43:43] [INFO] Checking for orphaned runs...
+[2026-02-04 09:43:43] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:43:43] [INFO] Loaded persistent tracking with 9 history entries
+[2026-02-04 09:43:43] [WARN] Previous session appears to have ended unexpectedly. Checking for orphaned runs...
+[2026-02-04 09:43:43] [INFO] Checking for orphaned runs...
+[2026-02-04 09:43:43] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:43:43] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:43:43] [DEBUG] Registering console control handler...
+[2026-02-04 09:43:43] [DEBUG] Console control handler registered
+[2026-02-04 09:43:43] [INFO] Entering main monitoring loop...
+[2026-02-04 09:43:43] [DEBUG] Check: 09:43:43 | Window: Inactive | Python: Stopped
+[2026-02-04 09:43:43] [INFO] End time reached - initiating shutdown sequence...
+[2026-02-04 09:43:43] [INFO] Validating final worker output...
+[2026-02-04 09:43:43] [DEBUG] No run folder specified, finding latest...
+[2026-02-04 09:43:43] [DEBUG] No run folders found in any date directory
+[2026-02-04 09:43:43] [WARN] No output folder found. Retrying in 10 seconds... (Attempt 1/5)
+[2026-02-04 09:43:54] [INFO] === ENHANCED Face Recognition Monitor Started ===
+[2026-02-04 09:43:54] [INFO] Monitor Version: 3.1 (Persistent Tracking)
+[2026-02-04 09:43:54] [INFO] Start Time: 08:00
+[2026-02-04 09:43:54] [INFO] End Time: 09:45
+[2026-02-04 09:43:54] [INFO] Force stop threshold: 2 attempts within 5 seconds
+[2026-02-04 09:43:54] [DEBUG] Initializing resilience system...
+[2026-02-04 09:43:54] [INFO] Testing email configuration...
+[2026-02-04 09:43:54] [SUCCESS] Found 2 email recipient(s)
+[2026-02-04 09:43:54] [INFO] Configured languages: Bahasa, English
+[2026-02-04 09:43:54] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-04 09:43:54] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-04 09:43:54] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-04 09:43:54] [INFO] - SSL Enabled: True
+[2026-02-04 09:43:54] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-04 09:43:54] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-04 09:43:54] [SUCCESS] Email configuration valid
+[2026-02-04 09:43:54] [SUCCESS] Email configuration validated successfully
+[2026-02-04 09:43:54] [INFO] Loading persistence data...
+[2026-02-04 09:43:54] [DEBUG] No PID tracking file found
+[2026-02-04 09:43:54] [INFO] Loaded resilience state with 0 collected folders
+[2026-02-04 09:43:54] [INFO] Loaded persistent tracking with 10 history entries
+[2026-02-04 09:43:54] [INFO] Checking for orphaned runs...
+[2026-02-04 09:43:54] [INFO] Loaded persistent tracking with 10 history entries
+[2026-02-04 09:43:54] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:43:54] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:43:54] [DEBUG] Registering console control handler...
+[2026-02-04 09:43:54] [DEBUG] Console control handler registered
+[2026-02-04 09:43:54] [INFO] Entering main monitoring loop...
+[2026-02-04 09:43:54] [DEBUG] Check: 09:43:54 | Window: Active | Python: Stopped
+[2026-02-04 09:43:54] [DEBUG] Check: 09:43:54 | Window: Active | Python: Stopped
+[2026-02-04 09:43:54] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-04 09:43:54] [DEBUG] Searching for Python process...
+[2026-02-04 09:43:54] [DEBUG] No run folders found in any date directory
+[2026-02-04 09:43:54] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:43:54] [INFO] Starting face recognition worker process...
+[2026-02-04 09:43:55] [SUCCESS] Worker process started (PID: 33884)
+[2026-02-04 09:43:55] [INFO] Waiting for Python process to start...
+[2026-02-04 09:43:55] [DEBUG] Searching for Python process...
+[2026-02-04 09:43:55] [DEBUG] No run folders found in any date directory
+[2026-02-04 09:43:55] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:43:57] [DEBUG] Searching for Python process...
+[2026-02-04 09:43:58] [SUCCESS] Found Python process with our script: PID=17636
+[2026-02-04 09:43:58] [SUCCESS] Python process found (PID: 17636)
+[2026-02-04 09:43:58] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:43:58] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:43:58] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:43:58] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-04 09:43:58] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:43:58] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:43:58] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:44:13] [DEBUG] Check: 09:44:13 | Window: Active | Python: Running (PID: 17636)
+[2026-02-04 09:44:13] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:44:13] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:44:13] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:44:28] [DEBUG] Check: 09:44:28 | Window: Active | Python: Running (PID: 17636)
+[2026-02-04 09:44:28] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:44:28] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:44:28] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:44:48] [INFO] === ENHANCED Face Recognition Monitor Started ===
+[2026-02-04 09:44:48] [INFO] Monitor Version: 3.1 (Persistent Tracking)
+[2026-02-04 09:44:48] [INFO] Start Time: 08:00
+[2026-02-04 09:44:48] [INFO] End Time: 09:45
+[2026-02-04 09:44:48] [INFO] Force stop threshold: 2 attempts within 5 seconds
+[2026-02-04 09:44:48] [DEBUG] Initializing resilience system...
+[2026-02-04 09:44:49] [INFO] Testing email configuration...
+[2026-02-04 09:44:49] [SUCCESS] Found 2 email recipient(s)
+[2026-02-04 09:44:49] [INFO] Configured languages: Bahasa, English
+[2026-02-04 09:44:49] [SUCCESS] Email credential file found and loaded successfully
+[2026-02-04 09:44:49] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-04 09:44:49] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-04 09:44:49] [INFO] - SSL Enabled: True
+[2026-02-04 09:44:49] [INFO] - Make sure you're using an App Password, not your regular password
+[2026-02-04 09:44:49] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-04 09:44:49] [SUCCESS] Email configuration valid
+[2026-02-04 09:44:49] [SUCCESS] Email configuration validated successfully
+[2026-02-04 09:44:49] [INFO] Loading persistence data...
+[2026-02-04 09:44:49] [INFO] Loaded PIDs are no longer running, cleaning up
+[2026-02-04 09:44:49] [INFO] Loaded persistent tracking with 15 history entries
+[2026-02-04 09:44:49] [WARN] Previous session appears to have ended unexpectedly. Checking for orphaned runs...
+[2026-02-04 09:44:49] [INFO] Checking for orphaned runs...
+[2026-02-04 09:44:49] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:44:49] [INFO] Loaded persistent tracking with 15 history entries
+[2026-02-04 09:44:49] [WARN] Previous session appears to have ended unexpectedly. Checking for orphaned runs...
+[2026-02-04 09:44:49] [INFO] Checking for orphaned runs...
+[2026-02-04 09:44:49] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:44:49] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:44:49] [DEBUG] Registering console control handler...
+[2026-02-04 09:44:49] [DEBUG] Console control handler registered
+[2026-02-04 09:44:49] [INFO] Entering main monitoring loop...
+[2026-02-04 09:44:49] [DEBUG] Check: 09:44:49 | Window: Active | Python: Stopped
+[2026-02-04 09:44:49] [DEBUG] Check: 09:44:49 | Window: Active | Python: Stopped
+[2026-02-04 09:44:49] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-04 09:44:49] [DEBUG] Searching for Python process...
+[2026-02-04 09:44:49] [DEBUG] No run folders found in any date directory
+[2026-02-04 09:44:49] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:44:49] [INFO] Starting face recognition worker process...
+[2026-02-04 09:44:49] [SUCCESS] Worker process started (PID: 35296)
+[2026-02-04 09:44:49] [INFO] Waiting for Python process to start...
+[2026-02-04 09:44:49] [DEBUG] Searching for Python process...
+[2026-02-04 09:44:49] [DEBUG] No run folders found in any date directory
+[2026-02-04 09:44:49] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:44:51] [DEBUG] Searching for Python process...
+[2026-02-04 09:44:52] [SUCCESS] Found Python process with our script: PID=11676
+[2026-02-04 09:44:52] [SUCCESS] Python process found (PID: 11676)
+[2026-02-04 09:44:52] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:44:52] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:44:52] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:44:52] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-04 09:44:52] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 09:44:52] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:44:52] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:45:07] [DEBUG] Check: 09:45:07 | Window: Inactive | Python: Running (PID: 11676)
+[2026-02-04 09:45:07] [INFO] End time reached - initiating shutdown sequence...
+[2026-02-04 09:45:08] [INFO] Stopping running processes...
+[2026-02-04 09:45:08] [INFO] Stopping worker process. Reason: Unexpected Process Stop
+[2026-02-04 09:45:08] [DEBUG] Process stop recorded: ProcessStop - Unexpected Process Stop (Unexpected: True)
+[2026-02-04 09:45:08] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:45:08] [WARN] Unexpected stop detected - validating and collecting current run...
+[2026-02-04 09:45:08] [INFO] Performing validation on stop: Unexpected Process Stop
+[2026-02-04 09:45:08] [DEBUG] No current run folder, finding latest...
+[2026-02-04 09:45:08] [DEBUG] Found latest run folder in date-based path: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:45:08] [DEBUG] Validating latest run folder on stop: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:45:08] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:45:08] [DEBUG] Found subfolder: logs
+[2026-02-04 09:45:08] [DEBUG] Found subfolder: script_output
+[2026-02-04 09:45:08] [DEBUG] Metadata file is valid JSON
+[2026-02-04 09:45:08] [DEBUG] Metadata file size: 1.64 KB
+[2026-02-04 09:45:08] [DEBUG] Found 2 log files
+[2026-02-04 09:45:08] [WARN] Missing log file: completion_summary.txt
+[2026-02-04 09:45:08] [DEBUG] python_output.txt size: 0 KB
+[2026-02-04 09:45:08] [DEBUG] Latest run log: run_2026-02-04_09-44-50.log (2.03 KB)
+[2026-02-04 09:45:08] [DEBUG] Script output contains 1 items
+[2026-02-04 09:45:08] [DEBUG] Total folder size: 0 MB
+[2026-02-04 09:45:08] [DEBUG] Total attachment size: 0 MB
+[2026-02-04 09:45:08] [DEBUG] Process stop recorded: Validation - Success (Unexpected: False)
+[2026-02-04 09:45:08] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:45:08] [SUCCESS] VALIDATION SUCCESS with warnings:
+[2026-02-04 09:45:08] [WARN]   Warning: Missing log file: completion_summary.txt
+[2026-02-04 09:45:08] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-04\Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:45:08] [SUCCESS]   - Created: 02/04/2026 09:44:50
+[2026-02-04 09:45:08] [SUCCESS]   - Size: 0 MB
+[2026-02-04 09:45:08] [SUCCESS]   - Attachments: 0 MB
+[2026-02-04 09:45:08] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:45:08] [DEBUG]   Found run log: run_2026-02-04_09-44-50.log
+[2026-02-04 09:45:08] [DEBUG]   Found metadata.json
+[2026-02-04 09:45:08] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-04_09-44-50 (0 MB)
+[2026-02-04 09:45:08] [SUCCESS] Collected latest run on stop: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:45:08] [DEBUG] Process stop recorded: Validation - Success (Unexpected: True)
+[2026-02-04 09:45:08] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:45:08] [DEBUG] Enhanced PID tracking saved with 1 collected folders
+[2026-02-04 09:45:08] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:45:08] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:45:08] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:45:08] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:45:08] [INFO] Stopping Python process (PID: 11676)...
+[2026-02-04 09:45:10] [WARN] Forcefully terminating Python process...
+[2026-02-04 09:45:10] [SUCCESS] Python process terminated
+[2026-02-04 09:45:10] [INFO] Stopping worker process (PID: 35296)...
+[2026-02-04 09:45:12] [SUCCESS] Worker process exited gracefully
+[2026-02-04 09:45:12] [DEBUG] Removed PID tracking file
+[2026-02-04 09:45:12] [INFO] Stopped processes: Python, Worker
+[2026-02-04 09:45:12] [DEBUG] Process stop recorded: ProcessStopComplete - Processes stopped: 2 (Unexpected: True)
+[2026-02-04 09:45:12] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:45:17] [INFO] Validating final worker output...
+[2026-02-04 09:45:17] [DEBUG] No run folder specified, finding latest...
+[2026-02-04 09:45:18] [DEBUG] Found latest run folder in date-based path: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:45:18] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:45:18] [DEBUG] Found subfolder: logs
+[2026-02-04 09:45:18] [DEBUG] Found subfolder: script_output
+[2026-02-04 09:45:18] [DEBUG] Metadata file is valid JSON
+[2026-02-04 09:45:18] [DEBUG] Metadata file size: 1.88 KB
+[2026-02-04 09:45:18] [DEBUG] Found 3 log files
+[2026-02-04 09:45:18] [DEBUG] completion_summary.txt size: 5.85 KB
+[2026-02-04 09:45:18] [DEBUG] python_output.txt size: 18.84 KB
+[2026-02-04 09:45:18] [DEBUG] Latest run log: run_2026-02-04_09-44-50.log (3.51 KB)
+[2026-02-04 09:45:18] [DEBUG] Script output contains 1 items
+[2026-02-04 09:45:18] [DEBUG] Total folder size: 0.03 MB
+[2026-02-04 09:45:18] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-04 09:45:18] [DEBUG] Process stop recorded: Validation - Success (Unexpected: False)
+[2026-02-04 09:45:18] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:45:18] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-04 09:45:18] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-04\Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:45:18] [SUCCESS]   - Created: 02/04/2026 09:44:50
+[2026-02-04 09:45:18] [SUCCESS]   - Size: 0.03 MB
+[2026-02-04 09:45:18] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-04 09:45:18] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:45:18] [DEBUG]   Found run log: run_2026-02-04_09-44-50.log
+[2026-02-04 09:45:18] [DEBUG]   Found metadata.json
+[2026-02-04 09:45:18] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-04_09-44-50 (0.01 MB)
+[2026-02-04 09:45:18] [DEBUG] Configuration backed up to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\backups\config_backup_20260204_094518.json
+[2026-02-04 09:45:18] [INFO] Preparing to send ENHANCED completion notifications with 1 collected runs...
+[2026-02-04 09:45:18] [DEBUG] Email credential loaded from C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-04 09:45:18] [INFO] Total attachments to send: 2 files (0.01 MB)
+[2026-02-04 09:45:18] [INFO] Sending emails in 2 different language(s)
+[2026-02-04 09:45:18] [INFO] Sending English email to: faridraihan17@gmail.com
+[2026-02-04 09:45:22] [SUCCESS] Successfully sent English email with 2 attachments to 1 recipient(s)
+[2026-02-04 09:45:22] [INFO] Sending Bahasa email to: ikeepmypromiz@gmail.com
+[2026-02-04 09:45:25] [SUCCESS] Successfully sent Bahasa email with 2 attachments to 1 recipient(s)
+[2026-02-04 09:45:25] [SUCCESS] All enhanced emails sent successfully (2 total recipients)
+[2026-02-04 09:45:25] [SUCCESS] Enhanced completion emails sent successfully with 1 collected runs.
+[2026-02-04 09:45:25] [SUCCESS] Face recognition pipeline completed successfully! Processed 1 runs today.
+[2026-02-04 09:45:25] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:45:25] [INFO] Daily process completed. Stopping monitor...
+[2026-02-04 09:45:25] [INFO] Cleaning up...
+[2026-02-04 09:45:25] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:45:25] [DEBUG]   Found run log: run_2026-02-04_09-44-50.log
+[2026-02-04 09:45:25] [DEBUG]   Found metadata.json
+[2026-02-04 09:45:25] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-04_09-44-50 (0.01 MB)
+[2026-02-04 09:45:25] [INFO] Collected final run during cleanup: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:45:25] [INFO] Stopping worker process. Reason: Normal Shutdown
+[2026-02-04 09:45:25] [DEBUG] Process stop recorded: ProcessStop - Normal Shutdown (Unexpected: False)
+[2026-02-04 09:45:25] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:45:26] [DEBUG] Process stop recorded: ProcessStopComplete - Processes stopped: 0 (Unexpected: False)
+[2026-02-04 09:45:26] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:45:26] [DEBUG] Process stop recorded: Shutdown - Monitor stopping (Unexpected: False)
+[2026-02-04 09:45:26] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:45:26] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:45:26] [INFO] === ENHANCED Face Recognition Monitor Stopped ===
+[2026-02-04 09:46:09] [INFO] === ENHANCED Face Recognition Monitor Started ===
+[2026-02-04 09:46:09] [INFO] Monitor Version: 3.1 (Persistent Tracking)
+[2026-02-04 09:46:09] [INFO] Start Time: 08:00
+[2026-02-04 09:46:09] [INFO] End Time: 09:48
+[2026-02-04 09:46:09] [INFO] Force stop threshold: 2 attempts within 5 seconds
+[2026-02-04 09:46:09] [DEBUG] Initializing resilience system...
+[2026-02-04 09:46:09] [INFO] Email notifications on completion are disabled
+[2026-02-04 09:46:09] [INFO] Loading persistence data...
+[2026-02-04 09:46:09] [DEBUG] No PID tracking file found
+[2026-02-04 09:46:09] [INFO] Loaded persistent tracking with 37 history entries
+[2026-02-04 09:46:09] [INFO] Checking for orphaned runs...
+[2026-02-04 09:46:09] [DEBUG] Validating last known folder: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:46:09] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:46:09] [DEBUG] Found subfolder: logs
+[2026-02-04 09:46:09] [DEBUG] Found subfolder: script_output
+[2026-02-04 09:46:09] [DEBUG] Metadata file is valid JSON
+[2026-02-04 09:46:09] [DEBUG] Metadata file size: 1.88 KB
+[2026-02-04 09:46:09] [DEBUG] Found 3 log files
+[2026-02-04 09:46:09] [DEBUG] completion_summary.txt size: 5.85 KB
+[2026-02-04 09:46:09] [DEBUG] python_output.txt size: 18.84 KB
+[2026-02-04 09:46:09] [DEBUG] Latest run log: run_2026-02-04_09-44-50.log (3.51 KB)
+[2026-02-04 09:46:09] [DEBUG] Script output contains 1 items
+[2026-02-04 09:46:09] [DEBUG] Total folder size: 0.03 MB
+[2026-02-04 09:46:09] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-04 09:46:09] [DEBUG] Process stop recorded: Validation - Success (Unexpected: False)
+[2026-02-04 09:46:09] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:46:09] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-04 09:46:09] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-04\Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:46:09] [SUCCESS]   - Created: 02/04/2026 09:44:50
+[2026-02-04 09:46:09] [SUCCESS]   - Size: 0.03 MB
+[2026-02-04 09:46:09] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-04 09:46:09] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:46:09] [DEBUG]   Found run log: run_2026-02-04_09-44-50.log
+[2026-02-04 09:46:09] [DEBUG]   Found metadata.json
+[2026-02-04 09:46:09] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-04_09-44-50 (0.01 MB)
+[2026-02-04 09:46:09] [SUCCESS] Collected orphaned run from previous session: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:46:09] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:46:09] [DEBUG] Found 1 total run folders
+[2026-02-04 09:46:09] [INFO] Loaded persistent tracking with 40 history entries
+[2026-02-04 09:46:09] [SUCCESS] Resumed monitoring of existing processes
+[2026-02-04 09:46:09] [INFO] Loaded 1 previously collected folders
+[2026-02-04 09:46:10] [DEBUG] Registering console control handler...
+[2026-02-04 09:46:10] [DEBUG] Console control handler registered
+[2026-02-04 09:46:10] [INFO] Entering main monitoring loop...
+[2026-02-04 09:46:10] [DEBUG] Check: 09:46:10 | Window: Active | Python: Stopped
+[2026-02-04 09:46:10] [DEBUG] Check: 09:46:10 | Window: Active | Python: Stopped
+[2026-02-04 09:46:10] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-04 09:46:10] [DEBUG] Searching for Python process...
+[2026-02-04 09:46:10] [DEBUG] Found latest run folder in date-based path: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:46:10] [INFO] Found Python PID in metadata: 35296
+[2026-02-04 09:46:10] [WARN] Python PID from metadata no longer exists: 35296
+[2026-02-04 09:46:10] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:46:10] [INFO] Starting face recognition worker process...
+[2026-02-04 09:46:10] [SUCCESS] Worker process started (PID: 29556)
+[2026-02-04 09:46:10] [INFO] Waiting for Python process to start...
+[2026-02-04 09:46:10] [DEBUG] Searching for Python process...
+[2026-02-04 09:46:10] [DEBUG] Found latest run folder in date-based path: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:46:10] [INFO] Found Python PID in metadata: 35296
+[2026-02-04 09:46:10] [WARN] Python PID from metadata no longer exists: 35296
+[2026-02-04 09:46:10] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:46:12] [DEBUG] Searching for Python process...
+[2026-02-04 09:46:13] [SUCCESS] Found Python process with our script: PID=9956
+[2026-02-04 09:46:13] [SUCCESS] Python process found (PID: 9956)
+[2026-02-04 09:46:13] [DEBUG] Enhanced PID tracking saved with 1 collected folders
+[2026-02-04 09:46:13] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:46:13] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:46:13] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-04 09:46:13] [DEBUG] Enhanced PID tracking saved with 1 collected folders
+[2026-02-04 09:46:13] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:46:13] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:46:28] [DEBUG] Check: 09:46:28 | Window: Active | Python: Running (PID: 9956)
+[2026-02-04 09:46:28] [DEBUG] Enhanced PID tracking saved with 1 collected folders
+[2026-02-04 09:46:28] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:46:28] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:46:43] [DEBUG] Searching for Python process...
+[2026-02-04 09:46:43] [DEBUG] Found latest run folder in date-based path: Magick_Process_MaskDetect_2026-02-04_09-46-10
+[2026-02-04 09:46:43] [INFO] Found Python PID in metadata: 29556
+[2026-02-04 09:46:43] [WARN] Python PID from metadata no longer exists: 29556
+[2026-02-04 09:46:43] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:46:43] [WARN] Detected unexpected process stop. Worker: True -> False, Python: True -> False
+[2026-02-04 09:46:44] [INFO] Validating run due to unexpected process stop in active window...
+[2026-02-04 09:46:44] [INFO] Performing validation on stop: Unexpected Process Stop
+[2026-02-04 09:46:44] [DEBUG] Validating current run folder on stop: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:46:44] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:46:44] [DEBUG] Found subfolder: logs
+[2026-02-04 09:46:44] [DEBUG] Found subfolder: script_output
+[2026-02-04 09:46:44] [DEBUG] Metadata file is valid JSON
+[2026-02-04 09:46:44] [DEBUG] Metadata file size: 1.88 KB
+[2026-02-04 09:46:44] [DEBUG] Found 3 log files
+[2026-02-04 09:46:44] [DEBUG] completion_summary.txt size: 5.85 KB
+[2026-02-04 09:46:44] [DEBUG] python_output.txt size: 18.84 KB
+[2026-02-04 09:46:44] [DEBUG] Latest run log: run_2026-02-04_09-44-50.log (3.51 KB)
+[2026-02-04 09:46:44] [DEBUG] Script output contains 1 items
+[2026-02-04 09:46:44] [DEBUG] Total folder size: 0.03 MB
+[2026-02-04 09:46:44] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-04 09:46:44] [DEBUG] Process stop recorded: Validation - Success (Unexpected: False)
+[2026-02-04 09:46:44] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:46:44] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-04 09:46:44] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-04\Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:46:44] [SUCCESS]   - Created: 02/04/2026 09:44:50
+[2026-02-04 09:46:44] [SUCCESS]   - Size: 0.03 MB
+[2026-02-04 09:46:44] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-04 09:46:44] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:46:44] [DEBUG]   Found run log: run_2026-02-04_09-44-50.log
+[2026-02-04 09:46:44] [DEBUG]   Found metadata.json
+[2026-02-04 09:46:44] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-04_09-44-50 (0.01 MB)
+[2026-02-04 09:46:44] [DEBUG] Enhanced PID tracking saved with 1 collected folders
+[2026-02-04 09:46:44] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:46:44] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:46:44] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:46:44] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:46:44] [DEBUG] Check: 09:46:44 | Window: Active | Python: Stopped
+[2026-02-04 09:46:44] [DEBUG] Check: 09:46:44 | Window: Active | Python: Stopped
+[2026-02-04 09:46:44] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-04 09:46:44] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-04 09:46:59] [DEBUG] Check: 09:46:59 | Window: Active | Python: Stopped
+[2026-02-04 09:46:59] [DEBUG] Check: 09:46:59 | Window: Active | Python: Stopped
+[2026-02-04 09:46:59] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-04 09:46:59] [DEBUG] Skipping worker start - too soon after last attempt (60s cooldown)
+[2026-02-04 09:47:14] [DEBUG] Check: 09:47:14 | Window: Active | Python: Stopped
+[2026-02-04 09:47:14] [DEBUG] Check: 09:47:14 | Window: Active | Python: Stopped
+[2026-02-04 09:47:14] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-04 09:47:14] [DEBUG] Searching for Python process...
+[2026-02-04 09:47:14] [DEBUG] Found latest run folder in date-based path: Magick_Process_MaskDetect_2026-02-04_09-46-10
+[2026-02-04 09:47:14] [INFO] Found Python PID in metadata: 29556
+[2026-02-04 09:47:14] [WARN] Python PID from metadata no longer exists: 29556
+[2026-02-04 09:47:14] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:47:14] [INFO] Starting face recognition worker process...
+[2026-02-04 09:47:14] [SUCCESS] Worker process started (PID: 41500)
+[2026-02-04 09:47:14] [INFO] Waiting for Python process to start...
+[2026-02-04 09:47:14] [DEBUG] Searching for Python process...
+[2026-02-04 09:47:14] [DEBUG] Found latest run folder in date-based path: Magick_Process_MaskDetect_2026-02-04_09-46-10
+[2026-02-04 09:47:14] [INFO] Found Python PID in metadata: 29556
+[2026-02-04 09:47:14] [WARN] Python PID from metadata no longer exists: 29556
+[2026-02-04 09:47:14] [DEBUG] No Python process found matching criteria
+[2026-02-04 09:47:16] [DEBUG] Searching for Python process...
+[2026-02-04 09:47:17] [SUCCESS] Found Python process with our script: PID=22404
+[2026-02-04 09:47:17] [SUCCESS] Python process found (PID: 22404)
+[2026-02-04 09:47:17] [DEBUG] Enhanced PID tracking saved with 1 collected folders
+[2026-02-04 09:47:17] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:47:17] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:47:17] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-04 09:47:17] [DEBUG] Enhanced PID tracking saved with 1 collected folders
+[2026-02-04 09:47:17] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:47:17] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:47:32] [DEBUG] Check: 09:47:32 | Window: Active | Python: Running (PID: 22404)
+[2026-02-04 09:47:32] [DEBUG] Enhanced PID tracking saved with 1 collected folders
+[2026-02-04 09:47:32] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:47:32] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:47:47] [DEBUG] Check: 09:47:47 | Window: Active | Python: Running (PID: 22404)
+[2026-02-04 09:47:47] [DEBUG] Enhanced PID tracking saved with 1 collected folders
+[2026-02-04 09:47:47] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:47:47] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:48:02] [DEBUG] Check: 09:48:02 | Window: Inactive | Python: Running (PID: 22404)
+[2026-02-04 09:48:02] [INFO] End time reached - initiating shutdown sequence...
+[2026-02-04 09:48:02] [INFO] Stopping running processes...
+[2026-02-04 09:48:02] [INFO] Stopping worker process. Reason: Unexpected Process Stop
+[2026-02-04 09:48:02] [DEBUG] Process stop recorded: ProcessStop - Unexpected Process Stop (Unexpected: True)
+[2026-02-04 09:48:02] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:48:02] [WARN] Unexpected stop detected - validating and collecting current run...
+[2026-02-04 09:48:02] [INFO] Performing validation on stop: Unexpected Process Stop
+[2026-02-04 09:48:02] [DEBUG] Validating current run folder on stop: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:48:02] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:48:02] [DEBUG] Found subfolder: logs
+[2026-02-04 09:48:02] [DEBUG] Found subfolder: script_output
+[2026-02-04 09:48:02] [DEBUG] Metadata file is valid JSON
+[2026-02-04 09:48:02] [DEBUG] Metadata file size: 1.88 KB
+[2026-02-04 09:48:02] [DEBUG] Found 3 log files
+[2026-02-04 09:48:02] [DEBUG] completion_summary.txt size: 5.85 KB
+[2026-02-04 09:48:02] [DEBUG] python_output.txt size: 18.84 KB
+[2026-02-04 09:48:02] [DEBUG] Latest run log: run_2026-02-04_09-44-50.log (3.51 KB)
+[2026-02-04 09:48:02] [DEBUG] Script output contains 1 items
+[2026-02-04 09:48:02] [DEBUG] Total folder size: 0.03 MB
+[2026-02-04 09:48:02] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-04 09:48:02] [DEBUG] Process stop recorded: Validation - Success (Unexpected: False)
+[2026-02-04 09:48:02] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:48:02] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-04 09:48:02] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-04\Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:48:02] [SUCCESS]   - Created: 02/04/2026 09:44:50
+[2026-02-04 09:48:02] [SUCCESS]   - Size: 0.03 MB
+[2026-02-04 09:48:02] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-04 09:48:02] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-04_09-44-50
+[2026-02-04 09:48:03] [DEBUG]   Found run log: run_2026-02-04_09-44-50.log
+[2026-02-04 09:48:03] [DEBUG]   Found metadata.json
+[2026-02-04 09:48:03] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-04_09-44-50 (0.01 MB)
+[2026-02-04 09:48:03] [DEBUG] Enhanced PID tracking saved with 1 collected folders
+[2026-02-04 09:48:03] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:48:03] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:48:03] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:48:03] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:48:03] [INFO] Stopping Python process (PID: 22404)...
+[2026-02-04 09:48:05] [WARN] Forcefully terminating Python process...
+[2026-02-04 09:48:05] [SUCCESS] Python process terminated
+[2026-02-04 09:48:05] [INFO] Stopping worker process (PID: 41500)...
+[2026-02-04 09:48:07] [SUCCESS] Worker process exited gracefully
+[2026-02-04 09:48:07] [DEBUG] Removed PID tracking file
+[2026-02-04 09:48:07] [INFO] Stopped processes: Python, Worker
+[2026-02-04 09:48:07] [DEBUG] Process stop recorded: ProcessStopComplete - Processes stopped: 2 (Unexpected: True)
+[2026-02-04 09:48:07] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:48:12] [INFO] Validating final worker output...
+[2026-02-04 09:48:12] [DEBUG] No run folder specified, finding latest...
+[2026-02-04 09:48:12] [DEBUG] Found latest run folder in date-based path: Magick_Process_MaskDetect_2026-02-04_09-47-15
+[2026-02-04 09:48:12] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-04_09-47-15
+[2026-02-04 09:48:12] [DEBUG] Found subfolder: logs
+[2026-02-04 09:48:12] [DEBUG] Found subfolder: script_output
+[2026-02-04 09:48:12] [DEBUG] Metadata file is valid JSON
+[2026-02-04 09:48:12] [DEBUG] Metadata file size: 1.88 KB
+[2026-02-04 09:48:12] [DEBUG] Found 3 log files
+[2026-02-04 09:48:12] [DEBUG] completion_summary.txt size: 5.85 KB
+[2026-02-04 09:48:12] [DEBUG] python_output.txt size: 66.97 KB
+[2026-02-04 09:48:12] [DEBUG] Latest run log: run_2026-02-04_09-47-15.log (3.51 KB)
+[2026-02-04 09:48:12] [DEBUG] Script output contains 1 items
+[2026-02-04 09:48:12] [DEBUG] Total folder size: 0.08 MB
+[2026-02-04 09:48:12] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-04 09:48:12] [DEBUG] Process stop recorded: Validation - Success (Unexpected: False)
+[2026-02-04 09:48:12] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:48:13] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-04 09:48:13] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-04\Magick_Process_MaskDetect_2026-02-04_09-47-15
+[2026-02-04 09:48:13] [SUCCESS]   - Created: 02/04/2026 09:47:15
+[2026-02-04 09:48:13] [SUCCESS]   - Size: 0.08 MB
+[2026-02-04 09:48:13] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-04 09:48:13] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-04_09-47-15
+[2026-02-04 09:48:13] [DEBUG]   Found run log: run_2026-02-04_09-47-15.log
+[2026-02-04 09:48:13] [DEBUG]   Found metadata.json
+[2026-02-04 09:48:13] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-04_09-47-15 (0.01 MB)
+[2026-02-04 09:48:13] [SUCCESS] Added final run to collection: Magick_Process_MaskDetect_2026-02-04_09-47-15
+[2026-02-04 09:48:13] [SUCCESS] Face recognition pipeline completed successfully! Processed 2 runs today.
+[2026-02-04 09:48:13] [DEBUG] Resilience state saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\resilience_state.json
+[2026-02-04 09:48:13] [INFO] Daily process completed. Stopping monitor...
+[2026-02-04 09:48:13] [INFO] Cleaning up...
+[2026-02-04 09:48:13] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-04_09-47-15
+[2026-02-04 09:48:13] [DEBUG]   Found run log: run_2026-02-04_09-47-15.log
+[2026-02-04 09:48:13] [DEBUG]   Found metadata.json
+[2026-02-04 09:48:13] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-04_09-47-15 (0.01 MB)
+[2026-02-04 09:48:13] [INFO] Collected final run during cleanup: Magick_Process_MaskDetect_2026-02-04_09-47-15
+[2026-02-04 09:48:13] [INFO] Stopping worker process. Reason: Normal Shutdown
+[2026-02-04 09:48:13] [DEBUG] Process stop recorded: ProcessStop - Normal Shutdown (Unexpected: False)
+[2026-02-04 09:48:13] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:48:13] [DEBUG] Process stop recorded: ProcessStopComplete - Processes stopped: 0 (Unexpected: False)
+[2026-02-04 09:48:13] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:48:13] [DEBUG] Process stop recorded: Shutdown - Monitor stopping (Unexpected: False)
+[2026-02-04 09:48:13] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:48:13] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\Magick\2026-02-04\persistent_tracking.json
+[2026-02-04 09:48:13] [INFO] === ENHANCED Face Recognition Monitor Stopped ===
