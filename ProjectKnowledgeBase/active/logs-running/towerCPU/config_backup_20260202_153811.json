@@ -1,0 +1,44 @@
+{
+  "RetryDelaySeconds": 10,
+  "MaxPIDFileAgeMinutes": 120,
+  "ExpectedSubfolders": [
+    "logs",
+    "script_output"
+  ],
+  "RunsBasePath": "C:\\raihan\\dokumen\\project\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\towerCPU",
+  "EndTime": "15:38",
+  "EmailFrom": "faridraihan17@gmail.com",
+  "WorkerProcessName": "powershell",
+  "PythonScriptPath": "C:\\raihan\\dokumen\\project\\faceRecog\\ProjectKnowledgeBase\\active\\projects\\maskRecog\\patterns\\algorithm\\entry_multi-USED-TowerCPU.py",
+  "SendEmailOnCompletion": true,
+  "WorkerScript": "C:\\raihan\\dokumen\\project\\faceRecog\\ProjectKnowledgeBase\\active\\projects\\maskRecog\\patterns\\scripts\\1_towerCPU\\maskDetect.ps1",
+  "OutputFolderPattern": "TowerCPU_Process_MaskDetect_*",
+  "EmailSubject": {
+    "Bahasa": "Proses Pengenalan Wajah Selesai dengan Sukses",
+    "English": "Face Recognition Process Completed Successfully"
+  },
+  "SmtpServer": "smtp.gmail.com",
+  "GracefulShutdownTimeout": 60,
+  "PythonProcessName": "python",
+  "ProcessCheckInterval": 15,
+  "UseSSL": true,
+  "EmailRecipients": [
+    {
+      "Address": "faridraihan17@gmail.com",
+      "Language": "English"
+    },
+    {
+      "Address": "ikeepmypromiz@gmail.com",
+      "Language": "Bahasa"
+    }
+  ],
+  "EmailCredentialPath": "C:\\Users\\cctv2scma\\.face-recog\\email-credential.xml",
+  "ExpectedFiles": [
+    "metadata.json"
+  ],
+  "MaxValidationRetries": 5,
+  "LogFile": "C:\\raihan\\dokumen\\project\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\towerCPU\\monitor_magick.log",
+  "SmtpPort": 587,
+  "StartTime": "08:50",
+  "PIDFilePath": "C:\\raihan\\dokumen\\project\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\towerCPU\\monitor_pid_magick.json"
+}
