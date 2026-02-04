@@ -96,7 +96,7 @@ function Initialize-ProjectPortablePaths {
     $Script:Config = @{
         # Schedule configuration (CRITICAL - was missing)
         StartTime = "08:00"  # Default start time
-        EndTime = "14:52"    # Default end time
+        EndTime = "16:15"    # Default end time
         
         # Worker script path - RELATIVE to project root
         WorkerScript = Join-Path $ProjectRoot "patterns\scripts\1_towerCPU\maskDetect.ps1"

@@ -14,3 +14,5 @@ wheels/
 **/*.cpython-312.pyc
 
 ProjectKnowledgeBase/active/mailkit/
+
+ProjectKnowledgeBase/active/logs-running/
