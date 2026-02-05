@@ -2434,3 +2434,774 @@ RECOMMENDATIONS:
 [2026-02-04 15:25:23] [INFO] Process completed. Stopping monitor as configured...
 [2026-02-04 15:25:23] [INFO] Cleaning up...
 [2026-02-04 15:25:23] [INFO] =============== Face Recognition Monitor Stopped ===============
+[2026-02-04 16:29:19] [INFO] =============== Face Recognition Monitor Started ===============
+[2026-02-04 16:29:19] [INFO] Monitor Version: 2.1 (Enhanced with MailKit Verification)
+[2026-02-04 16:29:19] [INFO] Performing early MailKit assembly verification...
+[2026-02-04 16:29:19] [INFO] Generating MailKit status report...
+[2026-02-04 16:29:19] [INFO] Starting MailKit assembly verification...
+[2026-02-04 16:29:19] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 16:29:19] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:19] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 16:29:19] [SUCCESS] MailKit is ready for email functionality
+[2026-02-04 16:29:19] [INFO]   - Assembly: PreLoaded
+[2026-02-04 16:29:19] [INFO]   - Version: 4.14.0.0
+[2026-02-04 16:29:19] [INFO] Performing startup cleanup check...
+[2026-02-04 16:29:19] [INFO] Loaded sudden termination tracking: 1 total events, current streak: 0
+[2026-02-04 16:29:19] [INFO] No orphaned processes found on startup
+[2026-02-04 16:29:19] [INFO] Testing email configuration with enhanced MailKit verification...
+[2026-02-04 16:29:19] [INFO] Generating MailKit status report...
+[2026-02-04 16:29:19] [INFO] Starting MailKit assembly verification...
+[2026-02-04 16:29:19] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 16:29:19] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:19] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 16:29:19] [INFO] Generating MailKit status report...
+[2026-02-04 16:29:19] [INFO] Starting MailKit assembly verification...
+[2026-02-04 16:29:19] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 16:29:19] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:19] [DEBUG]   - MimeKit Version: 4.14.0.0
+=== MAILKIT STATUS REPORT ===
+Timestamp: 2026-02-04 16:29:19
+Overall Status: READY
+
+ASSEMBLY STATUS:
+- Available: True
+- Load Method: PreLoaded
+- MailKit Version: 4.14.0.0
+- MimeKit Version: 4.14.0.0
+- Dependencies: True
+
+CONFIGURATION STATUS:
+- Email Enabled: True
+- SMTP Configured: True
+- Credential File: True
+- Recipients: True
+- SMTP Server: smtp.gmail.com
+- SMTP Port: 587
+- SSL: True
+
+SYSTEM INFORMATION:
+- PowerShell: 7.5.4
+- CLR: Unknown
+- OS: Microsoft Windows NT 10.0.26200.0
+- Host: MIS02
+
+RECOMMENDATIONS:
+
+[2026-02-04 16:29:19] [INFO] MailKit status report written to log
+[2026-02-04 16:29:19] [INFO] Verifying MailKit assembly...
+[2026-02-04 16:29:19] [SUCCESS] MailKit assembly verification PASSED
+[2026-02-04 16:29:19] [INFO]   - Load Method: PreLoaded
+[2026-02-04 16:29:19] [INFO]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:19] [INFO]   - MimeKit Version: 4.14.0.0
+[2026-02-04 16:29:19] [INFO] Verifying SMTP configuration...
+[2026-02-04 16:29:19] [SUCCESS] SMTP configuration verification PASSED
+[2026-02-04 16:29:19] [INFO]   - Server: smtp.gmail.com:587
+[2026-02-04 16:29:19] [INFO]   - SSL: True
+[2026-02-04 16:29:19] [INFO] Verifying email recipients...
+[2026-02-04 16:29:19] [SUCCESS] Found 2 email recipient(s)
+[2026-02-04 16:29:20] [INFO] Verifying email credentials...
+[2026-02-04 16:29:20] [SUCCESS] Email credential verification PASSED
+[2026-02-04 16:29:20] [INFO]   - Credential file: C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-04 16:29:20] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-04 16:29:20] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-04 16:29:20] [INFO] - SSL Enabled: True
+[2026-02-04 16:29:20] [INFO] - Ensure you're using an App Password, not your regular password
+[2026-02-04 16:29:20] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-04 16:29:20] [INFO] - Enable 2-Step Verification in Google Account
+[2026-02-04 16:29:20] [INFO] - Generate App Password: https://myaccount.google.com/apppasswords
+[2026-02-04 16:29:20] [SUCCESS] Email configuration validation COMPLETE
+[2026-02-04 16:29:20] [INFO] Overall status: READY
+[2026-02-04 16:29:20] [INFO] Skipping interactive test email prompt as per configuration
+[2026-02-04 16:29:20] [SUCCESS] Email configuration validated successfully
+[2026-02-04 16:29:20] [DEBUG] No PID tracking file found
+[2026-02-04 16:29:20] [INFO] Generating MailKit status report...
+[2026-02-04 16:29:20] [INFO] Starting MailKit assembly verification...
+[2026-02-04 16:29:20] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 16:29:20] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:20] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 16:29:20] [DEBUG] Check: 16:29:20 | Window: Inactive | Python: Stopped
+[2026-02-04 16:29:20] [INFO] End time reached - no active processes to stop
+[2026-02-04 16:29:20] [INFO] Initiating graceful shutdown: Schedule completed
+[2026-02-04 16:29:20] [DEBUG] Sudden termination tracking saved
+[2026-02-04 16:29:20] [DEBUG] Sudden termination tracking saved
+[2026-02-04 16:29:20] [SUCCESS] Graceful shutdown completed successfully
+[2026-02-04 16:29:20] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-04 16:29:20] [INFO] Cleaning up...
+[2026-02-04 16:29:20] [INFO] =============== Face Recognition Monitor Stopped ===============
+[2026-02-04 16:29:40] [INFO] =============== Face Recognition Monitor Started ===============
+[2026-02-04 16:29:40] [INFO] Monitor Version: 2.1 (Enhanced with MailKit Verification)
+[2026-02-04 16:29:40] [INFO] Performing early MailKit assembly verification...
+[2026-02-04 16:29:40] [INFO] Generating MailKit status report...
+[2026-02-04 16:29:40] [INFO] Starting MailKit assembly verification...
+[2026-02-04 16:29:41] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 16:29:41] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:41] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 16:29:41] [SUCCESS] MailKit is ready for email functionality
+[2026-02-04 16:29:41] [INFO]   - Assembly: PreLoaded
+[2026-02-04 16:29:41] [INFO]   - Version: 4.14.0.0
+[2026-02-04 16:29:41] [INFO] Performing startup cleanup check...
+[2026-02-04 16:29:41] [INFO] Loaded sudden termination tracking: 1 total events, current streak: 0
+[2026-02-04 16:29:41] [INFO] No orphaned processes found on startup
+[2026-02-04 16:29:41] [INFO] Testing email configuration with enhanced MailKit verification...
+[2026-02-04 16:29:41] [INFO] Generating MailKit status report...
+[2026-02-04 16:29:41] [INFO] Starting MailKit assembly verification...
+[2026-02-04 16:29:41] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 16:29:41] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:41] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 16:29:41] [INFO] Generating MailKit status report...
+[2026-02-04 16:29:41] [INFO] Starting MailKit assembly verification...
+[2026-02-04 16:29:41] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 16:29:41] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:41] [DEBUG]   - MimeKit Version: 4.14.0.0
+=== MAILKIT STATUS REPORT ===
+Timestamp: 2026-02-04 16:29:41
+Overall Status: READY
+
+ASSEMBLY STATUS:
+- Available: True
+- Load Method: PreLoaded
+- MailKit Version: 4.14.0.0
+- MimeKit Version: 4.14.0.0
+- Dependencies: True
+
+CONFIGURATION STATUS:
+- Email Enabled: True
+- SMTP Configured: True
+- Credential File: True
+- Recipients: True
+- SMTP Server: smtp.gmail.com
+- SMTP Port: 587
+- SSL: True
+
+SYSTEM INFORMATION:
+- PowerShell: 7.5.4
+- CLR: Unknown
+- OS: Microsoft Windows NT 10.0.26200.0
+- Host: MIS02
+
+RECOMMENDATIONS:
+
+[2026-02-04 16:29:41] [INFO] MailKit status report written to log
+[2026-02-04 16:29:41] [INFO] Verifying MailKit assembly...
+[2026-02-04 16:29:41] [SUCCESS] MailKit assembly verification PASSED
+[2026-02-04 16:29:41] [INFO]   - Load Method: PreLoaded
+[2026-02-04 16:29:41] [INFO]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:41] [INFO]   - MimeKit Version: 4.14.0.0
+[2026-02-04 16:29:41] [INFO] Verifying SMTP configuration...
+[2026-02-04 16:29:41] [SUCCESS] SMTP configuration verification PASSED
+[2026-02-04 16:29:41] [INFO]   - Server: smtp.gmail.com:587
+[2026-02-04 16:29:41] [INFO]   - SSL: True
+[2026-02-04 16:29:41] [INFO] Verifying email recipients...
+[2026-02-04 16:29:41] [SUCCESS] Found 2 email recipient(s)
+[2026-02-04 16:29:41] [INFO] Verifying email credentials...
+[2026-02-04 16:29:41] [SUCCESS] Email credential verification PASSED
+[2026-02-04 16:29:41] [INFO]   - Credential file: C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-04 16:29:41] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-04 16:29:41] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-04 16:29:41] [INFO] - SSL Enabled: True
+[2026-02-04 16:29:41] [INFO] - Ensure you're using an App Password, not your regular password
+[2026-02-04 16:29:41] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-04 16:29:42] [INFO] - Enable 2-Step Verification in Google Account
+[2026-02-04 16:29:42] [INFO] - Generate App Password: https://myaccount.google.com/apppasswords
+[2026-02-04 16:29:42] [SUCCESS] Email configuration validation COMPLETE
+[2026-02-04 16:29:42] [INFO] Overall status: READY
+[2026-02-04 16:29:42] [INFO] Skipping interactive test email prompt as per configuration
+[2026-02-04 16:29:42] [SUCCESS] Email configuration validated successfully
+[2026-02-04 16:29:42] [DEBUG] No PID tracking file found
+[2026-02-04 16:29:42] [DEBUG] Check: 16:29:42 | Window: Inactive | Python: Stopped
+[2026-02-04 16:29:42] [INFO] End time reached - no active processes to stop
+[2026-02-04 16:29:42] [INFO] Initiating graceful shutdown: Schedule completed
+[2026-02-04 16:29:42] [DEBUG] Sudden termination tracking saved
+[2026-02-04 16:29:42] [DEBUG] Sudden termination tracking saved
+[2026-02-04 16:29:42] [SUCCESS] Graceful shutdown completed successfully
+[2026-02-04 16:29:42] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-04 16:29:42] [INFO] Cleaning up...
+[2026-02-04 16:29:42] [INFO] =============== Face Recognition Monitor Stopped ===============
+[2026-02-04 16:29:52] [INFO] =============== Face Recognition Monitor Started ===============
+[2026-02-04 16:29:52] [INFO] Monitor Version: 2.1 (Enhanced with MailKit Verification)
+[2026-02-04 16:29:52] [INFO] Performing early MailKit assembly verification...
+[2026-02-04 16:29:52] [INFO] Generating MailKit status report...
+[2026-02-04 16:29:52] [INFO] Starting MailKit assembly verification...
+[2026-02-04 16:29:52] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 16:29:52] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:52] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 16:29:52] [SUCCESS] MailKit is ready for email functionality
+[2026-02-04 16:29:52] [INFO]   - Assembly: PreLoaded
+[2026-02-04 16:29:52] [INFO]   - Version: 4.14.0.0
+[2026-02-04 16:29:52] [INFO] Performing startup cleanup check...
+[2026-02-04 16:29:52] [INFO] Loaded sudden termination tracking: 1 total events, current streak: 0
+[2026-02-04 16:29:52] [INFO] No orphaned processes found on startup
+[2026-02-04 16:29:52] [INFO] Testing email configuration with enhanced MailKit verification...
+[2026-02-04 16:29:52] [INFO] Generating MailKit status report...
+[2026-02-04 16:29:52] [INFO] Starting MailKit assembly verification...
+[2026-02-04 16:29:52] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 16:29:52] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:53] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 16:29:53] [INFO] Generating MailKit status report...
+[2026-02-04 16:29:53] [INFO] Starting MailKit assembly verification...
+[2026-02-04 16:29:53] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 16:29:53] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:53] [DEBUG]   - MimeKit Version: 4.14.0.0
+=== MAILKIT STATUS REPORT ===
+Timestamp: 2026-02-04 16:29:53
+Overall Status: READY
+
+ASSEMBLY STATUS:
+- Available: True
+- Load Method: PreLoaded
+- MailKit Version: 4.14.0.0
+- MimeKit Version: 4.14.0.0
+- Dependencies: True
+
+CONFIGURATION STATUS:
+- Email Enabled: True
+- SMTP Configured: True
+- Credential File: True
+- Recipients: True
+- SMTP Server: smtp.gmail.com
+- SMTP Port: 587
+- SSL: True
+
+SYSTEM INFORMATION:
+- PowerShell: 7.5.4
+- CLR: Unknown
+- OS: Microsoft Windows NT 10.0.26200.0
+- Host: MIS02
+
+RECOMMENDATIONS:
+
+[2026-02-04 16:29:53] [INFO] MailKit status report written to log
+[2026-02-04 16:29:53] [INFO] Verifying MailKit assembly...
+[2026-02-04 16:29:53] [SUCCESS] MailKit assembly verification PASSED
+[2026-02-04 16:29:53] [INFO]   - Load Method: PreLoaded
+[2026-02-04 16:29:53] [INFO]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:29:53] [INFO]   - MimeKit Version: 4.14.0.0
+[2026-02-04 16:29:53] [INFO] Verifying SMTP configuration...
+[2026-02-04 16:29:53] [SUCCESS] SMTP configuration verification PASSED
+[2026-02-04 16:29:53] [INFO]   - Server: smtp.gmail.com:587
+[2026-02-04 16:29:53] [INFO]   - SSL: True
+[2026-02-04 16:29:53] [INFO] Verifying email recipients...
+[2026-02-04 16:29:53] [SUCCESS] Found 2 email recipient(s)
+[2026-02-04 16:29:53] [INFO] Verifying email credentials...
+[2026-02-04 16:29:53] [SUCCESS] Email credential verification PASSED
+[2026-02-04 16:29:53] [INFO]   - Credential file: C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-04 16:29:53] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-04 16:29:53] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-04 16:29:53] [INFO] - SSL Enabled: True
+[2026-02-04 16:29:53] [INFO] - Ensure you're using an App Password, not your regular password
+[2026-02-04 16:29:53] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-04 16:29:53] [INFO] - Enable 2-Step Verification in Google Account
+[2026-02-04 16:29:53] [INFO] - Generate App Password: https://myaccount.google.com/apppasswords
+[2026-02-04 16:29:53] [SUCCESS] Email configuration validation COMPLETE
+[2026-02-04 16:29:53] [INFO] Overall status: READY
+[2026-02-04 16:29:53] [INFO] Skipping interactive test email prompt as per configuration
+[2026-02-04 16:29:53] [SUCCESS] Email configuration validated successfully
+[2026-02-04 16:29:53] [DEBUG] No PID tracking file found
+[2026-02-04 16:29:53] [INFO] Checking for orphaned runs...
+[2026-02-04 16:29:53] [INFO] Checking for orphaned runs...
+[2026-02-04 16:29:53] [DEBUG] Check: 16:29:53 | Window: Active | Python: Stopped
+[2026-02-04 16:29:53] [DEBUG] Check: 16:29:53 | Window: Active | Python: Stopped
+[2026-02-04 16:29:53] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-04 16:29:53] [DEBUG] Searching for Python process...
+[2026-02-04 16:29:54] [DEBUG] No Python process found matching criteria
+[2026-02-04 16:29:54] [INFO] Starting face recognition worker process...
+[2026-02-04 16:29:54] [SUCCESS] Worker process started (PID: 24608)
+[2026-02-04 16:29:54] [INFO] Waiting for Python process to start...
+[2026-02-04 16:29:54] [DEBUG] Searching for Python process...
+[2026-02-04 16:29:54] [DEBUG] No Python process found matching criteria
+[2026-02-04 16:29:56] [DEBUG] Searching for Python process...
+[2026-02-04 16:29:57] [SUCCESS] Found Python process with our script: PID=38916
+[2026-02-04 16:29:57] [SUCCESS] Python process found (PID: 38916)
+[2026-02-04 16:29:57] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 16:29:57] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 16:29:57] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-04 16:30:02] [DEBUG] Check: 16:30:02 | Window: Active | Python: Running (PID: 38916)
+[2026-02-04 16:30:07] [DEBUG] Check: 16:30:07 | Window: Active | Python: Running (PID: 38916)
+[2026-02-04 16:30:12] [DEBUG] Check: 16:30:12 | Window: Active | Python: Running (PID: 38916)
+[2026-02-04 16:30:17] [DEBUG] Check: 16:30:17 | Window: Active | Python: Running (PID: 38916)
+[2026-02-04 16:30:22] [DEBUG] Check: 16:30:22 | Window: Active | Python: Running (PID: 38916)
+[2026-02-04 16:30:27] [DEBUG] Check: 16:30:27 | Window: Active | Python: Running (PID: 38916)
+[2026-02-04 16:30:32] [DEBUG] Searching for Python process...
+[2026-02-04 16:30:32] [DEBUG] No Python process found matching criteria
+[2026-02-04 16:30:32] [WARN] Detected unexpected process stop. Worker: True -> False, Python: True -> False
+[2026-02-04 16:30:32] [DEBUG] Check: 16:30:32 | Window: Active | Python: Stopped
+[2026-02-04 16:30:32] [DEBUG] Check: 16:30:32 | Window: Active | Python: Stopped
+[2026-02-04 16:30:32] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-04 16:30:32] [DEBUG] Searching for Python process...
+[2026-02-04 16:30:32] [DEBUG] No Python process found matching criteria
+[2026-02-04 16:30:32] [INFO] Starting face recognition worker process...
+[2026-02-04 16:30:32] [SUCCESS] Worker process started (PID: 29352)
+[2026-02-04 16:30:33] [INFO] Waiting for Python process to start...
+[2026-02-04 16:30:33] [DEBUG] Searching for Python process...
+[2026-02-04 16:30:33] [DEBUG] No Python process found matching criteria
+[2026-02-04 16:30:35] [DEBUG] Searching for Python process...
+[2026-02-04 16:30:35] [SUCCESS] Found Python process with our script: PID=9120
+[2026-02-04 16:30:35] [SUCCESS] Python process found (PID: 9120)
+[2026-02-04 16:30:35] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 16:30:35] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 16:30:35] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-04 16:30:40] [INFO] Generating MailKit status report...
+[2026-02-04 16:30:40] [INFO] Starting MailKit assembly verification...
+[2026-02-04 16:30:40] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 16:30:40] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:30:40] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 16:30:40] [DEBUG] Check: 16:30:40 | Window: Active | Python: Running (PID: 9120)
+[2026-02-04 16:30:45] [DEBUG] Check: 16:30:45 | Window: Active | Python: Running (PID: 9120)
+[2026-02-04 16:30:50] [DEBUG] Check: 16:30:50 | Window: Active | Python: Running (PID: 9120)
+[2026-02-04 16:30:55] [DEBUG] Check: 16:30:55 | Window: Active | Python: Running (PID: 9120)
+[2026-02-04 16:31:00] [INFO] Generating MailKit status report...
+[2026-02-04 16:31:00] [INFO] Starting MailKit assembly verification...
+[2026-02-04 16:31:00] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 16:31:00] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 16:31:00] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 16:31:00] [DEBUG] Check: 16:31:00 | Window: Inactive | Python: Running (PID: 9120)
+[2026-02-04 16:31:00] [INFO] End time reached - stopping processes...
+[2026-02-04 16:31:01] [INFO] Stopping worker process. Reason: Unexpected Process Stop
+[2026-02-04 16:31:01] [DEBUG] Process stop recorded: ProcessStop - Unexpected Process Stop (Unexpected: True)
+[2026-02-04 16:31:01] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 16:31:01] [WARN] Unexpected stop detected - validating and collecting current run...
+[2026-02-04 16:31:01] [INFO] Performing validation on stop: Unexpected Process Stop
+[2026-02-04 16:31:01] [DEBUG] No current run folder, finding latest...
+[2026-02-04 16:31:01] [DEBUG] Validating latest run folder on stop: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 16:31:01] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 16:31:01] [DEBUG]   Found run log: run_2026-02-03_16-58-54.log
+[2026-02-04 16:31:01] [DEBUG]   Found metadata.json
+[2026-02-04 16:31:01] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-03_16-58-54 (0 MB)
+[2026-02-04 16:31:01] [SUCCESS] Collected latest run on stop: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 16:31:01] [DEBUG] Enhanced PID tracking saved with 1 collected folders
+[2026-02-04 16:31:01] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 16:31:02] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 16:31:02] [INFO] Stopping Python process (PID: 9120)...
+[2026-02-04 16:31:04] [WARN] Forcefully terminating Python process...
+[2026-02-04 16:31:04] [SUCCESS] Python process terminated
+[2026-02-04 16:31:04] [INFO] Stopping worker process (PID: 29352)...
+[2026-02-04 16:31:06] [SUCCESS] Worker process exited gracefully
+[2026-02-04 16:31:06] [DEBUG] Removed PID tracking file
+[2026-02-04 16:31:06] [INFO] Stopped processes: Python, Worker
+[2026-02-04 16:31:06] [INFO] Waiting for output generation...
+[2026-02-04 16:31:16] [INFO] Validating final worker output...
+[2026-02-04 16:31:16] [INFO] Validating face recognition output structure...
+[2026-02-04 16:31:16] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 16:31:16] [DEBUG] Found subfolder: logs
+[2026-02-04 16:31:16] [DEBUG] Found subfolder: script_output
+[2026-02-04 16:31:16] [DEBUG] Metadata file is valid JSON
+[2026-02-04 16:31:16] [DEBUG] Metadata file size: 1.33 KB
+[2026-02-04 16:31:16] [DEBUG] Found 3 log files
+[2026-02-04 16:31:16] [DEBUG] completion_summary.txt size: 4.4 KB
+[2026-02-04 16:31:16] [DEBUG] python_output.txt size: 115.31 KB
+[2026-02-04 16:31:16] [DEBUG] Latest run log: run_2026-02-03_16-58-54.log (2.64 KB)
+[2026-02-04 16:31:16] [DEBUG] Script output contains 1 items
+[2026-02-04 16:31:16] [DEBUG] Total folder size: 0.12 MB
+[2026-02-04 16:31:16] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-04 16:31:16] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-04 16:31:16] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 16:31:16] [SUCCESS]   - Created: 02/03/2026 16:58:54
+[2026-02-04 16:31:16] [SUCCESS]   - Size: 0.12 MB
+[2026-02-04 16:31:16] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-04 16:31:16] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 16:31:16] [DEBUG]   Found run log: run_2026-02-03_16-58-54.log
+[2026-02-04 16:31:16] [DEBUG]   Found metadata.json
+[2026-02-04 16:31:16] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-03_16-58-54 (0 MB)
+[2026-02-04 16:31:16] [INFO] Preparing to send completion notifications to 2 recipient(s) using MailKit...
+[2026-02-04 16:31:16] [DEBUG] Email credential loaded from C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-04 16:31:16] [INFO] Using pre-collected attachments: 2 files
+[2026-02-04 16:31:16] [DEBUG] Found latest run log: run_2026-02-03_16-58-54.log
+[2026-02-04 16:31:16] [DEBUG] Found metadata.json
+[2026-02-04 16:31:16] [INFO] Using MailKit v4.14.0.0 for email sending
+[2026-02-04 16:31:16] [INFO] Sending emails in 2 different language(s) using MailKit
+[2026-02-04 16:31:16] [INFO] Sending English email to: faridraihan17@gmail.com
+[2026-02-04 16:31:17] [DEBUG] Using MailKit 4.0+ API for message construction
+[2026-02-04 16:31:17] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\logs\run_2026-02-03_16-58-54.log
+[2026-02-04 16:31:17] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\metadata.json
+[2026-02-04 16:31:17] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\logs\run_2026-02-03_16-58-54.log
+[2026-02-04 16:31:17] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\metadata.json
+[2026-02-04 16:31:17] [DEBUG] Connecting to SMTP server smtp.gmail.com:587 (SSL: True)...
+[2026-02-04 16:31:18] [DEBUG] Authenticating as faridraihan17@gmail.com...
+[2026-02-04 16:31:18] [DEBUG] Sending email...
+[2026-02-04 16:31:20] [SUCCESS] Email sent successfully using MailKit
+[2026-02-04 16:31:20] [SUCCESS] Successfully sent English email to 1 recipient(s) using MailKit
+[2026-02-04 16:31:20] [INFO] Sending Bahasa email to: ikeepmypromiz@gmail.com
+[2026-02-04 16:31:20] [DEBUG] Using MailKit 4.0+ API for message construction
+[2026-02-04 16:31:20] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\logs\run_2026-02-03_16-58-54.log
+[2026-02-04 16:31:20] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\metadata.json
+[2026-02-04 16:31:20] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\logs\run_2026-02-03_16-58-54.log
+[2026-02-04 16:31:20] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\metadata.json
+[2026-02-04 16:31:20] [DEBUG] Connecting to SMTP server smtp.gmail.com:587 (SSL: True)...
+[2026-02-04 16:31:21] [DEBUG] Authenticating as faridraihan17@gmail.com...
+[2026-02-04 16:31:22] [DEBUG] Sending email...
+[2026-02-04 16:31:24] [SUCCESS] Email sent successfully using MailKit
+[2026-02-04 16:31:24] [SUCCESS] Successfully sent Bahasa email to 1 recipient(s) using MailKit
+[2026-02-04 16:31:24] [SUCCESS] All emails sent successfully using MailKit (2 total recipients)
+[2026-02-04 16:31:24] [SUCCESS] Completion emails sent successfully with 1 collected runs.
+[2026-02-04 16:31:24] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 16:31:24] [INFO] Initiating graceful shutdown: Schedule completed
+[2026-02-04 16:31:24] [INFO] Stopping worker process. Reason: Normal Shutdown
+[2026-02-04 16:31:24] [DEBUG] Process stop recorded: ProcessStop - Normal Shutdown (Unexpected: False)
+[2026-02-04 16:31:24] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 16:31:24] [DEBUG] Sudden termination tracking saved
+[2026-02-04 16:31:24] [DEBUG] Sudden termination tracking saved
+[2026-02-04 16:31:24] [SUCCESS] Graceful shutdown completed successfully
+[2026-02-04 16:31:24] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-04 16:31:24] [INFO] Cleaning up...
+[2026-02-04 16:31:24] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 16:31:24] [DEBUG]   Found run log: run_2026-02-03_16-58-54.log
+[2026-02-04 16:31:24] [DEBUG]   Found metadata.json
+[2026-02-04 16:31:24] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-03_16-58-54 (0 MB)
+[2026-02-04 16:31:24] [INFO] Collected final run during cleanup: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 16:31:24] [INFO] Stopping worker process. Reason: Normal Shutdown
+[2026-02-04 16:31:24] [DEBUG] Process stop recorded: ProcessStop - Normal Shutdown (Unexpected: False)
+[2026-02-04 16:31:24] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 16:31:24] [DEBUG] Process stop recorded: Shutdown - Monitor stopping (Unexpected: False)
+[2026-02-04 16:31:24] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 16:31:24] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 16:31:24] [INFO] =============== Face Recognition Monitor Stopped ===============
+[2026-02-04 17:00:09] [INFO] =============== Face Recognition Monitor Started ===============
+[2026-02-04 17:00:09] [INFO] Monitor Version: 2.1 (Enhanced with MailKit Verification)
+[2026-02-04 17:00:09] [INFO] Performing early MailKit assembly verification...
+[2026-02-04 17:00:09] [INFO] Generating MailKit status report...
+[2026-02-04 17:00:09] [INFO] Starting MailKit assembly verification...
+[2026-02-04 17:00:09] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 17:00:09] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 17:00:09] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 17:00:09] [SUCCESS] MailKit is ready for email functionality
+[2026-02-04 17:00:09] [INFO]   - Assembly: PreLoaded
+[2026-02-04 17:00:09] [INFO]   - Version: 4.14.0.0
+[2026-02-04 17:00:09] [INFO] Performing startup cleanup check...
+[2026-02-04 17:00:09] [INFO] Loaded sudden termination tracking: 1 total events, current streak: 0
+[2026-02-04 17:00:09] [INFO] No orphaned processes found on startup
+[2026-02-04 17:00:09] [INFO] Testing email configuration with enhanced MailKit verification...
+[2026-02-04 17:00:09] [INFO] Generating MailKit status report...
+[2026-02-04 17:00:09] [INFO] Starting MailKit assembly verification...
+[2026-02-04 17:00:09] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 17:00:09] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 17:00:09] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 17:00:09] [INFO] Generating MailKit status report...
+[2026-02-04 17:00:09] [INFO] Starting MailKit assembly verification...
+[2026-02-04 17:00:09] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 17:00:09] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 17:00:09] [DEBUG]   - MimeKit Version: 4.14.0.0
+=== MAILKIT STATUS REPORT ===
+Timestamp: 2026-02-04 17:00:09
+Overall Status: READY
+
+ASSEMBLY STATUS:
+- Available: True
+- Load Method: PreLoaded
+- MailKit Version: 4.14.0.0
+- MimeKit Version: 4.14.0.0
+- Dependencies: True
+
+CONFIGURATION STATUS:
+- Email Enabled: True
+- SMTP Configured: True
+- Credential File: True
+- Recipients: True
+- SMTP Server: smtp.gmail.com
+- SMTP Port: 587
+- SSL: True
+
+SYSTEM INFORMATION:
+- PowerShell: 7.5.4
+- CLR: Unknown
+- OS: Microsoft Windows NT 10.0.26200.0
+- Host: MIS02
+
+RECOMMENDATIONS:
+
+[2026-02-04 17:00:09] [INFO] MailKit status report written to log
+[2026-02-04 17:00:09] [INFO] Verifying MailKit assembly...
+[2026-02-04 17:00:09] [SUCCESS] MailKit assembly verification PASSED
+[2026-02-04 17:00:09] [INFO]   - Load Method: PreLoaded
+[2026-02-04 17:00:09] [INFO]   - MailKit Version: 4.14.0.0
+[2026-02-04 17:00:09] [INFO]   - MimeKit Version: 4.14.0.0
+[2026-02-04 17:00:09] [INFO] Verifying SMTP configuration...
+[2026-02-04 17:00:09] [SUCCESS] SMTP configuration verification PASSED
+[2026-02-04 17:00:10] [INFO]   - Server: smtp.gmail.com:587
+[2026-02-04 17:00:10] [INFO]   - SSL: True
+[2026-02-04 17:00:10] [INFO] Verifying email recipients...
+[2026-02-04 17:00:10] [SUCCESS] Found 2 email recipient(s)
+[2026-02-04 17:00:10] [INFO] Verifying email credentials...
+[2026-02-04 17:00:10] [SUCCESS] Email credential verification PASSED
+[2026-02-04 17:00:10] [INFO]   - Credential file: C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-04 17:00:10] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-04 17:00:10] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-04 17:00:10] [INFO] - SSL Enabled: True
+[2026-02-04 17:00:10] [INFO] - Ensure you're using an App Password, not your regular password
+[2026-02-04 17:00:10] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-04 17:00:10] [INFO] - Enable 2-Step Verification in Google Account
+[2026-02-04 17:00:10] [INFO] - Generate App Password: https://myaccount.google.com/apppasswords
+[2026-02-04 17:00:10] [SUCCESS] Email configuration validation COMPLETE
+[2026-02-04 17:00:10] [INFO] Overall status: READY
+[2026-02-04 17:00:10] [INFO] Skipping interactive test email prompt as per configuration
+[2026-02-04 17:00:10] [SUCCESS] Email configuration validated successfully
+[2026-02-04 17:00:10] [DEBUG] No PID tracking file found
+[2026-02-04 17:00:10] [INFO] Loaded persistent tracking with 1 collected folders
+[2026-02-04 17:00:10] [INFO] Checking for orphaned runs...
+[2026-02-04 17:00:10] [DEBUG] Validating last known folder: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 17:00:10] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 17:00:10] [DEBUG]   Found run log: run_2026-02-03_16-58-54.log
+[2026-02-04 17:00:10] [DEBUG]   Found metadata.json
+[2026-02-04 17:00:10] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-03_16-58-54 (0 MB)
+[2026-02-04 17:00:10] [INFO] Loaded persistent tracking with 1 collected folders
+[2026-02-04 17:00:10] [INFO] Checking for orphaned runs...
+[2026-02-04 17:00:10] [DEBUG] Validating last known folder: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 17:00:10] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 17:00:10] [DEBUG]   Found run log: run_2026-02-03_16-58-54.log
+[2026-02-04 17:00:10] [DEBUG]   Found metadata.json
+[2026-02-04 17:00:10] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-03_16-58-54 (0 MB)
+[2026-02-04 17:00:11] [DEBUG] Console control handler registered
+[2026-02-04 17:00:11] [DEBUG] Check: 17:00:11 | Window: Inactive | Python: Stopped
+[2026-02-04 17:00:11] [INFO] End time reached - no active processes to stop
+[2026-02-04 17:00:11] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:00:11] [INFO] Initiating graceful shutdown: Schedule completed
+[2026-02-04 17:00:11] [INFO] Stopping worker process. Reason: Normal Shutdown
+[2026-02-04 17:00:11] [DEBUG] Process stop recorded: ProcessStop - Normal Shutdown (Unexpected: False)
+[2026-02-04 17:00:11] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:00:11] [DEBUG] Sudden termination tracking saved
+[2026-02-04 17:00:11] [DEBUG] Sudden termination tracking saved
+[2026-02-04 17:00:11] [SUCCESS] Graceful shutdown completed successfully
+[2026-02-04 17:00:11] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-04 17:00:11] [INFO] Cleaning up...
+[2026-02-04 17:00:11] [INFO] Stopping worker process. Reason: Normal Shutdown
+[2026-02-04 17:00:11] [DEBUG] Process stop recorded: ProcessStop - Normal Shutdown (Unexpected: False)
+[2026-02-04 17:00:11] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:00:11] [DEBUG] Process stop recorded: Shutdown - Monitor stopping (Unexpected: False)
+[2026-02-04 17:00:11] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:00:11] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:00:11] [INFO] =============== Face Recognition Monitor Stopped ===============
+[2026-02-04 17:00:35] [INFO] =============== Face Recognition Monitor Started ===============
+[2026-02-04 17:00:35] [INFO] Monitor Version: 2.1 (Enhanced with MailKit Verification)
+[2026-02-04 17:00:35] [INFO] Performing early MailKit assembly verification...
+[2026-02-04 17:00:35] [INFO] Generating MailKit status report...
+[2026-02-04 17:00:35] [INFO] Starting MailKit assembly verification...
+[2026-02-04 17:00:36] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 17:00:36] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 17:00:36] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 17:00:36] [SUCCESS] MailKit is ready for email functionality
+[2026-02-04 17:00:36] [INFO]   - Assembly: PreLoaded
+[2026-02-04 17:00:36] [INFO]   - Version: 4.14.0.0
+[2026-02-04 17:00:36] [INFO] Performing startup cleanup check...
+[2026-02-04 17:00:36] [INFO] Loaded sudden termination tracking: 1 total events, current streak: 0
+[2026-02-04 17:00:36] [INFO] No orphaned processes found on startup
+[2026-02-04 17:00:36] [INFO] Testing email configuration with enhanced MailKit verification...
+[2026-02-04 17:00:36] [INFO] Generating MailKit status report...
+[2026-02-04 17:00:36] [INFO] Starting MailKit assembly verification...
+[2026-02-04 17:00:36] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 17:00:36] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 17:00:36] [DEBUG]   - MimeKit Version: 4.14.0.0
+[2026-02-04 17:00:36] [INFO] Generating MailKit status report...
+[2026-02-04 17:00:36] [INFO] Starting MailKit assembly verification...
+[2026-02-04 17:00:36] [INFO] MailKit is already loaded into current AppDomain
+[2026-02-04 17:00:36] [DEBUG]   - MailKit Version: 4.14.0.0
+[2026-02-04 17:00:36] [DEBUG]   - MimeKit Version: 4.14.0.0
+=== MAILKIT STATUS REPORT ===
+Timestamp: 2026-02-04 17:00:36
+Overall Status: READY
+
+ASSEMBLY STATUS:
+- Available: True
+- Load Method: PreLoaded
+- MailKit Version: 4.14.0.0
+- MimeKit Version: 4.14.0.0
+- Dependencies: True
+
+CONFIGURATION STATUS:
+- Email Enabled: True
+- SMTP Configured: True
+- Credential File: True
+- Recipients: True
+- SMTP Server: smtp.gmail.com
+- SMTP Port: 587
+- SSL: True
+
+SYSTEM INFORMATION:
+- PowerShell: 7.5.4
+- CLR: Unknown
+- OS: Microsoft Windows NT 10.0.26200.0
+- Host: MIS02
+
+RECOMMENDATIONS:
+
+[2026-02-04 17:00:36] [INFO] MailKit status report written to log
+[2026-02-04 17:00:36] [INFO] Verifying MailKit assembly...
+[2026-02-04 17:00:36] [SUCCESS] MailKit assembly verification PASSED
+[2026-02-04 17:00:36] [INFO]   - Load Method: PreLoaded
+[2026-02-04 17:00:36] [INFO]   - MailKit Version: 4.14.0.0
+[2026-02-04 17:00:36] [INFO]   - MimeKit Version: 4.14.0.0
+[2026-02-04 17:00:36] [INFO] Verifying SMTP configuration...
+[2026-02-04 17:00:36] [SUCCESS] SMTP configuration verification PASSED
+[2026-02-04 17:00:36] [INFO]   - Server: smtp.gmail.com:587
+[2026-02-04 17:00:36] [INFO]   - SSL: True
+[2026-02-04 17:00:36] [INFO] Verifying email recipients...
+[2026-02-04 17:00:36] [SUCCESS] Found 2 email recipient(s)
+[2026-02-04 17:00:36] [INFO] Verifying email credentials...
+[2026-02-04 17:00:36] [SUCCESS] Email credential verification PASSED
+[2026-02-04 17:00:36] [INFO]   - Credential file: C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-04 17:00:36] [INFO] GMAIL CONFIGURATION NOTES:
+[2026-02-04 17:00:36] [INFO] - Using SMTP: smtp.gmail.com:587
+[2026-02-04 17:00:36] [INFO] - SSL Enabled: True
+[2026-02-04 17:00:36] [INFO] - Ensure you're using an App Password, not your regular password
+[2026-02-04 17:00:36] [INFO] - Gmail attachment limit: 25 MB total
+[2026-02-04 17:00:36] [INFO] - Enable 2-Step Verification in Google Account
+[2026-02-04 17:00:36] [INFO] - Generate App Password: https://myaccount.google.com/apppasswords
+[2026-02-04 17:00:36] [SUCCESS] Email configuration validation COMPLETE
+[2026-02-04 17:00:36] [INFO] Overall status: READY
+[2026-02-04 17:00:36] [INFO] Skipping interactive test email prompt as per configuration
+[2026-02-04 17:00:36] [SUCCESS] Email configuration validated successfully
+[2026-02-04 17:00:36] [DEBUG] No PID tracking file found
+[2026-02-04 17:00:36] [INFO] Loaded persistent tracking with 0 collected folders
+[2026-02-04 17:00:36] [INFO] Checking for orphaned runs...
+[2026-02-04 17:00:36] [INFO] Loaded persistent tracking with 0 collected folders
+[2026-02-04 17:00:36] [INFO] Checking for orphaned runs...
+[2026-02-04 17:00:37] [DEBUG] Console control handler registered
+[2026-02-04 17:00:37] [DEBUG] Check: 17:00:37 | Window: Active | Python: Stopped
+[2026-02-04 17:00:37] [DEBUG] Check: 17:00:37 | Window: Active | Python: Stopped
+[2026-02-04 17:00:37] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-04 17:00:37] [DEBUG] Searching for Python process...
+[2026-02-04 17:00:37] [DEBUG] No Python process found matching criteria
+[2026-02-04 17:00:37] [INFO] Starting face recognition worker process...
+[2026-02-04 17:00:37] [SUCCESS] Worker process started (PID: 40164)
+[2026-02-04 17:00:37] [INFO] Waiting for Python process to start...
+[2026-02-04 17:00:37] [DEBUG] Searching for Python process...
+[2026-02-04 17:00:37] [DEBUG] No Python process found matching criteria
+[2026-02-04 17:00:39] [DEBUG] Searching for Python process...
+[2026-02-04 17:00:40] [SUCCESS] Found Python process with our script: PID=20432
+[2026-02-04 17:00:40] [SUCCESS] Python process found (PID: 20432)
+[2026-02-04 17:00:40] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 17:00:40] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:00:40] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-04 17:00:45] [DEBUG] Check: 17:00:45 | Window: Active | Python: Running (PID: 20432)
+[2026-02-04 17:00:50] [DEBUG] Check: 17:00:50 | Window: Active | Python: Running (PID: 20432)
+[2026-02-04 17:00:55] [DEBUG] Check: 17:00:55 | Window: Active | Python: Running (PID: 20432)
+[2026-02-04 17:01:01] [DEBUG] Check: 17:01:01 | Window: Active | Python: Running (PID: 20432)
+[2026-02-04 17:01:06] [DEBUG] Check: 17:01:06 | Window: Active | Python: Running (PID: 20432)
+[2026-02-04 17:01:11] [DEBUG] Check: 17:01:11 | Window: Active | Python: Running (PID: 20432)
+[2026-02-04 17:01:16] [DEBUG] Check: 17:01:16 | Window: Active | Python: Running (PID: 20432)
+[2026-02-04 17:01:21] [DEBUG] Check: 17:01:21 | Window: Active | Python: Running (PID: 20432)
+[2026-02-04 17:01:26] [DEBUG] Searching for Python process...
+[2026-02-04 17:01:26] [DEBUG] No Python process found matching criteria
+[2026-02-04 17:01:26] [WARN] Detected unexpected process stop. Worker: True -> False, Python: True -> False
+[2026-02-04 17:01:26] [DEBUG] Check: 17:01:26 | Window: Active | Python: Stopped
+[2026-02-04 17:01:26] [DEBUG] Check: 17:01:26 | Window: Active | Python: Stopped
+[2026-02-04 17:01:26] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-04 17:01:26] [DEBUG] Searching for Python process...
+[2026-02-04 17:01:26] [DEBUG] No Python process found matching criteria
+[2026-02-04 17:01:26] [INFO] Starting face recognition worker process...
+[2026-02-04 17:01:26] [SUCCESS] Worker process started (PID: 35524)
+[2026-02-04 17:01:26] [INFO] Waiting for Python process to start...
+[2026-02-04 17:01:26] [DEBUG] Searching for Python process...
+[2026-02-04 17:01:26] [DEBUG] No Python process found matching criteria
+[2026-02-04 17:01:28] [DEBUG] Searching for Python process...
+[2026-02-04 17:01:28] [SUCCESS] Found Python process with our script: PID=10024
+[2026-02-04 17:01:28] [SUCCESS] Python process found (PID: 10024)
+[2026-02-04 17:01:28] [DEBUG] Enhanced PID tracking saved with 0 collected folders
+[2026-02-04 17:01:28] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:01:28] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-04 17:01:33] [DEBUG] Check: 17:01:33 | Window: Active | Python: Running (PID: 10024)
+[2026-02-04 17:01:38] [DEBUG] Check: 17:01:38 | Window: Active | Python: Running (PID: 10024)
+[2026-02-04 17:01:43] [DEBUG] Check: 17:01:43 | Window: Active | Python: Running (PID: 10024)
+[2026-02-04 17:01:48] [DEBUG] Check: 17:01:48 | Window: Active | Python: Running (PID: 10024)
+[2026-02-04 17:01:53] [DEBUG] Check: 17:01:53 | Window: Active | Python: Running (PID: 10024)
+[2026-02-04 17:01:58] [DEBUG] Check: 17:01:58 | Window: Active | Python: Running (PID: 10024)
+[2026-02-04 17:02:03] [DEBUG] Check: 17:02:03 | Window: Inactive | Python: Running (PID: 10024)
+[2026-02-04 17:02:03] [INFO] End time reached - stopping processes...
+[2026-02-04 17:02:03] [INFO] Stopping worker process. Reason: Unexpected Process Stop
+[2026-02-04 17:02:03] [DEBUG] Process stop recorded: ProcessStop - Unexpected Process Stop (Unexpected: True)
+[2026-02-04 17:02:03] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:02:03] [WARN] Unexpected stop detected - validating and collecting current run...
+[2026-02-04 17:02:03] [INFO] Performing validation on stop: Unexpected Process Stop
+[2026-02-04 17:02:04] [DEBUG] No current run folder, finding latest...
+[2026-02-04 17:02:04] [DEBUG] Validating latest run folder on stop: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 17:02:04] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 17:02:04] [DEBUG]   Found run log: run_2026-02-03_16-58-54.log
+[2026-02-04 17:02:04] [DEBUG]   Found metadata.json
+[2026-02-04 17:02:04] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-03_16-58-54 (0 MB)
+[2026-02-04 17:02:04] [SUCCESS] Collected latest run on stop: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 17:02:04] [DEBUG] Enhanced PID tracking saved with 1 collected folders
+[2026-02-04 17:02:04] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:02:04] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:02:04] [INFO] Stopping Python process (PID: 10024)...
+[2026-02-04 17:02:06] [WARN] Forcefully terminating Python process...
+[2026-02-04 17:02:06] [SUCCESS] Python process terminated
+[2026-02-04 17:02:06] [INFO] Stopping worker process (PID: 35524)...
+[2026-02-04 17:02:08] [SUCCESS] Worker process exited gracefully
+[2026-02-04 17:02:08] [DEBUG] Removed PID tracking file
+[2026-02-04 17:02:08] [INFO] Stopped processes: Python, Worker
+[2026-02-04 17:02:08] [INFO] Waiting for output generation...
+[2026-02-04 17:02:18] [INFO] Validating final worker output...
+[2026-02-04 17:02:18] [INFO] Validating face recognition output structure...
+[2026-02-04 17:02:18] [INFO] Validating folder structure for: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 17:02:18] [DEBUG] Found subfolder: logs
+[2026-02-04 17:02:18] [DEBUG] Found subfolder: script_output
+[2026-02-04 17:02:18] [DEBUG] Metadata file is valid JSON
+[2026-02-04 17:02:18] [DEBUG] Metadata file size: 1.33 KB
+[2026-02-04 17:02:18] [DEBUG] Found 3 log files
+[2026-02-04 17:02:19] [DEBUG] completion_summary.txt size: 4.4 KB
+[2026-02-04 17:02:19] [DEBUG] python_output.txt size: 115.31 KB
+[2026-02-04 17:02:19] [DEBUG] Latest run log: run_2026-02-03_16-58-54.log (2.64 KB)
+[2026-02-04 17:02:19] [DEBUG] Script output contains 1 items
+[2026-02-04 17:02:19] [DEBUG] Total folder size: 0.12 MB
+[2026-02-04 17:02:19] [DEBUG] Total attachment size: 0.01 MB
+[2026-02-04 17:02:19] [SUCCESS] VALIDATION SUCCESS: Folder structure complete
+[2026-02-04 17:02:19] [SUCCESS]   - Path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 17:02:19] [SUCCESS]   - Created: 02/03/2026 16:58:54
+[2026-02-04 17:02:19] [SUCCESS]   - Size: 0.12 MB
+[2026-02-04 17:02:19] [SUCCESS]   - Attachments: 0.01 MB
+[2026-02-04 17:02:19] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 17:02:19] [DEBUG]   Found run log: run_2026-02-03_16-58-54.log
+[2026-02-04 17:02:19] [DEBUG]   Found metadata.json
+[2026-02-04 17:02:19] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-03_16-58-54 (0 MB)
+[2026-02-04 17:02:19] [INFO] Preparing to send completion notifications to 2 recipient(s)...
+[2026-02-04 17:02:19] [DEBUG] Email credential loaded from C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-04 17:02:19] [INFO] Using pre-collected attachments: 2 files
+[2026-02-04 17:02:19] [DEBUG] Found latest run log: run_2026-02-03_16-58-54.log
+[2026-02-04 17:02:19] [DEBUG] Found metadata.json
+[2026-02-04 17:02:19] [INFO] Sending emails in 2 different language(s)
+[2026-02-04 17:02:19] [INFO] Sending English email to: faridraihan17@gmail.com
+[2026-02-04 17:02:19] [INFO] Using MailKit v4.14.0.0 for email sending
+[2026-02-04 17:02:19] [DEBUG] Using MailKit 4.0+ API for message construction
+[2026-02-04 17:02:19] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\logs\run_2026-02-03_16-58-54.log
+[2026-02-04 17:02:19] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\metadata.json
+[2026-02-04 17:02:19] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\logs\run_2026-02-03_16-58-54.log
+[2026-02-04 17:02:19] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\metadata.json
+[2026-02-04 17:02:19] [DEBUG] Connecting to SMTP server smtp.gmail.com:587 (SSL: True)...
+[2026-02-04 17:02:20] [DEBUG] Authenticating as faridraihan17@gmail.com...
+[2026-02-04 17:02:21] [DEBUG] Sending email...
+[2026-02-04 17:02:23] [SUCCESS] Email sent successfully using MailKit
+[2026-02-04 17:02:23] [SUCCESS] Successfully sent English email to 1 recipient(s)
+[2026-02-04 17:02:23] [INFO] Sending Bahasa email to: ikeepmypromiz@gmail.com
+[2026-02-04 17:02:23] [INFO] Using MailKit v4.14.0.0 for email sending
+[2026-02-04 17:02:23] [DEBUG] Using MailKit 4.0+ API for message construction
+[2026-02-04 17:02:23] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\logs\run_2026-02-03_16-58-54.log
+[2026-02-04 17:02:23] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\metadata.json
+[2026-02-04 17:02:23] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\logs\run_2026-02-03_16-58-54.log
+[2026-02-04 17:02:23] [DEBUG] Added attachment using BodyBuilder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\Magick_Process_MaskDetect_2026-02-03_16-58-54\metadata.json
+[2026-02-04 17:02:23] [DEBUG] Connecting to SMTP server smtp.gmail.com:587 (SSL: True)...
+[2026-02-04 17:02:24] [DEBUG] Authenticating as faridraihan17@gmail.com...
+[2026-02-04 17:02:24] [DEBUG] Sending email...
+[2026-02-04 17:02:26] [SUCCESS] Email sent successfully using MailKit
+[2026-02-04 17:02:26] [SUCCESS] Successfully sent Bahasa email to 1 recipient(s)
+[2026-02-04 17:02:26] [SUCCESS] All emails sent successfully (2 total recipients)
+[2026-02-04 17:02:26] [SUCCESS] Completion emails sent successfully with 1 collected runs.
+[2026-02-04 17:02:26] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:02:27] [INFO] Initiating graceful shutdown: Schedule completed
+[2026-02-04 17:02:27] [INFO] Stopping worker process. Reason: Normal Shutdown
+[2026-02-04 17:02:27] [DEBUG] Process stop recorded: ProcessStop - Normal Shutdown (Unexpected: False)
+[2026-02-04 17:02:27] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:02:27] [DEBUG] Sudden termination tracking saved
+[2026-02-04 17:02:27] [DEBUG] Sudden termination tracking saved
+[2026-02-04 17:02:27] [SUCCESS] Graceful shutdown completed successfully
+[2026-02-04 17:02:27] [INFO] Process completed. Stopping monitor as configured...
+[2026-02-04 17:02:27] [INFO] Cleaning up...
+[2026-02-04 17:02:27] [DEBUG] Collecting attachments from: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 17:02:27] [DEBUG]   Found run log: run_2026-02-03_16-58-54.log
+[2026-02-04 17:02:27] [DEBUG]   Found metadata.json
+[2026-02-04 17:02:27] [INFO] Collected 2 files from Magick_Process_MaskDetect_2026-02-03_16-58-54 (0 MB)
+[2026-02-04 17:02:27] [INFO] Collected final run during cleanup: Magick_Process_MaskDetect_2026-02-03_16-58-54
+[2026-02-04 17:02:27] [INFO] Stopping worker process. Reason: Normal Shutdown
+[2026-02-04 17:02:27] [DEBUG] Process stop recorded: ProcessStop - Normal Shutdown (Unexpected: False)
+[2026-02-04 17:02:27] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:02:27] [DEBUG] Process stop recorded: Shutdown - Monitor stopping (Unexpected: False)
+[2026-02-04 17:02:27] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:02:27] [DEBUG] Persistent tracking saved to: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\persistent_tracking.json
+[2026-02-04 17:02:27] [INFO] =============== Face Recognition Monitor Stopped ===============
