@@ -1,0 +1,13 @@
+{
+  "python_script": "A:\\SCMA\\3-APD\\Recognition-0\\faceRecog\\run_py\\modular\\entry_multi-USED-Laptop.py",
+  "start_time": "2026-01-24 16:38:39",
+  "run_folder": "A:\\SCMA\\3-APD\\Recognition-0\\faceRecog\\process-run\\Run_Process_Laptop_2026-01-24_16-38-39",
+  "powershell_script": "process-run-0.ps1",
+  "virtual_env": "A:\\SCMA\\3-APD\\Recognition-0\\faceRecog\\.venv",
+  "run_id": "2026-01-24_16-38-39",
+  "arguments_count": 1,
+  "arguments": "--multi-source",
+  "end_time": "2026-01-24 16:46:05",
+  "duration": "00:07:25",
+  "exit_code": 0
+}
