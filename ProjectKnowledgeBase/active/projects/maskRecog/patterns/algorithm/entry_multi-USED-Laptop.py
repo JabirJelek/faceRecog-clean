@@ -213,9 +213,9 @@ def get_default_config():
     """Return the complete default configuration"""
     return {
         # ========== MODEL PATHS ==========        
-        'detection_model_path': r'A:\SCMA\3-APD\fromAraya\Computer-Vision-CV\3.1_FaceRecog\run_py\modular\0_0_model\yolov12m-face.pt',
-        'embeddings_db_path': r'A:\SCMA\3-APD\fromAraya\Computer-Vision-CV\3.1_FaceRecog\run_py\modular\0_dataset\person_512.json',
-        'mask_model_path': r'A:\SCMA\3-APD\fromAraya\Computer-Vision-CV\3.1_FaceRecog\run_py\modular\0_0_model\mask_detector_cus4.onnx',
+        'detection_model_path': r'A:\SCMA\3-APD\Recognition-0\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\yolov12m-face.pt',
+        'embeddings_db_path': r'A:\SCMA\3-APD\Recognition-0\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\dataset\person_512.json',
+        'mask_model_path': r'A:\SCMA\3-APD\Recognition-0\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\mask_detector_cus4.onnx',
         
                                                 # PLEASE FIX THE STABILITY OF THE VERIFICATION 
                                                 # VALUE BEFORE TRYING TO CHANGE THE TYPE OF mask MODEL USED.        

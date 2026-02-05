@@ -41,20 +41,20 @@ $PIDTracking = @{
 
 $Config = @{
     # Worker script path
-    WorkerScript = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\maskDetect.ps1"
+    WorkerScript = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_laptop\maskDetect.ps1"
     
     # Schedule (24-hour format)
     StartTime = "08:50"    # 3:08 PM
     EndTime = "11:46"      # 3:15 PM
     
     # Paths for validation
-    RunsBasePath = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick"
-    OutputFolderPattern = "Magick_Process_MaskDetect_*"
+    RunsBasePath = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\laptop"
+    OutputFolderPattern = "Laptop_Process_MaskDetect_*"
     
     # Process tracking
     PythonProcessName = "python"  # The actual process we want to track
     WorkerProcessName = "powershell"  # PowerShell wrapper process
-    PythonScriptPath = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py"
+    PythonScriptPath = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Laptop.py"
     
     # Expected folder structure
     ExpectedSubfolders = @("logs", "script_output")
@@ -69,11 +69,11 @@ $Config = @{
     GracefulShutdownTimeout = 60  # seconds
     
     # PID tracking
-    PIDFilePath = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\monitor_pid_magick.json"
+    PIDFilePath = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\laptop\monitor_pid_laptop.json"
     MaxPIDFileAgeMinutes = 120  # Clean up old PID files
     
     # Logging
-    LogFile = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\monitor_magick.log"
+    LogFile = "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\laptop\monitor_laptop.log"
 
     
     # Email notifications for successful process COMPLETION
