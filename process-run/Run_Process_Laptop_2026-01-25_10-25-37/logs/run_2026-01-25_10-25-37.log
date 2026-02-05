@@ -1,0 +1,26 @@
+==================================================
+RUN STARTED: 2026-01-25 10:25:37
+Run Folder: A:\SCMA\3-APD\Recognition-0\faceRecog\process-run\Run_Process_Laptop_2026-01-25_10-25-37
+PowerShell Script: process-run-0.ps1
+Virtual Environment: A:\SCMA\3-APD\Recognition-0\faceRecog\.venv
+Python Script: A:\SCMA\3-APD\Recognition-0\faceRecog\run_py\modular\entry_multi-USED-Laptop.py
+Arguments: --multi-source
+Number of arguments: 1
+==================================================
+
+Execution started at: 2026-01-25 10:25:37
+"A:\SCMA\3-APD\Recognition-0\faceRecog\.venv\Scripts\python.exe" "A:\SCMA\3-APD\Recognition-0\faceRecog\run_py\modular\entry_multi-USED-Laptop.py" --multi-source
+
+
+==================================================
+EXECUTION SUMMARY
+==================================================
+PowerShell Script: process-run-0.ps1
+Exit code: 0
+Start time: 2026-01-25 10:25:37
+End time: 2026-01-25 10:33:04
+Duration: 00:07:26
+Arguments passed to Python script:
+  [0]: -
+Python script created folders:
+  - A:\SCMA\3-APD\Recognition-0\faceRecog\process-run\Run_Process_Laptop_2026-01-25_10-25-37\script_output\multi_source_20260125_102735_Local-Camera-0_images
