@@ -1,0 +1,13 @@
+==================================================
+RUN STARTED: 2026-01-30 14:19:39
+Run Folder: A:\SCMA\3-APD\Recognition-0\faceRecog\process-run\Run_Process_Laptop_2026-01-30_14-19-39
+PowerShell Script: process-run-0.ps1
+Virtual Environment: A:\SCMA\3-APD\Recognition-0\faceRecog\.venv
+Python Script: A:\SCMA\3-APD\Recognition-0\faceRecog\run_py\modular\entry_multi-USED-Laptop.py
+Arguments: --multi-source
+Number of arguments: 1
+==================================================
+
+Execution started at: 2026-01-30 14:19:39
+"A:\SCMA\3-APD\Recognition-0\faceRecog\.venv\Scripts\python.exe" "A:\SCMA\3-APD\Recognition-0\faceRecog\run_py\modular\entry_multi-USED-Laptop.py" --multi-source
+

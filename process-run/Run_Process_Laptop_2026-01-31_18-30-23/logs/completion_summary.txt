@@ -1,0 +1,46 @@
+==================================================
+RUN COMPLETION SUMMARY
+==================================================
+Completion Time: 2026-01-31 18:38:33
+Run ID: 2026-01-31_18-30-23
+PowerShell Script: process-run-0.ps1
+Status: SUCCESS
+
+FOLDER STRUCTURE
+==================================================
+Run Folder: A:\SCMA\3-APD\Recognition-0\faceRecog\process-run\Run_Process_Laptop_2026-01-31_18-30-23
+├── logs\
+│   ├── run_2026-01-31_18-30-23.log          (This main log file)
+│   ├── python_output.txt           (Full Python script output)
+│   └── completion_summary.txt      (This summary)
+├── script_output\                  (Python script's working directory)
+│   └── [Output folders created by Python]
+└── metadata.json                   (Run configuration metadata)
+
+EXECUTION DETAILS
+==================================================
+PowerShell Script: process-run-0.ps1
+Virtual Environment: A:\SCMA\3-APD\Recognition-0\faceRecog\.venv
+Python Script: A:\SCMA\3-APD\Recognition-0\faceRecog\run_py\modular\entry_multi-USED-Laptop.py
+Start Time: 2026-01-31 18:30:23
+End Time: 2026-01-31 18:38:33
+Duration: 00:08:09
+
+ARGUMENTS PASSED
+==================================================
+  --multi-source
+
+
+LOG FILES
+==================================================
+1. Main Execution Log: A:\SCMA\3-APD\Recognition-0\faceRecog\process-run\Run_Process_Laptop_2026-01-31_18-30-23\logs\run_2026-01-31_18-30-23.log
+2. Python Output: A:\SCMA\3-APD\Recognition-0\faceRecog\process-run\Run_Process_Laptop_2026-01-31_18-30-23\logs\python_output.txt
+3. Python Exit Code: 0
+
+SCRIPT OUTPUT LOCATION
+==================================================
+Any folders/files created by the Python script should be located in:
+A:\SCMA\3-APD\Recognition-0\faceRecog\process-run\Run_Process_Laptop_2026-01-31_18-30-23\script_output
+
+NOTE: For debugging, check python_output.txt for detailed error messages.
+==================================================
