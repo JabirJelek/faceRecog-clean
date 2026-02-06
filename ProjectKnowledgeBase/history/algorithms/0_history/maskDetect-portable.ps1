@@ -1,4 +1,4 @@
-# secondScript.ps1 - UPDATED WITH PORTABILITY
+# maskDetect-portable.ps1
 # ==============================================
 # Organized version with unified folder structure
 # ==============================================
