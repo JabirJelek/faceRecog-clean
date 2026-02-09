@@ -47,7 +47,7 @@ if (-not $paths -or -not $paths.ProjectRoot) {
 $Script:Config = @{
     # Schedule configuration
     StartTime = "08:00"
-    EndTime = "15:23"
+    EndTime = "16:23"
     
     # Process tracking - USING OLD VERSION'S STRUCTURE
     PythonProcessName = "python"
@@ -536,11 +536,15 @@ function Start-WorkerProcess {
         
         $processInfo = New-Object System.Diagnostics.ProcessStartInfo
         $processInfo.FileName = "powershell.exe"
-        $processInfo.Arguments = @(
+        
+        # FIXED: Properly formatted arguments array
+        $arguments = @(
             "-NoProfile",
             "-ExecutionPolicy", "Bypass",
-            "-Command", "& { & '$($Script:Config.WorkerScript)' }"
+            "-File", "`"$($Script:Config.WorkerScript)`""
         )
+        $processInfo.Arguments = $arguments
+        
         $processInfo.UseShellExecute = $false
         $processInfo.RedirectStandardOutput = $true
         $processInfo.RedirectStandardError = $true
@@ -623,8 +627,12 @@ function Start-WorkerProcess {
                 }
                 
                 # Clean up events
-                Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
-                Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
+                if ($stdOutEvent) {
+                    Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
+                }
+                if ($stdErrEvent) {
+                    Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
+                }
                 
                 return $false
             }
@@ -646,8 +654,12 @@ function Start-WorkerProcess {
                     Save-PIDTracking
                     
                     # Clean up events
-                    Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
-                    Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
+                    if ($stdOutEvent) {
+                        Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
+                    }
+                    if ($stdErrEvent) {
+                        Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
+                    }
                     
                     return $true
                 }
@@ -665,8 +677,12 @@ function Start-WorkerProcess {
             Write-Log "Python process not found within $maxWait seconds" -Level "WARN"
             
             # Clean up events
-            Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
-            Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
+            if ($stdOutEvent) {
+                Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
+            }
+            if ($stdErrEvent) {
+                Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
+            }
             
             Save-PIDTracking
             return $true
@@ -855,7 +871,7 @@ function Initialize-EmailReporting {
     Write-Log "Initializing email reporting..." -Level "INFO"
     
     # Load email sender script
-    $emailSenderScript = Join-Path $PSScriptRoot "1_email-sender.ps1"
+    $emailSenderScript = Join-Path $PSScriptRoot "1_email-sender-stable.ps1"
     if (Test-Path $emailSenderScript) {
         try {
             . $emailSenderScript
@@ -871,7 +887,7 @@ function Initialize-EmailReporting {
                 ToAddress = "faridraihan17@gmail.com"
             }
             
-            Register-EmailSender -MonitorConfig $Script:Config -CustomEmailConfig $emailConfig
+            Register-StableEmailSender -MonitorConfig $Script:Config -CustomEmailConfig $emailConfig
             Write-Log "Email reporting initialized" -Level "SUCCESS"
             
             return $true
