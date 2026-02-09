@@ -152,61 +152,30 @@ $global:EmailAttachmentQueue = @()
 # ====================================================================
 
 function Check-ProcessStatus {
-    # First try communication-based detection
-    if (-not $global:WorkerIsRunning) {
-        $detected = Detect-WorkerProcess
-        if ($detected) {
-            Save-PIDTracking
-        }
-    }
-    
-    # Then verify processes
     $status = @{
         WorkerRunning = $false
         PythonRunning = $false
         WorkerPID = $global:WorkerPID
         PythonPID = $global:PythonPID
-        UsingCommunication = $false
     }
     
-    # Check worker using multiple methods
+    # Check worker process
     if ($global:WorkerPID -and $global:WorkerPID -ne 0) {
         $status.WorkerRunning = Is-ProcessRunning -ProcessId $global:WorkerPID -ProcessName "powershell"
-        
-        if (-not $status.WorkerRunning) {
-            # Try communication check as fallback
-            $status.WorkerRunning = Check-WorkerHealth
-            if ($status.WorkerRunning) {
-                $status.UsingCommunication = $true
-            }
-        }
-    } else {
-        # No worker PID set, try communication
-        $status.WorkerRunning = Check-WorkerHealth
-        if ($status.WorkerRunning) {
-            $status.UsingCommunication = $true
-            # Try to get PID from communication files
-            $commPaths = Initialize-CommunicationPaths -Paths $global:MonitorPaths -IsMonitor
-            $statusData = Read-WorkerStatus -StatusFile $commPaths.StatusFile
-            if ($statusData.WorkerPID -gt 0) {
-                $global:WorkerPID = $statusData.WorkerPID
-                $status.WorkerPID = $statusData.WorkerPID
-            }
-        }
     }
     
-    # Check Python
+    # Check Python process
     if ($global:PythonPID -and $global:PythonPID -ne 0) {
         $status.PythonRunning = Is-ProcessRunning -ProcessId $global:PythonPID -ProcessName "python"
-    } elseif ($global:WorkerIsRunning) {
-        # Try to find Python if worker is running but PythonPID not set
-        $foundPID = Find-PythonProcess
-        if ($foundPID) {
-            $global:PythonPID = $foundPID
-            $status.PythonPID = $foundPID
-            $status.PythonRunning = Is-ProcessRunning -ProcessId $foundPID -ProcessName "python"
-            Save-PIDTracking
-            Update-WorkerCommunication -WorkerPID $global:WorkerPID -PythonPID $foundPID
+    } else {
+        # If PythonPID not set but worker is running, try to find it
+        if ($status.WorkerRunning) {
+            $foundPID = Find-PythonProcess
+            if ($foundPID) {
+                $global:PythonPID = $foundPID
+                $status.PythonPID = $foundPID
+                $status.PythonRunning = Is-ProcessRunning -ProcessId $foundPID -ProcessName "python"
+            }
         }
     }
     
@@ -216,7 +185,6 @@ function Check-ProcessStatus {
     
     return $status
 }
-
 
 function Is-ProcessRunning {
     param(
@@ -582,83 +550,119 @@ function Send-StopCommand {
 }
 
 function Start-WorkerProcess {
-    # Clean up any stale communication files
-    $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
-    if (Test-Path $commPaths.CommunicationDir) {
-        Get-ChildItem $commPaths.CommunicationDir -Filter "*.txt" -ErrorAction SilentlyContinue | Remove-Item -Force
-        Get-ChildItem $commPaths.CommunicationDir -Filter "*.json" -ErrorAction SilentlyContinue | Remove-Item -Force
-    }
-    
-    Write-Log "Starting face recognition worker with enhanced communication..." -Level "INFO" -LogFile $Script:Config.LogFile
+    Write-Log "Starting face recognition worker..." -Level "INFO"
     
     try {
-        # Create start command
-        $commandData = @{
-            Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-            Command = "START"
-            MonitorPID = $PID
-            Action = "StartWorker"
-            Parameters = @{
-                WorkerScript = $Script:Config.WorkerScript
-                PythonScript = $Script:Config.PythonScript
-            }
-        }
-
-        $lockFile = $commPaths.LockFile
-        if (Acquire-Lock -LockFile $lockFile) {
-            try {
-                $commandData | ConvertTo-Json | Out-File $commPaths.CommandFile -Force
-                Write-Log "Sent START command to worker via CommandFile" -Level "DEBUG" -LogFile $Script:Config.LogFile
-            } finally {
-                Release-Lock -LockFile $lockFile
-            }
+        Write-Log "Worker script path: $($Script:Config.WorkerScript)" -Level "INFO"
+        
+        # Verify worker script exists
+        if (-not (Test-Path $Script:Config.WorkerScript)) {
+            Write-Log "ERROR: Worker script not found at: $($Script:Config.WorkerScript)" -Level "ERROR"
+            return $false
         }
         
-        # Start the worker process
+        # Start worker process with explicit output capture
+        Write-Log "Starting worker process..." -Level "INFO"
+        
         $processInfo = New-Object System.Diagnostics.ProcessStartInfo
         $processInfo.FileName = "powershell.exe"
         $processInfo.Arguments = @(
             "-NoProfile",
             "-ExecutionPolicy", "Bypass",
-            "-File", "`"$($Script:Config.WorkerScript)`""
+            "-Command", "& { & '$($Script:Config.WorkerScript)' }"
         )
         $processInfo.UseShellExecute = $false
-        $processInfo.RedirectStandardOutput = $false
+        $processInfo.RedirectStandardOutput = $true
+        $processInfo.RedirectStandardError = $true
         $processInfo.CreateNoWindow = $true
         
         $WorkerProcess = New-Object System.Diagnostics.Process
         $WorkerProcess.StartInfo = $processInfo
         
+        # Create output collectors
+        $stdOutBuilder = New-Object System.Text.StringBuilder
+        $stdErrBuilder = New-Object System.Text.StringBuilder
+        
+        # Set up event handlers for async output
+        $outAction = {
+            if (-not [String]::IsNullOrEmpty($EventArgs.Data)) {
+                $Event.MessageData.AppendLine($EventArgs.Data)
+                # Also log to monitor log
+                Write-Log "Worker Output: $($EventArgs.Data)" -Level "DEBUG"
+            }
+        }
+        
+        $errAction = {
+            if (-not [String]::IsNullOrEmpty($EventArgs.Data)) {
+                $Event.MessageData.AppendLine($EventArgs.Data)
+                # Also log to monitor log
+                Write-Log "Worker Error: $($EventArgs.Data)" -Level "ERROR"
+            }
+        }
+        
+        # Register events
+        $stdOutEvent = Register-ObjectEvent -InputObject $WorkerProcess `
+            -EventName 'OutputDataReceived' `
+            -Action $outAction `
+            -MessageData $stdOutBuilder
+        
+        $stdErrEvent = Register-ObjectEvent -InputObject $WorkerProcess `
+            -EventName 'ErrorDataReceived' `
+            -Action $errAction `
+            -MessageData $stdErrBuilder
+        
+        # Start the process
         if ($WorkerProcess.Start()) {
             $global:WorkerPID = $WorkerProcess.Id
             $global:WorkerStartTime = Get-Date
             $global:WorkerIsRunning = $true
             
-            Write-Log "Worker process started (PID: $global:WorkerPID)" -Level "SUCCESS" -LogFile $Script:Config.LogFile
+            Write-Log "Worker process started (PID: $global:WorkerPID)" -Level "SUCCESS"
             
-            # Wait for worker to register
-            Write-Log "Waiting for worker registration..." -Level "INFO" -LogFile $Script:Config.LogFile
-            $maxWait = 30
-            $waited = 0
+            # Begin async output reading
+            $WorkerProcess.BeginOutputReadLine()
+            $WorkerProcess.BeginErrorReadLine()
             
-            while ($waited -lt $maxWait) {
-                if (Test-Path $commPaths.RegistrationFile) {
-                    Write-Log "Worker registered successfully" -Level "SUCCESS" -LogFile $Script:Config.LogFile
-                    break
+            # Wait a moment for initial output
+            Start-Sleep -Seconds 2
+            
+            # Check if process is still running
+            if ($WorkerProcess.HasExited) {
+                $exitCode = $WorkerProcess.ExitCode
+                $output = $stdOutBuilder.ToString()
+                $errorOutput = $stdErrBuilder.ToString()
+                
+                Write-Log "Worker process exited immediately with code: $exitCode" -Level "ERROR"
+                
+                if ($output) {
+                    Write-Log "Worker output:" -Level "DEBUG"
+                    foreach ($line in $output -split "`n") {
+                        if ($line.Trim()) {
+                            Write-Log "  $line" -Level "DEBUG"
+                        }
+                    }
                 }
                 
-                Start-Sleep -Seconds 1
-                $waited++
-                
-                # Check if process died
-                if ($WorkerProcess.HasExited) {
-                    Write-Log "Worker process exited unexpectedly" -Level "ERROR" -LogFile $Script:Config.LogFile
-                    return $false
+                if ($errorOutput) {
+                    Write-Log "Worker error output:" -Level "ERROR"
+                    foreach ($line in $errorOutput -split "`n") {
+                        if ($line.Trim()) {
+                            Write-Log "  $line" -Level "ERROR"
+                        }
+                    }
                 }
+                
+                # Clean up events
+                Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
+                Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
+                
+                return $false
             }
             
-            # Wait for Python process
-            Write-Log "Waiting for Python process..." -Level "INFO" -LogFile $Script:Config.LogFile
+            Write-Log "Worker process is running, waiting for Python..." -Level "INFO"
+            
+            # Look for Python process
+            $maxWait = 60
             $waited = 0
             
             while ($waited -lt $maxWait) {
@@ -668,122 +672,137 @@ function Start-WorkerProcess {
                     $global:PythonIsRunning = $true
                     $global:PythonStartTime = Get-Date
                     
-                    # Update communication
-                    Update-WorkerCommunication -WorkerPID $global:WorkerPID -PythonPID $foundPID
-                    
-                    Write-Log "Python process found (PID: $global:PythonPID)" -Level "SUCCESS" -LogFile $Script:Config.LogFile
+                    Write-Log "Python process found (PID: $global:PythonPID)" -Level "SUCCESS"
                     Save-PIDTracking
+                    
+                    # Clean up events
+                    Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
+                    Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
+                    
                     return $true
                 }
                 
-                Start-Sleep -Seconds 2
-                $waited += 2
+                Start-Sleep -Seconds 5
+                $waited += 5
+                
+                # Check if worker is still running
+                if ($WorkerProcess.HasExited) {
+                    Write-Log "Worker process exited while waiting for Python" -Level "ERROR"
+                    break
+                }
             }
             
-            Write-Log "Python process did not start within $maxWait seconds" -Level "WARN" -LogFile $Script:Config.LogFile
+            Write-Log "Python process not found within $maxWait seconds" -Level "WARN"
+            
+            # Clean up events
+            Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
+            Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
+            
             Save-PIDTracking
             return $true
         } else {
-            Write-Log "Failed to start worker process" -Level "ERROR" -LogFile $Script:Config.LogFile
+            Write-Log "Failed to start worker process" -Level "ERROR"
             return $false
         }
     } catch {
-        Write-Log "ERROR starting worker: $_" -Level "ERROR" -LogFile $Script:Config.LogFile
+        Write-Log "ERROR starting worker: $_" -Level "ERROR"
+        Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
         return $false
     }
 }
 
+
 function Stop-WorkerProcess {
-    Write-Log "Stopping worker process..." -Level "INFO" -LogFile $Script:Config.LogFile
+    Write-Log "Stopping worker process..." -Level "INFO"
     
     $stoppedProcesses = @()
     
-    # Send STOP command to worker first
-    $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
-    $commandData = @{
-        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        Command = "STOP"
-        MonitorPID = $PID
-        Action = "StopWorker"
-        Parameters = @{
-            Reason = "Monitor Shutdown"
-            GracePeriodSeconds = 10
-        }
-    }
-    
-    if (Acquire-Lock -LockFile $commPaths.LockFile) {
-        try {
-            $commandData | ConvertTo-Json | Out-File $commPaths.CommandFile -Force
-            Write-Log "Sent STOP command to worker" -Level "INFO" -LogFile $Script:Config.LogFile
-        } finally {
-            Release-Lock -LockFile $commPaths.LockFile
-        }
-    }
-    
-    # Give worker time to shut down gracefully
-    Start-Sleep -Seconds 5
-    
-    # Stop worker PowerShell process
-    if ($global:WorkerPID -and $global:WorkerPID -ne 0) {
-        Write-Log "Stopping worker process (PID: $global:WorkerPID)..." -Level "INFO" -LogFile $Script:Config.LogFile
-        
-        try {
-            $workerProcess = Get-Process -Id $global:WorkerPID -ErrorAction Stop
-            
-            if (-not $workerProcess.HasExited) {
-                $workerProcess.CloseMainWindow() | Out-Null
-                Start-Sleep -Seconds 2
-                
-                if (-not $workerProcess.HasExited) {
-                    Write-Log "Forcefully terminating worker process..." -Level "WARN" -LogFile $Script:Config.LogFile
-                    $workerProcess.Kill()
-                    if ($workerProcess.WaitForExit($Script:Config.GracefulShutdownTimeout * 1000)) {
-                        $stoppedProcesses += "Worker"
-                        Write-Log "Worker process terminated" -Level "SUCCESS" -LogFile $Script:Config.LogFile
-                    }
-                } else {
-                    $stoppedProcesses += "Worker"
-                    Write-Log "Worker process exited gracefully" -Level "SUCCESS" -LogFile $Script:Config.LogFile
-                }
-            } else {
-                Write-Log "Worker process already exited" -Level "INFO" -LogFile $Script:Config.LogFile
-            }
-        } catch {
-            Write-Log "Error stopping worker process: $_" -Level "ERROR" -LogFile $Script:Config.LogFile
-        }
-    }
-    
-    # Stop the Python process
+    # First, try to stop Python process
     if ($global:PythonPID -and $global:PythonPID -ne 0) {
-        Write-Log "Stopping Python process (PID: $global:PythonPID)..." -Level "INFO" -LogFile $Script:Config.LogFile
+        Write-Log "Stopping Python process (PID: $global:PythonPID)..." -Level "INFO"
         
         try {
             $pythonProcess = Get-Process -Id $global:PythonPID -ErrorAction Stop
             
             if (-not $pythonProcess.HasExited) {
+                # Try graceful shutdown first
                 $pythonProcess.CloseMainWindow() | Out-Null
                 Start-Sleep -Seconds 2
                 
                 if (-not $pythonProcess.HasExited) {
-                    Write-Log "Forcefully terminating Python process..." -Level "WARN" -LogFile $Script:Config.LogFile
+                    Write-Log "Forcefully terminating Python process..." -Level "WARN"
                     $pythonProcess.Kill()
-                    if ($pythonProcess.WaitForExit($Script:Config.GracefulShutdownTimeout * 1000)) {
+                    Start-Sleep -Seconds 2
+                    
+                    if ($pythonProcess.HasExited) {
                         $stoppedProcesses += "Python"
-                        Write-Log "Python process terminated" -Level "SUCCESS" -LogFile $Script:Config.LogFile
+                        Write-Log "Python process terminated" -Level "SUCCESS"
                     }
                 } else {
                     $stoppedProcesses += "Python"
-                    Write-Log "Python process exited gracefully" -Level "SUCCESS" -LogFile $Script:Config.LogFile
+                    Write-Log "Python process exited gracefully" -Level "SUCCESS"
                 }
             } else {
-                Write-Log "Python process already exited" -Level "INFO" -LogFile $Script:Config.LogFile
+                Write-Log "Python process already exited" -Level "INFO"
             }
         } catch {
-            Write-Log "Error stopping Python process: $_" -Level "ERROR" -LogFile $Script:Config.LogFile
+            Write-Log "Error stopping Python process: $_" -Level "ERROR"
         }
     }
     
-    # Clean up variables
+    # Then, try to stop worker PowerShell process
+    if ($global:WorkerPID -and $global:WorkerPID -ne 0) {
+        Write-Log "Stopping worker process (PID: $global:WorkerPID)..." -Level "INFO"
+        
+        try {
+            $workerProcess = Get-Process -Id $global:WorkerPID -ErrorAction Stop
+            
+            if (-not $workerProcess.HasExited) {
+                # Try graceful shutdown first
+                $workerProcess.CloseMainWindow() | Out-Null
+                Start-Sleep -Seconds 2
+                
+                if (-not $workerProcess.HasExited) {
+                    Write-Log "Forcefully terminating worker process..." -Level "WARN"
+                    $workerProcess.Kill()
+                    Start-Sleep -Seconds 2
+                    
+                    if ($workerProcess.HasExited) {
+                        $stoppedProcesses += "Worker"
+                        Write-Log "Worker process terminated" -Level "SUCCESS"
+                    }
+                } else {
+                    $stoppedProcesses += "Worker"
+                    Write-Log "Worker process exited gracefully" -Level "SUCCESS"
+                }
+            } else {
+                Write-Log "Worker process already exited" -Level "INFO"
+            }
+        } catch {
+            Write-Log "Error stopping worker process: $_" -Level "ERROR"
+        }
+    }
+    
+    # Clean up any remaining orphaned processes
+    Write-Log "Checking for orphaned processes..." -Level "INFO"
+    $orphanedProcesses = @()
+    
+    # Check for Python processes
+    $pythonProcesses = Get-Process -Name "python*" -ErrorAction SilentlyContinue | 
+        Where-Object { $_.Path -like "*python*" }
+    
+    foreach ($proc in $pythonProcesses) {
+        try {
+            $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
+            if ($cmdLine -like "*$($Script:Config.PythonScript)*") {
+                Write-Log "Found orphaned Python process (PID: $($proc.Id)) - terminating" -Level "WARN"
+                $proc.Kill()
+                $orphanedProcesses += "Python:$($proc.Id)"
+            }
+        } catch { }
+    }
+    
+    # Reset global process variables
     $global:WorkerProcess = $null
     $global:WorkerPID = $null
     $global:PythonPID = $null
@@ -793,17 +812,22 @@ function Stop-WorkerProcess {
     # Remove PID tracking file
     if (Test-Path $Script:Config.PIDFilePath) {
         Remove-Item -Path $Script:Config.PIDFilePath -Force -ErrorAction SilentlyContinue
-        Write-Log "Removed PID tracking file" -Level "DEBUG" -LogFile $Script:Config.LogFile
+        Write-Log "Removed PID tracking file" -Level "DEBUG"
     }
     
-    # Clean up communication files
+    # Clean up communication directory
+    $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
     if (Test-Path $commPaths.CommunicationDir) {
         Remove-Item -Path $commPaths.CommunicationDir -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Log "Cleaned up communication directory" -Level "DEBUG" -LogFile $Script:Config.LogFile
+        Write-Log "Cleaned up communication directory" -Level "DEBUG"
     }
     
     if ($stoppedProcesses.Count -gt 0) {
-        Write-Log "Stopped processes: $($stoppedProcesses -join ', ')" -Level "INFO" -LogFile $Script:Config.LogFile
+        Write-Log "Stopped processes: $($stoppedProcesses -join ', ')" -Level "INFO"
+    }
+    
+    if ($orphanedProcesses.Count -gt 0) {
+        Write-Log "Cleaned up orphaned processes: $($orphanedProcesses.Count)" -Level "INFO"
     }
 }
 
