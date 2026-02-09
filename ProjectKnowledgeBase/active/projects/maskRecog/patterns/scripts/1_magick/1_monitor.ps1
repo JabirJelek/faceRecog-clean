@@ -12,17 +12,13 @@ Updated with old version's process checking structure that works.
 # ENHANCED: Import common paths module with improved error handling
 # ====================================================================
 $commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
+
+# Test module load into monitor
+
 if (Test-Path $commonPathsScript) {
     try {
-        # Dot-source the script to load functions into current scope
         . $commonPathsScript
         Write-Host "✓ Common paths module loaded" -ForegroundColor Green
-        
-        # Test if functions are loaded
-        if (-not (Get-Command Initialize-ProjectPortablePaths -ErrorAction SilentlyContinue)) {
-            Write-Host "ERROR: Required functions not loaded from common-paths.ps1" -ForegroundColor Red
-            exit 1
-        }
     } catch {
         Write-Host "ERROR: Failed to load common paths: $_" -ForegroundColor Red
         exit 1
@@ -51,7 +47,7 @@ if (-not $paths -or -not $paths.ProjectRoot) {
 $Script:Config = @{
     # Schedule configuration
     StartTime = "08:00"
-    EndTime = "14:47"
+    EndTime = "15:23"
     
     # Process tracking - USING OLD VERSION'S STRUCTURE
     PythonProcessName = "python"
@@ -116,33 +112,6 @@ $global:ForceStopThreshold = 2
 $global:ForceStopWindowSeconds = 5
 $global:IsShuttingDown = $false
 
-# Sudden Termination Tracking
-# $global:SuddenTerminationTracking = @{
-#     Events = @()
-#     CurrentStreak = 0
-#     LastCleanupDate = $null
-#     Statistics = @{
-#         TotalSuddenTerminations = 0
-#         TotalCleanups = 0
-#         LastCleanupReason = $null
-#         FirstEventDate = $null
-#         LastEventDate = $null
-#     }
-# }
-
-# Persistent Tracking
-# $global:PersistentTracking = @{
-#     LastKnownRunFolder = $null
-#     LastKnownPythonPID = $null
-#     LastKnownWorkerPID = $null
-#     LastValidationTime = $null
-#     LastValidationResult = $null
-#     ProcessStopHistory = @()
-#     ValidationHistory = @()
-#     DailyRunCount = 0
-#     LastSuccessfulRun = $null
-#     CollectedRunFolders = @()
-# }
 
 $global:CollectedRunFolders = @()
 $global:EmailAttachmentQueue = @()
@@ -300,6 +269,7 @@ function Write-Log {
         "WARN" { Write-Host $logEntry -ForegroundColor Yellow }
         "SUCCESS" { Write-Host $logEntry -ForegroundColor Green }
         "DEBUG" { Write-Host $logEntry -ForegroundColor Gray }
+        "SHUTDOWN" {Write-Host $logEntry -ForegroundColor Blue} 
         default { Write-Host $logEntry -ForegroundColor White }
     }
 }
@@ -714,124 +684,206 @@ function Start-WorkerProcess {
 
 function Stop-WorkerProcess {
     Write-Log "Stopping worker process..." -Level "INFO"
-    
+
     $stoppedProcesses = @()
-    
-    # First, try to stop Python process
+    $processesToStop = @()
+
+    # Collect all processes to stop
     if ($global:PythonPID -and $global:PythonPID -ne 0) {
-        Write-Log "Stopping Python process (PID: $global:PythonPID)..." -Level "INFO"
-        
         try {
-            $pythonProcess = Get-Process -Id $global:PythonPID -ErrorAction Stop
-            
-            if (-not $pythonProcess.HasExited) {
-                # Try graceful shutdown first
-                $pythonProcess.CloseMainWindow() | Out-Null
-                Start-Sleep -Seconds 2
-                
-                if (-not $pythonProcess.HasExited) {
-                    Write-Log "Forcefully terminating Python process..." -Level "WARN"
-                    $pythonProcess.Kill()
-                    Start-Sleep -Seconds 2
-                    
-                    if ($pythonProcess.HasExited) {
-                        $stoppedProcesses += "Python"
-                        Write-Log "Python process terminated" -Level "SUCCESS"
-                    }
-                } else {
-                    $stoppedProcesses += "Python"
-                    Write-Log "Python process exited gracefully" -Level "SUCCESS"
+            $pythonProcess = Get-Process -Id $global:PythonPID -ErrorAction SilentlyContinue
+            if ($pythonProcess -and (-not $pythonProcess.HasExited)) {
+                $processesToStop += @{
+                    Type = "Python"
+                    PID = $global:PythonPID
+                    Process = $pythonProcess
                 }
-            } else {
-                Write-Log "Python process already exited" -Level "INFO"
             }
         } catch {
-            Write-Log "Error stopping Python process: $_" -Level "ERROR"
+            Write-Log "Python process not found (PID: $global:PythonPID) - $_" -Level "DEBUG"
         }
     }
-    
-    # Then, try to stop worker PowerShell process
+
     if ($global:WorkerPID -and $global:WorkerPID -ne 0) {
-        Write-Log "Stopping worker process (PID: $global:WorkerPID)..." -Level "INFO"
-        
         try {
-            $workerProcess = Get-Process -Id $global:WorkerPID -ErrorAction Stop
-            
-            if (-not $workerProcess.HasExited) {
-                # Try graceful shutdown first
-                $workerProcess.CloseMainWindow() | Out-Null
-                Start-Sleep -Seconds 2
-                
-                if (-not $workerProcess.HasExited) {
-                    Write-Log "Forcefully terminating worker process..." -Level "WARN"
-                    $workerProcess.Kill()
-                    Start-Sleep -Seconds 2
-                    
-                    if ($workerProcess.HasExited) {
-                        $stoppedProcesses += "Worker"
-                        Write-Log "Worker process terminated" -Level "SUCCESS"
-                    }
-                } else {
-                    $stoppedProcesses += "Worker"
-                    Write-Log "Worker process exited gracefully" -Level "SUCCESS"
+            $workerProcess = Get-Process -Id $global:WorkerPID -ErrorAction SilentlyContinue
+            if ($workerProcess -and (-not $workerProcess.HasExited)) {
+                $processesToStop += @{
+                    Type = "Worker"
+                    PID = $global:WorkerPID
+                    Process = $workerProcess
                 }
-            } else {
-                Write-Log "Worker process already exited" -Level "INFO"
             }
         } catch {
-            Write-Log "Error stopping worker process: $_" -Level "ERROR"
+            Write-Log "Worker process not found (PID: $global:WorkerPID) - $_" -Level "DEBUG"
         }
     }
-    
-    # Clean up any remaining orphaned processes
-    Write-Log "Checking for orphaned processes..." -Level "INFO"
-    $orphanedProcesses = @()
-    
-    # Check for Python processes
-    $pythonProcesses = Get-Process -Name "python*" -ErrorAction SilentlyContinue | 
-        Where-Object { $_.Path -like "*python*" }
-    
-    foreach ($proc in $pythonProcesses) {
+
+    # Stop processes in reverse order (Python first, then Worker)
+    foreach ($procInfo in $processesToStop | Where-Object { $_.Type -eq "Python" }) {
+        Write-Log "Stopping $($procInfo.Type) process (PID: $($procInfo.PID))..." -Level "INFO"
+        
         try {
-            $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
-            if ($cmdLine -like "*$($Script:Config.PythonScript)*") {
-                Write-Log "Found orphaned Python process (PID: $($proc.Id)) - terminating" -Level "WARN"
-                $proc.Kill()
-                $orphanedProcesses += "Python:$($proc.Id)"
+            # For Python processes, use Kill() directly as they don't respond well to CloseMainWindow
+            $procInfo.Process.Kill()
+            
+            # Wait for process to exit
+            $timeout = 10 # seconds
+            $startTime = Get-Date
+            while ((-not $procInfo.Process.HasExited) -and ((Get-Date) - $startTime).TotalSeconds -lt $timeout) {
+                Start-Sleep -Milliseconds 100
             }
-        } catch { }
+            
+            if ($procInfo.Process.HasExited) {
+                $stoppedProcesses += $procInfo.Type
+                Write-Log "$($procInfo.Type) process stopped successfully" -Level "SUCCESS"
+            } else {
+                Write-Log "$($procInfo.Type) process did not stop within timeout" -Level "WARN"
+            }
+        } catch {
+            Write-Log "Error stopping $($procInfo.Type) process: $_" -Level "ERROR"
+        }
     }
-    
+
+    # Now stop Worker processes
+    foreach ($procInfo in $processesToStop | Where-Object { $_.Type -eq "Worker" }) {
+        Write-Log "Stopping $($procInfo.Type) process (PID: $($procInfo.PID))..." -Level "INFO"
+        
+        try {
+            # Try to close gracefully first
+            if ($procInfo.Process.CloseMainWindow()) {
+                $timeout = 5 # seconds
+                $startTime = Get-Date
+                while ((-not $procInfo.Process.HasExited) -and ((Get-Date) - $startTime).TotalSeconds -lt $timeout) {
+                    Start-Sleep -Milliseconds 100
+                }
+            }
+            
+            # Force kill if still running
+            if (-not $procInfo.Process.HasExited) {
+                $procInfo.Process.Kill()
+                Start-Sleep -Seconds 2
+            }
+            
+            if ($procInfo.Process.HasExited) {
+                $stoppedProcesses += $procInfo.Type
+                Write-Log "$($procInfo.Type) process stopped successfully" -Level "SUCCESS"
+            }
+        } catch {
+            Write-Log "Error stopping $($procInfo.Type) process: $_" -Level "ERROR"
+        }
+    }
+
+    # Additional cleanup: Find and stop any orphaned Python processes
+    Write-Log "Checking for orphaned Python processes..." -Level "INFO"
+    $orphanedProcesses = @()
+
+    try {
+        $allPythonProcesses = Get-Process -Name "python*" -ErrorAction SilentlyContinue |
+            Where-Object { $_.Path -like "*python*" -and $_.Id -ne $PID }
+
+        foreach ($proc in $allPythonProcesses) {
+            try {
+                $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
+                if ($cmdLine -like "*$($Script:Config.PythonScript)*") {
+                    Write-Log "Found orphaned Python process (PID: $($proc.Id)) - terminating" -Level "WARN"
+                    $proc.Kill()
+                    $orphanedProcesses += "Python:$($proc.Id)"
+                    Start-Sleep -Seconds 1
+                }
+            } catch { }
+        }
+    } catch {
+        Write-Log "Error checking for orphaned processes: $_" -Level "DEBUG"
+    }
+
     # Reset global process variables
     $global:WorkerProcess = $null
     $global:WorkerPID = $null
     $global:PythonPID = $null
     $global:WorkerIsRunning = $false
     $global:PythonIsRunning = $false
-    
+    $global:WorkerStartTime = $null
+    $global:PythonStartTime = $null
+
     # Remove PID tracking file
     if (Test-Path $Script:Config.PIDFilePath) {
         Remove-Item -Path $Script:Config.PIDFilePath -Force -ErrorAction SilentlyContinue
         Write-Log "Removed PID tracking file" -Level "DEBUG"
     }
-    
+
     # Clean up communication directory
-    $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
+    $commPaths = Initialize-CommunicationPaths -Paths $global:MonitorPaths -IsMonitor
     if (Test-Path $commPaths.CommunicationDir) {
         Remove-Item -Path $commPaths.CommunicationDir -Recurse -Force -ErrorAction SilentlyContinue
         Write-Log "Cleaned up communication directory" -Level "DEBUG"
     }
-    
+
+    # Summary
     if ($stoppedProcesses.Count -gt 0) {
-        Write-Log "Stopped processes: $($stoppedProcesses -join ', ')" -Level "INFO"
+        Write-Log "Successfully stopped processes: $($stoppedProcesses -join ', ')" -Level "INFO"
     }
     
     if ($orphanedProcesses.Count -gt 0) {
         Write-Log "Cleaned up orphaned processes: $($orphanedProcesses.Count)" -Level "INFO"
     }
+
+    Write-Log "Worker process cleanup completed" -Level "INFO"
 }
 
- 
+
+ function Get-ProcessChildren {
+    param([int]$ParentPID)
+    
+    $children = @()
+    try {
+        $processes = Get-WmiObject Win32_Process | Where-Object { $_.ParentProcessId -eq $ParentPID }
+        foreach ($proc in $processes) {
+            $children += $proc.ProcessId
+            # Recursively get grandchildren
+            $children += Get-ProcessChildren -ParentPID $proc.ProcessId
+        }
+    } catch { }
+    return $children
+}
+
+
+# ====================================================================
+# Email Reporting Integration
+# ====================================================================
+function Initialize-EmailReporting {
+    Write-Log "Initializing email reporting..." -Level "INFO"
+    
+    # Load email sender script
+    $emailSenderScript = Join-Path $PSScriptRoot "1_email-sender.ps1"
+    if (Test-Path $emailSenderScript) {
+        try {
+            . $emailSenderScript
+            
+            # Register email sender with monitor configuration
+            $emailConfig = @{
+                SmtpServer = "smtp.gmail.com"  # Configure these
+                SmtpPort = 587
+                UseSsl = $true
+                Username = "faridraihan17@gmail.com"
+                Password = "$env:USERPROFILE\.face-recog\email-credential.xml"
+                FromAddress = "monitor@facerecog.local"
+                ToAddress = "faridraihan17@gmail.com"
+            }
+            
+            Register-EmailSender -MonitorConfig $Script:Config -CustomEmailConfig $emailConfig
+            Write-Log "Email reporting initialized" -Level "SUCCESS"
+            
+            return $true
+        } catch {
+            Write-Log "Failed to initialize email reporting: $_" -Level "ERROR"
+            return $false
+        }
+    } else {
+        Write-Log "Email sender script not found: $emailSenderScript" -Level "WARN"
+        return $false
+    }
+}
 
 # ====================================================================
 # ENHANCED: PID Tracking with persistent data (from old version)
@@ -1127,6 +1179,11 @@ try {
     
     # Clear console for clean display
     #Clear-Host
+
+    # Add to main try block (before the monitoring loop):
+    $emailReportingInitialized = Initialize-EmailReporting
+
+
     
     # Main monitoring loop with OLD VERSION'S reliability
     Write-Log "Entering enhanced monitoring loop..." -Level "INFO"
@@ -1210,7 +1267,7 @@ try {
             
             # OLD VERSION'S LOGIC: Handle end time
             elseif ($endPassed) {
-                Write-Log "End time reached - initiating shutdown sequence..." -Level "INFO"
+                Write-Log "End time reached - initiating shutdown sequence..." -Level "SHUTDOWN"
                 
                 if ($processStatus.PythonRunning -or $processStatus.WorkerRunning) {
                     Write-Log "Stopping running processes..." -Level "INFO"
@@ -1279,8 +1336,8 @@ finally {
     Stop-WorkerProcess
     
     # Save final state
-    Save-SuddenTerminationTracking
-    Save-PersistentTracking
+    #Save-SuddenTerminationTracking
+    #Save-PersistentTracking
     
     Write-Log "=== Enhanced Face Recognition Monitor Stopped ===" -Level "INFO"
     
@@ -1306,5 +1363,13 @@ finally {
     
     Write-Host "Collected runs: $($global:CollectedRunFolders.Count)" -ForegroundColor White
     Write-Host "Sudden terminations: $($global:SuddenTerminationTracking.Statistics.TotalSuddenTerminations)" -ForegroundColor $(if ($global:SuddenTerminationTracking.Statistics.TotalSuddenTerminations -gt 0) { 'Yellow' } else { 'White' })
+        
+    # Add to monitoring loop (after the status check):
+    if ($emailReportingInitialized) {
+        # Send email report every hour
+        if ((Get-Date).Minute -eq 0 -and (Get-Date).Second -le $Script:Config.ProcessCheckInterval) {
+            Invoke-EmailReport
+        }
+    }
     Write-Host "================================================" -ForegroundColor Cyan
 }

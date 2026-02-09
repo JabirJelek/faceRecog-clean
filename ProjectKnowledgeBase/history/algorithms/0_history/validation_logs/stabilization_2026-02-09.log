@@ -1,0 +1,218 @@
+[2026-02-09 15:00:48] [INFO] Step 1: Validating script existence...
+[2026-02-09 15:00:48] [SUCCESS] ✓ Found: 1_common-paths.ps1
+[2026-02-09 15:00:48] [SUCCESS] ✓ Found: 1_mask_portable.ps1
+[2026-02-09 15:00:48] [SUCCESS] ✓ Found: 1_monitor.ps1
+[2026-02-09 15:00:48] [SUCCESS] ✓ Found: 1_email-sender.ps1
+[2026-02-09 15:00:48] [SUCCESS] ✓ Found: 1_run_after_validation.ps1
+[2026-02-09 15:00:48] [INFO] 
+Step 2: Validating script syntax...
+[2026-02-09 15:00:48] [SUCCESS] ✓ Syntax OK: 1_common-paths.ps1
+[2026-02-09 15:00:48] [SUCCESS] ✓ Syntax OK: 1_mask_portable.ps1
+[2026-02-09 15:00:48] [SUCCESS] ✓ Syntax OK: 1_monitor.ps1
+[2026-02-09 15:00:48] [SUCCESS] ✓ Syntax OK: 1_email-sender.ps1
+[2026-02-09 15:00:48] [SUCCESS] ✓ Syntax OK: 1_run_after_validation.ps1
+[2026-02-09 15:00:48] [INFO] 
+Step 3: Fixing monitor script issues...
+[2026-02-09 15:00:48] [INFO] Fixing monitor script loading issues...
+[2026-02-09 15:00:48] [SUCCESS] Fixed monitor script loading
+[2026-02-09 15:00:48] [SUCCESS] Monitor script fixed successfully
+[2026-02-09 15:00:48] [INFO] 
+Step 4: Checking for missing functions...
+[2026-02-09 15:00:48] [SUCCESS] ✓ Function found: Initialize-ProjectPortablePaths in 1_common-paths.ps1
+[2026-02-09 15:00:48] [SUCCESS] ✓ Function found: Write-Log in 1_common-paths.ps1
+[2026-02-09 15:00:48] [SUCCESS] ✓ Function found: Write-WorkerStatus in 1_common-paths.ps1
+[2026-02-09 15:00:48] [SUCCESS] ✓ Function found: Read-WorkerStatus in 1_common-paths.ps1
+[2026-02-09 15:00:48] [SUCCESS] ✓ Function found: Initialize-CommunicationPaths in 1_common-paths.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Check-Heartbeat in 1_common-paths.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Check-Heartbeat in 1_mask_portable.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Check-Heartbeat in 1_monitor.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Check-Heartbeat in 1_email-sender.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Check-Heartbeat in 1_run_after_validation.ps1
+[2026-02-09 15:00:48] [WARN] Missing function: Check-Heartbeat
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Send-Heartbeat in 1_common-paths.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Send-Heartbeat in 1_mask_portable.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Send-Heartbeat in 1_monitor.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Send-Heartbeat in 1_email-sender.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Send-Heartbeat in 1_run_after_validation.ps1
+[2026-02-09 15:00:48] [WARN] Missing function: Send-Heartbeat
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Acquire-Lock in 1_common-paths.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Acquire-Lock in 1_mask_portable.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Acquire-Lock in 1_monitor.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Acquire-Lock in 1_email-sender.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Acquire-Lock in 1_run_after_validation.ps1
+[2026-02-09 15:00:48] [WARN] Missing function: Acquire-Lock
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Release-Lock in 1_common-paths.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Release-Lock in 1_mask_portable.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Release-Lock in 1_monitor.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Release-Lock in 1_email-sender.ps1
+[2026-02-09 15:00:48] [WARN] ✗ Function missing: Release-Lock in 1_run_after_validation.ps1
+[2026-02-09 15:00:48] [WARN] Missing function: Release-Lock
+[2026-02-09 15:00:48] [INFO] Creating missing function implementations...
+[2026-02-09 15:00:49] [SUCCESS] Created missing functions at: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\1_missing-functions.ps1
+[2026-02-09 15:00:49] [INFO] Created missing functions. Please add 'if (Test-Path "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\1_missing-functions.ps1") { . "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\1_missing-functions.ps1" }' to your scripts.
+[2026-02-09 15:00:49] [INFO] 
+Step 5: Configuring email credentials...
+[2026-02-09 15:00:49] [INFO] Setting up email credentials...
+[2026-02-09 15:00:49] [INFO] Email credentials already configured
+[2026-02-09 15:00:49] [INFO] 
+Step 6: Testing process cleanup...
+[2026-02-09 15:00:49] [INFO] Testing process cleanup...
+[2026-02-09 15:00:49] [SUCCESS] No orphaned processes found
+[2026-02-09 15:00:49] [INFO] 
+Step 7: Creating utility scripts...
+[2026-02-09 15:00:49] [INFO] Creating run validation script...
+[2026-02-09 15:00:49] [SUCCESS] Created run validation script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\run_validation.ps1
+[2026-02-09 15:00:49] [INFO] Creating cleanup script...
+[2026-02-09 15:00:49] [SUCCESS] Created cleanup script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\cleanup.ps1
+[2026-02-09 15:01:55] [INFO] Step 1: Validating script existence...
+[2026-02-09 15:01:55] [SUCCESS] ✓ Found: 1_common-paths.ps1
+[2026-02-09 15:01:55] [SUCCESS] ✓ Found: 1_mask_portable.ps1
+[2026-02-09 15:01:55] [SUCCESS] ✓ Found: 1_monitor.ps1
+[2026-02-09 15:01:55] [SUCCESS] ✓ Found: 1_email-sender.ps1
+[2026-02-09 15:01:55] [SUCCESS] ✓ Found: 1_run_after_validation.ps1
+[2026-02-09 15:01:55] [INFO] 
+Step 2: Validating script syntax...
+[2026-02-09 15:01:55] [SUCCESS] ✓ Syntax OK: 1_common-paths.ps1
+[2026-02-09 15:01:55] [SUCCESS] ✓ Syntax OK: 1_mask_portable.ps1
+[2026-02-09 15:01:55] [SUCCESS] ✓ Syntax OK: 1_monitor.ps1
+[2026-02-09 15:01:55] [SUCCESS] ✓ Syntax OK: 1_email-sender.ps1
+[2026-02-09 15:01:55] [SUCCESS] ✓ Syntax OK: 1_run_after_validation.ps1
+[2026-02-09 15:01:55] [INFO] 
+Step 3: Fixing monitor script issues...
+[2026-02-09 15:01:55] [INFO] Fixing monitor script loading issues...
+[2026-02-09 15:01:55] [SUCCESS] Fixed monitor script loading
+[2026-02-09 15:01:55] [SUCCESS] Monitor script fixed successfully
+[2026-02-09 15:01:55] [INFO] 
+Step 4: Checking for missing functions...
+[2026-02-09 15:01:55] [SUCCESS] ✓ Function found: Initialize-ProjectPortablePaths in 1_common-paths.ps1
+[2026-02-09 15:01:55] [SUCCESS] ✓ Function found: Write-Log in 1_common-paths.ps1
+[2026-02-09 15:01:55] [SUCCESS] ✓ Function found: Write-WorkerStatus in 1_common-paths.ps1
+[2026-02-09 15:01:55] [SUCCESS] ✓ Function found: Read-WorkerStatus in 1_common-paths.ps1
+[2026-02-09 15:01:55] [SUCCESS] ✓ Function found: Initialize-CommunicationPaths in 1_common-paths.ps1
+[2026-02-09 15:01:55] [WARN] ✗ Function missing: Check-Heartbeat in 1_common-paths.ps1
+[2026-02-09 15:01:55] [WARN] ✗ Function missing: Check-Heartbeat in 1_mask_portable.ps1
+[2026-02-09 15:01:55] [WARN] ✗ Function missing: Check-Heartbeat in 1_monitor.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Check-Heartbeat in 1_email-sender.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Check-Heartbeat in 1_run_after_validation.ps1
+[2026-02-09 15:01:56] [WARN] Missing function: Check-Heartbeat
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Send-Heartbeat in 1_common-paths.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Send-Heartbeat in 1_mask_portable.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Send-Heartbeat in 1_monitor.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Send-Heartbeat in 1_email-sender.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Send-Heartbeat in 1_run_after_validation.ps1
+[2026-02-09 15:01:56] [WARN] Missing function: Send-Heartbeat
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Acquire-Lock in 1_common-paths.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Acquire-Lock in 1_mask_portable.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Acquire-Lock in 1_monitor.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Acquire-Lock in 1_email-sender.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Acquire-Lock in 1_run_after_validation.ps1
+[2026-02-09 15:01:56] [WARN] Missing function: Acquire-Lock
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Release-Lock in 1_common-paths.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Release-Lock in 1_mask_portable.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Release-Lock in 1_monitor.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Release-Lock in 1_email-sender.ps1
+[2026-02-09 15:01:56] [WARN] ✗ Function missing: Release-Lock in 1_run_after_validation.ps1
+[2026-02-09 15:01:56] [WARN] Missing function: Release-Lock
+[2026-02-09 15:01:56] [INFO] Creating missing function implementations...
+[2026-02-09 15:01:56] [SUCCESS] Created missing functions at: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\1_missing-functions.ps1
+[2026-02-09 15:01:56] [INFO] Created missing functions. Please add 'if (Test-Path "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\1_missing-functions.ps1") { . "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\1_missing-functions.ps1" }' to your scripts.
+[2026-02-09 15:01:56] [INFO] 
+Step 5: Configuring email credentials...
+[2026-02-09 15:01:56] [INFO] Setting up email credentials...
+[2026-02-09 15:01:56] [INFO] Email credentials already configured
+[2026-02-09 15:01:56] [INFO] 
+Step 6: Testing process cleanup...
+[2026-02-09 15:01:56] [INFO] Testing process cleanup...
+[2026-02-09 15:01:56] [SUCCESS] No orphaned processes found
+[2026-02-09 15:01:56] [INFO] 
+Step 7: Creating utility scripts...
+[2026-02-09 15:01:56] [INFO] Creating run validation script...
+[2026-02-09 15:01:56] [SUCCESS] Created run validation script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\run_validation.ps1
+[2026-02-09 15:01:56] [INFO] Creating cleanup script...
+[2026-02-09 15:01:57] [SUCCESS] Created cleanup script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\cleanup.ps1
+[2026-02-09 15:03:17] [INFO] Step 1: Validating script existence...
+[2026-02-09 15:03:17] [SUCCESS] ✓ Found: 1_common-paths.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Found: 1_mask_portable.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Found: 1_monitor.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Found: 1_email-sender.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Found: 1_run_after_validation.ps1
+[2026-02-09 15:03:17] [INFO] 
+Step 2: Validating script syntax...
+[2026-02-09 15:03:17] [SUCCESS] ✓ Syntax OK: 1_common-paths.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Syntax OK: 1_mask_portable.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Syntax OK: 1_monitor.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Syntax OK: 1_email-sender.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Syntax OK: 1_run_after_validation.ps1
+[2026-02-09 15:03:17] [INFO] 
+Step 3: Fixing monitor script issues...
+[2026-02-09 15:03:17] [INFO] Fixing monitor script loading issues...
+[2026-02-09 15:03:17] [SUCCESS] Fixed monitor script loading
+[2026-02-09 15:03:17] [SUCCESS] Monitor script fixed successfully
+[2026-02-09 15:03:17] [INFO] 
+Step 4: Checking for missing functions...
+[2026-02-09 15:03:17] [SUCCESS] ✓ Function found: Initialize-ProjectPortablePaths in 1_common-paths.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Function found: Write-Log in 1_common-paths.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Function found: Write-WorkerStatus in 1_common-paths.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Function found: Read-WorkerStatus in 1_common-paths.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Function found: Initialize-CommunicationPaths in 1_common-paths.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Function found: Check-Heartbeat in 1_common-paths.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Function found: Send-Heartbeat in 1_common-paths.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Function found: Acquire-Lock in 1_common-paths.ps1
+[2026-02-09 15:03:17] [SUCCESS] ✓ Function found: Release-Lock in 1_common-paths.ps1
+[2026-02-09 15:03:17] [INFO] 
+Step 5: Configuring email credentials...
+[2026-02-09 15:03:17] [INFO] Setting up email credentials...
+[2026-02-09 15:03:17] [INFO] Email credentials already configured
+[2026-02-09 15:03:17] [INFO] 
+Step 6: Testing process cleanup...
+[2026-02-09 15:03:18] [INFO] Testing process cleanup...
+[2026-02-09 15:03:18] [SUCCESS] No orphaned processes found
+[2026-02-09 15:03:18] [INFO] 
+Step 7: Creating utility scripts...
+[2026-02-09 15:03:18] [INFO] Creating run validation script...
+[2026-02-09 15:03:18] [SUCCESS] Created run validation script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\run_validation.ps1
+[2026-02-09 15:03:18] [INFO] Creating cleanup script...
+[2026-02-09 15:03:18] [SUCCESS] Created cleanup script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\cleanup.ps1
+[2026-02-09 15:13:02] [INFO] Step 1: Validating script existence...
+[2026-02-09 15:13:02] [SUCCESS] ✓ Found: 1_common-paths.ps1
+[2026-02-09 15:13:02] [SUCCESS] ✓ Found: 1_mask_portable.ps1
+[2026-02-09 15:13:02] [SUCCESS] ✓ Found: 1_monitor.ps1
+[2026-02-09 15:13:02] [SUCCESS] ✓ Found: 1_email-sender.ps1
+[2026-02-09 15:13:02] [SUCCESS] ✓ Found: 1_run_after_validation.ps1
+[2026-02-09 15:13:02] [INFO] 
+Step 2: Validating script syntax...
+[2026-02-09 15:13:02] [SUCCESS] ✓ Syntax OK: 1_common-paths.ps1
+[2026-02-09 15:13:02] [SUCCESS] ✓ Syntax OK: 1_mask_portable.ps1
+[2026-02-09 15:13:02] [SUCCESS] ✓ Syntax OK: 1_monitor.ps1
+[2026-02-09 15:13:02] [SUCCESS] ✓ Syntax OK: 1_email-sender.ps1
+[2026-02-09 15:13:02] [SUCCESS] ✓ Syntax OK: 1_run_after_validation.ps1
+[2026-02-09 15:13:02] [INFO] 
+Step 3: Fixing monitor script issues...
+[2026-02-09 15:13:02] [INFO] Fixing monitor script loading issues...
+[2026-02-09 15:13:02] [SUCCESS] Fixed monitor script loading
+[2026-02-09 15:13:02] [SUCCESS] Monitor script fixed successfully
+[2026-02-09 15:13:02] [INFO] 
+Step 4: Checking for missing functions...
+[2026-02-09 15:13:03] [SUCCESS] ✓ Function found: Initialize-ProjectPortablePaths in 1_common-paths.ps1
+[2026-02-09 15:13:03] [SUCCESS] ✓ Function found: Write-Log in 1_common-paths.ps1
+[2026-02-09 15:13:03] [SUCCESS] ✓ Function found: Write-WorkerStatus in 1_common-paths.ps1
+[2026-02-09 15:13:03] [SUCCESS] ✓ Function found: Read-WorkerStatus in 1_common-paths.ps1
+[2026-02-09 15:13:03] [SUCCESS] ✓ Function found: Initialize-CommunicationPaths in 1_common-paths.ps1
+[2026-02-09 15:13:03] [SUCCESS] ✓ Function found: Check-Heartbeat in 1_common-paths.ps1
+[2026-02-09 15:13:03] [SUCCESS] ✓ Function found: Send-Heartbeat in 1_common-paths.ps1
+[2026-02-09 15:13:03] [SUCCESS] ✓ Function found: Acquire-Lock in 1_common-paths.ps1
+[2026-02-09 15:13:03] [SUCCESS] ✓ Function found: Release-Lock in 1_common-paths.ps1
+[2026-02-09 15:13:03] [INFO] 
+Step 5: Configuring email credentials...
+[2026-02-09 15:13:03] [INFO] Setting up email credentials...
+[2026-02-09 15:13:03] [INFO] Email credentials already configured
+[2026-02-09 15:13:03] [INFO] 
+Step 6: Testing process cleanup...
+[2026-02-09 15:13:03] [INFO] Testing process cleanup...
+[2026-02-09 15:13:03] [SUCCESS] No orphaned processes found
+[2026-02-09 15:13:03] [INFO] 
+Step 7: Creating utility scripts...
+[2026-02-09 15:13:03] [INFO] Creating run validation script...
+[2026-02-09 15:13:03] [SUCCESS] Created run validation script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\run_validation.ps1
+[2026-02-09 15:13:03] [INFO] Creating cleanup script...
+[2026-02-09 15:13:03] [SUCCESS] Created cleanup script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\cleanup.ps1

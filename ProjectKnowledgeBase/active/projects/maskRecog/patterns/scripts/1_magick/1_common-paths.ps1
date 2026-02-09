@@ -1,3 +1,5 @@
+# 1_common-paths.ps1
+
 <#
 .SYNOPSIS
 Common path initialization module shared by monitor and worker scripts
@@ -139,14 +141,104 @@ function Add-ScriptSpecificPaths {
     if ($IsWorker) {
         $Paths.PythonScript = Join-Path $Paths.ProjectRoot "patterns\algorithm\entry_multi-USED-Magick.py"
         $Paths.PythonExe = Join-Path $Paths.VenvRoot ".venv\Scripts\python.exe"
+        # $Paths.
     }
     
     return $Paths
 }
 
 # ====================================================================
-# Logging function
+# MISSING FUNCTION IMPLEMENTATIONS
 # ====================================================================
+
+function Check-Heartbeat {
+    [CmdletBinding()]
+    param([string]$HeartbeatFile)
+    
+    if (-not (Test-Path $HeartbeatFile)) {
+        return $false
+    }
+    
+    try {
+        $heartbeatTime = (Get-Item $HeartbeatFile).LastWriteTime
+        $ageMinutes = ((Get-Date) - $heartbeatTime).TotalMinutes
+        
+        # Heartbeat is considered alive if updated within last 2 minutes
+        return $ageMinutes -le 2
+    } catch {
+        return $false
+    }
+}
+
+function Send-Heartbeat {
+    [CmdletBinding()]
+    param([string]$HeartbeatFile)
+    
+    try {
+        $heartbeatDir = Split-Path $HeartbeatFile -Parent
+        if (-not (Test-Path $heartbeatDir)) {
+            New-Item -ItemType Directory -Path $heartbeatDir -Force | Out-Null
+        }
+        
+        Set-Content -Path $HeartbeatFile -Value (Get-Date -Format "yyyy-MM-dd HH:mm:ss") -Force
+        return $true
+    } catch {
+        return $false
+    }
+}
+
+function Acquire-Lock {
+    [CmdletBinding()]
+    param(
+        [string]$LockFile,
+        [int]$TimeoutSeconds = 30
+    )
+    
+    $startTime = Get-Date
+    $lockAcquired = $false
+    
+    while (((Get-Date) - $startTime).TotalSeconds -lt $TimeoutSeconds) {
+        try {
+            if (Test-Path $LockFile) {
+                $lockTime = [DateTime]::Parse((Get-Content $LockFile -First 1))
+                $lockAge = ((Get-Date) - $lockTime).TotalSeconds
+                
+                # If lock is older than 30 seconds, consider it stale
+                if ($lockAge -gt 30) {
+                    Remove-Item $LockFile -Force -ErrorAction SilentlyContinue
+                }
+            }
+            
+            # Try to create lock file
+            $lockDir = Split-Path $LockFile -Parent
+            if (-not (Test-Path $lockDir)) {
+                New-Item -ItemType Directory -Path $lockDir -Force | Out-Null
+            }
+            
+            $tempFile = "$LockFile.tmp"
+            (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") | Out-File $tempFile -Force
+            Move-Item $tempFile $LockFile -Force -ErrorAction Stop
+            
+            $lockAcquired = $true
+            break
+        } catch {
+            Start-Sleep -Milliseconds 500
+        }
+    }
+    
+    return $lockAcquired
+}
+
+function Release-Lock {
+    [CmdletBinding()]
+    param([string]$LockFile)
+    
+    if (Test-Path $LockFile) {
+        Remove-Item $LockFile -Force -ErrorAction SilentlyContinue
+    }
+    return $true
+}
+
 
 function Write-Log {
     [CmdletBinding()]
