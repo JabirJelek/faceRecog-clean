@@ -13,38 +13,16 @@ Updated to work with enhanced monitor script structure
 # ====================================================================
 $commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
 if (Test-Path $commonPathsScript) {
-    . $commonPathsScript
-    Write-Host "✓ Common paths module loaded" -ForegroundColor Green
+    try {
+        . $commonPathsScript
+        Write-Host "✓ Common paths module loaded" -ForegroundColor Green
+    } catch {
+        Write-Host "ERROR: Failed to load common paths: $_" -ForegroundColor Red
+        exit 1
+    }
 } else {
     Write-Host "ERROR: Common paths script not found at: $commonPathsScript" -ForegroundColor Red
-    Write-Host "Attempting to find project root manually..." -ForegroundColor Yellow
-    
-    # Fallback to manual initialization
-    function Initialize-ManualPaths {
-        $scriptPath = $PSScriptRoot
-        $currentPath = $scriptPath
-        
-        while ($currentPath -and (Split-Path $currentPath -Parent)) {
-            $currentDirName = Split-Path $currentPath -Leaf
-            if ($currentDirName -eq "maskRecog") {
-                $global:ProjectRoot = $currentPath
-                $global:ActiveRoot = Split-Path $currentPath -Parent | Split-Path -Parent
-                break
-            }
-            $currentPath = Split-Path $currentPath -Parent
-        }
-        
-        if (-not $global:ProjectRoot) {
-            $global:ProjectRoot = Read-Host "Please enter full path to 'maskRecog' project root"
-            if (!(Test-Path $global:ProjectRoot)) {
-                Write-Host "ERROR: Path does not exist!" -ForegroundColor Red
-                exit 1
-            }
-            $global:ActiveRoot = Split-Path $global:ProjectRoot -Parent | Split-Path -Parent
-        }
-    }
-    
-    Initialize-ManualPaths
+    exit 1
 }
 
 # ====================================================================
@@ -54,6 +32,9 @@ Write-Host "=== Mask Detection Worker Script ===" -ForegroundColor Cyan
 Write-Host "Starting portable path initialization..." -ForegroundColor Cyan
 
 $paths = Initialize-ProjectPortablePaths -IsWorker
+
+# Initialize communication paths
+$global:CommunicationPaths = Initialize-CommunicationPaths -Paths $paths -IsWorker
 
 # Extract validated paths
 $ProjectRoot = $paths.ProjectRoot
@@ -69,7 +50,7 @@ $POWERSHELL_SCRIPT_NAME = Split-Path -Leaf $MyInvocation.MyCommand.Path
 
 # Store worker PID for monitor tracking
 $global:WorkerPID = $PID
-Write-Log "Worker process started (PID: $global:WorkerPID)" -Level "INFO"
+Write-Log "Worker process started (PID: $global:WorkerPID)" -Level "INFO"  # Changed from
 
 # ====================================================================
 # ENHANCED: Configuration for worker
@@ -89,6 +70,97 @@ $Script:WorkerConfig = @{
     WorkerLogFile = Join-Path $ActiveDatePath "worker_$(Get-Date -Format 'yyyy-MM-dd_HH-mm-ss').log"
 }
 
+# Add these functions to 1_common-paths.ps1 after the existing communication functions:
+
+function Read-WorkerStatus {
+    [CmdletBinding()]
+    param([string]$StatusFile)
+    
+    if (-not (Test-Path $StatusFile)) {
+        return @{ Status = "NOT_FOUND"; WorkerPID = 0; PythonPID = 0 }
+    }
+    
+    try {
+        $content = Get-Content $StatusFile -Raw
+        return $content | ConvertFrom-Json -AsHashtable
+    } catch {
+        return @{ Status = "ERROR"; Error = $_; WorkerPID = 0; PythonPID = 0 }
+    }
+}
+
+function Check-Heartbeat {
+    [CmdletBinding()]
+    param([string]$HeartbeatFile, [int]$TimeoutSeconds = 30)
+    
+    if (-not (Test-Path $HeartbeatFile)) {
+        return $false
+    }
+    
+    try {
+        $content = Get-Content $HeartbeatFile -Raw
+        $heartbeat = $content | ConvertFrom-Json -AsHashtable
+        
+        $lastBeat = [DateTime]::ParseExact($heartbeat.Timestamp, "yyyy-MM-dd HH:mm:ss", $null)
+        $now = Get-Date
+        
+        return ($now - $lastBeat).TotalSeconds -le $TimeoutSeconds
+    } catch {
+        return $false
+    }
+}
+
+function Acquire-Lock {
+    [CmdletBinding()]
+    param([string]$LockFile, [int]$TimeoutSeconds = 10)
+    
+    $startTime = Get-Date
+    $lockAcquired = $false
+    
+    while (((Get-Date) - $startTime).TotalSeconds -lt $TimeoutSeconds) {
+        try {
+            if (Test-Path $LockFile) {
+                # Check if lock is stale (older than 30 seconds)
+                $lockTime = (Get-Item $LockFile).LastWriteTime
+                if (((Get-Date) - $lockTime).TotalSeconds -gt 30) {
+                    Remove-Item $LockFile -Force
+                    Start-Sleep -Milliseconds 100
+                }
+                Start-Sleep -Milliseconds 200
+                continue
+            }
+            
+            # Create lock file
+            $PID | Out-File $LockFile
+            Start-Sleep -Milliseconds 100
+            
+            # Verify we still own the lock
+            if ((Test-Path $LockFile) -and ((Get-Content $LockFile) -eq $PID)) {
+                $lockAcquired = $true
+                break
+            }
+        } catch {
+            Start-Sleep -Milliseconds 200
+        }
+    }
+    
+    return $lockAcquired
+}
+
+function Release-Lock {
+    [CmdletBinding()]
+    param([string]$LockFile)
+    
+    if (Test-Path $LockFile) {
+        try {
+            if ((Get-Content $LockFile) -eq $PID) {
+                Remove-Item $LockFile -Force
+            }
+        } catch {
+            # Ignore cleanup errors
+        }
+    }
+}
+
 # ====================================================================
 # ENHANCED: Helper functions
 # ====================================================================
@@ -106,34 +178,34 @@ function Convert-HashtableToArgs {
     return $argsArray
 }
 
-function Write-WorkerLog {
-    param(
-        [string]$Message,
-        [string]$Level = "INFO"
-    )
+# function Write-Log1 {
+#     param(
+#         [string]$Message,
+#         [string]$Level = "INFO"
+#     )
     
-    $currentTimestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logEntry = "[$currentTimestamp] [$Level] $Message"
+#     $currentTimestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+#     $logEntry = "[$currentTimestamp] [$Level] $Message"
     
-    # Write to worker log file
-    if ($Script:WorkerConfig.WorkerLogFile) {
-        try {
-            Add-Content -Path $Script:WorkerConfig.WorkerLogFile -Value $logEntry -ErrorAction SilentlyContinue
-        } catch {
-            # Fallback to console
-            Write-Host "Worker log file write failed: $_" -ForegroundColor Yellow
-        }
-    }
+#     # Write to worker log file
+#     if ($Script:WorkerConfig.WorkerLogFile) {
+#         try {
+#             Add-Content -Path $Script:WorkerConfig.WorkerLogFile -Value $logEntry -ErrorAction SilentlyContinue
+#         } catch {
+#             # Fallback to console
+#             Write-Host "Worker log file write failed: $_" -ForegroundColor Yellow
+#         }
+#     }
     
-    # Color-coded console output
-    switch ($Level) {
-        "ERROR" { Write-Host $logEntry -ForegroundColor Red }
-        "WARN" { Write-Host $logEntry -ForegroundColor Yellow }
-        "SUCCESS" { Write-Host $logEntry -ForegroundColor Green }
-        "DEBUG" { Write-Host $logEntry -ForegroundColor Gray }
-        default { Write-Host $logEntry -ForegroundColor White }
-    }
-}
+#     # Color-coded console output
+#     switch ($Level) {
+#         "ERROR" { Write-Host $logEntry -ForegroundColor Red }
+#         "WARN" { Write-Host $logEntry -ForegroundColor Yellow }
+#         "SUCCESS" { Write-Host $logEntry -ForegroundColor Green }
+#         "DEBUG" { Write-Host $logEntry -ForegroundColor Gray }
+#         default { Write-Host $logEntry -ForegroundColor White }
+#     }
+# }
 
 function Create-RunFolderStructure {
     param(
@@ -141,7 +213,7 @@ function Create-RunFolderStructure {
         [string]$Timestamp
     )
     
-    Write-WorkerLog "Creating run folder structure..." -Level "INFO"
+    Write-Log "Creating run folder structure..." -Level "INFO"
     
     $RUN_FOLDER_NAME = "Magick_Process_MaskDetect_$Timestamp"
     $RUN_FOLDER_PATH = Join-Path $BasePath $RUN_FOLDER_NAME
@@ -157,7 +229,7 @@ function Create-RunFolderStructure {
         New-Item -ItemType Directory -Path $RUN_LOGS_PATH -Force | Out-Null
         New-Item -ItemType Directory -Path $RUN_SCRIPT_OUTPUT_PATH -Force | Out-Null
         
-        Write-WorkerLog "Created run folder structure at: $RUN_FOLDER_PATH" -Level "SUCCESS"
+        Write-Log "Created run folder structure at: $RUN_FOLDER_PATH" -Level "SUCCESS"
         
         return @{
             RunFolderPath = $RUN_FOLDER_PATH
@@ -167,7 +239,7 @@ function Create-RunFolderStructure {
             RunFolderName = $RUN_FOLDER_NAME
         }
     } catch {
-        Write-WorkerLog "Failed to create run folder structure: $_" -Level "ERROR"
+        Write-Log "Failed to create run folder structure: $_" -Level "ERROR"
         throw
     }
 }
@@ -198,7 +270,7 @@ function Create-MetadataFile {
     }
     
     $metadata | ConvertTo-Json | Out-File $MetadataPath
-    Write-WorkerLog "Created metadata file: $MetadataPath" -Level "INFO"
+    Write-Log "Created metadata file: $MetadataPath" -Level "INFO"
     
     return $metadata
 }
@@ -212,38 +284,35 @@ function Execute-PythonScript {
         [string]$OutputFile
     )
     
-    Write-WorkerLog "Starting Python script execution..." -Level "INFO"
-    Write-WorkerLog "Python executable: $PythonExe" -Level "DEBUG"
-    Write-WorkerLog "Python script: $PythonScript" -Level "DEBUG"
-    Write-WorkerLog "Working directory: $WorkingDirectory" -Level "DEBUG"
+    Write-Log "Starting Python script execution..." -Level "INFO" -LogFile $Script:WorkerConfig.WorkerLogFile
     
     if (-not (Test-Path $PythonExe)) {
         $errorMsg = "ERROR: Python executable not found at $PythonExe"
-        Write-WorkerLog $errorMsg -Level "ERROR"
+        Write-Log $errorMsg -Level "ERROR" -LogFile $Script:WorkerConfig.WorkerLogFile
         throw $errorMsg
     }
     
     if (-not (Test-Path $PythonScript)) {
         $errorMsg = "ERROR: Python script not found at $PythonScript"
-        Write-WorkerLog $errorMsg -Level "ERROR"
+        Write-Log $errorMsg -Level "ERROR" -LogFile $Script:WorkerConfig.WorkerLogFile
         throw $errorMsg
     }
     
     # Prepare the command
     $commandString = "`"$PythonExe`" `"$PythonScript`" $($PythonArgs -join ' ')"
-    Write-WorkerLog "Executing: $commandString" -Level "INFO"
+    Write-Log "Executing: $commandString" -Level "INFO" -LogFile $Script:WorkerConfig.WorkerLogFile
     
     # Capture start time
     $startTime = Get-Date
-    Write-WorkerLog "Execution started at: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))" -Level "INFO"
-    
+    Write-Log "Execution started at: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))" -Level "INFO" -LogFile $Script:WorkerConfig.WorkerLogFile
+
     try {
         # Save original location
         $originalLocation = Get-Location
         
         # Change to working directory
         Set-Location $WorkingDirectory
-        Write-WorkerLog "Changed working directory to: $WorkingDirectory" -Level "DEBUG"
+        Write-Log "Changed working directory to: $WorkingDirectory" -Level "DEBUG" -LogFile $Script:WorkerConfig.WorkerLogFile
         
         # Start Python process
         $pythonProcess = Start-Process -FilePath $PythonExe `
@@ -254,18 +323,51 @@ function Execute-PythonScript {
             -RedirectStandardError $OutputFile `
             -WorkingDirectory $WorkingDirectory
         
-        # Store Python PID for monitor tracking
         $global:PythonPID = $pythonProcess.Id
-        Write-WorkerLog "Python process started (PID: $global:PythonPID)" -Level "SUCCESS"
         
-        # Wait for process to complete
-        Wait-Process -Id $pythonProcess.Id -ErrorAction Stop
+        # Update status
+        Write-WorkerStatus -StatusFile $global:CommunicationPaths.StatusFile `
+            -Status "RUNNING" `
+            -WorkerPID $global:WorkerPID `
+            -PythonPID $global:PythonPID `
+            -Message "Python script running"
+        
+        # Monitor loop with heartbeat and command checking
+        while (-not $pythonProcess.HasExited) {
+            # Send heartbeat
+            Send-HeartbeatToMonitor -Message "Python script running"
+            
+            # Check for monitor commands
+            $command = Check-ForMonitorCommand
+            if ($command -eq "STOP") {
+                Write-Log "Stopping Python process due to STOP command from monitor" -Level "WARN" -LogFile $Script:WorkerConfig.WorkerLogFile
+                
+                # Try graceful shutdown first
+                if (-not $pythonProcess.HasExited) {
+                    $pythonProcess.CloseMainWindow() | Out-Null
+                    Start-Sleep -Seconds 2
+                    
+                    if (-not $pythonProcess.HasExited) {
+                        Write-Log "Forcefully terminating Python process..." -Level "WARN" -LogFile $Script:WorkerConfig.WorkerLogFile
+                        $pythonProcess.Kill()
+                    }
+                }
+                
+                # Update status
+                Write-WorkerStatus -StatusFile $global:CommunicationPaths.StatusFile `
+                    -Status "STOPPED" `
+                    -WorkerPID $global:WorkerPID `
+                    -PythonPID $global:PythonPID `
+                    -Message "Stopped by monitor command"
+                
+                break
+            }
+            
+            Start-Sleep -Seconds 2
+        }
+        
+        $pythonProcess.WaitForExit()
         $exitCode = $pythonProcess.ExitCode
-        
-        # Return to original location
-        Set-Location $originalLocation
-        
-        Write-WorkerLog "Python process completed with exit code: $exitCode" -Level "INFO"
         
         return @{
             ExitCode = $exitCode
@@ -275,11 +377,19 @@ function Execute-PythonScript {
         }
         
     } catch {
-        $errorMessage = $_.Exception.Message
-        Write-WorkerLog "Exception during Python script execution: $errorMessage" -Level "ERROR"
+        # Update status on error
+        Write-WorkerStatus -StatusFile $global:CommunicationPaths.StatusFile `
+            -Status "ERROR" `
+            -WorkerPID $global:WorkerPID `
+            -PythonPID $global:PythonPID `
+            -Message "Python execution error: $_"
         throw
+    } finally {
+        # Restore original location
+        Set-Location $originalLocation
     }
 }
+
 
 function Create-CompletionSummary {
     param(
@@ -350,22 +460,111 @@ NOTE: This run uses portable paths that are relative to the project root.
 "@
 
     $completionSummary | Out-File $SummaryPath
-    Write-WorkerLog "Created completion summary: $SummaryPath" -Level "INFO"
+    Write-Log "Created completion summary: $SummaryPath" -Level "INFO"
 }
+
+
+function Register-WorkerWithMonitor {
+    try {
+        # Write PID file for monitor to detect
+        $PID | Out-File $global:CommunicationPaths.PIDFile -Force
+        
+        # Create registration file
+        $registration = @{
+            Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            WorkerPID = $PID
+            ScriptPath = $MyInvocation.MyCommand.Path
+            Version = "2.0"
+            Status = "STARTING"
+        }
+        
+        $registration | ConvertTo-Json | Out-File $global:CommunicationPaths.RegistrationFile -Force
+        
+        # Initial status update using common function
+        Write-WorkerStatus -StatusFile $global:CommunicationPaths.StatusFile `
+            -Status "STARTING" `
+            -WorkerPID $PID `
+            -Message "Worker script initializing"
+        
+        Write-Host "✓ Worker registered with monitor (PID: $PID)" -ForegroundColor Green
+        return $true
+    } catch {
+        Write-Host "WARNING: Failed to register with monitor: $_" -ForegroundColor Yellow
+        return $false
+    }
+}
+
+function Send-HeartbeatToMonitor {
+    param([string]$Message = "")
+    
+    try {
+        $success = Send-Heartbeat -HeartbeatFile $global:CommunicationPaths.HeartbeatFile
+        
+        if ($Message -ne "") {
+            $status = Read-WorkerStatus -StatusFile $global:CommunicationPaths.StatusFile
+            if ($status.Status -ne "ERROR") {
+                $status.Message = $Message
+                $status.LastHeartbeat = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+                $status | ConvertTo-Json | Out-File $global:CommunicationPaths.StatusFile -Force
+            }
+        }
+        
+        return $success
+    } catch {
+        return $false
+    }
+}
+
+function Check-ForMonitorCommand {
+    if (Test-Path $global:CommunicationPaths.CommandFile) {
+        try {
+            $lockFile = $global:CommunicationPaths.LockFile
+            if (Acquire-Lock -LockFile $lockFile) {
+                $commandData = Get-Content $global:CommunicationPaths.CommandFile -Raw | ConvertFrom-Json
+                Remove-Item $global:CommunicationPaths.CommandFile -Force
+                
+                Release-Lock -LockFile $lockFile
+                
+                Write-Log "Received command from monitor: $($commandData.Command)" -Level "INFO" -LogFile $Script:WorkerConfig.WorkerLogFile
+                
+                switch ($commandData.Command) {
+                    "STOP" {
+                        Write-Host "Received STOP command from monitor: $($commandData.Parameters.Reason)" -ForegroundColor Yellow
+                        
+                        # Update status to show we're shutting down
+                        Write-WorkerStatus -StatusFile $global:CommunicationPaths.StatusFile `
+                            -Status "SHUTTING_DOWN" `
+                            -WorkerPID $global:WorkerPID `
+                            -PythonPID $global:PythonPID `
+                            -Message "Received STOP command: $($commandData.Parameters.Reason)"
+                        
+                        return "STOP"
+                    }
+                    default {
+                        Write-Log "Unknown command received: $($commandData.Command)" -Level "WARN" -LogFile $Script:WorkerConfig.WorkerLogFile
+                        return $null
+                    }
+                }
+            }
+        } catch {
+            Write-Log "Error reading monitor command: $_" -Level "ERROR" -LogFile $Script:WorkerConfig.WorkerLogFile
+        }
+    }
+    return $null
+}
+
 
 # ====================================================================
 # MAIN EXECUTION
 # ====================================================================
 
 try {
-    Write-WorkerLog "=== Worker Script Started ===" -Level "INFO"
-    Write-WorkerLog "Worker PID: $global:WorkerPID" -Level "INFO"
-    Write-WorkerLog "Project Root: $ProjectRoot" -Level "INFO"
-    Write-WorkerLog "Active Date Path: $ActiveDatePath" -Level "INFO"
+    Write-Log "=== Worker Script Started ===" -Level "INFO" -LogFile $Script:WorkerConfig.WorkerLogFile
+    Write-Log "Worker PID: $global:WorkerPID" -Level "INFO" -LogFile $Script:WorkerConfig.WorkerLogFile
     
     # Convert Python parameters to argument array
     $PYTHON_ARGS = Convert-HashtableToArgs -Params $Script:WorkerConfig.PythonParams
-    Write-WorkerLog "Python arguments: $($PYTHON_ARGS -join ' ')" -Level "INFO"
+    Write-Log "Python arguments: $($PYTHON_ARGS -join ' ')" -Level "INFO" -LogFile $Script:WorkerConfig.WorkerLogFile
     
     # Generate timestamp for this run
     $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
@@ -378,6 +577,9 @@ try {
     $PYTHON_OUTPUT_FILE = Join-Path $folderStructure.LogsPath "python_output.txt"
     $COMPLETION_SUMMARY_FILE = Join-Path $folderStructure.LogsPath "completion_summary.txt"
     
+    # Register worker with monitor
+    Register-WorkerWithMonitor
+
     # Write initial log header
     @"
 ==================================================
@@ -438,21 +640,28 @@ Number of arguments: $($PYTHON_ARGS.Count)
         -StartTime $executionResult.StartTime `
         -EndTime $executionResult.EndTime
     
-    # Log summary to console
-    Write-WorkerLog "==================================================" -Level "SUCCESS"
-    Write-WorkerLog "RUN COMPLETED" -Level "SUCCESS"
-    Write-WorkerLog "Run Folder: $($folderStructure.RunFolderPath)" -Level "INFO"
-    Write-WorkerLog "Exit Code: $($executionResult.ExitCode)" -Level "INFO"
-    Write-WorkerLog "Duration: $durationFormatted" -Level "INFO"
-    Write-WorkerLog "Worker PID: $global:WorkerPID" -Level "INFO"
-    Write-WorkerLog "Python PID: $($executionResult.PythonPID)" -Level "INFO"
-    Write-WorkerLog "==================================================" -Level "SUCCESS"
+    # Log summary
+    Write-Log "==================================================" -Level "SUCCESS" -LogFile $Script:WorkerConfig.WorkerLogFile
+    Write-Log "RUN COMPLETED" -Level "SUCCESS" -LogFile $Script:WorkerConfig.WorkerLogFile
+    Write-Log "Run Folder: $($folderStructure.RunFolderPath)" -Level "INFO" -LogFile $Script:WorkerConfig.WorkerLogFile
+    Write-Log "Exit Code: $($executionResult.ExitCode)" -Level "INFO" -LogFile $Script:WorkerConfig.WorkerLogFile
+    Write-Log "Duration: $durationFormatted" -Level "INFO" -LogFile $Script:WorkerConfig.WorkerLogFile
     
-    # Exit with Python's exit code
-    exit $executionResult.ExitCode
+    # Update status
+    Write-WorkerStatus -StatusFile $global:CommunicationPaths.StatusFile `
+        -Status "COMPLETED" `
+        -WorkerPID $global:WorkerPID `
+        -PythonPID $global:PythonPID `
+        -Message "Worker completed successfully" `
+        -RunFolder $folderStructure.RunFolderPath
     
 } catch {
-    Write-WorkerLog "FATAL ERROR in worker script: $_" -Level "ERROR"
-    Write-WorkerLog "Stack trace: $($_.ScriptStackTrace)" -Level "ERROR"
-    exit 1
+    # Update status on error
+    Write-WorkerStatus -StatusFile $global:CommunicationPaths.StatusFile `
+        -Status "ERROR" `
+        -WorkerPID $global:WorkerPID `
+        -Message "Worker error: $_"
+    
+    Write-Log "Worker error: $_" -Level "ERROR" -LogFile $Script:WorkerConfig.WorkerLogFile
+    throw
 }

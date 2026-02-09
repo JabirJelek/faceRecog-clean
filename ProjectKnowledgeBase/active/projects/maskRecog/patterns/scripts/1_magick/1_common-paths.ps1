@@ -326,51 +326,7 @@ function Validate-CriticalPaths {
 # ENHANCED: Get-DateBasedPath with improved functionality
 # ====================================================================
 
-function Get-DateBasedPath {
-    <#
-    .SYNOPSIS
-    Gets or creates a date-based folder path for the current or specified day
-    .DESCRIPTION
-    Enhanced version with better error handling and date flexibility
-    #>
-    [CmdletBinding()]
-    param(
-        [string]$BasePath = (Join-Path $global:ActiveRoot $Script:CommonConfig.LogBasePath),
-        [DateTime]$Date = (Get-Date),
-        [switch]$CreateIfNotExist = $true
-    )
-    
-    try {
-        $dateString = $Date.ToString($Script:CommonConfig.DateFormat)
-        $datePath = Join-Path $BasePath $dateString
-        
-        # Create the directory if it doesn't exist and flag is set
-        if (-not (Test-Path $datePath) -and $CreateIfNotExist) {
-            try {
-                # Ensure base directory exists
-                if (-not (Test-Path $BasePath)) {
-                    New-Item -ItemType Directory -Path $BasePath -Force | Out-Null
-                    Write-Host "Created base directory: $BasePath" -ForegroundColor Yellow
-                }
-                
-                New-Item -ItemType Directory -Path $datePath -Force | Out-Null
-                Write-Host "Created date-based folder: $datePath" -ForegroundColor Yellow
-            } catch {
-                Write-Host "ERROR: Failed to create date-based folder: $_" -ForegroundColor Red
-                throw
-            }
-        } elseif (Test-Path $datePath) {
-            Write-Host "Using existing date-based folder: $datePath" -ForegroundColor Green
-        } elseif (-not $CreateIfNotExist) {
-            Write-Host "Date-based folder does not exist: $datePath" -ForegroundColor Yellow
-        }
-        
-        return $datePath
-    } catch {
-        Write-Host "ERROR in Get-DateBasedPath: $_" -ForegroundColor Red
-        throw
-    }
-}
+ 
 
 # ====================================================================
 # ENHANCED: Logging function with flexible output - STABILIZED
@@ -437,99 +393,6 @@ function Write-Log {
 # ENHANCED: Utility Functions - REMOVED Export-ModuleMember dependencies
 # ====================================================================
 
-function Get-RunFolderPattern {
-    <#
-    .SYNOPSIS
-    Returns the pattern for run folders based on current configuration
-    #>
-    param([string]$Pattern = "Magick_Process_MaskDetect_*")
-    return $Pattern
-}
-
-function Get-WorkerScriptPath {
-    <#
-    .SYNOPSIS
-    Returns the path to the worker script
-    #>
-    param([string]$ProjectRoot = $global:ProjectRoot)
-    
-    if (-not $ProjectRoot) {
-        Write-Host "ERROR: ProjectRoot not initialized" -ForegroundColor Red
-        return $null
-    }
-    
-    $workerScript = Join-Path $ProjectRoot "patterns\scripts\1_magick\1_mask_portable.ps1"
-    
-    if (Test-Path $workerScript) {
-        return $workerScript
-    } else {
-        Write-Host "WARNING: Worker script not found at: $workerScript" -ForegroundColor Yellow
-        return $null
-    }
-}
-
-function Get-PythonPaths {
-    <#
-    .SYNOPSIS
-    Returns Python-related paths (script and executable)
-    #>
-    param(
-        [string]$ProjectRoot = $global:ProjectRoot,
-        [string]$VenvRoot = $global:VenvRoot
-    )
-    
-    if (-not $ProjectRoot -or -not $VenvRoot) {
-        Write-Host "ERROR: ProjectRoot or VenvRoot not initialized" -ForegroundColor Red
-        return $null
-    }
-    
-    $pythonScript = Join-Path $ProjectRoot "patterns\algorithm\entry_multi-USED-Magick.py"
-    $pythonExe = Join-Path $VenvRoot ".venv\Scripts\python.exe"
-    
-    return @{
-        PythonScript = $pythonScript
-        PythonExe = $pythonExe
-    }
-}
-
-function Test-ProjectStructure {
-    <#
-    .SYNOPSIS
-    Tests if the project structure is valid
-    #>
-    [CmdletBinding()]
-    param()
-    
-    try {
-        $paths = Initialize-ProjectPortablePaths -Silent
-        
-        if (-not $paths) {
-            return $false
-        }
-        
-        # Test critical paths
-        $criticalTests = @(
-            @{ Path = $paths.ProjectRoot; Type = "Directory" }
-            @{ Path = $paths.ActiveRoot; Type = "Directory" }
-            @{ Path = $paths.DateBasedPath; Type = "Directory" }
-        )
-        
-        foreach ($test in $criticalTests) {
-            if ($test.Type -eq "Directory") {
-                if (-not (Test-Path $test.Path -PathType Container)) {
-                    Write-Host "Missing directory: $($test.Path)" -ForegroundColor Red
-                    return $false
-                }
-            }
-        }
-        
-        return $true
-    } catch {
-        Write-Host "Project structure test failed: $_" -ForegroundColor Red
-        return $false
-    }
-}
-
 # ====================================================================
 # STABILIZATION: Global Variable Initialization
 # ====================================================================
@@ -540,38 +403,193 @@ if (-not $global:ActiveRoot) { $global:ActiveRoot = $null }
 if (-not $global:VenvRoot) { $global:VenvRoot = $null }
 if (-not $global:ActiveDatePath) { $global:ActiveDatePath = $null }
 if (-not $global:CurrentDateFolder) { $global:CurrentDateFolder = $null }
+ 
+# ====================================================================
+# ENHANCED: Communication Functions for Monitor-Worker Coordination
+# ====================================================================
 
 # ====================================================================
-# STABILIZATION: Main Execution Block for Testing
+# ENHANCED: Communication Functions for Monitor-Worker Coordination
 # ====================================================================
 
-<#
-This script is designed to be dot-sourced by other scripts.
-When run directly, it will test the initialization functions.
-#>
-
-if ($MyInvocation.InvocationName -ne '.') {
-    Write-Host "=== Common Paths Module Test ===" -ForegroundColor Cyan
-    Write-Host "This script is designed to be dot-sourced by other scripts." -ForegroundColor Yellow
-    Write-Host "Example usage in monitor script:" -ForegroundColor White
-    Write-Host "  . `"$PSScriptRoot\1_common-paths.ps1`"" -ForegroundColor White
-    Write-Host "  `$paths = Initialize-ProjectPortablePaths -IsMonitor" -ForegroundColor White
-    Write-Host ""
-    Write-Host "Example usage in worker script:" -ForegroundColor White
-    Write-Host "  . `"$PSScriptRoot\1_common-paths.ps1`"" -ForegroundColor White
-    Write-Host "  `$paths = Initialize-ProjectPortablePaths -IsWorker" -ForegroundColor White
-    Write-Host ""
+function Initialize-CommunicationPaths {
+    [CmdletBinding()]
+    param(
+        [hashtable]$Paths,
+        [switch]$IsMonitor,
+        [switch]$IsWorker
+    )
     
-    # Test the functions
+    if (-not $Paths -or -not $Paths.DateBasedPath) {
+        Write-Host "ERROR: Invalid paths provided to Initialize-CommunicationPaths" -ForegroundColor Red
+        return $null
+    }
+    
+    $communicationPaths = @{}
+    
     try {
-        Write-Host "Testing project structure..." -ForegroundColor Cyan
-        $testResult = Test-ProjectStructure
-        if ($testResult) {
-            Write-Host "✓ Project structure test passed" -ForegroundColor Green
-        } else {
-            Write-Host "✗ Project structure test failed" -ForegroundColor Red
+        # Create communication directory
+        $commDir = Join-Path $Paths.DateBasedPath "communication"
+        if (-not (Test-Path $commDir)) {
+            New-Item -ItemType Directory -Path $commDir -Force -ErrorAction Stop | Out-Null
+            Write-Host "Created communication directory: $commDir" -ForegroundColor Yellow
         }
+        
+        # Common communication files (used by both monitor and worker)
+        $communicationPaths.CommunicationDir = $commDir
+        $communicationPaths.StatusFile = Join-Path $commDir "worker_status.json"
+        $communicationPaths.HeartbeatFile = Join-Path $commDir "worker_heartbeat.json"
+        $communicationPaths.CommandFile = Join-Path $commDir "monitor_command.json"
+        $communicationPaths.LockFile = Join-Path $commDir "communication.lock"
+        $communicationPaths.RegistrationFile = Join-Path $commDir "worker_registered.json"
+        
+        # Worker-specific communication
+        if ($IsWorker) {
+            $communicationPaths.PIDFile = Join-Path $commDir "worker_pid.txt"
+        }
+        
+        return $communicationPaths
     } catch {
-        Write-Host "Error during test: $_" -ForegroundColor Red
+        Write-Host "ERROR: Failed to initialize communication paths: $_" -ForegroundColor Red
+        return $null
+    }
+}
+
+function Write-WorkerStatus {
+    [CmdletBinding()]
+    param(
+        [string]$StatusFile,
+        [string]$Status,
+        [int]$WorkerPID,
+        [int]$PythonPID = 0,
+        [string]$Message = "",
+        [string]$RunFolder = ""
+    )
+    
+    $statusData = @{
+        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        Status = $Status
+        WorkerPID = $WorkerPID
+        PythonPID = $PythonPID
+        Message = $Message
+        RunFolder = $RunFolder
+        MonitorDetected = $false
+        LastHeartbeat = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    }
+    
+    try {
+        $statusData | ConvertTo-Json | Out-File $StatusFile -Force
+        return $true
+    } catch {
+        Write-Host "Failed to write worker status: $_" -ForegroundColor Red
+        return $false
+    }
+}
+
+function Read-WorkerStatus {
+    [CmdletBinding()]
+    param([string]$StatusFile)
+    
+    if (-not (Test-Path $StatusFile)) {
+        return @{ Status = "NOT_FOUND"; WorkerPID = 0; PythonPID = 0 }
+    }
+    
+    try {
+        $content = Get-Content $StatusFile -Raw
+        return $content | ConvertFrom-Json -AsHashtable
+    } catch {
+        return @{ Status = "ERROR"; Error = $_; WorkerPID = 0; PythonPID = 0 }
+    }
+}
+
+function Send-Heartbeat {
+    [CmdletBinding()]
+    param([string]$HeartbeatFile)
+    
+    try {
+        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        $heartbeat = @{
+            Timestamp = $timestamp
+            ProcessID = $PID
+            Type = "Worker"
+        }
+        
+        $heartbeat | ConvertTo-Json | Out-File $HeartbeatFile -Force
+        return $true
+    } catch {
+        return $false
+    }
+}
+
+function Check-Heartbeat {
+    [CmdletBinding()]
+    param([string]$HeartbeatFile, [int]$TimeoutSeconds = 30)
+    
+    if (-not (Test-Path $HeartbeatFile)) {
+        return $false
+    }
+    
+    try {
+        $content = Get-Content $HeartbeatFile -Raw
+        $heartbeat = $content | ConvertFrom-Json -AsHashtable
+        
+        $lastBeat = [DateTime]::ParseExact($heartbeat.Timestamp, "yyyy-MM-dd HH:mm:ss", $null)
+        $now = Get-Date
+        
+        return ($now - $lastBeat).TotalSeconds -le $TimeoutSeconds
+    } catch {
+        return $false
+    }
+}
+
+function Acquire-Lock {
+    [CmdletBinding()]
+    param([string]$LockFile, [int]$TimeoutSeconds = 10)
+    
+    $startTime = Get-Date
+    $lockAcquired = $false
+    
+    while (((Get-Date) - $startTime).TotalSeconds -lt $TimeoutSeconds) {
+        try {
+            if (Test-Path $LockFile) {
+                # Check if lock is stale (older than 30 seconds)
+                $lockTime = (Get-Item $LockFile).LastWriteTime
+                if (((Get-Date) - $lockTime).TotalSeconds -gt 30) {
+                    Remove-Item $LockFile -Force
+                    Start-Sleep -Milliseconds 100
+                }
+                Start-Sleep -Milliseconds 200
+                continue
+            }
+            
+            # Create lock file
+            $PID | Out-File $LockFile
+            Start-Sleep -Milliseconds 100
+            
+            # Verify we still own the lock
+            if ((Test-Path $LockFile) -and ((Get-Content $LockFile) -eq $PID)) {
+                $lockAcquired = $true
+                break
+            }
+        } catch {
+            Start-Sleep -Milliseconds 200
+        }
+    }
+    
+    return $lockAcquired
+}
+
+function Release-Lock {
+    [CmdletBinding()]
+    param([string]$LockFile)
+    
+    if (Test-Path $LockFile) {
+        try {
+            if ((Get-Content $LockFile) -eq $PID) {
+                Remove-Item $LockFile -Force
+            }
+        } catch {
+            # Ignore cleanup errors
+        }
     }
 }

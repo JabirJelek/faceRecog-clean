@@ -5,7 +5,7 @@ Enhanced time-based process monitor for Face Recognition pipeline with PID track
 .DESCRIPTION
 Monitors face recognition worker process with enhanced resilience and state recovery.
 .NOTES
-Incorporates features from old version: sudden termination tracking, persistent state, MailKit email with verification.
+Updated with old version's process checking structure that works.
 #>
 
 # ====================================================================
@@ -13,100 +13,57 @@ Incorporates features from old version: sudden termination tracking, persistent 
 # ====================================================================
 $commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
 if (Test-Path $commonPathsScript) {
-    . $commonPathsScript
-    Write-Host "✓ Common paths module loaded" -ForegroundColor Green
+    try {
+        # Dot-source the script to load functions into current scope
+        . $commonPathsScript
+        Write-Host "✓ Common paths module loaded" -ForegroundColor Green
+        
+        # Test if functions are loaded
+        if (-not (Get-Command Initialize-ProjectPortablePaths -ErrorAction SilentlyContinue)) {
+            Write-Host "ERROR: Required functions not loaded from common-paths.ps1" -ForegroundColor Red
+            exit 1
+        }
+    } catch {
+        Write-Host "ERROR: Failed to load common paths: $_" -ForegroundColor Red
+        exit 1
+    }
 } else {
     Write-Host "ERROR: Common paths script not found at: $commonPathsScript" -ForegroundColor Red
-    Write-Host "Attempting to find project root manually..." -ForegroundColor Yellow
-    
-    # Fallback to manual initialization similar to old version
-    function Initialize-ManualPaths {
-        $scriptPath = $PSScriptRoot
-        $currentPath = $scriptPath
-        
-        while ($currentPath -and (Split-Path $currentPath -Parent)) {
-            $currentDirName = Split-Path $currentPath -Leaf
-            if ($currentDirName -eq "maskRecog") {
-                $global:ProjectRoot = $currentPath
-                $global:ActiveRoot = Split-Path $currentPath -Parent | Split-Path -Parent
-                break
-            }
-            $currentPath = Split-Path $currentPath -Parent
-        }
-        
-        if (-not $global:ProjectRoot) {
-            $global:ProjectRoot = Read-Host "Please enter full path to 'maskRecog' project root"
-            if (!(Test-Path $global:ProjectRoot)) {
-                Write-Host "ERROR: Path does not exist!" -ForegroundColor Red
-                exit 1
-            }
-            $global:ActiveRoot = Split-Path $global:ProjectRoot -Parent | Split-Path -Parent
-        }
-    }
-    
-    Initialize-ManualPaths
+    exit 1
 }
 
 # ====================================================================
-# ENHANCED: Global variables with persistent tracking (from old version)
+# ENHANCED: Initialize paths for monitor
 # ====================================================================
-$global:WorkerProcess = $null
-$global:WorkerPID = $null
-$global:PythonPID = $null
-$global:WorkerStartTime = $null
-$global:PythonStartTime = $null
-$global:LastValidation = $null
-$global:CurrentRunFolder = $null
-$global:WorkerIsRunning = $false
-$global:PythonIsRunning = $false
-$global:timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-$global:LastWorkerAttempt = $null
+Write-Host "Initializing enhanced monitor..." -ForegroundColor Cyan
 
-# Enhanced tracking for resilience (from old version)
-$global:ForceStopAttempts = 0
-$global:LastForceStopTime = $null
-$global:ForceStopThreshold = 2
-$global:ForceStopWindowSeconds = 5
-$global:EmailAttachmentQueue = @()
-$global:CollectedRunFolders = @()
-$global:IsShuttingDown = $false
-$global:PersistentTracking = @{
-    LastKnownRunFolder = $null
-    LastKnownPythonPID = $null
-    LastKnownWorkerPID = $null
-    LastValidationTime = $null
-    LastValidationResult = $null
-    ProcessStopHistory = @()
-    ValidationHistory = @()
-    DailyRunCount = 0
-    LastSuccessfulRun = $null
+# Use the common paths function with monitor configuration
+$paths = Initialize-ProjectPortablePaths -IsMonitor
+$global:MonitorPaths = $paths
+
+# Check if paths initialization was successful
+if (-not $paths -or -not $paths.ProjectRoot) {
+    Write-Host "ERROR: Failed to initialize paths. Check project structure." -ForegroundColor Red
+    exit 1
 }
 
-# Sudden Termination Tracking (from old version)
-$global:SuddenTerminationTracking = @{
-    Events = @()
-    CurrentStreak = 0
-    LastCleanupDate = $null
-    Statistics = @{
-        TotalSuddenTerminations = 0
-        TotalCleanups = 0
-        LastCleanupReason = $null
-        FirstEventDate = $null
-        LastEventDate = $null
-    }
-}
-
-# ====================================================================
-# ENHANCED: Configuration with improved settings (from old version)
-# ====================================================================
+# Update configuration with paths
 $Script:Config = @{
     # Schedule configuration
     StartTime = "08:00"
-    EndTime = "14:18"
-
-    # Process tracking
+    EndTime = "14:47"
+    
+    # Process tracking - USING OLD VERSION'S STRUCTURE
     PythonProcessName = "python"
     WorkerProcessName = "powershell"
+    
+    # Worker script path
+    WorkerScript = $paths.WorkerScript
+    PythonScript = $paths.PythonScript
+    
+    # Paths for validation
+    RunsBasePath = $paths.DateBasedPath
+    OutputFolderPattern = "Magick_Process_MaskDetect_*"
     
     # Expected folder structure
     ExpectedSubfolders = @("logs", "script_output")
@@ -121,27 +78,17 @@ $Script:Config = @{
     GracefulShutdownTimeout = 60
     
     # PID tracking
+    PIDFilePath = $paths.PIDFilePath
     MaxPIDFileAgeMinutes = 120
     
-    # Email notifications (updated with old version's MailKit approach)
-    SendEmailOnCompletion = $true
-    EmailRecipients = @(
-        @{ Address = "faridraihan17@gmail.com"; Language = "English" },
-        @{ Address = "ikeepmypromiz@gmail.com"; Language = "Bahasa" }
-    )
-    EmailFrom = "faridraihan17@gmail.com"
-    EmailSubject = @{
-        English = "Face Recognition Process Completed Successfully"
-        Bahasa = "Proses Pengenalan Wajah Selesai dengan Sukses"
-    }
-    SmtpServer = "smtp.gmail.com"
-    SmtpPort = 587
-    UseSSL = $true
-    EmailCredentialPath = "$env:USERPROFILE\.face-recog\email-credential.xml"
+    # Logging - FIXED: Ensure LogFile path is properly set
+    LogFile = if ($paths.LogFile) { $paths.LogFile } else { Join-Path $paths.DateBasedPath "monitor_Magick.log" }
+    CurrentDate = $paths.CurrentDate
+    ActiveDatePath = $paths.DateBasedPath
     
-    # ENHANCED: Sudden termination tracking (from old version)
+    # Sudden termination tracking
     SuddenTermination = @{
-        TrackingFile = $null  # Will be set after paths initialized
+        TrackingFile = Join-Path $paths.DateBasedPath "sudden_termination_tracking.json"
         RecordRetentionDays = 30
         ConsecutiveThreshold = 3
         CleanupAction = "ForceCleanupAndNotify"
@@ -149,348 +96,127 @@ $Script:Config = @{
 }
 
 # ====================================================================
-# ENHANCED: Logging function with file and console output
+# ENHANCED: Global variables - UPDATED WITH OLD VERSION'S TRACKING
 # ====================================================================
-function Write-Log {
-    param(
-        [string]$Message,
-        [string]$Level = "INFO"
-    )
-    
-    $currentTimestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logEntry = "[$currentTimestamp] [$Level] $Message"
-    
-    # Write to log file
-    if ($Script:Config.LogFile) {
-        try {
-            Add-Content -Path $Script:Config.LogFile -Value $logEntry -ErrorAction SilentlyContinue
-        } catch {
-            # Fallback to console if file write fails
-            Write-Host "Log file write failed: $_" -ForegroundColor Yellow
-        }
-    }
-    
-    # Color-coded console output
-    switch ($Level) {
-        "ERROR" { Write-Host $logEntry -ForegroundColor Red }
-        "WARN" { Write-Host $logEntry -ForegroundColor Yellow }
-        "SUCCESS" { Write-Host $logEntry -ForegroundColor Green }
-        "DEBUG" { Write-Host $logEntry -ForegroundColor Gray }
-        default { Write-Host $logEntry -ForegroundColor White }
-    }
-}
+$global:WorkerProcess = $null
+$global:WorkerPID = $null
+$global:PythonPID = $null
+$global:WorkerStartTime = $null
+$global:PythonStartTime = $null
+$global:LastValidation = $null
+$global:CurrentRunFolder = $null
+$global:WorkerIsRunning = $false
+$global:PythonIsRunning = $false
+$global:LastWorkerAttempt = $null
 
-# ====================================================================
-# ENHANCED: Sudden Termination Handling Functions (from old version)
-# ====================================================================
+# Enhanced tracking from old version
+$global:ForceStopAttempts = 0
+$global:LastForceStopTime = $null
+$global:ForceStopThreshold = 2
+$global:ForceStopWindowSeconds = 5
+$global:IsShuttingDown = $false
 
-function Register-SuddenTermination {
-    param(
-        [string]$Reason,
-        [string]$TerminationType = "Unexpected",
-        [hashtable]$ProcessInfo = @{}
-    )
-    
-    $eventHost = @{
-        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        Reason = $Reason
-        TerminationType = $TerminationType
-        ProcessInfo = $ProcessInfo
-        ScriptVersion = "2.1"
-        HostName = $env:COMPUTERNAME
-    }
-    
-    # Add to events list
-    $global:SuddenTerminationTracking.Events += $eventHost
-    
-    # Update statistics
-    $global:SuddenTerminationTracking.Statistics.TotalSuddenTerminations++
-    $global:SuddenTerminationTracking.Statistics.LastEventDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    
-    if (-not $global:SuddenTerminationTracking.Statistics.FirstEventDate) {
-        $global:SuddenTerminationTracking.Statistics.FirstEventDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    }
-    
-    # Calculate streak
-    if ($global:SuddenTerminationTracking.Events.Count -gt 1) {
-        $lastEvent = $global:SuddenTerminationTracking.Events[-2]
-        $lastEventTime = [DateTime]::ParseExact($lastEvent.Timestamp, "yyyy-MM-dd HH:mm:ss", $null)
-        $currentTime = Get-Date
-        
-        if (($currentTime - $lastEventTime).TotalMinutes -le 5) {
-            $global:SuddenTerminationTracking.CurrentStreak++
-            Write-Log "Consecutive sudden termination detected. Streak: $($global:SuddenTerminationTracking.CurrentStreak)" -Level "WARN"
-        } else {
-            $global:SuddenTerminationTracking.CurrentStreak = 1
-        }
-    } else {
-        $global:SuddenTerminationTracking.CurrentStreak = 1
-    }
-    
-    # Check if we need to take action
-    if ($global:SuddenTerminationTracking.CurrentStreak -ge $Script:Config.SuddenTermination.ConsecutiveThreshold) {
-        Write-Log "Sudden termination streak threshold reached ($($global:SuddenTerminationTracking.CurrentStreak) consecutive). Taking cleanup action." -Level "ERROR"
-        Invoke-StreakThresholdAction
-    }
-    
-    # Save tracking data
-    Save-SuddenTerminationTracking
-    
-    return $eventHost
-}
+# Sudden Termination Tracking
+# $global:SuddenTerminationTracking = @{
+#     Events = @()
+#     CurrentStreak = 0
+#     LastCleanupDate = $null
+#     Statistics = @{
+#         TotalSuddenTerminations = 0
+#         TotalCleanups = 0
+#         LastCleanupReason = $null
+#         FirstEventDate = $null
+#         LastEventDate = $null
+#     }
+# }
 
-function Save-SuddenTerminationTracking {
-    try {
-        # Clean up old events beyond retention period
-        $retentionDate = (Get-Date).AddDays(-$Script:Config.SuddenTermination.RecordRetentionDays)
-        $filteredEvents = @()
-        
-        foreach ($eventHost in $global:SuddenTerminationTracking.Events) {
-            $eventHostTime = [DateTime]::ParseExact($eventHost.Timestamp, "yyyy-MM-dd HH:mm:ss", $null)
-            if ($eventHostTime -ge $retentionDate) {
-                $filteredEvents += $eventHost
-            }
-        }
-        
-        $global:SuddenTerminationTracking.Events = $filteredEvents
-        
-        # Save to file
-        if ($Script:Config.SuddenTermination.TrackingFile) {
-            $global:SuddenTerminationTracking | ConvertTo-Json -Depth 5 | Out-File -FilePath $Script:Config.SuddenTermination.TrackingFile -Force
-            Write-Log "Sudden termination tracking saved" -Level "DEBUG"
-        }
-    } catch {
-        Write-Log "Failed to save sudden termination tracking: $_" -Level "ERROR"
-    }
-}
+# Persistent Tracking
+# $global:PersistentTracking = @{
+#     LastKnownRunFolder = $null
+#     LastKnownPythonPID = $null
+#     LastKnownWorkerPID = $null
+#     LastValidationTime = $null
+#     LastValidationResult = $null
+#     ProcessStopHistory = @()
+#     ValidationHistory = @()
+#     DailyRunCount = 0
+#     LastSuccessfulRun = $null
+#     CollectedRunFolders = @()
+# }
 
-function Load-SuddenTerminationTracking {
-    if (-not $Script:Config.SuddenTermination.TrackingFile -or -not (Test-Path $Script:Config.SuddenTermination.TrackingFile)) {
-        Write-Log "No sudden termination tracking file found" -Level "DEBUG"
-        return $false
-    }
-    
-    try {
-        $loaded = Get-Content -Path $Script:Config.SuddenTermination.TrackingFile -Raw | ConvertFrom-Json
-        
-        $global:SuddenTerminationTracking = @{
-            Events = @($loaded.Events)
-            CurrentStreak = $loaded.CurrentStreak
-            LastCleanupDate = $loaded.LastCleanupDate
-            Statistics = @{
-                TotalSuddenTerminations = $loaded.Statistics.TotalSuddenTerminations
-                TotalCleanups = $loaded.Statistics.TotalCleanups
-                LastCleanupReason = $loaded.Statistics.LastCleanupReason
-                FirstEventDate = $loaded.Statistics.FirstEventDate
-                LastEventDate = $loaded.Statistics.LastEventDate
-            }
-        }
-        
-        Write-Log "Loaded sudden termination tracking: $($global:SuddenTerminationTracking.Statistics.TotalSuddenTerminations) total events" -Level "INFO"
-        return $true
-    } catch {
-        Write-Log "Failed to load sudden termination tracking: $_" -Level "ERROR"
-        return $false
-    }
-}
-
-function Invoke-StreakThresholdAction {
-    $action = $Script:Config.SuddenTermination.CleanupAction
-    $streak = $global:SuddenTerminationTracking.CurrentStreak
-    
-    Write-Log "Executing cleanup action '$action' for streak of $streak consecutive sudden terminations" -Level "WARN"
-    
-    switch ($action) {
-        "ForceCleanupAndNotify" {
-            Force-CleanupOrphanedProcesses
-            
-            $global:SuddenTerminationTracking.Statistics.TotalCleanups++
-            $global:SuddenTerminationTracking.Statistics.LastCleanupReason = "ConsecutiveSuddenTerminations"
-            $global:SuddenTerminationTracking.LastCleanupDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-            
-            $global:SuddenTerminationTracking.CurrentStreak = 0
-            
-            Save-SuddenTerminationTracking
-        }
-        default {
-            Write-Log "Unknown cleanup action: $action" -Level "ERROR"
-        }
-    }
-}
-
-function Force-CleanupOrphanedProcesses {
-    Write-Log "Starting forced cleanup of orphaned processes..." -Level "WARN"
-    
-    $cleanedProcesses = @()
-    
-    # Clean up Python processes
-    $pythonProcesses = Get-Process -Name "python*" -ErrorAction SilentlyContinue | 
-        Where-Object { $_.Path -like "*python*" }
-    
-    foreach ($proc in $pythonProcesses) {
-        try {
-            $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
-            if ($cmdLine -like "*$($Script:Config.PythonScriptPath)*") {
-                Write-Log "Forcefully terminating orphaned Python process (PID: $($proc.Id))" -Level "WARN"
-                $proc.Kill()
-                if ($proc.WaitForExit(5000)) {
-                    $cleanedProcesses += "Python:$($proc.Id)"
-                }
-            }
-        } catch { }
-    }
-    
-    # Clean up worker PowerShell processes
-    $workerProcesses = Get-Process -Name "powershell*" -ErrorAction SilentlyContinue |
-        Where-Object { $_.ProcessName -like "*powershell*" }
-    
-    foreach ($proc in $workerProcesses) {
-        try {
-            $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
-            if ($cmdLine -like "*$($Script:Config.WorkerScript)*") {
-                Write-Log "Forcefully terminating orphaned worker process (PID: $($proc.Id))" -Level "WARN"
-                $proc.Kill()
-                if ($proc.WaitForExit(5000)) {
-                    $cleanedProcesses += "Worker:$($proc.Id)"
-                }
-            }
-        } catch { }
-    }
-    
-    # Clean up PID tracking file
-    if (Test-Path $Script:Config.PIDFilePath) {
-        Remove-Item -Path $Script:Config.PIDFilePath -Force -ErrorAction SilentlyContinue
-        Write-Log "Cleaned up PID tracking file" -Level "INFO"
-    }
-    
-    # Reset global process variables
-    $global:WorkerProcess = $null
-    $global:WorkerPID = $null
-    $global:PythonPID = $null
-    $global:WorkerIsRunning = $false
-    $global:PythonIsRunning = $false
-    
-    Write-Log "Forced cleanup completed. Cleaned processes: $($cleanedProcesses.Count)" -Level "INFO"
-    
-    return $cleanedProcesses
-}
-
-function Initialize-CleanupOnStartup {
-    Write-Log "Performing startup cleanup check..." -Level "INFO"
-    
-    Load-SuddenTerminationTracking
-    
-    $orphanedProcesses = @()
-    
-    # Check Python processes
-    $pythonProcesses = Get-Process -Name "python*" -ErrorAction SilentlyContinue | 
-        Where-Object { $_.Path -like "*python*" }
-    
-    foreach ($proc in $pythonProcesses) {
-        try {
-            $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
-            if ($cmdLine -like "*$($Script:Config.PythonScriptPath)*") {
-                $orphanedProcesses += @{
-                    Type = "Python"
-                    PID = $proc.Id
-                    StartTime = $proc.StartTime
-                }
-            }
-        } catch { }
-    }
-    
-    # Check worker processes
-    $workerProcesses = Get-Process -Name "powershell*" -ErrorAction SilentlyContinue |
-        Where-Object { $_.ProcessName -like "*powershell*" }
-    
-    foreach ($proc in $workerProcesses) {
-        try {
-            $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
-            if ($cmdLine -like "*$($Script:Config.WorkerScript)*") {
-                $orphanedProcesses += @{
-                    Type = "Worker"
-                    PID = $proc.Id
-                    StartTime = $proc.StartTime
-                }
-            }
-        } catch { }
-    }
-    
-    if ($orphanedProcesses.Count -gt 0) {
-        Write-Log "Found $($orphanedProcesses.Count) orphaned process(es) from previous run" -Level "WARN"
-        
-        foreach ($orphan in $orphanedProcesses) {
-            Write-Log "  - $($orphan.Type) process (PID: $($orphan.PID), Started: $($orphan.StartTime))" -Level "WARN"
-        }
-        
-        Register-SuddenTermination -Reason "Orphaned processes found on startup" `
-            -TerminationType "StartupCleanup" `
-            -ProcessInfo @{ OrphanedProcesses = $orphanedProcesses }
-        
-        Force-CleanupOrphanedProcesses
-        return $true
-    }
-    
-    Write-Log "No orphaned processes found on startup" -Level "INFO"
-    return $false
-}
+$global:CollectedRunFolders = @()
+$global:EmailAttachmentQueue = @()
 
 # ====================================================================
-# Process Management Functions
+# CRITICAL UPDATE: Process Management Functions from OLD VERSION
 # ====================================================================
 
 function Check-ProcessStatus {
+    # First try communication-based detection
+    if (-not $global:WorkerIsRunning) {
+        $detected = Detect-WorkerProcess
+        if ($detected) {
+            Save-PIDTracking
+        }
+    }
+    
+    # Then verify processes
     $status = @{
         WorkerRunning = $false
         PythonRunning = $false
         WorkerPID = $global:WorkerPID
         PythonPID = $global:PythonPID
+        UsingCommunication = $false
     }
     
-    # Simple check worker process
+    # Check worker using multiple methods
     if ($global:WorkerPID -and $global:WorkerPID -ne 0) {
         $status.WorkerRunning = Is-ProcessRunning -ProcessId $global:WorkerPID -ProcessName "powershell"
+        
+        if (-not $status.WorkerRunning) {
+            # Try communication check as fallback
+            $status.WorkerRunning = Check-WorkerHealth
+            if ($status.WorkerRunning) {
+                $status.UsingCommunication = $true
+            }
+        }
+    } else {
+        # No worker PID set, try communication
+        $status.WorkerRunning = Check-WorkerHealth
+        if ($status.WorkerRunning) {
+            $status.UsingCommunication = $true
+            # Try to get PID from communication files
+            $commPaths = Initialize-CommunicationPaths -Paths $global:MonitorPaths -IsMonitor
+            $statusData = Read-WorkerStatus -StatusFile $commPaths.StatusFile
+            if ($statusData.WorkerPID -gt 0) {
+                $global:WorkerPID = $statusData.WorkerPID
+                $status.WorkerPID = $statusData.WorkerPID
+            }
+        }
     }
     
-    # Simple check Python process
+    # Check Python
     if ($global:PythonPID -and $global:PythonPID -ne 0) {
         $status.PythonRunning = Is-ProcessRunning -ProcessId $global:PythonPID -ProcessName "python"
-    }
-    
-    # If we think Python is running but PID is null, try to find it
-    if ((-not $status.PythonRunning) -and $global:WorkerIsRunning) {
+    } elseif ($global:WorkerIsRunning) {
+        # Try to find Python if worker is running but PythonPID not set
         $foundPID = Find-PythonProcess
         if ($foundPID) {
             $global:PythonPID = $foundPID
             $status.PythonPID = $foundPID
             $status.PythonRunning = Is-ProcessRunning -ProcessId $foundPID -ProcessName "python"
             Save-PIDTracking
+            Update-WorkerCommunication -WorkerPID $global:WorkerPID -PythonPID $foundPID
         }
     }
     
     # Update global state
-    $previousWorkerRunning = $global:WorkerIsRunning
-    $previousPythonRunning = $global:PythonIsRunning
-    
     $global:WorkerIsRunning = $status.WorkerRunning
     $global:PythonIsRunning = $status.PythonRunning
     
-    # Detect unexpected stops
-    if (($previousWorkerRunning -and -not $status.WorkerRunning) -or 
-        ($previousPythonRunning -and -not $status.PythonRunning)) {
-        
-        Write-Log "Detected unexpected process stop. Worker: $previousWorkerRunning -> $($status.WorkerRunning), Python: $previousPythonRunning -> $($status.PythonRunning)" -Level "WARN"
-        
-        # Only trigger validation if we're in the active time window
-        $inWindow = Test-TimeWindow -TargetTime $Script:Config.StartTime -and (-not (Test-TimeWindow -TargetTime $Script:Config.EndTime))
-        
-        if ($inWindow -and $global:CurrentRunFolder) {
-            Write-Log "Validating run due to unexpected process stop in active window..." -Level "INFO"
-        }
-    }
-    
     return $status
 }
+
 
 function Is-ProcessRunning {
     param(
@@ -513,47 +239,6 @@ function Is-ProcessRunning {
     }
 }
 
-
-function Clean-StalePIDFiles {
-    if (Test-Path $Script:Config.PIDFilePath) {
-        try {
-            $pidData = Get-Content $Script:Config.PIDFilePath -Raw | ConvertFrom-Json
-            
-            # Check if processes are still running
-            $processesExist = $true
-            if ($pidData.WorkerPID) {
-                try {
-                    Get-Process -Id $pidData.WorkerPID -ErrorAction Stop | Out-Null
-                } catch {
-                    $processesExist = $false
-                    Write-Log "Stale worker PID found: $($pidData.WorkerPID)" -Level "WARN"
-                }
-            }
-            
-            if ($pidData.PythonPID) {
-                try {
-                    Get-Process -Id $pidData.PythonPID -ErrorAction Stop | Out-Null
-                } catch {
-                    $processesExist = $false
-                    Write-Log "Stale Python PID found: $($pidData.PythonPID)" -Level "WARN"
-                }
-            }
-            
-            if (-not $processesExist) {
-                Remove-Item -Path $Script:Config.PIDFilePath -Force -ErrorAction SilentlyContinue
-                Write-Log "Removed stale PID tracking file" -Level "INFO"
-                return $true
-            }
-        } catch {
-            # If PID file is corrupted, remove it
-            Remove-Item -Path $Script:Config.PIDFilePath -Force -ErrorAction SilentlyContinue
-            Write-Log "Removed corrupted PID tracking file" -Level "WARN"
-            return $true
-        }
-    }
-    return $false
-}
-
 function Find-PythonProcess {
     # Try to find the Python process running our specific script
     Write-Log "Searching for Python process..." -Level "DEBUG"
@@ -565,7 +250,7 @@ function Find-PythonProcess {
     foreach ($proc in $pythonProcesses) {
         try {
             $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
-            if ($cmdLine -like "*$($Script:Config.PythonScriptPath)*") {
+            if ($cmdLine -like "*$($Script:Config.PythonScript)*") {
                 Write-Log "Found Python process with our script: PID=$($proc.Id)" -Level "SUCCESS"
                 return $proc.Id
             }
@@ -612,33 +297,333 @@ function Find-PythonProcess {
     return $null
 }
 
-function Start-WorkerProcess {
-    # Check for existing Python process first
-    $existingPythonPID = Find-PythonProcess
-    if ($existingPythonPID) {
-        Write-Log "Found existing Python process (PID: $existingPythonPID), reusing it" -Level "WARN"
-        $global:PythonPID = $existingPythonPID
-        $global:PythonIsRunning = $true
-        $global:PythonStartTime = Get-Date
-        Save-PIDTracking
+
+
+# ====================================================================
+# ENHANCED: Logging function with file and console output
+# ====================================================================
+function Write-Log {
+    param(
+        [string]$Message,
+        [string]$Level = "INFO"
+    )
+    
+    $currentTimestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $logEntry = "[$currentTimestamp] [$Level] $Message"
+    
+    # Write to log file
+    if ($Script:Config.LogFile) {
+        try {
+            $logDir = Split-Path $Script:Config.LogFile -Parent
+            if (-not (Test-Path $logDir)) {
+                New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+            }
+            
+            Add-Content -Path $Script:Config.LogFile -Value $logEntry -ErrorAction SilentlyContinue
+        } catch {
+            # Fallback to console if file write fails
+            Write-Host "Log file write failed: $_" -ForegroundColor Yellow
+        }
+    }
+    
+    # Color-coded console output
+    switch ($Level) {
+        "ERROR" { Write-Host $logEntry -ForegroundColor Red }
+        "WARN" { Write-Host $logEntry -ForegroundColor Yellow }
+        "SUCCESS" { Write-Host $logEntry -ForegroundColor Green }
+        "DEBUG" { Write-Host $logEntry -ForegroundColor Gray }
+        default { Write-Host $logEntry -ForegroundColor White }
+    }
+}
+
+# ====================================================================
+# ENHANCED: Worker Detection and Communication Functions
+# ====================================================================
+function Detect-WorkerProcess {
+    Write-Log "Detecting worker process..." -Level "INFO" -LogFile $Script:Config.LogFile
+    
+    # Method 1: Check communication status file
+    $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
+    $statusFile = $commPaths.StatusFile
+    
+    if (Test-Path $statusFile) {
+        try {
+            $status = Read-WorkerStatus -StatusFile $statusFile
+            
+            if ($status.Status -ne "NOT_FOUND" -and $status.WorkerPID -gt 0) {
+                # Verify the PID is actually running
+                if (Is-ProcessRunning -ProcessId $status.WorkerPID -ProcessName "powershell") {
+                    Write-Log "Found registered worker (PID: $($status.WorkerPID)) via status file" -Level "SUCCESS" -LogFile $Script:Config.LogFile
+                    $global:WorkerPID = $status.WorkerPID
+                    $global:PythonPID = $status.PythonPID
+                    $global:WorkerIsRunning = $true
+                    $global:PythonIsRunning = ($status.PythonPID -gt 0) -and (Is-ProcessRunning -ProcessId $status.PythonPID -ProcessName "python")
+                    return $true
+                }
+            }
+        } catch {
+            Write-Log "Error reading worker status: $_" -Level "WARN" -LogFile $Script:Config.LogFile
+        }
+    }
+    
+    # Method 2: Check heartbeat file
+    $heartbeatFile = $commPaths.HeartbeatFile
+    if ((Test-Path $heartbeatFile) -and (Check-Heartbeat -HeartbeatFile $heartbeatFile)) {
+        Write-Log "Worker heartbeat detected" -Level "INFO" -LogFile $Script:Config.LogFile
         return $true
     }
     
+    # Method 3: Traditional process scanning
+    Write-Log "Scanning for worker processes..." -Level "DEBUG" -LogFile $Script:Config.LogFile
+
+    $workerProcesses = Get-Process -Name "powershell*" -ErrorAction SilentlyContinue |
+        Where-Object { 
+            ($_.ProcessName -like "*powershell*") -and ($_.Id -ne $PID)
+        }
+    
+    foreach ($proc in $workerProcesses) {
+        try {
+            $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
+            if ($cmdLine -like "*$($Script:Config.WorkerScript)*") {
+                Write-Log "Found worker process via command line scan (PID: $($proc.Id))" -Level "SUCCESS" -LogFile $Script:Config.LogFile
+                $global:WorkerPID = $proc.Id
+                $global:WorkerIsRunning = $true
+                
+                # Try to find associated Python process
+                $pythonPID = Find-PythonProcess
+                if ($pythonPID) {
+                    $global:PythonPID = $pythonPID
+                    $global:PythonIsRunning = $true
+                }
+                
+                # Update communication files
+                Update-WorkerCommunication -WorkerPID $proc.Id -PythonPID $pythonPID
+                return $true
+            }
+        } catch {
+            continue
+        }
+    }
+    
+    Write-Log "No active worker process detected" -Level "INFO" -LogFile $Script:Config.LogFile
+    return $false
+}
+
+
+function Update-WorkerCommunication {
+    param(
+        [int]$WorkerPID,
+        [int]$PythonPID = 0
+    )
+    
+    $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
+    
     try {
-        Write-Log "Starting face recognition worker process..." -Level "INFO"
+        # Update status file using common function
+        Write-WorkerStatus -StatusFile $commPaths.StatusFile `
+            -Status "RUNNING" `
+            -WorkerPID $WorkerPID `
+            -PythonPID $PythonPID `
+            -Message "Detected by monitor"
         
-        $arguments = @(
+        # Create heartbeat if missing
+        if (-not (Test-Path $commPaths.HeartbeatFile)) {
+            Send-Heartbeat -HeartbeatFile $commPaths.HeartbeatFile
+        }
+        
+        Write-Log "Updated worker communication files" -Level "DEBUG" -LogFile $Script:Config.LogFile
+        return $true
+    } catch {
+        Write-Log "Failed to update worker communication: $_" -Level "ERROR" -LogFile $Script:Config.LogFile
+        return $false
+    }
+}
+
+
+
+
+function Check-WorkerHealth {
+    $commPaths = Initialize-CommunicationPaths -Paths $global:MonitorPaths -IsMonitor
+    
+    # Check heartbeat using common function
+    $heartbeatAlive = Check-Heartbeat -HeartbeatFile $commPaths.HeartbeatFile
+    
+    # Check if process is still running
+    $processAlive = $false
+    if ($global:WorkerPID -gt 0) {
+        $processAlive = Is-ProcessRunning -ProcessId $global:WorkerPID -ProcessName "powershell"
+    }
+    
+    # If heartbeat says alive but process is dead, cleanup
+    if ($heartbeatAlive -and -not $processAlive) {
+        Write-Log "Worker heartbeat active but process not found - cleaning up stale heartbeat" -Level "WARN" -LogFile $Script:Config.LogFile
+        Remove-Item $commPaths.HeartbeatFile -Force -ErrorAction SilentlyContinue
+        return $false
+    }
+    
+    return $heartbeatAlive -or $processAlive
+}
+
+function Cleanup-OrphanedProcesses {
+    Write-Log "Checking for orphaned processes..." -Level "INFO" -LogFile $Script:Config.LogFile
+    
+    $cleanedProcesses = @()
+    
+    # Clean up Python processes
+    $pythonProcesses = Get-Process -Name "python*" -ErrorAction SilentlyContinue | 
+        Where-Object { $_.Path -like "*python*" }
+    
+    foreach ($proc in $pythonProcesses) {
+        try {
+            $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
+            if ($cmdLine -like "*$($Script:Config.PythonScript)*") {
+                Write-Log "Terminating orphaned Python process (PID: $($proc.Id))" -Level "WARN" -LogFile $Script:Config.LogFile
+                $proc.Kill()
+                $cleanedProcesses += "Python:$($proc.Id)"
+            }
+        } catch { }
+    }
+    
+    # Clean up worker PowerShell processes
+    $workerProcesses = Get-Process -Name "powershell*" -ErrorAction SilentlyContinue |
+        Where-Object { $_.ProcessName -like "*powershell*" }
+    
+    foreach ($proc in $workerProcesses) {
+        try {
+            $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
+            if ($cmdLine -like "*$($Script:Config.WorkerScript)*") {
+                Write-Log "Terminating orphaned worker process (PID: $($proc.Id))" -Level "WARN" -LogFile $Script:Config.LogFile
+                $proc.Kill()
+                $cleanedProcesses += "Worker:$($proc.Id)"
+            }
+        } catch { }
+    }
+    
+    # Clean up PID tracking file
+    if ($Script:Config.PIDFilePath -and (Test-Path $Script:Config.PIDFilePath)) {
+        Remove-Item -Path $Script:Config.PIDFilePath -Force -ErrorAction SilentlyContinue
+        Write-Log "Cleaned up PID tracking file" -Level "INFO" -LogFile $Script:Config.LogFile
+    }
+    
+    # Reset global process variables
+    $global:WorkerProcess = $null
+    $global:WorkerPID = $null
+    $global:PythonPID = $null
+    $global:WorkerIsRunning = $false
+    $global:PythonIsRunning = $false
+    
+    if ($cleanedProcesses.Count -gt 0) {
+        Write-Log "Cleanup completed. Cleaned processes: $($cleanedProcesses.Count)" -Level "INFO" -LogFile $Script:Config.LogFile
+    }
+    
+    return $cleanedProcesses
+}
+
+# ====================================================================
+# Modified Start-WorkerProcess with communication
+# ====================================================================
+
+function Send-StopCommand {
+    param(
+        [string]$Reason = "Normal Shutdown",
+        [switch]$Force = $false
+    )
+    
+    $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
+    
+    $commandData = @{
+        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        Command = "STOP"
+        MonitorPID = $PID
+        Action = "StopWorker"
+        Parameters = @{
+            Reason = $Reason
+            Force = $Force
+            GracePeriodSeconds = if ($Force) { 5 } else { 30 }
+        }
+    }
+    
+    $lockFile = $commPaths.LockFile
+    if (Acquire-Lock -LockFile $lockFile) {
+        try {
+            $commandData | ConvertTo-Json | Out-File $commPaths.CommandFile -Force
+            Write-Log "Sent STOP command to worker: $Reason" -Level "INFO"
+            
+            # Wait for acknowledgement if not forcing
+            if (-not $Force) {
+                Write-Log "Waiting for worker to acknowledge STOP command..." -Level "INFO"
+                $maxWait = $commandData.Parameters.GracePeriodSeconds
+                $waited = 0
+                
+                while ($waited -lt $maxWait) {
+                    $status = Read-WorkerStatus -StatusFile $commPaths.StatusFile
+                    if ($status.Status -eq "SHUTTING_DOWN" -or $status.Status -eq "STOPPED") {
+                        Write-Log "Worker acknowledged STOP command" -Level "SUCCESS"
+                        return $true
+                    }
+                    
+                    Start-Sleep -Seconds 2
+                    $waited += 2
+                }
+                
+                Write-Log "Worker did not acknowledge STOP command within $maxWait seconds" -Level "WARN"
+            }
+            
+            return $true
+        } catch {
+            Write-Log "Failed to send STOP command: $_" -Level "ERROR"
+            return $false
+        } finally {
+            Release-Lock -LockFile $lockFile
+        }
+    }
+    
+    return $false
+}
+
+function Start-WorkerProcess {
+    # Clean up any stale communication files
+    $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
+    if (Test-Path $commPaths.CommunicationDir) {
+        Get-ChildItem $commPaths.CommunicationDir -Filter "*.txt" -ErrorAction SilentlyContinue | Remove-Item -Force
+        Get-ChildItem $commPaths.CommunicationDir -Filter "*.json" -ErrorAction SilentlyContinue | Remove-Item -Force
+    }
+    
+    Write-Log "Starting face recognition worker with enhanced communication..." -Level "INFO" -LogFile $Script:Config.LogFile
+    
+    try {
+        # Create start command
+        $commandData = @{
+            Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            Command = "START"
+            MonitorPID = $PID
+            Action = "StartWorker"
+            Parameters = @{
+                WorkerScript = $Script:Config.WorkerScript
+                PythonScript = $Script:Config.PythonScript
+            }
+        }
+
+        $lockFile = $commPaths.LockFile
+        if (Acquire-Lock -LockFile $lockFile) {
+            try {
+                $commandData | ConvertTo-Json | Out-File $commPaths.CommandFile -Force
+                Write-Log "Sent START command to worker via CommandFile" -Level "DEBUG" -LogFile $Script:Config.LogFile
+            } finally {
+                Release-Lock -LockFile $lockFile
+            }
+        }
+        
+        # Start the worker process
+        $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+        $processInfo.FileName = "powershell.exe"
+        $processInfo.Arguments = @(
             "-NoProfile",
             "-ExecutionPolicy", "Bypass",
             "-File", "`"$($Script:Config.WorkerScript)`""
         )
-        
-        $processInfo = New-Object System.Diagnostics.ProcessStartInfo
-        $processInfo.FileName = "powershell.exe"
-        $processInfo.Arguments = $arguments
-        $processInfo.RedirectStandardOutput = $false
-        $processInfo.RedirectStandardError = $false
         $processInfo.UseShellExecute = $false
+        $processInfo.RedirectStandardOutput = $false
         $processInfo.CreateNoWindow = $true
         
         $WorkerProcess = New-Object System.Diagnostics.Process
@@ -649,94 +634,98 @@ function Start-WorkerProcess {
             $global:WorkerStartTime = Get-Date
             $global:WorkerIsRunning = $true
             
-            Write-Log "Worker process started (PID: $global:WorkerPID)" -Level "SUCCESS"
+            Write-Log "Worker process started (PID: $global:WorkerPID)" -Level "SUCCESS" -LogFile $Script:Config.LogFile
             
-            # Wait for Python process to start
-            Write-Log "Waiting for Python process to start..." -Level "INFO"
-            $maxWaitTime = 30
-            $waitInterval = 2
+            # Wait for worker to register
+            Write-Log "Waiting for worker registration..." -Level "INFO" -LogFile $Script:Config.LogFile
+            $maxWait = 30
             $waited = 0
             
-            while ($waited -lt $maxWaitTime) {
+            while ($waited -lt $maxWait) {
+                if (Test-Path $commPaths.RegistrationFile) {
+                    Write-Log "Worker registered successfully" -Level "SUCCESS" -LogFile $Script:Config.LogFile
+                    break
+                }
+                
+                Start-Sleep -Seconds 1
+                $waited++
+                
+                # Check if process died
+                if ($WorkerProcess.HasExited) {
+                    Write-Log "Worker process exited unexpectedly" -Level "ERROR" -LogFile $Script:Config.LogFile
+                    return $false
+                }
+            }
+            
+            # Wait for Python process
+            Write-Log "Waiting for Python process..." -Level "INFO" -LogFile $Script:Config.LogFile
+            $waited = 0
+            
+            while ($waited -lt $maxWait) {
                 $foundPID = Find-PythonProcess
                 if ($foundPID) {
                     $global:PythonPID = $foundPID
                     $global:PythonIsRunning = $true
                     $global:PythonStartTime = Get-Date
-                    Write-Log "Python process found (PID: $global:PythonPID)" -Level "SUCCESS"
+                    
+                    # Update communication
+                    Update-WorkerCommunication -WorkerPID $global:WorkerPID -PythonPID $foundPID
+                    
+                    Write-Log "Python process found (PID: $global:PythonPID)" -Level "SUCCESS" -LogFile $Script:Config.LogFile
                     Save-PIDTracking
                     return $true
                 }
                 
-                Start-Sleep -Seconds $waitInterval
-                $waited += $waitInterval
+                Start-Sleep -Seconds 2
+                $waited += 2
             }
             
-            Write-Log "Python process did not start within $maxWaitTime seconds" -Level "WARN"
+            Write-Log "Python process did not start within $maxWait seconds" -Level "WARN" -LogFile $Script:Config.LogFile
             Save-PIDTracking
             return $true
         } else {
-            Write-Log "Failed to start worker process" -Level "ERROR"
+            Write-Log "Failed to start worker process" -Level "ERROR" -LogFile $Script:Config.LogFile
             return $false
         }
-    }
-    catch {
-        Write-Log "ERROR: Failed to start worker process: $_" -Level "ERROR"
+    } catch {
+        Write-Log "ERROR starting worker: $_" -Level "ERROR" -LogFile $Script:Config.LogFile
         return $false
     }
 }
 
 function Stop-WorkerProcess {
+    Write-Log "Stopping worker process..." -Level "INFO" -LogFile $Script:Config.LogFile
+    
     $stoppedProcesses = @()
-    $stopReason = "Normal Shutdown"
-    $wasUnexpected = $false
     
-    # Determine if this is an unexpected stop
-    if ($global:IsShuttingDown -and $global:ForceStopAttempts -ge $global:ForceStopThreshold) {
-        $stopReason = "Force Stop by User"
-        $wasUnexpected = $true
-    } elseif (-not $global:IsShuttingDown -and ($global:PythonIsRunning -or $global:WorkerIsRunning)) {
-        $stopReason = "Unexpected Process Stop"
-        $wasUnexpected = $true
-        Register-SuddenTermination -Reason $stopReason -TerminationType "Unexpected"
+    # Send STOP command to worker first
+    $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
+    $commandData = @{
+        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        Command = "STOP"
+        MonitorPID = $PID
+        Action = "StopWorker"
+        Parameters = @{
+            Reason = "Monitor Shutdown"
+            GracePeriodSeconds = 10
+        }
     }
     
-    Write-Log "Stopping worker process. Reason: $stopReason" -Level "INFO"
-    
-    # First, try to stop the Python process
-    if ($global:PythonPID -and $global:PythonPID -ne 0) {
-        Write-Log "Stopping Python process (PID: $global:PythonPID)..." -Level "INFO"
-        
+    if (Acquire-Lock -LockFile $commPaths.LockFile) {
         try {
-            $pythonProcess = Get-Process -Id $global:PythonPID -ErrorAction Stop
-            
-            if (-not $pythonProcess.HasExited) {
-                $pythonProcess.CloseMainWindow() | Out-Null
-                Start-Sleep -Seconds 2
-                
-                if (-not $pythonProcess.HasExited) {
-                    Write-Log "Forcefully terminating Python process..." -Level "WARN"
-                    $pythonProcess.Kill()
-                    if ($pythonProcess.WaitForExit($Script:Config.GracefulShutdownTimeout * 1000)) {
-                        $stoppedProcesses += "Python"
-                        Write-Log "Python process terminated" -Level "SUCCESS"
-                    }
-                } else {
-                    $stoppedProcesses += "Python"
-                    Write-Log "Python process exited gracefully" -Level "SUCCESS"
-                }
-            } else {
-                Write-Log "Python process already exited" -Level "INFO"
-            }
-        }
-        catch {
-            Write-Log "Error stopping Python process: $_" -Level "ERROR"
+            $commandData | ConvertTo-Json | Out-File $commPaths.CommandFile -Force
+            Write-Log "Sent STOP command to worker" -Level "INFO" -LogFile $Script:Config.LogFile
+        } finally {
+            Release-Lock -LockFile $commPaths.LockFile
         }
     }
     
-    # Then stop the worker PowerShell process
+    # Give worker time to shut down gracefully
+    Start-Sleep -Seconds 5
+    
+    # Stop worker PowerShell process
     if ($global:WorkerPID -and $global:WorkerPID -ne 0) {
-        Write-Log "Stopping worker process (PID: $global:WorkerPID)..." -Level "INFO"
+        Write-Log "Stopping worker process (PID: $global:WorkerPID)..." -Level "INFO" -LogFile $Script:Config.LogFile
         
         try {
             $workerProcess = Get-Process -Id $global:WorkerPID -ErrorAction Stop
@@ -746,22 +735,51 @@ function Stop-WorkerProcess {
                 Start-Sleep -Seconds 2
                 
                 if (-not $workerProcess.HasExited) {
-                    Write-Log "Forcefully terminating worker process..." -Level "WARN"
+                    Write-Log "Forcefully terminating worker process..." -Level "WARN" -LogFile $Script:Config.LogFile
                     $workerProcess.Kill()
                     if ($workerProcess.WaitForExit($Script:Config.GracefulShutdownTimeout * 1000)) {
                         $stoppedProcesses += "Worker"
-                        Write-Log "Worker process terminated" -Level "SUCCESS"
+                        Write-Log "Worker process terminated" -Level "SUCCESS" -LogFile $Script:Config.LogFile
                     }
                 } else {
                     $stoppedProcesses += "Worker"
-                    Write-Log "Worker process exited gracefully" -Level "SUCCESS"
+                    Write-Log "Worker process exited gracefully" -Level "SUCCESS" -LogFile $Script:Config.LogFile
                 }
             } else {
-                Write-Log "Worker process already exited" -Level "INFO"
+                Write-Log "Worker process already exited" -Level "INFO" -LogFile $Script:Config.LogFile
             }
+        } catch {
+            Write-Log "Error stopping worker process: $_" -Level "ERROR" -LogFile $Script:Config.LogFile
         }
-        catch {
-            Write-Log "Error stopping worker process: $_" -Level "ERROR"
+    }
+    
+    # Stop the Python process
+    if ($global:PythonPID -and $global:PythonPID -ne 0) {
+        Write-Log "Stopping Python process (PID: $global:PythonPID)..." -Level "INFO" -LogFile $Script:Config.LogFile
+        
+        try {
+            $pythonProcess = Get-Process -Id $global:PythonPID -ErrorAction Stop
+            
+            if (-not $pythonProcess.HasExited) {
+                $pythonProcess.CloseMainWindow() | Out-Null
+                Start-Sleep -Seconds 2
+                
+                if (-not $pythonProcess.HasExited) {
+                    Write-Log "Forcefully terminating Python process..." -Level "WARN" -LogFile $Script:Config.LogFile
+                    $pythonProcess.Kill()
+                    if ($pythonProcess.WaitForExit($Script:Config.GracefulShutdownTimeout * 1000)) {
+                        $stoppedProcesses += "Python"
+                        Write-Log "Python process terminated" -Level "SUCCESS" -LogFile $Script:Config.LogFile
+                    }
+                } else {
+                    $stoppedProcesses += "Python"
+                    Write-Log "Python process exited gracefully" -Level "SUCCESS" -LogFile $Script:Config.LogFile
+                }
+            } else {
+                Write-Log "Python process already exited" -Level "INFO" -LogFile $Script:Config.LogFile
+            }
+        } catch {
+            Write-Log "Error stopping Python process: $_" -Level "ERROR" -LogFile $Script:Config.LogFile
         }
     }
     
@@ -775,80 +793,50 @@ function Stop-WorkerProcess {
     # Remove PID tracking file
     if (Test-Path $Script:Config.PIDFilePath) {
         Remove-Item -Path $Script:Config.PIDFilePath -Force -ErrorAction SilentlyContinue
-        Write-Log "Removed PID tracking file" -Level "DEBUG"
+        Write-Log "Removed PID tracking file" -Level "DEBUG" -LogFile $Script:Config.LogFile
+    }
+    
+    # Clean up communication files
+    if (Test-Path $commPaths.CommunicationDir) {
+        Remove-Item -Path $commPaths.CommunicationDir -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Log "Cleaned up communication directory" -Level "DEBUG" -LogFile $Script:Config.LogFile
     }
     
     if ($stoppedProcesses.Count -gt 0) {
-        Write-Log "Stopped processes: $($stoppedProcesses -join ', ')" -Level "INFO"
+        Write-Log "Stopped processes: $($stoppedProcesses -join ', ')" -Level "INFO" -LogFile $Script:Config.LogFile
     }
 }
 
-function Handle-UnexpectedProcessStop {
-    # Collect any incomplete run data
-    if ($global:CurrentRunFolder -and (Test-Path $global:CurrentRunFolder)) {
-        Write-Log "Collecting data from incomplete run: $(Split-Path $global:CurrentRunFolder -Leaf)" -Level "WARN"
-        
-        # Check for completion summary
-        $completionPath = Join-Path $global:CurrentRunFolder "Magick_Process_*\logs\completion_summary.txt"
-        if (Test-Path $completionPath) {
-            $runData = @{
-                RunFolder = $global:CurrentRunFolder
-                RunFolderName = Split-Path $global:CurrentRunFolder -Leaf
-                Attachments = @($completionPath)
-                CollectionTime = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
-            }
-            
-            $global:CollectedRunFolders += $runData
-            Write-Log "Collected incomplete run data" -Level "INFO"
-        }
-    }
-}
+ 
 
 # ====================================================================
 # ENHANCED: PID Tracking with persistent data (from old version)
 # ====================================================================
 
 function Save-PIDTracking {
-    $workerStartString = if ($global:WorkerStartTime -and ($global:WorkerStartTime -is [DateTime])) {
-        $global:WorkerStartTime.ToString("yyyy-MM-dd HH:mm:ss")
-    } else {
-        $null
-    }
-    
-    $pythonStartString = if ($global:PythonStartTime -and ($global:PythonStartTime -is [DateTime])) {
-        $global:PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss")
-    } else {
-        $null
-    }
-    
     $PIDTracking = @{
         WorkerPID = $global:WorkerPID
         PythonPID = $global:PythonPID
-        WorkerStartTime = $workerStartString
-        PythonStartTime = $pythonStartString
+        WorkerStartTime = if ($global:WorkerStartTime) { $global:WorkerStartTime.ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
+        PythonStartTime = if ($global:PythonStartTime) { $global:PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
         RunFolder = $global:CurrentRunFolder
         LastUpdate = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
-        EmailQueue = $global:EmailAttachmentQueue
-        CollectedFolders = $global:CollectedRunFolders
-        ShutdownInitiated = $global:IsShuttingDown
-        PersistentTracking = $global:PersistentTracking
     }
     
     try {
-        $PIDTracking | ConvertTo-Json -Depth 10 | Out-File -FilePath $Script:Config.PIDFilePath -Force
-        Write-Log "PID tracking saved with $($global:CollectedRunFolders.Count) collected folders" -Level "DEBUG"
-        
-        # Also save persistent tracking separately
-        Save-PersistentTracking
+        if ($Script:Config.PIDFilePath) {
+            $PIDTracking | ConvertTo-Json -Depth 5 | Out-File -FilePath $Script:Config.PIDFilePath -Force
+            Write-Log "PID tracking saved" -Level "DEBUG" -LogFile $Script:Config.LogFile
+        }
     } catch {
-        Write-Log "Failed to save PID tracking: $_" -Level "ERROR"
+        Write-Log "Failed to save PID tracking: $_" -Level "ERROR" -LogFile $Script:Config.LogFile
     }
 }
 
+
 function Load-PIDTracking {
-    if (-not (Test-Path $Script:Config.PIDFilePath)) {
-        Write-Log "No PID tracking file found" -Level "DEBUG"
-        Load-PersistentTracking
+    if (-not $Script:Config.PIDFilePath -or -not (Test-Path $Script:Config.PIDFilePath)) {
+        Write-Log "No PID tracking file found" -Level "DEBUG" -LogFile $Script:Config.LogFile
         return $false
     }
     
@@ -860,7 +848,7 @@ function Load-PIDTracking {
         $ageMinutes = ((Get-Date) - $lastUpdate).TotalMinutes
         
         if ($ageMinutes -gt $Script:Config.MaxPIDFileAgeMinutes) {
-            Write-Log "PID file is too old ($ageMinutes minutes), cleaning up" -Level "WARN"
+            Write-Log "PID file is too old ($ageMinutes minutes), cleaning up" -Level "WARN" -LogFile $Script:Config.LogFile
             Remove-Item -Path $Script:Config.PIDFilePath -Force -ErrorAction SilentlyContinue
             return $false
         }
@@ -886,76 +874,16 @@ function Load-PIDTracking {
         }
         
         $global:CurrentRunFolder = $loaded.RunFolder
-        $global:EmailAttachmentQueue = @($loaded.EmailQueue)
-        $global:CollectedRunFolders = @($loaded.CollectedFolders)
-        $global:IsShuttingDown = $loaded.ShutdownInitiated
         
-        if ($loaded.PersistentTracking) {
-            $global:PersistentTracking = $loaded.PersistentTracking
-        }
-        
-        Write-Log "PID tracking loaded: WorkerPID=$global:WorkerPID, PythonPID=$global:PythonPID" -Level "INFO"
+        Write-Log "PID tracking loaded: WorkerPID=$global:WorkerPID, PythonPID=$global:PythonPID" -Level "INFO" -LogFile $Script:Config.LogFile
         return $true
     } catch {
-        Write-Log "Failed to load PID tracking: $_" -Level "ERROR"
+        Write-Log "Failed to load PID tracking: $_" -Level "ERROR" -LogFile $Script:Config.LogFile
         Remove-Item -Path $Script:Config.PIDFilePath -Force -ErrorAction SilentlyContinue
         return $false
     }
 }
-
-function Save-PersistentTracking {
-    $persistentFilePath = Join-Path (Split-Path $Script:Config.LogFile -Parent) "persistent_tracking.json"
-    
-    # Update persistent tracking data
-    $global:PersistentTracking.LastKnownRunFolder = $global:CurrentRunFolder
-    $global:PersistentTracking.LastKnownPythonPID = $global:PythonPID
-    $global:PersistentTracking.LastKnownWorkerPID = $global:WorkerPID
-    $global:PersistentTracking.LastValidationTime = if ($global:LastValidation) { (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
-    $global:PersistentTracking.LastValidationResult = if ($global:LastValidation) { @{ Success = $global:LastValidation.Success; FolderName = $global:LastValidation.FolderName } } else { $null }
-    $global:PersistentTracking.CollectedRunFolders = $global:CollectedRunFolders
-    
-    try {
-        $global:PersistentTracking | ConvertTo-Json -Depth 10 | Out-File -FilePath $persistentFilePath -Force
-        Write-Log "Persistent tracking saved" -Level "DEBUG"
-        return $true
-    } catch {
-        Write-Log "Failed to save persistent tracking: $_" -Level "ERROR"
-        return $false
-    }
-}
-
-function Load-PersistentTracking {
-    $persistentFilePath = Join-Path (Split-Path $Script:Config.LogFile -Parent) "persistent_tracking.json"
-    
-    if (Test-Path $persistentFilePath) {
-        try {
-            $loadedData = Get-Content -Path $persistentFilePath -Raw | ConvertFrom-Json
-            
-            $global:PersistentTracking = @{
-                LastKnownRunFolder = $loadedData.LastKnownRunFolder
-                LastKnownPythonPID = $loadedData.LastKnownPythonPID
-                LastKnownWorkerPID = $loadedData.LastKnownWorkerPID
-                LastValidationTime = $loadedData.LastValidationTime
-                LastValidationResult = $loadedData.LastValidationResult
-                ProcessStopHistory = @($loadedData.ProcessStopHistory)
-                ValidationHistory = @($loadedData.ValidationHistory)
-                DailyRunCount = $loadedData.DailyRunCount
-                LastSuccessfulRun = $loadedData.LastSuccessfulRun
-                CollectedRunFolders = @($loadedData.CollectedRunFolders)
-            }
-            
-            $global:CollectedRunFolders = @($loadedData.CollectedRunFolders)
-            
-            Write-Log "Loaded persistent tracking with $($global:PersistentTracking.CollectedRunFolders.Count) collected folders" -Level "INFO"
-            return $true
-        } catch {
-            Write-Log "Failed to load persistent tracking: $_" -Level "ERROR"
-            return $false
-        }
-    }
-    
-    return $false
-}
+ 
 
 # ====================================================================
 # ENHANCED: Validation and Folder Functions (improved)
@@ -963,7 +891,7 @@ function Load-PersistentTracking {
 
 function Find-LatestRunFolder {
     try {
-        if (-not (Test-Path $Script:Config.RunsBasePath)) {
+        if (-not $Script:Config.RunsBasePath -or -not (Test-Path $Script:Config.RunsBasePath)) {
             return $null
         }
         
@@ -1081,42 +1009,6 @@ function Test-TimeWindow {
 # ENHANCED: Status Display (improved from old version)
 # ====================================================================
 
-function Show-StatusBanner {
-    $currentSecond = (Get-Date).Second
-    if ($currentSecond % 20 -ne 0) {
-        return
-    }
-    
-    Clear-Host
-    Write-Host "================================================" -ForegroundColor Cyan
-    Write-Host "    ENHANCED FACE RECOGNITION PROCESS MONITOR" -ForegroundColor Cyan
-    Write-Host "================================================" -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host "Current Date: $(Get-Date -Format 'yyyy-MM-dd')" -ForegroundColor Yellow
-    Write-Host "Current Time: $(Get-Date -Format 'HH:mm:ss')" -ForegroundColor Yellow
-    Write-Host "Schedule: $($Script:Config.StartTime) - $($Script:Config.EndTime)" -ForegroundColor Yellow
-    
-    $processStatus = Check-ProcessStatus
-    
-    if ($processStatus.PythonRunning) {
-        Write-Host "PYTHON STATUS: RUNNING" -ForegroundColor Green
-        Write-Host "  PID: $($global:PythonPID)" -ForegroundColor White
-    } else {
-        Write-Host "PYTHON STATUS: STOPPED" -ForegroundColor Red
-    }
-    
-    Write-Host ""
-    Write-Host "WORKER STATUS: $(if ($processStatus.WorkerRunning) {'RUNNING'} else {'STOPPED'})" -ForegroundColor $(if ($processStatus.WorkerRunning) {'Green'} else {'Red'})
-    
-    # Show sudden termination streak if any
-    if ($global:SuddenTerminationTracking.CurrentStreak -gt 0) {
-        Write-Host ""
-        Write-Host "Sudden Termination Streak: $($global:SuddenTerminationTracking.CurrentStreak)" -ForegroundColor $(if ($global:SuddenTerminationTracking.CurrentStreak -ge $Script:Config.SuddenTermination.ConsecutiveThreshold) { 'Red' } else { 'Yellow' })
-    }
-    
-    Write-Host ""
-    Write-Host "================================================" -ForegroundColor Cyan
-}
 
 # ====================================================================
 # ENHANCED: Console Control Handler (from old version)
@@ -1183,80 +1075,99 @@ function Register-ConsoleControlHandler {
     [void][ConsoleCtrlHandler]::SetConsoleCtrlHandler($handler, $true)
     Write-Log "Console control handler registered" -Level "DEBUG"
 }
-
+ 
 # ====================================================================
-# MAIN EXECUTION
+# MAIN EXECUTION - UPDATED WITH OLD VERSION'S RELIABILITY
 # ====================================================================
 
 try {
-    # Initialize paths for monitor
-    Write-Host "Initializing enhanced monitor..." -ForegroundColor Cyan
-    
-    # Use the common paths function but with enhanced configuration
-    $paths = Initialize-ProjectPortablePaths -IsMonitor
-    
-    # Update configuration with paths
-    $Script:Config.WorkerScript = $paths.WorkerScript
-    $Script:Config.PythonScriptPath = $paths.PythonScriptPath
-    $Script:Config.RunsBasePath = $paths.DateBasedPath
-    $Script:Config.OutputFolderPattern = "Magick_Process_MaskDetect_*"
-    $Script:Config.PIDFilePath = $paths.PIDFilePath
-    $Script:Config.LogFile = $paths.LogFile
-    $Script:Config.CurrentDate = $paths.CurrentDate
-    $Script:Config.ActiveDatePath = $paths.DateBasedPath
-    
-    # Set sudden termination tracking file path
-    $Script:Config.SuddenTermination.TrackingFile = Join-Path $paths.DateBasedPath "sudden_termination_tracking.json"
-    
     # Create log directory if it doesn't exist
-    $logDir = Split-Path $Script:Config.LogFile -Parent
-    if (-not (Test-Path $logDir)) {
-        New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+    if ($Script:Config.LogFile) {
+        $logDir = Split-Path $Script:Config.LogFile -Parent
+        if (-not (Test-Path $logDir)) {
+            New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+        }
     }
     
     Write-Log "=== Enhanced Face Recognition Monitor Started ===" -Level "INFO"
-    Write-Log "Version: 2.1 (with sudden termination tracking)" -Level "INFO"
+    Write-Log "Version: 2.1 (Updated with old version's process checking)" -Level "INFO"
     Write-Log "Start Time: $($Script:Config.StartTime)" -Level "INFO"
     Write-Log "End Time: $($Script:Config.EndTime)" -Level "INFO"
-    
-    # Initialize cleanup and tracking
-    Initialize-CleanupOnStartup
-    Register-ConsoleControlHandler
-    
-    # Load existing PID tracking
-    $pidLoaded = Load-PIDTracking
-    if ($pidLoaded) {
-        Write-Log "Resumed monitoring of existing processes" -Level "SUCCESS"
-        Check-ProcessStatus | Out-Null
-    }
+    Write-Log "Log File: $($Script:Config.LogFile)" -Level "INFO"
     
     # Ensure runs base path exists
-    if (-not (Test-Path $Script:Config.RunsBasePath)) {
+    if ($Script:Config.RunsBasePath -and -not (Test-Path $Script:Config.RunsBasePath)) {
         Write-Log "Creating runs base directory" -Level "WARN"
         New-Item -ItemType Directory -Path $Script:Config.RunsBasePath -Force | Out-Null
     }
     
-    Clear-Host
+    # Clear console for clean display
+    #Clear-Host
     
-    # Main monitoring loop with enhanced resilience
+    # Main monitoring loop with OLD VERSION'S reliability
     Write-Log "Entering enhanced monitoring loop..." -Level "INFO"
     
-    while ($true) {
+    # Initialize monitoring loop variables
+    $monitoringActive = $true
+    
+    while ($monitoringActive) {
         try {
+            # OLD VERSION'S PROCESS CHECKING LOGIC
             $processStatus = Check-ProcessStatus
             
             $startPassed = Test-TimeWindow -TargetTime $Script:Config.StartTime
             $endPassed = Test-TimeWindow -TargetTime $Script:Config.EndTime
-            $inWindow = ($startPassed -and !$endPassed)
+            
+            # FIXED: Correct syntax for boolean condition
+            if ($startPassed -and (-not $endPassed)) {
+                $inWindow = $true
+            } else {
+                $inWindow = $false
+            }
             
             $currentTime = Get-Date -Format "HH:mm:ss"
             
-            Show-StatusBanner
+            # Show status banner every 10 seconds
+            $currentSecond = (Get-Date).Second
+            if ($currentSecond % 10 -eq 0) {
+                #Clear-Host
+                Write-Host "================================================" -ForegroundColor Cyan
+                Write-Host "    ENHANCED FACE RECOGNITION PROCESS MONITOR" -ForegroundColor Cyan
+                Write-Host "================================================" -ForegroundColor Cyan
+                Write-Host "Current Time: $currentTime" -ForegroundColor Yellow
+                Write-Host "Schedule: $($Script:Config.StartTime) - $($Script:Config.EndTime)" -ForegroundColor Yellow
+                Write-Host "Status: $(if ($inWindow) {'ACTIVE WINDOW'} else {'OUTSIDE WINDOW'})" -ForegroundColor $(if ($inWindow) {'Green'} else {'Yellow'})
+                Write-Host ""
+                
+                if ($processStatus.PythonRunning) {
+                    Write-Host "PYTHON STATUS: RUNNING" -ForegroundColor Green
+                    Write-Host "  PID: $($global:PythonPID)" -ForegroundColor White
+                    Write-Host "  Detected via: $(if ($processStatus.UsingCommunication) {'Communication'} else {'Process Scan'})" -ForegroundColor Gray
+                } else {
+                    Write-Host "PYTHON STATUS: STOPPED" -ForegroundColor Red
+                }
+                
+                Write-Host ""
+                Write-Host "WORKER STATUS: $(if ($processStatus.WorkerRunning) {'RUNNING'} else {'STOPPED'})" -ForegroundColor $(if ($processStatus.WorkerRunning) {'Green'} else {'Red'})
+                if ($processStatus.WorkerRunning) {
+                    Write-Host "  PID: $($global:WorkerPID)" -ForegroundColor White
+                }
+                
+                # Show sudden termination streak if any
+                if ($global:SuddenTerminationTracking.CurrentStreak -gt 0) {
+                    Write-Host ""
+                    Write-Host "Sudden Termination Streak: $($global:SuddenTerminationTracking.CurrentStreak)" -ForegroundColor $(if ($global:SuddenTerminationTracking.CurrentStreak -ge $Script:Config.SuddenTermination.ConsecutiveThreshold) { 'Red' } else { 'Yellow' })
+                }
+                
+                Write-Host ""
+                Write-Host "Communication: $(if (Test-Path (Initialize-CommunicationPaths -Paths $paths -IsMonitor).StatusFile) {'ACTIVE'} else {'INACTIVE'})" -ForegroundColor Gray
+                Write-Host "================================================" -ForegroundColor Cyan
+            }
             
-            Write-Log "Check: $currentTime | Window: $(if ($inWindow) {'Active'} else {'Inactive'}) | Python: $(if ($processStatus.PythonRunning) {'Running (PID: ' + $global:PythonPID + ')'} else {'Stopped'})" -Level "DEBUG"
+            Write-Log "Check: $currentTime | Window: $(if ($inWindow) {'Active'} else {'Inactive'}) | Worker: $(if ($processStatus.WorkerRunning) {'Running'} else {'Stopped'}) | Python: $(if ($processStatus.PythonRunning) {'Running'} else {'Stopped'})" -Level "DEBUG"
             
-            # Check if we should start worker
-            if ($inWindow -and !$processStatus.PythonRunning) {
+            # OLD VERSION'S LOGIC: Check if we should start worker
+            if ($inWindow -and (-not $processStatus.PythonRunning)) {
                 Write-Log "Time window active and no Python process running - starting worker..." -Level "INFO"
                 
                 if ($global:LastWorkerAttempt -and ((Get-Date) - $global:LastWorkerAttempt).TotalSeconds -lt 60) {
@@ -1267,11 +1178,13 @@ try {
                     
                     if ($started) {
                         Write-Log "Worker started. Monitoring Python process..." -Level "SUCCESS"
+                    } else {
+                        Write-Log "Failed to start worker process" -Level "ERROR"
                     }
                 }
             }
             
-            # Handle end time
+            # OLD VERSION'S LOGIC: Handle end time
             elseif ($endPassed) {
                 Write-Log "End time reached - initiating shutdown sequence..." -Level "INFO"
                 
@@ -1285,31 +1198,60 @@ try {
                 Write-Log "Validating final worker output..." -Level "INFO"
                 $global:LastValidation = Validate-Output
                 
+                if ($global:LastValidation.Success) {
+                    Write-Log "Validation successful. Run folder: $($global:LastValidation.FolderName)" -Level "SUCCESS"
+                } else {
+                    Write-Log "Validation failed: $($global:LastValidation.Error)" -Level "ERROR"
+                }
+                
                 Write-Log "Daily process completed. Stopping monitor..." -Level "INFO"
+                $monitoringActive = $false
                 break
             }
             
-            # Save tracking periodically
-            if ($processStatus.PythonRunning -or $processStatus.WorkerRunning) {
-                Save-PIDTracking
+            # If we're in the window and processes should be running, verify health
+            if ($inWindow -and $processStatus.WorkerRunning) {
+                # Send periodic heartbeat request to worker
+                $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
+                if ((Get-Date).Second % 15 -eq 0) {
+                    $workerHealth = Check-WorkerHealth
+                    if (-not $workerHealth) {
+                        Write-Log "Worker health check failed. Attempting to restart..." -Level "WARN"
+                        Stop-WorkerProcess
+                        Start-Sleep -Seconds 2
+                        Start-WorkerProcess
+                    }
+                }
             }
             
             Start-Sleep -Seconds $Script:Config.ProcessCheckInterval
             
         } catch {
             Write-Log "Error in main loop: $_" -Level "ERROR"
-            Register-SuddenTermination -Reason "Main loop error: $_" -TerminationType "Error"
-            Save-PIDTracking
+            Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
             Start-Sleep -Seconds $Script:Config.ProcessCheckInterval
         }
     }
 }
 catch {
     Write-Log "FATAL ERROR: $_" -Level "ERROR"
-    Register-SuddenTermination -Reason "Fatal error: $_" -TerminationType "Fatal"
+    Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
+    
+    # Register sudden termination
+    $errorInfo = @{
+        ErrorMessage = $_.Exception.Message
+        ErrorType = $_.Exception.GetType().Name
+        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    }
+    
+    Register-SuddenTermination -Reason "Fatal error in monitor main loop: $_" `
+        -TerminationType "Fatal" `
+        -ProcessInfo $errorInfo
 }
 finally {
     Write-Log "Cleaning up..." -Level "INFO"
+    
+    # Stop any running processes
     Stop-WorkerProcess
     
     # Save final state
@@ -1317,7 +1259,28 @@ finally {
     Save-PersistentTracking
     
     Write-Log "=== Enhanced Face Recognition Monitor Stopped ===" -Level "INFO"
-    Write-Host "Monitor stopped." -ForegroundColor Yellow
-    Write-Host "Log file: $($Script:Config.LogFile)" -ForegroundColor Yellow
-    Write-Host "Collected runs: $($global:CollectedRunFolders.Count)" -ForegroundColor Yellow
+    
+    # Final console output
+    Write-Host ""
+    Write-Host "================================================" -ForegroundColor Cyan
+    Write-Host "MONITOR STOPPED" -ForegroundColor Yellow
+    Write-Host "================================================" -ForegroundColor Cyan
+    
+    if ($Script:Config.LogFile) {
+        Write-Host "Log file: $($Script:Config.LogFile)" -ForegroundColor White
+    }
+    
+    if ($global:LastValidation) {
+        if ($global:LastValidation.Success) {
+            Write-Host "Last run validation: SUCCESS" -ForegroundColor Green
+            Write-Host "  Folder: $($global:LastValidation.FolderName)" -ForegroundColor White
+        } else {
+            Write-Host "Last run validation: FAILED" -ForegroundColor Red
+            Write-Host "  Error: $($global:LastValidation.Error)" -ForegroundColor White
+        }
+    }
+    
+    Write-Host "Collected runs: $($global:CollectedRunFolders.Count)" -ForegroundColor White
+    Write-Host "Sudden terminations: $($global:SuddenTerminationTracking.Statistics.TotalSuddenTerminations)" -ForegroundColor $(if ($global:SuddenTerminationTracking.Statistics.TotalSuddenTerminations -gt 0) { 'Yellow' } else { 'White' })
+    Write-Host "================================================" -ForegroundColor Cyan
 }

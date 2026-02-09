@@ -1,4 +1,4 @@
-# maskDetect-portable.ps1
+# old-worker.ps1
 # ==============================================
 # Organized version with unified folder structure
 # ==============================================
