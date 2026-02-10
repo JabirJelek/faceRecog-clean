@@ -276,17 +276,17 @@ function Create-EmailBody {
 </head>
 <body>
     <div class="container">
-        <h1>🎭 Face Recognition Run Report</h1>
+        <h1> === Face Recognition Run Report === </h1>
         
         <div class="summary-box">
-            <h2>📊 Summary</h2>
+            <h2> === Summary === </h2>
             <p><strong>Total Runs:</strong> $runCount</p>
             <p><strong>Successful:</strong> <span style="color: #27ae60;">$successCount</span></p>
             <p><strong>Failed:</strong> <span style="color: #e74c3c;">$failedCount</span></p>
             <p><strong>Report Time:</strong> $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')</p>
         </div>
         
-        <h2>📁 Recent Runs</h2>
+        <h2> === Recent Runs === </h2>
 "@
 
     foreach ($summary in $RunSummaries) {
@@ -416,7 +416,7 @@ function Register-StableEmailSender {
         CredentialPath = "$env:USERPROFILE\.face-recog\email-credential.xml"
     }
     
-    Write-Host "Stable email sender registered" -Level "SUCCESS"
+    #Write-Host "Stable email sender registered" -Level "SUCCESS"
     return $true
 }
 
