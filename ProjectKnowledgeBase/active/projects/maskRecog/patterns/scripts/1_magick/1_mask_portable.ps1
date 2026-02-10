@@ -65,7 +65,7 @@ try {
     # Run Python
     Write-Host "Starting Python script..." -ForegroundColor Cyan
     
-    $pythonOutputFile = Join-Path $runFolder "logs\python_output.txt"
+    $pythonOutputFile = Join-Path $runFolder "logs\python_output_$timestamp.txt"
     $workingDir = Join-Path $runFolder "script_output"
     
     # Start Python process

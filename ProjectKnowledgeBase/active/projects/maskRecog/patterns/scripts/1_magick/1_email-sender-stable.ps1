@@ -91,7 +91,10 @@ function Get-RunSummaries {
     param(
         [string]$BasePath,
         [datetime]$Since,
-        [int]$MaxRuns = 10
+        [int]$MaxRuns = 10,
+        [DateTime]$ScheduleStart = $null,
+        [DateTime]$ScheduleEnd = $null,
+        [switch]$TimeWindowMode = $false
     )
     
     $summaries = @()
@@ -104,66 +107,122 @@ function Get-RunSummaries {
         
         Write-Host "Found $($runFolders.Count) run folders" -ForegroundColor Cyan
         
+        $collectedWithSummary = 0
+        $collectedMetadataOnly = 0
+        $outsideTimeWindow = 0
+        
         foreach ($folder in $runFolders) {
+            # If TimeWindowMode is enabled, filter by schedule time
+            $inTimeWindow = $true
+            if ($TimeWindowMode -and $ScheduleStart -and $ScheduleEnd) {
+                $inTimeWindow = ($folder.CreationTime -ge $ScheduleStart -and $folder.CreationTime -le $ScheduleEnd)
+                if (-not $inTimeWindow) {
+                    $outsideTimeWindow++
+                    continue
+                }
+            }
+            
             # Check if folder was created after the specified time
             if ($folder.CreationTime -ge $Since) {
                 $summaryPath = Join-Path $folder.FullName "logs\completion_summary.txt"
+                $hasSummary = Test-Path $summaryPath
                 
-                if (Test-Path $summaryPath) {
+                # Get metadata if available
+                $metadata = $null
+                $metadataPath = Join-Path $folder.FullName "metadata.json"
+                $hasMetadata = Test-Path $metadataPath
+                
+                if ($hasMetadata) {
+                    try {
+                        $metadata = Get-Content $metadataPath -Raw | ConvertFrom-Json
+                    } catch { 
+                        $hasMetadata = $false
+                    }
+                }
+                
+                # Create summary object
+                $summary = @{
+                    FolderPath = $folder.FullName
+                    FolderName = $folder.Name
+                    CreationTime = $folder.CreationTime
+                    ExitCode = "UNKNOWN"
+                    SummaryText = $null
+                    Metadata = $metadata
+                    LogFiles = @()
+                    HasSummary = $hasSummary
+                    HasMetadata = $hasMetadata
+                    CollectionType = "UNKNOWN"
+                    Status = "UNKNOWN"
+                }
+                
+                if ($hasSummary) {
                     $summaryContent = Get-Content $summaryPath -Raw
+                    $summary.SummaryText = $summaryContent
                     
                     # Parse the summary for exit code
-                    $exitCode = "UNKNOWN"
                     if ($summaryContent -match "Exit code: (\d+)") {
-                        $exitCode = $matches[1]
+                        $summary.ExitCode = $matches[1]
+                        $summary.Status = if ($matches[1] -eq "0") { "SUCCESS" } else { "FAILED" }
                     }
-                    
-                    # Get metadata if available
-                    $metadata = $null
-                    $metadataPath = Join-Path $folder.FullName "metadata.json"
-                    if (Test-Path $metadataPath) {
-                        try {
-                            $metadata = Get-Content $metadataPath -Raw | ConvertFrom-Json
-                        } catch { }
+                    $summary.CollectionType = "SUMMARY_METADATA"
+                    $collectedWithSummary++
+                    Write-Host "  ✓ Collected with summary: $($folder.Name) (Exit: $($summary.ExitCode))" -ForegroundColor Green
+                } elseif ($hasMetadata) {
+                    # Try to get exit code from metadata
+                    if ($metadata -and $metadata.worker_exit_code) {
+                        $summary.ExitCode = $metadata.worker_exit_code
+                        $summary.Status = if ($metadata.worker_exit_code -eq "0") { "SUCCESS" } else { "FAILED" }
                     }
-                    
-                    $summary = @{
-                        FolderPath = $folder.FullName
-                        FolderName = $folder.Name
-                        CreationTime = $folder.CreationTime
-                        ExitCode = $exitCode
-                        SummaryText = $summaryContent
-                        Metadata = $metadata
-                        LogFiles = @()
-                        Status = if ($exitCode -eq "0") { "SUCCESS" } else { "FAILED" }
-                    }
-                    
-                    # Find log files
-                    $logDir = Join-Path $folder.FullName "logs"
-                    if (Test-Path $logDir) {
-                        $logFiles = Get-ChildItem -Path $logDir -File -Filter "*.txt" -ErrorAction SilentlyContinue
-                        foreach ($logFile in $logFiles) {
-                            $summary.LogFiles += @{
-                                Path = $logFile.FullName
-                                Name = $logFile.Name
-                                Size = "$([math]::Round($logFile.Length / 1KB, 2)) KB"
-                            }
+                    $summary.CollectionType = "METADATA_ONLY"
+                    $collectedMetadataOnly++
+                    Write-Host "  ⚠ Collected metadata only: $($folder.Name) (Exit: $($summary.ExitCode))" -ForegroundColor Yellow
+                } else {
+                    # No summary or metadata
+                    $summary.CollectionType = "NO_DATA"
+                    Write-Host "  ✗ No data found: $($folder.Name)" -ForegroundColor Red
+                }
+                
+                # Find log files (even if no summary, we might still have logs)
+                $logDir = Join-Path $folder.FullName "logs"
+                if (Test-Path $logDir) {
+                    $logFiles = Get-ChildItem -Path $logDir -File -Filter "*.txt" -ErrorAction SilentlyContinue
+                    foreach ($logFile in $logFiles) {
+                        $sizeInKB = [math]::Round($logFile.Length / 1KB, 2)
+                        $summary.LogFiles += @{
+                            Path = $logFile.FullName
+                            Name = $logFile.Name
+                            Size = "$sizeInKB KB"
+                            SizeBytes = $logFile.Length
+                            SizeKB = $sizeInKB
                         }
                     }
-                    
-                    $summaries += $summary
-                    Write-Host "  ✓ Collected: $($folder.Name) (Exit: $exitCode)" -ForegroundColor Green
-                } else {
-                    Write-Host "  ⚠ No summary found: $($folder.Name)" -ForegroundColor Yellow
                 }
+                
+                $summaries += $summary
             }
         }
+        
+        # Calculate final counts correctly
+        $totalInWindow = $runFolders.Count - $outsideTimeWindow
+        $noDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
+        
+        Write-Host "`nCollection Summary:" -ForegroundColor Cyan
+        Write-Host "  Total folders checked: $($runFolders.Count)" -ForegroundColor White
+        Write-Host "  Runs in time window: $totalInWindow" -ForegroundColor White
+        Write-Host "  With completion summary: $collectedWithSummary" -ForegroundColor Green
+        Write-Host "  Metadata only: $collectedMetadataOnly" -ForegroundColor Yellow
+        Write-Host "  No data available: $noDataCount" -ForegroundColor Red
+        if ($TimeWindowMode) {
+            Write-Host "  Outside time window: $outsideTimeWindow" -ForegroundColor Gray
+        }
+        
     } catch {
         Write-Host "Error collecting run summaries: $_" -ForegroundColor Red
     }
     
     return $summaries
 }
+
 
 # ====================================================================
 # Send Email with Send-MailMessage (No External Dependencies)
@@ -229,12 +288,19 @@ function Create-EmailBody {
     [CmdletBinding()]
     param(
         [array]$RunSummaries,
-        [hashtable]$Config
+        [hashtable]$Config,
+        [string]$ScheduleStart = $null,
+        [string]$ScheduleEnd = $null
     )
     
     $runCount = $RunSummaries.Count
+    $summaryCount = ($RunSummaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
+    $metadataOnlyCount = ($RunSummaries | Where-Object { $_.CollectionType -eq "METADATA_ONLY" }).Count
+    $noDataCount = $runCount - $summaryCount - $metadataOnlyCount
+    
     $successCount = ($RunSummaries | Where-Object { $_.Status -eq "SUCCESS" }).Count
-    $failedCount = $runCount - $successCount
+    $failedCount = ($RunSummaries | Where-Object { $_.Status -eq "FAILED" }).Count
+    $unknownCount = $runCount - $successCount - $failedCount
     
     $htmlBody = @"
 <!DOCTYPE html>
@@ -255,6 +321,8 @@ function Create-EmailBody {
         }
         .run-success { border-left-color: #27ae60; }
         .run-failed { border-left-color: #e74c3c; }
+        .run-unknown { border-left-color: #95a5a6; }
+        .run-metadata-only { border-left-color: #f39c12; }
         .status-badge { 
             display: inline-block; 
             padding: 3px 8px; 
@@ -265,13 +333,19 @@ function Create-EmailBody {
         }
         .status-success { background: #d4edda; color: #155724; }
         .status-failed { background: #f8d7da; color: #721c24; }
+        .status-unknown { background: #d1ecf1; color: #0c5460; }
+        .collection-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 8px;
+        }
+        .collection-summary { background: #28a745; color: white; }
+        .collection-metadata { background: #ffc107; color: black; }
         .metadata { font-size: 12px; color: #7f8c8d; margin-top: 5px; }
         .timestamp { color: #95a5a6; font-size: 11px; }
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
         .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; font-size: 12px; color: #7f8c8d; }
-        .highlight { background-color: #fff3cd; padding: 10px; border-radius: 5px; margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -281,29 +355,87 @@ function Create-EmailBody {
         <div class="summary-box">
             <h2> === Summary === </h2>
             <p><strong>Total Runs:</strong> $runCount</p>
-            <p><strong>Successful:</strong> <span style="color: #27ae60;">$successCount</span></p>
-            <p><strong>Failed:</strong> <span style="color: #e74c3c;">$failedCount</span></p>
+            <p><strong>With Completion Summary:</strong> <span style="color: #28a745;">$summaryCount</span></p>
+            <p><strong>Metadata Only:</strong> <span style="color: #ffc107;">$metadataOnlyCount</span></p>
+            <p><strong>No Data:</strong> <span style="color: #dc3545;">$noDataCount</span></p>
+            <p><strong>Successful:</strong> <span style="color: #28a745;">$successCount</span></p>
+            <p><strong>Failed:</strong> <span style="color: #dc3545;">$failedCount</span></p>
+            <p><strong>Unknown Status:</strong> <span style="color: #6c757d;">$unknownCount</span></p>
+"@
+
+    if ($ScheduleStart -and $ScheduleEnd) {
+        $htmlBody += @"
+            <p><strong>Schedule Window:</strong> $ScheduleStart to $ScheduleEnd</p>
+"@
+    }
+    
+    $htmlBody += @"
             <p><strong>Report Time:</strong> $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')</p>
         </div>
         
-        <h2> === Recent Runs === </h2>
+        <h2> === Run Details === </h2>
 "@
 
     foreach ($summary in $RunSummaries) {
-        $statusClass = if ($summary.Status -eq "SUCCESS") { "run-success" } else { "run-failed" }
-        $statusBadge = if ($summary.Status -eq "SUCCESS") { "status-success" } else { "status-failed" }
+        # Determine status class and badge
+        $statusClass = "run-unknown"
+        $statusBadge = "status-unknown"
+        $statusText = "UNKNOWN"
+        
+        if ($summary.Status -eq "SUCCESS") { 
+            $statusClass = "run-success"
+            $statusBadge = "status-success"
+            $statusText = "SUCCESS"
+        } elseif ($summary.Status -eq "FAILED") { 
+            $statusClass = "run-failed"
+            $statusBadge = "status-failed"
+            $statusText = "FAILED"
+        }
+        
+        # Add metadata-only styling
+        if ($summary.CollectionType -eq "METADATA_ONLY") {
+            $statusClass = "run-metadata-only"
+        }
+        
+        # Determine collection badge
+        $collectionBadge = ""
+        $collectionText = ""
+        if ($summary.CollectionType -eq "SUMMARY_METADATA") {
+            $collectionBadge = "collection-summary"
+            $collectionText = "Full Data"
+        } elseif ($summary.CollectionType -eq "METADATA_ONLY") {
+            $collectionBadge = "collection-metadata"
+            $collectionText = "Metadata Only"
+        }
         
         $htmlBody += @"
         <div class="run-card $statusClass">
             <div>
-                <span class="status-badge $statusBadge">$($summary.Status)</span>
+                <span class="status-badge $statusBadge">$statusText</span>
                 <strong>$($summary.FolderName)</strong>
+                $(if ($collectionBadge) { "<span class='collection-badge $collectionBadge'>$collectionText</span>" })
             </div>
             <div class="timestamp">Created: $($summary.CreationTime.ToString('yyyy-MM-dd HH:mm:ss'))</div>
             <div class="metadata">
                 Exit Code: $($summary.ExitCode)<br>
-                $(if ($summary.Metadata -and $summary.Metadata.worker_pid) { "Worker PID: $($summary.Metadata.worker_pid)<br>" })
-                $(if ($summary.Metadata -and $summary.Metadata.python_pid) { "Python PID: $($summary.Metadata.python_pid)" })
+"@
+        
+        if ($summary.Metadata) {
+            if ($summary.Metadata.worker_pid) {
+                $htmlBody += "Worker PID: $($summary.Metadata.worker_pid)<br>"
+            }
+            if ($summary.Metadata.python_pid) {
+                $htmlBody += "Python PID: $($summary.Metadata.python_pid)<br>"
+            }
+            if ($summary.Metadata.start_time) {
+                $htmlBody += "Start Time: $($summary.Metadata.start_time)<br>"
+            }
+            if ($summary.Metadata.end_time) {
+                $htmlBody += "End Time: $($summary.Metadata.end_time)<br>"
+            }
+        }
+        
+        $htmlBody += @"
             </div>
         </div>
 "@
@@ -331,12 +463,16 @@ function Send-RunReport {
     param(
         [string]$BasePath,
         [hashtable]$ConfigOverride = @{},
-        [switch]$TestMode = $false
+        [switch]$TestMode = $false,
+        [string]$ScheduleStartTime = $null,
+        [string]$ScheduleEndTime = $null,
+        [switch]$UseTimeWindow = $false
     )
     
-    Write-Host "`n" + "="*60 -ForegroundColor Cyan
+    
+    Write-Host "==============================" -ForegroundColor Cyan
     Write-Host "FACE RECOGNITION EMAIL REPORT" -ForegroundColor Cyan
-    Write-Host "="*60 -ForegroundColor Cyan
+    Write-Host "==============================" -ForegroundColor Cyan
     Write-Host ""
     
     # Initialize configuration
@@ -344,12 +480,33 @@ function Send-RunReport {
         return $false
     }
     
-    # Determine time range (last 24 hours by default)
-    $since = (Get-Date).AddHours(-24)
+    # Determine time range based on mode
+    $since = (Get-Date).AddHours(-24)  # Default: last 24 hours
+    
+    # If using schedule time window, parse the times
+    $windowStart = $null
+    $windowEnd = $null
+    if ($UseTimeWindow -and $ScheduleStartTime -and $ScheduleEndTime) {
+        try {
+            $today = Get-Date -Format "yyyy-MM-dd"
+            $windowStart = [DateTime]::ParseExact("$today $ScheduleStartTime", "yyyy-MM-dd HH:mm", $null)
+            $windowEnd = [DateTime]::ParseExact("$today $ScheduleEndTime", "yyyy-MM-dd HH:mm", $null)
+            
+            Write-Host "Using schedule time window:" -ForegroundColor Cyan
+            Write-Host "  Start: $ScheduleStartTime" -ForegroundColor White
+            Write-Host "  End: $ScheduleEndTime" -ForegroundColor White
+            Write-Host "  Window: $($windowStart.ToString('HH:mm')) to $($windowEnd.ToString('HH:mm'))" -ForegroundColor White
+        } catch {
+            Write-Host "Warning: Failed to parse schedule times. Using 24-hour window." -ForegroundColor Yellow
+            Write-Host "  Error: $_" -ForegroundColor Red
+            $UseTimeWindow = $false
+        }
+    }
     
     # Collect run summaries
     Write-Host "Collecting run summaries from: $BasePath" -ForegroundColor Cyan
-    $summaries = Get-RunSummaries -BasePath $BasePath -Since $since -MaxRuns 10
+    $summaries = Get-RunSummaries -BasePath $BasePath -Since $since -MaxRuns 10 `
+        -ScheduleStart $windowStart -ScheduleEnd $windowEnd -TimeWindowMode:$UseTimeWindow
     
     if ($summaries.Count -eq 0) {
         Write-Host "No runs found to report." -ForegroundColor Yellow
@@ -357,22 +514,55 @@ function Send-RunReport {
         # Still send a summary email if needed
         if (-not $TestMode) {
             $subject = "$($EmailConfig.SubjectPrefix) No Runs Found - $(Get-Date -Format 'yyyy-MM-dd')"
-            $body = Create-EmailBody -RunSummaries @() -Config $EmailConfig
+            if ($UseTimeWindow) {
+                $subject = "$($EmailConfig.SubjectPrefix) No Runs in Window $ScheduleStartTime-$ScheduleEndTime - $(Get-Date -Format 'yyyy-MM-dd')"
+            }
+            $body = Create-EmailBody -RunSummaries @() -Config $EmailConfig -ScheduleStart $ScheduleStartTime -ScheduleEnd $ScheduleEndTime
             return Send-EmailWithAttachments -Subject $subject -Body $body -Config $EmailConfig
         }
         return $true
     }
+
+    # Validate the counts
+    $totalCollected = $summaries.Count
+    $calcSummaryCount = ($summaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
+    $calcMetadataOnlyCount = ($summaries | Where-Object { $_.CollectionType -eq "METADATA_ONLY" }).Count
+    $calcNoDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
     
-    # Prepare attachments (limit to 3 MB total to avoid email size limits)
+    # Verify counts add up
+    $calculatedTotal = $calcSummaryCount + $calcMetadataOnlyCount + $calcNoDataCount
+    if ($calculatedTotal -ne $totalCollected) {
+        Write-Host "Warning: Count mismatch! Calculated: $calculatedTotal, Actual: $totalCollected" -ForegroundColor Red
+        Write-Host "  Adjusting counts to match actual total..." -ForegroundColor Yellow
+        $summaryCount = $calcSummaryCount
+        $metadataOnlyCount = $calcMetadataOnlyCount
+        $noDataCount = $calcNoDataCount
+    }    
+    
+    # Prepare attachments - only attach from runs that have data
     $attachments = @()
     $totalSize = 0
     $maxSize = 3 * 1024 * 1024  # 3 MB
     
+    # Calculate counts correctly
+    $summaryCount = ($summaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
+    $metadataOnlyCount = ($summaries | Where-Object { $_.CollectionType -eq "METADATA_ONLY" }).Count
+    $noDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
+    
     foreach ($summary in $summaries) {
         foreach ($logFile in $summary.LogFiles) {
-            if ($totalSize + $logFile.SizeKB -lt $maxSize) {
+            # Use SizeBytes if available, otherwise calculate from SizeKB
+            $sizeInBytes = if ($logFile.SizeBytes) {
+                $logFile.SizeBytes
+            } elseif ($logFile.SizeKB) {
+                $logFile.SizeKB * 1024
+            } else {
+                0
+            }
+            
+            if (($totalSize + $sizeInBytes) -lt $maxSize) {
                 $attachments += $logFile.Path
-                $totalSize += $logFile.SizeKB
+                $totalSize += $sizeInBytes
             }
         }
     }
@@ -380,13 +570,24 @@ function Send-RunReport {
     # Create email
     $runCount = $summaries.Count
     $subject = "$($EmailConfig.SubjectPrefix) $runCount Runs - $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
-    $body = Create-EmailBody -RunSummaries $summaries -Config $EmailConfig
+    
+    if ($UseTimeWindow) {
+        $subject = "$($EmailConfig.SubjectPrefix) $runCount Runs ($ScheduleStartTime-$ScheduleEndTime) - $(Get-Date -Format 'yyyy-MM-dd')"
+    }
+    
+    $body = Create-EmailBody -RunSummaries $summaries -Config $EmailConfig -ScheduleStart $ScheduleStartTime -ScheduleEnd $ScheduleEndTime
     
     Write-Host "`nEmail Details:" -ForegroundColor Cyan
     Write-Host "  Subject: $subject" -ForegroundColor White
     Write-Host "  To: $($EmailConfig.ToAddress)" -ForegroundColor White
-    Write-Host "  Runs: $runCount" -ForegroundColor White
-    Write-Host "  Attachments: $($attachments.Count) files (~$([math]::Round($totalSize/1024, 2)) MB)" -ForegroundColor White
+    Write-Host "  Total runs in collection: $($summaries.Count)" -ForegroundColor White
+    Write-Host "  With summary: $summaryCount" -ForegroundColor Green
+    Write-Host "  Metadata only: $metadataOnlyCount" -ForegroundColor Yellow
+    Write-Host "  No data: $noDataCount" -ForegroundColor Gray
+    Write-Host "  Attachments: $($attachments.Count) files (~$([math]::Round($totalSize/1MB, 2)) MB)" -ForegroundColor White
+    if ($UseTimeWindow) {
+        Write-Host "  Time window: $ScheduleStartTime to $ScheduleEndTime" -ForegroundColor Cyan
+    }
     
     if ($TestMode) {
         Write-Host "`nTest Mode: Email would be sent with above details." -ForegroundColor Yellow
@@ -396,6 +597,7 @@ function Send-RunReport {
     # Send email
     return Send-EmailWithAttachments -Subject $subject -Body $body -Attachments $attachments -Config $EmailConfig
 }
+
 
 # ====================================================================
 # Monitor Integration Functions
@@ -423,8 +625,7 @@ function Register-StableEmailSender {
 function Invoke-StableEmailReport {
     [CmdletBinding()]
     param(
-        [switch]$Force = $false,
-        [int]$HoursBack = 1
+        [switch]$Force = $false
     )
     
     if (-not $global:StableEmailSender -or -not $global:StableEmailSender.Enabled) {
@@ -439,29 +640,57 @@ function Invoke-StableEmailReport {
     )
     
     if ($shouldSend) {
-        Write-Host "Scheduled email report triggered..." -ForegroundColor Cyan
+        Write-Host "Sending email report..." -ForegroundColor Cyan
+        Write-Host "Time: $(Get-Date -Format 'HH:mm:ss')" -ForegroundColor Gray
+        
+        # Initialize the configuration if needed
+        if (-not $global:StableEmailSender.Config -or $global:StableEmailSender.Config.Count -eq 0) {
+            $global:StableEmailSender.Config = @{
+                SubjectPrefix = "[FaceRecog]"
+            }
+        }
+        
+        # Extract schedule times from config
+        $scheduleStart = $global:StableEmailSender.Config.ScheduleStartTime
+        $scheduleEnd = $global:StableEmailSender.Config.ScheduleEndTime
+        
+        # Send the report with time window if schedule times are available
+        $useTimeWindow = ($scheduleStart -and $scheduleEnd)
+        
+        if ($useTimeWindow) {
+            Write-Host "Using schedule window: $scheduleStart to $scheduleEnd" -ForegroundColor White
+        }
         
         $success = Send-RunReport -BasePath $global:StableEmailSender.MonitorConfig.RunsBasePath `
-            -ConfigOverride $global:StableEmailSender.Config
+            -ConfigOverride $global:StableEmailSender.Config `
+            -ScheduleStartTime $scheduleStart `
+            -ScheduleEndTime $scheduleEnd `
+            -UseTimeWindow:$useTimeWindow
         
         if ($success) {
             $global:StableEmailSender.LastSent = Get-Date
+            Write-Host "Email sent successfully at $(Get-Date -Format 'HH:mm:ss')" -ForegroundColor Green
+        } else {
+            Write-Host "Failed to send email" -ForegroundColor Red
         }
         
         return $success
+    } else {
+        Write-Host "Email report not sent (recently sent at $($global:StableEmailSender.LastSent.ToString('HH:mm:ss')))" -ForegroundColor Gray
+        return $true
     }
-    
-    return $true
 }
+
+
 
 # ====================================================================
 # Direct Execution
 # ====================================================================
 if ($MyInvocation.InvocationName -ne '.') {
     # This script is being run directly
-    Write-Host "`n" + "="*60 -ForegroundColor Cyan
+    Write-Host "==============================" -ForegroundColor Cyan
     Write-Host "DIRECT EMAIL REPORT TEST" -ForegroundColor Cyan
-    Write-Host "="*60 -ForegroundColor Cyan
+    Write-Host "==============================" -ForegroundColor Cyan
     Write-Host ""
     
     # Get base path from common paths
