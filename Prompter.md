@@ -8,183 +8,113 @@
 
 #### Instructions
 
-Here is the example
+Stabilize the current codebase.
 
-here, my schedule is this
-
-Schedule: 10:17 - 10:18
-
-When validation occurs, sure, it detect each and every file in the logs, and the output was
-
-Found 8 run folders
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_10-17-11 (Exit: 0)
-⚠ No summary found: Magick_Process_MaskDetect_2026-02-10_09-59-46
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_09-58-12 (Exit: 0)
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_09-57-11 (Exit: UNKNOWN)
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_09-46-10 (Exit: UNKNOWN)
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_08-48-00 (Exit: UNKNOWN)
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_08-46-27 (Exit: 0)
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_08-43-53 (Exit: 0)
-
-but, when sending into email, it should only capture the folder in the time window. Meaning, each and every folder from the schedule above
-
-When it detect folder outside of that schedule, it will disregard from sending into email.
-
-#### Output of the codebase
+#### Output debug from running the codebase
 
 ✓ Common paths module loaded
 Initializing enhanced monitor...
 Initializing portable paths for maskRecog project...
 Found project root: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog
-[2026-02-10 10:15:55] [INFO] === Enhanced Face Recognition Monitor Started ===
-[2026-02-10 10:15:55] [INFO] Version: 2.1 (Updated with old version's process checking)
-[2026-02-10 10:15:55] [INFO] Start Time: 10:17
-[2026-02-10 10:15:55] [INFO] End Time: 10:18
-[2026-02-10 10:15:55] [INFO] Log File: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-10\monitor_Magick.log
-[2026-02-10 10:15:55] [INFO] Initializing email reporting...
-[2026-02-10 10:15:55] [INFO] Using email credentials from: C:\Users\MIS2\.face-recog\email-credential.xml
-[2026-02-10 10:15:55] [SUCCESS] Stable Email sender initialized successfully
-[2026-02-10 10:15:55] [INFO] Initializing run collection system...
-[2026-02-10 10:15:55] [SUCCESS] Integrated run collection functions initialized
-[2026-02-10 10:15:55] [INFO] Entering enhanced monitoring loop...
-[2026-02-10 10:15:55] [INFO] Current time: 2026-02-10 10:15:55
-[2026-02-10 10:15:55] [INFO] Monitor window: 10:17 to 10:18
-[2026-02-10 10:15:55] [INFO] Monitoring window: 2026-02-10 10:17:00 to 2026-02-10 10:18:00
-[2026-02-10 10:15:55] [DEBUG] Check: 2026-02-10 10:15:55 | Window: Inactive | Worker: Stopped | Python: Stopped
-================================================
-ENHANCED FACE RECOGNITION PROCESS MONITOR
-================================================
-Current Time: 2026-02-10 10:16:10
-Schedule: 10:17 - 10:18
-Status: OUTSIDE WINDOW
-
-PYTHON STATUS: STOPPED
-
-WORKER STATUS: STOPPED
-
-# Communication: INACTIVE
-
-[2026-02-10 10:16:10] [DEBUG] Check: 2026-02-10 10:16:10 | Window: Inactive | Worker: Stopped | Python: Stopped
-[2026-02-10 10:16:25] [DEBUG] Check: 2026-02-10 10:16:25 | Window: Inactive | Worker: Stopped | Python: Stopped
-[2026-02-10 10:16:41] [DEBUG] Check: 2026-02-10 10:16:41 | Window: Inactive | Worker: Stopped | Python: Stopped
-[2026-02-10 10:16:56] [DEBUG] Check: 2026-02-10 10:16:56 | Window: Inactive | Worker: Stopped | Python: Stopped
-[2026-02-10 10:17:11] [DEBUG] Check: 2026-02-10 10:17:11 | Window: Active | Worker: Stopped | Python: Stopped
-[2026-02-10 10:17:11] [INFO] Time window active and no Python process running - starting worker...
-[2026-02-10 10:17:11] [INFO] Starting face recognition worker...
-[2026-02-10 10:17:11] [INFO] Worker script path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\1_mask_portable.ps1
-[2026-02-10 10:17:11] [INFO] Starting worker process...
-[2026-02-10 10:17:11] [SUCCESS] Worker process started (PID: 29296)
-[2026-02-10 10:17:13] [DEBUG] Worker Output: === WORKER SCRIPT STARTING ===
-[2026-02-10 10:17:13] [DEBUG] Worker Output: Worker PID: 29296
-[2026-02-10 10:17:13] [DEBUG] Worker Output: Common paths script loaded
-[2026-02-10 10:17:13] [DEBUG] Worker Output: Python executable: D:\RaihanFarid\Dokumen\faceRecog\.venv\Scripts\python.exe
-[2026-02-10 10:17:13] [DEBUG] Worker Output: Python script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
-[2026-02-10 10:17:13] [DEBUG] Worker Output: Creating run folder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-10\Magick_Process_MaskDetect_2026-02-10_10-17-11
-[2026-02-10 10:17:13] [DEBUG] Worker Output: Starting Python script...
-[2026-02-10 10:17:13] [DEBUG] Worker Output: Python process started (PID: 18988)
-[2026-02-10 10:17:13] [DEBUG] Worker Output: Waiting for Python to complete...
-[2026-02-10 10:17:13] [INFO] Worker process is running, waiting for Python...
-[2026-02-10 10:17:13] [DEBUG] Searching for Python process...
-[2026-02-10 10:17:14] [SUCCESS] Found Python process with our script: PID=14856
-[2026-02-10 10:17:14] [SUCCESS] Python process found (PID: 14856)
-[2026-02-10 10:17:14] [DEBUG] PID tracking saved
-[2026-02-10 10:17:14] [SUCCESS] Worker started. Monitoring Python process...
-[2026-02-10 10:17:29] [DEBUG] Check: 2026-02-10 10:17:29 | Window: Active | Worker: Running | Python: Running
-[2026-02-10 10:17:44] [DEBUG] Check: 2026-02-10 10:17:44 | Window: Active | Worker: Running | Python: Running
-[2026-02-10 10:17:59] [DEBUG] Check: 2026-02-10 10:17:59 | Window: Active | Worker: Stopped | Python: Stopped
-[2026-02-10 10:17:59] [INFO] Time window active and no Python process running - starting worker...
-[2026-02-10 10:17:59] [DEBUG] Skipping worker start - too soon after last attempt
-[2026-02-10 10:18:14] [DEBUG] Check: 2026-02-10 10:18:14 | Window: Inactive | Worker: Stopped | Python: Stopped
-[2026-02-10 10:18:14] [SHUTDOWN] End time reached - initiating shutdown sequence...
-[2026-02-10 10:18:14] [INFO] Time window for validation: 10:17 to 10:18
-[2026-02-10 10:18:15] [INFO] Current time: 10:18:15
-[2026-02-10 10:18:15] [INFO] Validating ALL runs from today's monitoring window...
-[2026-02-10 10:18:15] [INFO] Validating face recognition output structure...
-[2026-02-10 10:18:15] [INFO] Using enhanced collection mode for all runs in time window
-[2026-02-10 10:18:15] [INFO] Collecting runs from 10:17 to 10:18...
-[2026-02-10 10:18:15] [INFO] Time window for collection: 10:17 to 10:18
-[2026-02-10 10:18:15] [DEBUG] Integrated collection called with StartTime: '10:17', EndTime: '10:18'
-[2026-02-10 10:18:15] [INFO] Found 8 total run folders
-[2026-02-10 10:18:15] [INFO] Time window parsed: 2026-02-10 10:17:00 to 2026-02-10 10:18:00
-[2026-02-10 10:18:15] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_08-43-53 created at: 2026-02-10 08:43:53
-[2026-02-10 10:18:15] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_08-46-27 created at: 2026-02-10 08:46:27
-[2026-02-10 10:18:15] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_08-48-00 created at: 2026-02-10 08:48:00
-[2026-02-10 10:18:15] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_09-46-10 created at: 2026-02-10 09:46:10
-[2026-02-10 10:18:15] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_09-57-11 created at: 2026-02-10 09:57:11
-[2026-02-10 10:18:15] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_09-58-12 created at: 2026-02-10 09:58:12
-[2026-02-10 10:18:15] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_09-59-46 created at: 2026-02-10 09:59:46
-[2026-02-10 10:18:15] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_10-17-11 created at: 2026-02-10 10:17:11
-[2026-02-10 10:18:15] [DEBUG] Validating folder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-10\Magick_Process_MaskDetect_2026-02-10_10-17-11
-[2026-02-10 10:18:15] [DEBUG] Found subfolder: logs
-[2026-02-10 10:18:15] [DEBUG] Found subfolder: script_output
-[2026-02-10 10:18:15] [DEBUG] Found file: metadata.json
-[2026-02-10 10:18:15] [INFO] Validation result for Magick_Process_MaskDetect_2026-02-10_10-17-11: SUCCESS
-[2026-02-10 10:18:15] [INFO] ✓ Collected folder within window: Magick_Process_MaskDetect_2026-02-10_10-17-11
-[2026-02-10 10:18:15] [INFO] Collection complete. Found 1 runs within time window.
-[2026-02-10 10:18:15] [INFO] Collection completed: 5/5 valid runs
-[2026-02-10 10:18:15] [SUCCESS] All runs validation successful: 5/5 valid
-[2026-02-10 10:18:15] [INFO] Sending final daily email report...
-[2026-02-10 10:18:15] [INFO] Scheduled email report triggered...
-Scheduled email report triggered...
-
-- = *60
-  FACE RECOGNITION EMAIL REPORT
-  = *60
-
-Initializing email configuration...
-✓ Email credentials loaded from: C:\Users\MIS2\.face-recog\email-credential.xml
-Collecting run summaries from: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-10
-Found 8 run folders
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_10-17-11 (Exit: 0)
-⚠ No summary found: Magick_Process_MaskDetect_2026-02-10_09-59-46
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_09-58-12 (Exit: 0)
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_09-57-11 (Exit: UNKNOWN)
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_09-46-10 (Exit: UNKNOWN)
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_08-48-00 (Exit: UNKNOWN)
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_08-46-27 (Exit: 0)
-✓ Collected: Magick_Process_MaskDetect_2026-02-10_08-43-53 (Exit: 0)
-
-Email Details:
-Subject: [FaceRecog] 7 Runs - 2026-02-10 10:18
-To: faridraihan17@gmail.com
-Runs: 7
-Attachments: 14 files (~0 MB)
-Preparing email with 14 attachments...
-✓ Attached: completion_summary.txt
-✓ Attached: python_output.txt
-✓ Attached: completion_summary.txt
-✓ Attached: python_output.txt
-✓ Attached: completion_summary.txt
-✓ Attached: python_output.txt
-✓ Attached: completion_summary.txt
-✓ Attached: python_output.txt
-✓ Attached: completion_summary.txt
-✓ Attached: python_output.txt
-✓ Attached: completion_summary.txt
-✓ Attached: python_output.txt
-✓ Attached: completion_summary.txt
-✓ Attached: python_output.txt
-Sending email via smtp.gmail.com...
-WARNING: The command 'Send-MailMessage' is obsolete. This cmdlet does not guarantee secure connections to SMTP servers. While there is no immediate replacement available in PowerShell, we recommend you do not use Send-MailMessage at this time. See https://aka.ms/SendMailMessage for more information.
-✓ Email sent successfully!
-[2026-02-10 10:18:22] [SUCCESS] Email report sent successfully!
+[2026-02-10 10:35:27] [INFO] === Enhanced Face Recognition Monitor Started ===
+[2026-02-10 10:35:27] [INFO] Version: 2.1 (Updated with old version's process checking)
+[2026-02-10 10:35:27] [INFO] Start Time: 10:31
+[2026-02-10 10:35:27] [INFO] End Time: 10:36
+[2026-02-10 10:35:27] [INFO] Log File: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-10\monitor_Magick.log
+[2026-02-10 10:35:27] [INFO] Initializing email reporting...
+[2026-02-10 10:35:27] [INFO] Using email credentials from: C:\Users\MIS2\.face-recog\email-credential.xml
+[2026-02-10 10:35:27] [SUCCESS] Stable Email sender initialized successfully
+[2026-02-10 10:35:27] [INFO] Initializing run collection system...
+[2026-02-10 10:35:28] [SUCCESS] Integrated run collection functions initialized
+[2026-02-10 10:35:28] [INFO] Entering enhanced monitoring loop...
+[2026-02-10 10:35:28] [INFO] Current time: 2026-02-10 10:35:28
+[2026-02-10 10:35:28] [INFO] Monitor window: 10:31 to 10:36
+[2026-02-10 10:35:28] [INFO] Monitoring window: 2026-02-10 10:31:00 to 2026-02-10 10:36:00
+[2026-02-10 10:35:28] [DEBUG] Check: 2026-02-10 10:35:28 | Window: Active | Worker: Stopped | Python: Stopped
+[2026-02-10 10:35:28] [INFO] Time window active and no Python process running - starting worker...
+[2026-02-10 10:35:28] [INFO] Starting face recognition worker...
+[2026-02-10 10:35:28] [INFO] Worker script path: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_magick\1_mask_portable.ps1
+[2026-02-10 10:35:28] [INFO] Starting worker process...
+[2026-02-10 10:35:28] [SUCCESS] Worker process started (PID: 9936)
+[2026-02-10 10:35:30] [DEBUG] Worker Output: === WORKER SCRIPT STARTING ===
+[2026-02-10 10:35:30] [DEBUG] Worker Output: Worker PID: 9936
+[2026-02-10 10:35:30] [DEBUG] Worker Output: Common paths script loaded
+[2026-02-10 10:35:30] [DEBUG] Worker Output: Python executable: D:\RaihanFarid\Dokumen\faceRecog\.venv\Scripts\python.exe
+[2026-02-10 10:35:30] [DEBUG] Worker Output: Python script: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-Magick.py
+[2026-02-10 10:35:30] [DEBUG] Worker Output: Creating run folder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-10\Magick_Process_MaskDetect_2026-02-10_10-35-28
+[2026-02-10 10:35:30] [DEBUG] Worker Output: Starting Python script...
+[2026-02-10 10:35:30] [DEBUG] Worker Output: Python process started (PID: 30000)
+[2026-02-10 10:35:30] [DEBUG] Worker Output: Waiting for Python to complete...
+[2026-02-10 10:35:30] [INFO] Worker process is running, waiting for Python...
+[2026-02-10 10:35:30] [DEBUG] Searching for Python process...
+[2026-02-10 10:35:31] [SUCCESS] Found Python process with our script: PID=29688
+[2026-02-10 10:35:31] [SUCCESS] Python process found (PID: 29688)
+[2026-02-10 10:35:31] [DEBUG] PID tracking saved
+[2026-02-10 10:35:31] [SUCCESS] Worker started. Monitoring Python process...
+[2026-02-10 10:35:46] [DEBUG] Check: 2026-02-10 10:35:46 | Window: Active | Worker: Running | Python: Running
+[2026-02-10 10:36:01] [DEBUG] Check: 2026-02-10 10:36:01 | Window: Inactive | Worker: Stopped | Python: Stopped
+[2026-02-10 10:36:01] [SHUTDOWN] End time reached - initiating shutdown sequence...
+[2026-02-10 10:36:01] [INFO] Time window for validation: 10:31 to 10:36
+[2026-02-10 10:36:01] [INFO] Current time: 10:36:01
+[2026-02-10 10:36:01] [INFO] Validating ALL runs from today's monitoring window...
+[2026-02-10 10:36:01] [INFO] Validating face recognition output structure...
+[2026-02-10 10:36:01] [INFO] Using enhanced collection mode for all runs in time window
+[2026-02-10 10:36:01] [INFO] Collecting runs from 10:31 to 10:36...
+[2026-02-10 10:36:01] [INFO] Time window for collection: 10:31 to 10:36
+[2026-02-10 10:36:02] [DEBUG] Integrated collection called with StartTime: '10:31', EndTime: '10:36'
+[2026-02-10 10:36:02] [INFO] Found 12 total run folders
+[2026-02-10 10:36:02] [INFO] Time window parsed: 2026-02-10 10:31:00 to 2026-02-10 10:36:00
+[2026-02-10 10:36:02] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_08-43-53 created at: 2026-02-10 08:43:53
+[2026-02-10 10:36:02] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_08-46-27 created at: 2026-02-10 08:46:27
+[2026-02-10 10:36:02] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_08-48-00 created at: 2026-02-10 08:48:00
+[2026-02-10 10:36:02] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_09-46-10 created at: 2026-02-10 09:46:10
+[2026-02-10 10:36:02] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_09-57-11 created at: 2026-02-10 09:57:11
+[2026-02-10 10:36:02] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_09-58-12 created at: 2026-02-10 09:58:12
+[2026-02-10 10:36:02] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_09-59-46 created at: 2026-02-10 09:59:46
+[2026-02-10 10:36:02] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_10-17-11 created at: 2026-02-10 10:17:11
+[2026-02-10 10:36:02] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_10-28-13 created at: 2026-02-10 10:28:13
+[2026-02-10 10:36:02] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_10-29-16 created at: 2026-02-10 10:29:16
+[2026-02-10 10:36:02] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_10-31-54 created at: 2026-02-10 10:31:54
+[2026-02-10 10:36:02] [DEBUG] Validating folder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-10\Magick_Process_MaskDetect_2026-02-10_10-31-54
+[2026-02-10 10:36:02] [DEBUG] Found subfolder: logs
+[2026-02-10 10:36:02] [DEBUG] Found subfolder: script_output
+[2026-02-10 10:36:02] [DEBUG] Found file: metadata.json
+[2026-02-10 10:36:02] [INFO] Validation result for Magick_Process_MaskDetect_2026-02-10_10-31-54: SUCCESS
+[2026-02-10 10:36:02] [INFO] ✓ Collected folder within window: Magick_Process_MaskDetect_2026-02-10_10-31-54
+[2026-02-10 10:36:02] [DEBUG] Checking folder: Magick_Process_MaskDetect_2026-02-10_10-35-28 created at: 2026-02-10 10:35:28
+[2026-02-10 10:36:02] [DEBUG] Validating folder: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-10\Magick_Process_MaskDetect_2026-02-10_10-35-28
+[2026-02-10 10:36:02] [DEBUG] Found subfolder: logs
+[2026-02-10 10:36:02] [DEBUG] Found subfolder: script_output
+[2026-02-10 10:36:02] [DEBUG] Found file: metadata.json
+[2026-02-10 10:36:02] [INFO] Validation result for Magick_Process_MaskDetect_2026-02-10_10-35-28: SUCCESS
+[2026-02-10 10:36:02] [INFO] ✓ Collected folder within window: Magick_Process_MaskDetect_2026-02-10_10-35-28
+[2026-02-10 10:36:02] [INFO] Collection complete. Found 2 runs within time window.
+[2026-02-10 10:36:02] [INFO] Collection completed: 2/2 valid runs
+[2026-02-10 10:36:02] [SUCCESS] All runs validation successful: 2/2 valid
+[2026-02-10 10:36:02] [INFO] Sending final daily email report...
+[2026-02-10 10:36:02] [INFO] Scheduled email report triggered...
+[2026-02-10 10:36:02] [INFO] Email collection time window: 10:31 to 10:36
+[2026-02-10 10:36:02] [INFO] Using pre-collected runs from validation: 2 runs
+[2026-02-10 10:36:02] [INFO] Initializing run collection system...
+[2026-02-10 10:36:02] [SUCCESS] Integrated run collection functions initialized
+[2026-02-10 10:36:02] [SUCCESS] Email report sent successfully!
 True
-[2026-02-10 10:18:23] [INFO] Daily process completed. Stopping monitor...
-[2026-02-10 10:18:23] [INFO] Cleaning up...
-[2026-02-10 10:18:23] [INFO] Stopping worker process...
-[2026-02-10 10:18:23] [INFO] Checking for orphaned Python processes...
-[2026-02-10 10:18:23] [DEBUG] Cleaned up communication directory
-[2026-02-10 10:18:23] [INFO] Worker process cleanup completed
-[2026-02-10 10:18:23] [INFO] === Enhanced Face Recognition Monitor Stopped ===
+[2026-02-10 10:36:02] [INFO] Daily process completed. Stopping monitor...
+[2026-02-10 10:36:02] [INFO] Cleaning up...
+[2026-02-10 10:36:02] [INFO] Stopping worker process...
+[2026-02-10 10:36:02] [INFO] Checking for orphaned Python processes...
+[2026-02-10 10:36:02] [DEBUG] Cleaned up communication directory
+[2026-02-10 10:36:02] [INFO] Worker process cleanup completed
+[2026-02-10 10:36:02] [INFO] === Enhanced Face Recognition Monitor Stopped ===
 
 ================================================
 MONITOR STOPPED
 ================================================
 Log file: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\logs-running\magick\2026-02-10\monitor_Magick.log
 Run validation (All runs):
-Total runs: 5
-Valid runs: 5
-Collected runs: 5
+Total runs: 2
+Valid runs: 2
+Collected runs: 2
 ================================================
 
 #### Tips
@@ -266,8 +196,8 @@ $global:MonitorPaths = $paths
 # Update configuration with paths
 
 $Script:Config = @{ # Schedule configuration
-StartTime = "09:58"
-EndTime = "10:00"
+StartTime = "10:31"
+EndTime = "10:36"
 
     # Process tracking - USING OLD VERSION'S STRUCTURE
     PythonProcessName = "python"
@@ -1194,28 +1124,59 @@ param([switch]$Force = $false)
     if (Test-Path $emailSenderScript) {
         try {
             # Clear any existing global variable to ensure fresh initialization
-            if (Test-Path "variable:global:StableEmailReport") {
+            if (Test-Path "variable:global:StableEmailSender") {
                 Remove-Variable -Name StableEmailSender -Scope Global -ErrorAction SilentlyContinue
             }
 
             . $emailSenderScript
 
-        # Use the Invoke-StableEmailReport function from the email sender script
-        $success = Invoke-StableEmailReport -Force:$Force -HoursBack 24
+            # Calculate time window for email collection
+            $today = Get-Date -Format "yyyy-MM-dd"
+            $windowStart = [DateTime]::ParseExact("$today $($Script:Config.StartTime)", "yyyy-MM-dd HH:mm", $null)
+            $windowEnd = [DateTime]::ParseExact("$today $($Script:Config.EndTime)", "yyyy-MM-dd HH:mm", $null)
 
-        if ($success) {
-            Write-Log "Email report sent successfully!" -Level "SUCCESS"
-        } else {
-            Write-Log "Failed to send email report" -Level "ERROR"
+            # Convert to string format for the email sender
+            $startTimeStr = $windowStart.ToString("HH:mm")
+            $endTimeStr = $windowEnd.ToString("HH:mm")
+
+            Write-Log "Email collection time window: $startTimeStr to $endTimeStr" -Level "INFO"
+
+            # Use the collected runs from validation if available
+            if ($global:CollectedRunFolders -and $global:CollectedRunFolders.Count -gt 0) {
+                Write-Log "Using pre-collected runs from validation: $($global:CollectedRunFolders.Count) runs" -Level "INFO"
+
+                # Prepare run folder paths for email sender
+                $runFolderPaths = $global:CollectedRunFolders | ForEach-Object {
+                    if ($_.GetType().Name -eq 'PSCustomObject' -and $_.Folder) {
+                        $_.Folder
+                    } elseif ($_.GetType().Name -eq 'String') {
+                        $_
+                    } elseif ($_.FullName) {
+                        $_.FullName
+                    }
+                }
+
+                # Call email sender with specific run folders
+                $success = Initialize-RunCollection -RunFolders $runFolderPaths -SubjectSchedule "$startTimeStr-$endTimeStr"
+            } else {
+                # Fallback: Use time window collection
+                Write-Log "No pre-collected runs, using time window collection" -Level "WARN"
+                $success = Invoke-StableEmailReport -Force:$Force -StartTime $startTimeStr -EndTime $endTimeStr
+            }
+
+            if ($success) {
+                Write-Log "Email report sent successfully!" -Level "SUCCESS"
+            } else {
+                Write-Log "Failed to send email report" -Level "ERROR"
+            }
+
+            return $success
+        } catch {
+            Write-Log "Error in email report: $_" -Level "ERROR"
+            return $false
         }
-
-        return $success
-    } catch {
-        Write-Log "Error in email report: $_" -Level "ERROR"
-        return $false
     }
 
-}
 }
 
 # ====================================================================
@@ -1440,7 +1401,7 @@ param(
 [switch]$ForceValidation = $false
 )
 
-    Write-Log "Collecting runs from $($StartTime.ToString('yyyy-MM-dd HH:mm:ss')) to $($EndTime.ToString('yyyy-MM-dd HH:mm:ss'))..." -Level "INFO"
+    Write-Log "Collecting runs from $($StartTime.ToString('HH:mm')) to $($EndTime.ToString('HH:mm'))..." -Level "INFO"
 
     $collectionResults = @{
         TotalRuns = 0
@@ -1451,23 +1412,32 @@ param(
     }
 
     try {
-        # Use integrated functions
-        $startTimeStr = $StartTime.ToString("yyyy-MM-dd HH:mm:ss")
-        $endTimeStr = $EndTime.ToString("yyyy-MM-dd HH:mm:ss")
+        # FIX: Use just the time portion (HH:mm) instead of full datetime
+        $startTimeStr = $StartTime.ToString("HH:mm")
+        $endTimeStr = $EndTime.ToString("HH:mm")
+
+        Write-Log "Time window for collection: $startTimeStr to $endTimeStr" -Level "INFO"
 
         # Check if integrated functions are available
         if (Get-Command -Name "Start-RunCollection-Integrated" -ErrorAction SilentlyContinue) {
             $collectedRuns = Start-RunCollection-Integrated -StartTime $startTimeStr -EndTime $endTimeStr
         } else {
-            # Fallback to simple manual collection
+            # Fallback to simple manual collection using TimeOfDay
             Write-Log "Integrated functions not available, using manual collection" -Level "WARN"
             $collectedRuns = @()
 
             if ($Script:Config.RunsBasePath -and (Test-Path $Script:Config.RunsBasePath)) {
                 $folders = Get-ChildItem -Path $Script:Config.RunsBasePath -Directory -Filter $Script:Config.OutputFolderPattern -ErrorAction SilentlyContinue
 
+                Write-Log "Found $($folders.Count) total folders to check" -Level "INFO"
+
                 foreach ($folder in $folders) {
-                    if ($folder.CreationTime -ge $StartTime -and $folder.CreationTime -le $EndTime) {
+                    # Check if folder creation time is within window using TimeOfDay
+                    $folderTime = $folder.CreationTime.TimeOfDay
+                    $startTimeOfDay = $StartTime.TimeOfDay
+                    $endTimeOfDay = $EndTime.TimeOfDay
+
+                    if ($folderTime -ge $startTimeOfDay -and $folderTime -le $endTimeOfDay) {
                         $collectedRuns += @{
                             Folder = $folder.FullName
                             Name = $folder.Name
@@ -1475,6 +1445,7 @@ param(
                             Validation = @{ Success = $true; MissingItems = @() }
                             Status = "VALID"
                         }
+                        Write-Log "✓ Manual collection added: $($folder.Name)" -Level "INFO"
                     }
                 }
             }
@@ -1496,6 +1467,7 @@ param(
 
     } catch {
         Write-Log "Error during run collection: $_" -Level "ERROR"
+        Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
     }
 
     return $collectionResults
@@ -1598,10 +1570,13 @@ Write-Log "Initializing run collection system..." -Level "INFO"
     # Instead of loading external script, integrate key functions directly
     try {
         # Define the core collection function inline
+        # Define the core collection function inline
         function global:Validate-RunFolder-Integrated {
             param(
                 [string]$FolderPath
             )
+
+            Write-Log "Validating folder: $FolderPath" -Level "DEBUG"
 
             $result = @{
                 Success = $false
@@ -1618,6 +1593,9 @@ Write-Log "Initializing run collection system..." -Level "INFO"
                     $subfolderPath = Join-Path $FolderPath $subfolder
                     if (-not (Test-Path $subfolderPath)) {
                         $result.MissingItems += $subfolder
+                        Write-Log "  Missing subfolder: $subfolder" -Level "DEBUG"
+                    } else {
+                        Write-Log "  Found subfolder: $subfolder" -Level "DEBUG"
                     }
                 }
 
@@ -1626,12 +1604,17 @@ Write-Log "Initializing run collection system..." -Level "INFO"
                     $filePath = Join-Path $FolderPath $file
                     if (-not (Test-Path $filePath)) {
                         $result.MissingItems += $file
+                        Write-Log "  Missing file: $file" -Level "DEBUG"
+                    } else {
+                        Write-Log "  Found file: $file" -Level "DEBUG"
                     }
                 }
 
                 $result.Success = ($result.MissingItems.Count -eq 0)
+                Write-Log "Validation result for $($result.FolderName): $(if($result.Success){'SUCCESS'}else{'FAILED'})" -Level "INFO"
                 return $result
             } catch {
+                Write-Log "Error validating folder: $_" -Level "ERROR"
                 return $result
             }
         }
@@ -1646,23 +1629,51 @@ Write-Log "Initializing run collection system..." -Level "INFO"
             $collectedRuns = @()
 
             try {
-                # Convert times
-                $today = Get-Date -Format "yyyy-MM-dd"
-                $windowStart = [DateTime]::ParseExact("$today $StartTime", "yyyy-MM-dd HH:mm", $null)
-                $windowEnd = [DateTime]::ParseExact("$today $EndTime", "yyyy-MM-dd HH:mm", $null)
+                # Debug: Log what we're receiving
+                Write-Log "Integrated collection called with StartTime: '$StartTime', EndTime: '$EndTime'" -Level "DEBUG"
 
                 # Check if runs path exists
                 if (-not $Script:Config.RunsBasePath -or -not (Test-Path $Script:Config.RunsBasePath)) {
+                    Write-Log "Runs base path not found: $($Script:Config.RunsBasePath)" -Level "WARN"
                     return $collectedRuns
                 }
 
                 # Get all run folders
                 $allRunFolders = Get-ChildItem -Path $Script:Config.RunsBasePath -Directory -Filter $Script:Config.OutputFolderPattern -ErrorAction SilentlyContinue
 
+                Write-Log "Found $($allRunFolders.Count) total run folders" -Level "INFO"
+
                 if ($allRunFolders) {
+                    # Parse time window - FIX: Check what format we're getting
+                    $windowStart = $null
+                    $windowEnd = $null
+
+                    try {
+                        # Try to parse as full datetime first
+                        if ($StartTime -match '^\d{4}-\d{2}-\d{2}') {
+                            $windowStart = [DateTime]::ParseExact($StartTime, "yyyy-MM-dd HH:mm:ss", $null)
+                            $windowEnd = [DateTime]::ParseExact($EndTime, "yyyy-MM-dd HH:mm:ss", $null)
+                        } else {
+                            # Parse as time only (HH:mm)
+                            $today = Get-Date -Format "yyyy-MM-dd"
+                            $windowStart = [DateTime]::ParseExact("$today $StartTime", "yyyy-MM-dd HH:mm", $null)
+                            $windowEnd = [DateTime]::ParseExact("$today $EndTime", "yyyy-MM-dd HH:mm", $null)
+                        }
+                    } catch {
+                        Write-Log "Error parsing time window: $_" -Level "ERROR"
+                        Write-Log "StartTime was: '$StartTime', EndTime was: '$EndTime'" -Level "DEBUG"
+                        return $collectedRuns
+                    }
+
+                    Write-Log "Time window parsed: $($windowStart.ToString('yyyy-MM-dd HH:mm:ss')) to $($windowEnd.ToString('yyyy-MM-dd HH:mm:ss'))" -Level "INFO"
+
                     foreach ($runFolder in $allRunFolders) {
-                        # Check if folder is within time window
-                        if ($runFolder.CreationTime -ge $windowStart -and $runFolder.CreationTime -le $windowEnd) {
+                        # Check if folder is within time window using TimeOfDay for hour/minute comparison
+                        $folderTime = $runFolder.CreationTime
+                        Write-Log "Checking folder: $($runFolder.Name) created at: $($folderTime.ToString('yyyy-MM-dd HH:mm:ss'))" -Level "DEBUG"
+
+                        # Compare just the time portion (hours and minutes)
+                        if ($folderTime -ge $windowStart -and $folderTime -le $windowEnd) {
                             $validation = Validate-RunFolder-Integrated -FolderPath $runFolder.FullName
 
                             $collectedRuns += @{
@@ -1672,13 +1683,17 @@ Write-Log "Initializing run collection system..." -Level "INFO"
                                 Validation = $validation
                                 Status = if ($validation.Success) { "VALID" } else { "INVALID" }
                             }
+
+                            Write-Log "✓ Collected folder within window: $($runFolder.Name)" -Level "INFO"
                         }
                     }
                 }
             } catch {
                 Write-Log "Error in integrated collection: $_" -Level "ERROR"
+                Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
             }
 
+            Write-Log "Collection complete. Found $($collectedRuns.Count) runs within time window." -Level "INFO"
             return $collectedRuns
         }
 
@@ -1733,19 +1748,31 @@ New-Item -ItemType Directory -Path $logDir -Force | Out-Null
 
 
     # Check if we're already past end time
+    # Check if we're already past end time
     $now = Get-Date
     $today = Get-Date -Format "yyyy-MM-dd"
     $startDateTime = [DateTime]::ParseExact("$today $($Script:Config.StartTime)", "yyyy-MM-dd HH:mm", $null)
     $endDateTime = [DateTime]::ParseExact("$today $($Script:Config.EndTime)", "yyyy-MM-dd HH:mm", $null)
 
-    # Initialize monitoring loop variables based on the current time
+    Write-Log "Current time: $($now.ToString('yyyy-MM-dd HH:mm:ss'))" -Level "INFO"
+    Write-Log "Monitor window: $($startDateTime.ToString('HH:mm')) to $($endDateTime.ToString('HH:mm'))" -Level "INFO"
+
     if ($now -gt $endDateTime) {
-        Write-Log "Current time ($($now.ToString('yyyy-MM-dd HH:mm:ss'))) is past end time ($($Script:Config.EndTime)). Starting immediate shutdown." -Level "WARN"
+        Write-Log "Current time is past end time. Starting immediate shutdown and validation." -Level "WARN"
         $monitoringActive = $false
+
+        # Validate runs from the window that just passed
+        Write-Log "Validating runs from completed time window..." -Level "INFO"
+        $global:LastValidation = Validate-Output -CollectAll -CollectionStart $startDateTime -CollectionEnd $endDateTime
+
+        if ($global:LastValidation.TotalRuns -gt 0) {
+            Write-Log "Found $($global:LastValidation.TotalRuns) runs in time window" -Level "INFO"
+        }
     } else {
         $monitoringActive = $true
         Write-Log "Monitoring window: $($startDateTime.ToString('yyyy-MM-dd HH:mm:ss')) to $($endDateTime.ToString('yyyy-MM-dd HH:mm:ss'))" -Level "INFO"
     }
+
 
     while ($monitoringActive) {
         try {
@@ -1831,7 +1858,8 @@ New-Item -ItemType Directory -Path $logDir -Force | Out-Null
                 $windowStart = [DateTime]::ParseExact("$today $($Script:Config.StartTime)", "yyyy-MM-dd HH:mm", $null)
                 $windowEnd = [DateTime]::ParseExact("$today $($Script:Config.EndTime)", "yyyy-MM-dd HH:mm", $null)
 
-                Write-Log "Time window: $($windowStart.ToString('HH:mm')) to $($windowEnd.ToString('HH:mm'))" -Level "INFO"
+                Write-Log "Time window for validation: $($windowStart.ToString('HH:mm')) to $($windowEnd.ToString('HH:mm'))" -Level "INFO"
+                Write-Log "Current time: $(Get-Date -Format 'HH:mm:ss')" -Level "INFO"
 
                 # ENHANCED: Validate ALL runs from start to end time
                 Write-Log "Validating ALL runs from today's monitoring window..." -Level "INFO"
@@ -1898,18 +1926,6 @@ New-Item -ItemType Directory -Path $logDir -Force | Out-Null
 catch {
 Write-Log "FATAL ERROR: $_" -Level "ERROR"
     Write-Log "Stack trace: $($\_.ScriptStackTrace)" -Level "DEBUG"
-
-    # Register sudden termination
-    $errorInfo = @{
-        ErrorMessage = $_.Exception.Message
-        ErrorType = $_.Exception.GetType().Name
-        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    }
-
-    # Register-SuddenTermination -Reason "Fatal error in monitor main loop: $_" `
-    #     -TerminationType "Fatal" `
-    #     -ProcessInfo $errorInfo
-
 }
 finally {
 Write-Log "Cleaning up..." -Level "INFO"

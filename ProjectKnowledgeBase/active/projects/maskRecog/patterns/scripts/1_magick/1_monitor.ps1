@@ -55,8 +55,8 @@ try {
 # Update configuration with paths 
 $Script:Config = @{
     # Schedule configuration
-    StartTime = "10:17"
-    EndTime = "10:18"
+    StartTime = "09:31"
+    EndTime = "10:49"
     
     # Process tracking - USING OLD VERSION'S STRUCTURE
     PythonProcessName = "python"
@@ -123,6 +123,7 @@ $global:CurrentRunFolder = $null
 $global:WorkerIsRunning = $false
 $global:PythonIsRunning = $false
 $global:LastWorkerAttempt = $null
+$global:TotalRunFolders = $null
 
 # Enhanced tracking from old version
 $global:ForceStopAttempts = 0
@@ -955,36 +956,47 @@ function Initialize-EmailReporting {
 
 function Invoke-EmailReport {
     [CmdletBinding()]
-    param([switch]$Force = $false) 
+    param([switch]$Force = $false)
 
     Write-Log "Scheduled email report triggered..." -Level "INFO"
-    
+
     # Load email sender script
     $emailSenderScript = Join-Path $PSScriptRoot "1_email-sender-stable.ps1"
     if (Test-Path $emailSenderScript) {
         try {
             # Clear any existing global variable to ensure fresh initialization
-            if (Test-Path "variable:global:StableEmailReport") {
+            if (Test-Path "variable:global:StableEmailSender") {
                 Remove-Variable -Name StableEmailSender -Scope Global -ErrorAction SilentlyContinue
             }
-            
-            . $emailSenderScript   
 
-        # Use the Invoke-StableEmailReport function from the email sender script
-        $success = Invoke-StableEmailReport -Force:$Force -HoursBack 24
-        
-        if ($success) {
-            Write-Log "Email report sent successfully!" -Level "SUCCESS"
-        } else {
-            Write-Log "Failed to send email report" -Level "ERROR"
+            . $emailSenderScript
+
+            # Calculate time window for email collection
+            $today = Get-Date -Format "yyyy-MM-dd"
+            $windowStart = [DateTime]::ParseExact("$today $($Script:Config.StartTime)", "yyyy-MM-dd HH:mm", $null)
+            $windowEnd = [DateTime]::ParseExact("$today $($Script:Config.EndTime)", "yyyy-MM-dd HH:mm", $null)
+
+            # Convert to string format for the email sender
+            $startTimeStr = $windowStart.ToString("HH:mm")
+            $endTimeStr = $windowEnd.ToString("HH:mm")
+
+            Write-Log "Email collection time window: $startTimeStr to $endTimeStr" -Level "INFO"
+
+            # Simply call the Invoke-StableEmailReport function with the time window
+            $success = Invoke-StableEmailReport -Force:$Force -StartTime $startTimeStr -EndTime $endTimeStr
+
+            if ($success) {
+                Write-Log "Email report sent successfully!" -Level "SUCCESS"
+            } else {
+                Write-Log "Failed to send email report" -Level "ERROR"
+            }
+
+            return $success
+        } catch {
+            Write-Log "Error in email report: $_" -Level "ERROR"
+            return $false
         }
-        
-        return $success
-    } catch {
-        Write-Log "Error in email report: $_" -Level "ERROR"
-        return $false
     }
-}
 }
 
 
@@ -1366,7 +1378,6 @@ function Initialize-RunCollection {
     # Instead of loading external script, integrate key functions directly
     try {
         # Define the core collection function inline
-        # Define the core collection function inline
         function global:Validate-RunFolder-Integrated {
             param(
                 [string]$FolderPath
@@ -1435,11 +1446,11 @@ function Initialize-RunCollection {
                 }
                 
                 # Get all run folders
-                $allRunFolders = Get-ChildItem -Path $Script:Config.RunsBasePath -Directory -Filter $Script:Config.OutputFolderPattern -ErrorAction SilentlyContinue
+                $global:TotalRunFolders = Get-ChildItem -Path $Script:Config.RunsBasePath -Directory -Filter $Script:Config.OutputFolderPattern -ErrorAction SilentlyContinue
                 
-                Write-Log "Found $($allRunFolders.Count) total run folders" -Level "INFO"
+                Write-Log "Found $($global:TotalRunFolders.Count) total run folders" -Level "INFO"
                 
-                if ($allRunFolders) {
+                if ($global:TotalRunFolders) {
                     # Parse time window - FIX: Check what format we're getting
                     $windowStart = $null
                     $windowEnd = $null
@@ -1463,7 +1474,7 @@ function Initialize-RunCollection {
                     
                     Write-Log "Time window parsed: $($windowStart.ToString('yyyy-MM-dd HH:mm:ss')) to $($windowEnd.ToString('yyyy-MM-dd HH:mm:ss'))" -Level "INFO"
                     
-                    foreach ($runFolder in $allRunFolders) {
+                    foreach ($runFolder in $global:TotalRunFolders) {
                         # Check if folder is within time window using TimeOfDay for hour/minute comparison
                         $folderTime = $runFolder.CreationTime
                         Write-Log "Checking folder: $($runFolder.Name) created at: $($folderTime.ToString('yyyy-MM-dd HH:mm:ss'))" -Level "DEBUG"
@@ -1542,7 +1553,6 @@ try {
     Write-Log "Entering enhanced monitoring loop..." -Level "INFO"
     
     
-    # Check if we're already past end time
     # Check if we're already past end time
     $now = Get-Date
     $today = Get-Date -Format "yyyy-MM-dd"
@@ -1720,17 +1730,6 @@ try {
 catch {
     Write-Log "FATAL ERROR: $_" -Level "ERROR"
     Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
-    
-    # Register sudden termination
-    $errorInfo = @{
-        ErrorMessage = $_.Exception.Message
-        ErrorType = $_.Exception.GetType().Name
-        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    }
-    
-    # Register-SuddenTermination -Reason "Fatal error in monitor main loop: $_" `
-    #     -TerminationType "Fatal" `
-    #     -ProcessInfo $errorInfo
 }
 finally {
     Write-Log "Cleaning up..." -Level "INFO"
@@ -1753,8 +1752,8 @@ finally {
     # Handle new validation format
     if ($global:LastValidation) {
         if ($global:LastValidation.Mode -eq "COLLECT_ALL") {
-            Write-Host "Run validation (All runs):" -ForegroundColor White
-            Write-Host "  Total runs: $($global:LastValidation.TotalRuns)" -ForegroundColor White
+            Write-Host "Run validation on every created folder:" -ForegroundColor White
+            Write-Host "  Total Folder Created: $($global:TotalRunFolders.Count)" -ForegroundColor White
             Write-Host "  Valid runs: $($global:LastValidation.ValidRuns)" -ForegroundColor Green
             if ($global:LastValidation.InvalidRuns -gt 0) {
                 Write-Host "  Invalid runs: $($global:LastValidation.InvalidRuns)" -ForegroundColor Red
