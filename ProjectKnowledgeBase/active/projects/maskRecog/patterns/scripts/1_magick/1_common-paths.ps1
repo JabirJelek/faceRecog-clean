@@ -8,7 +8,7 @@ Handles portable path discovery and date-based folder creation
 #>
 
 # ====================================================================
-# Module Configuration
+# Module Configuration - MODIFIABLE SECTION
 # ====================================================================
 $Script:CommonConfig = @{
     ProjectName = "maskRecog"
@@ -16,6 +16,28 @@ $Script:CommonConfig = @{
     DateFormat = "yyyy-MM-dd"
     DateTimeFormat = "yyyy-MM-dd_HH-mm-ss"
     LogDateTimeFormat = "yyyy-MM-dd HH:mm:ss"
+    
+    # ====================== EXTRACTED FILE PATHS ======================
+    # File paths for monitor script
+    MonitorFilePaths = @{
+        WorkerScript = "patterns\scripts\1_magick\1_mask_portable.ps1"
+        PythonScriptPath = "patterns\algorithm\entry_multi-USED-Magick.py"
+        PIDFileName = "monitor_pid_Magick.json"
+        LogFileName = "monitor_Magick.log"
+    }
+    
+    # File paths for worker script
+    WorkerFilePaths = @{
+        PythonScript = "patterns\algorithm\entry_multi-USED-Magick.py"
+    }
+    
+    # Common file paths
+    CommonFilePaths = @{
+        PythonExe = ".venv\Scripts\python.exe"
+        CommunicationDirName = "communication"
+        WorkerPIDFileName = "worker_pid.txt"
+        WorkerStatusFileName = "worker_status.json"
+    }
 }
 
 # ====================================================================
@@ -131,17 +153,16 @@ function Add-ScriptSpecificPaths {
     $Paths.DateBasedPath = $DateBasedPath
     
     if ($IsMonitor) {
-        $Paths.WorkerScript = Join-Path $Paths.ProjectRoot "patterns\scripts\1_magick\1_mask_portable.ps1"
-        $Paths.PythonScriptPath = Join-Path $Paths.ProjectRoot "patterns\algorithm\entry_multi-USED-Magick.py"
-        $Paths.PIDFilePath = Join-Path $DateBasedPath "monitor_pid_Magick.json"
-        $Paths.LogFile = Join-Path $DateBasedPath "monitor_Magick.log"
-        $Paths.PythonExe = Join-Path $Paths.VenvRoot ".venv\Scripts\python.exe"
+        $Paths.WorkerScript = Join-Path $Paths.ProjectRoot $Script:CommonConfig.MonitorFilePaths.WorkerScript
+        $Paths.PythonScriptPath = Join-Path $Paths.ProjectRoot $Script:CommonConfig.MonitorFilePaths.PythonScriptPath
+        $Paths.PIDFilePath = Join-Path $DateBasedPath $Script:CommonConfig.MonitorFilePaths.PIDFileName
+        $Paths.LogFile = Join-Path $DateBasedPath $Script:CommonConfig.MonitorFilePaths.LogFileName
+        $Paths.PythonExe = Join-Path $Paths.VenvRoot $Script:CommonConfig.CommonFilePaths.PythonExe
     }
     
     if ($IsWorker) {
-        $Paths.PythonScript = Join-Path $Paths.ProjectRoot "patterns\algorithm\entry_multi-USED-Magick.py"
-        $Paths.PythonExe = Join-Path $Paths.VenvRoot ".venv\Scripts\python.exe"
-        # $Paths.
+        $Paths.PythonScript = Join-Path $Paths.ProjectRoot $Script:CommonConfig.WorkerFilePaths.PythonScript
+        $Paths.PythonExe = Join-Path $Paths.VenvRoot $Script:CommonConfig.CommonFilePaths.PythonExe
     }
     
     return $Paths
@@ -239,7 +260,6 @@ function Release-Lock {
     return $true
 }
 
-
 function Write-Log {
     [CmdletBinding()]
     param(
@@ -300,16 +320,16 @@ function Initialize-CommunicationPaths {
     $communicationPaths = @{}
     
     try {
-        $commDir = Join-Path $Paths.DateBasedPath "communication"
+        $commDir = Join-Path $Paths.DateBasedPath $Script:CommonConfig.CommonFilePaths.CommunicationDirName
         if (-not (Test-Path $commDir)) {
             New-Item -ItemType Directory -Path $commDir -Force -ErrorAction Stop | Out-Null
         }
         
         $communicationPaths.CommunicationDir = $commDir
-        $communicationPaths.StatusFile = Join-Path $commDir "worker_status.json"
+        $communicationPaths.StatusFile = Join-Path $commDir $Script:CommonConfig.CommonFilePaths.WorkerStatusFileName
         
         if ($IsWorker) {
-            $communicationPaths.PIDFile = Join-Path $commDir "worker_pid.txt"
+            $communicationPaths.PIDFile = Join-Path $commDir $Script:CommonConfig.CommonFilePaths.WorkerPIDFileName
         }
         
         return $communicationPaths

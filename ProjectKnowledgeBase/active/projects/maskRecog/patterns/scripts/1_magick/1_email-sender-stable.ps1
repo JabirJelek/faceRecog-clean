@@ -7,7 +7,32 @@ Collects run completion summaries and sends them via email
 #>
 
 # ====================================================================
-# Configuration - Loaded from credentials or environment
+# CONFIGURATION - MODIFY THESE VALUES AS NEEDED
+# ====================================================================
+$ScriptConfig = @{
+    # Credentials file location
+    CredentialPath = "$env:USERPROFILE\.face-recog\email-credential.xml"
+    
+    # Run folder naming pattern
+    RunFolderFilter = "Magick_Process_MaskDetect_*"
+    
+    # File and folder names
+    CompletionSummaryFile = "completion_summary.txt"
+    MetadataFile = "metadata.json"
+    LogsFolder = "logs"
+    LogFileFilter = "*.txt"
+    
+    # Common paths script (if used)
+    CommonPathsScript = "1_common-paths.ps1"
+    
+    # Default collection settings
+    MaxRunsToCollect = 10
+    DefaultHoursBack = 24
+    MaxAttachmentSizeMB = 3
+}
+
+# ====================================================================
+# Email Configuration - Loaded from credentials or environment
 # ====================================================================
 $EmailConfig = @{
     SmtpServer = "smtp.gmail.com"
@@ -26,7 +51,7 @@ $EmailConfig = @{
 function Initialize-EmailConfig {
     [CmdletBinding()]
     param(
-        [string]$CredentialPath = "$env:USERPROFILE\.face-recog\email-credential.xml",
+        [string]$CredentialPath = $ScriptConfig.CredentialPath,
         [hashtable]$OverrideConfig = @{}
     )
     
@@ -91,7 +116,7 @@ function Get-RunSummaries {
     param(
         [string]$BasePath,
         [datetime]$Since,
-        [int]$MaxRuns = 10,
+        [int]$MaxRuns = $ScriptConfig.MaxRunsToCollect,
         [DateTime]$ScheduleStart = $null,
         [DateTime]$ScheduleEnd = $null,
         [switch]$TimeWindowMode = $false
@@ -101,7 +126,7 @@ function Get-RunSummaries {
     
     try {
         # Find all run folders
-        $runFolders = Get-ChildItem -Path $BasePath -Directory -Filter "Magick_Process_MaskDetect_*" -ErrorAction SilentlyContinue | 
+        $runFolders = Get-ChildItem -Path $BasePath -Directory -Filter $ScriptConfig.RunFolderFilter -ErrorAction SilentlyContinue | 
             Sort-Object CreationTime -Descending |
             Select-Object -First $MaxRuns
         
@@ -124,12 +149,12 @@ function Get-RunSummaries {
             
             # Check if folder was created after the specified time
             if ($folder.CreationTime -ge $Since) {
-                $summaryPath = Join-Path $folder.FullName "logs\completion_summary.txt"
+                $summaryPath = Join-Path $folder.FullName "$($ScriptConfig.LogsFolder)\$($ScriptConfig.CompletionSummaryFile)"
                 $hasSummary = Test-Path $summaryPath
                 
                 # Get metadata if available
                 $metadata = $null
-                $metadataPath = Join-Path $folder.FullName "metadata.json"
+                $metadataPath = Join-Path $folder.FullName $ScriptConfig.MetadataFile
                 $hasMetadata = Test-Path $metadataPath
                 
                 if ($hasMetadata) {
@@ -183,9 +208,9 @@ function Get-RunSummaries {
                 }
                 
                 # Find log files (even if no summary, we might still have logs)
-                $logDir = Join-Path $folder.FullName "logs"
+                $logDir = Join-Path $folder.FullName $ScriptConfig.LogsFolder
                 if (Test-Path $logDir) {
-                    $logFiles = Get-ChildItem -Path $logDir -File -Filter "*.txt" -ErrorAction SilentlyContinue
+                    $logFiles = Get-ChildItem -Path $logDir -File -Filter $ScriptConfig.LogFileFilter -ErrorAction SilentlyContinue
                     foreach ($logFile in $logFiles) {
                         $sizeInKB = [math]::Round($logFile.Length / 1KB, 2)
                         $summary.LogFiles += @{
@@ -222,7 +247,6 @@ function Get-RunSummaries {
     
     return $summaries
 }
-
 
 # ====================================================================
 # Send Email with Send-MailMessage (No External Dependencies)
@@ -469,7 +493,6 @@ function Send-RunReport {
         [switch]$UseTimeWindow = $false
     )
     
-    
     Write-Host "==============================" -ForegroundColor Cyan
     Write-Host "FACE RECOGNITION EMAIL REPORT" -ForegroundColor Cyan
     Write-Host "==============================" -ForegroundColor Cyan
@@ -481,7 +504,7 @@ function Send-RunReport {
     }
     
     # Determine time range based on mode
-    $since = (Get-Date).AddHours(-24)  # Default: last 24 hours
+    $since = (Get-Date).AddHours(-$ScriptConfig.DefaultHoursBack)  # Default: last 24 hours
     
     # If using schedule time window, parse the times
     $windowStart = $null
@@ -497,7 +520,7 @@ function Send-RunReport {
             Write-Host "  End: $ScheduleEndTime" -ForegroundColor White
             Write-Host "  Window: $($windowStart.ToString('HH:mm')) to $($windowEnd.ToString('HH:mm'))" -ForegroundColor White
         } catch {
-            Write-Host "Warning: Failed to parse schedule times. Using 24-hour window." -ForegroundColor Yellow
+            Write-Host "Warning: Failed to parse schedule times. Using default $($ScriptConfig.DefaultHoursBack)-hour window." -ForegroundColor Yellow
             Write-Host "  Error: $_" -ForegroundColor Red
             $UseTimeWindow = $false
         }
@@ -505,7 +528,7 @@ function Send-RunReport {
     
     # Collect run summaries
     Write-Host "Collecting run summaries from: $BasePath" -ForegroundColor Cyan
-    $summaries = Get-RunSummaries -BasePath $BasePath -Since $since -MaxRuns 10 `
+    $summaries = Get-RunSummaries -BasePath $BasePath -Since $since -MaxRuns $ScriptConfig.MaxRunsToCollect `
         -ScheduleStart $windowStart -ScheduleEnd $windowEnd -TimeWindowMode:$UseTimeWindow
     
     if ($summaries.Count -eq 0) {
@@ -542,7 +565,7 @@ function Send-RunReport {
     # Prepare attachments - only attach from runs that have data
     $attachments = @()
     $totalSize = 0
-    $maxSize = 3 * 1024 * 1024  # 3 MB
+    $maxSize = $ScriptConfig.MaxAttachmentSizeMB * 1024 * 1024  # Convert MB to bytes
     
     # Calculate counts correctly
     $summaryCount = ($summaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
@@ -598,7 +621,6 @@ function Send-RunReport {
     return Send-EmailWithAttachments -Subject $subject -Body $body -Attachments $attachments -Config $EmailConfig
 }
 
-
 # ====================================================================
 # Monitor Integration Functions
 # ====================================================================
@@ -615,10 +637,9 @@ function Register-StableEmailSender {
         LastSent = $null
         MonitorConfig = $MonitorConfig
         Enabled = $true
-        CredentialPath = "$env:USERPROFILE\.face-recog\email-credential.xml"
+        CredentialPath = $ScriptConfig.CredentialPath
     }
     
-    #Write-Host "Stable email sender registered" -Level "SUCCESS"
     return $true
 }
 
@@ -681,8 +702,6 @@ function Invoke-StableEmailReport {
     }
 }
 
-
-
 # ====================================================================
 # Direct Execution
 # ====================================================================
@@ -694,7 +713,7 @@ if ($MyInvocation.InvocationName -ne '.') {
     Write-Host ""
     
     # Get base path from common paths
-    $commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
+    $commonPathsScript = Join-Path $PSScriptRoot $ScriptConfig.CommonPathsScript
     if (Test-Path $commonPathsScript) {
         try {
             . $commonPathsScript
@@ -711,7 +730,7 @@ if ($MyInvocation.InvocationName -ne '.') {
                 
                 if ($result) {
                     Write-Host "`n✓ Email test completed successfully!" -ForegroundColor Green
-                    Write-Host "   Run with -TestMode:$false to send actual email." -ForegroundColor Yellow
+                    Write-Host "   Run with -TestMode:`$false to send actual email." -ForegroundColor Yellow
                 } else {
                     Write-Host "`n✗ Email test failed" -ForegroundColor Red
                 }

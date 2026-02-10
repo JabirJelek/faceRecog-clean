@@ -6,12 +6,24 @@ Worker script for face recognition pipeline
 Basic worker script that just runs Python
 #>
 
+# ======================= CONFIGURABLE PATHS =======================
+# Extract hardcoded values for easy modification
+$COMMON_PATHS_SCRIPT_NAME = "1_common-paths.ps1"
+$RUN_FOLDER_PREFIX = "Magick_Process_MaskDetect_"
+$LOG_SUBFOLDER_NAME = "logs"
+$OUTPUT_SUBFOLDER_NAME = "script_output"
+$METADATA_FILENAME = "metadata.json"
+$PYTHON_OUTPUT_FILENAME_PREFIX = "python_output_"
+$COMPLETION_SUMMARY_FILENAME = "completion_summary.txt"
+$PYTHON_ARGUMENT = "--multi-source"
+# ===============================================================
+
 try {
     Write-Host "=== WORKER SCRIPT STARTING ===" -ForegroundColor Cyan
     Write-Host "Worker PID: $PID" -ForegroundColor Yellow
     
     # Load common paths
-    $commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
+    $commonPathsScript = Join-Path $PSScriptRoot $COMMON_PATHS_SCRIPT_NAME
     if (-not (Test-Path $commonPathsScript)) {
         throw "Common paths script not found: $commonPathsScript"
     }
@@ -43,12 +55,12 @@ try {
     
     # Create run folder
     $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
-    $runFolder = Join-Path $RUNS_BASE_PATH "Magick_Process_MaskDetect_$timestamp"
+    $runFolder = Join-Path $RUNS_BASE_PATH "$RUN_FOLDER_PREFIX$timestamp"
     Write-Host "Creating run folder: $runFolder" -ForegroundColor Yellow
     
     New-Item -ItemType Directory -Path $runFolder -Force | Out-Null
-    New-Item -ItemType Directory -Path (Join-Path $runFolder "logs") -Force | Out-Null
-    New-Item -ItemType Directory -Path (Join-Path $runFolder "script_output") -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $runFolder $LOG_SUBFOLDER_NAME) -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $runFolder $OUTPUT_SUBFOLDER_NAME) -Force | Out-Null
     
     # Create metadata
     $metadata = @{
@@ -60,18 +72,18 @@ try {
         run_folder = $runFolder
     }
     
-    $metadata | ConvertTo-Json | Out-File (Join-Path $runFolder "metadata.json")
+    $metadata | ConvertTo-Json | Out-File (Join-Path $runFolder $METADATA_FILENAME)
     
     # Run Python
     Write-Host "Starting Python script..." -ForegroundColor Cyan
     
-    $pythonOutputFile = Join-Path $runFolder "logs\python_output_$timestamp.txt"
-    $workingDir = Join-Path $runFolder "script_output"
+    $pythonOutputFile = Join-Path $runFolder "$LOG_SUBFOLDER_NAME\${PYTHON_OUTPUT_FILENAME_PREFIX}${timestamp}.txt"
+    $workingDir = Join-Path $runFolder $OUTPUT_SUBFOLDER_NAME
     
     # Start Python process
     $processInfo = New-Object System.Diagnostics.ProcessStartInfo
     $processInfo.FileName = $PYTHON_EXE
-    $processInfo.Arguments = "`"$PYTHON_SCRIPT`" --multi-source"
+    $processInfo.Arguments = "`"$PYTHON_SCRIPT`" $PYTHON_ARGUMENT"
     $processInfo.UseShellExecute = $false
     $processInfo.RedirectStandardOutput = $true
     $processInfo.RedirectStandardError = $true
@@ -87,7 +99,7 @@ try {
         
         # Update metadata
         $metadata.python_pid = $pythonPID
-        $metadata | ConvertTo-Json | Out-File (Join-Path $runFolder "metadata.json") -Force
+        $metadata | ConvertTo-Json | Out-File (Join-Path $runFolder $METADATA_FILENAME) -Force
         
         # Wait for completion
         Write-Host "Waiting for Python to complete..." -ForegroundColor Yellow
@@ -115,7 +127,7 @@ Worker PID: $PID
 Python PID: $pythonPID
 "@
         
-        $summary | Out-File (Join-Path $runFolder "logs\completion_summary.txt")
+        $summary | Out-File (Join-Path $runFolder "$LOG_SUBFOLDER_NAME\$COMPLETION_SUMMARY_FILENAME")
         
         Write-Host "=== WORKER SCRIPT COMPLETED ===" -ForegroundColor Green
         exit $exitCode

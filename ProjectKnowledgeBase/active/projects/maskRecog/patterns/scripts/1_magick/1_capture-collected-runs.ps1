@@ -1,3 +1,5 @@
+# 1_capture-collected-runs.ps1
+
 <#
 .SYNOPSIS
 Captures and validates all run folders created between start and end times.
@@ -7,25 +9,40 @@ Collects run folders created during the monitoring window and validates each one
 This ensures that even if the worker process stops suddenly, all runs are captured.
 #>
 
+
 # ====================================================================
 # Configuration and Setup
 # ====================================================================
+
+# Centralized path configuration
+$Script:PathConfig = @{
+    # Base directories
+    ProjectRootRelativePath = ".."  # Relative path to project root from script location
+    RunsDirectory = "runs"          # Base runs directory name
+    LogsDirectory = "logs"          # Base logs directory name
+    
+    # File and folder patterns
+    OutputFolderPattern = "Magick_Process_MaskDetect_*"
+    LogFilePattern = "capture_collected_runs_{0}.log"
+    
+    # Default date format
+    DateFormat = "yyyy-MM-dd"
+    DateTimeFormat = "yyyy-MM-dd HH:mm"
+    FileTimestampFormat = "yyyyMMdd_HHmmss"
+}
 
 $Script:Config = @{
     # Time window for collection
     StartTime = "08:00"
     EndTime = "16:23"
     
-    # Paths
-    RunsBasePath = $null  # Will be set by Initialize-Paths
-    OutputFolderPattern = "Magick_Process_MaskDetect_*"
+    # Paths - will be set by Initialize-Paths
+    RunsBasePath = $null
+    LogFile = $null
     
     # Validation settings
     ExpectedSubfolders = @("logs", "script_output")
     ExpectedFiles = @("metadata.json")
-    
-    # Logging
-    LogFile = $null  # Will be set
 }
 
 # ====================================================================
@@ -33,26 +50,32 @@ $Script:Config = @{
 # ====================================================================
 function Initialize-Paths {
     param(
-        [string]$DateString = (Get-Date -Format "yyyy-MM-dd")
+        [string]$DateString = (Get-Date -Format $Script:PathConfig.DateFormat)
     )
     
     try {
         # Get project root (adjust as needed)
         $projectRoot = if ($PSScriptRoot) {
-            Split-Path $PSScriptRoot -Parent
+            Join-Path $PSScriptRoot $Script:PathConfig.ProjectRootRelativePath
         } else {
             $PWD.Path
         }
         
-        $Script:Config.RunsBasePath = Join-Path $projectRoot "runs" $DateString
+        # Build paths using centralized configuration
+        $Script:Config.RunsBasePath = Join-Path $projectRoot `
+            $Script:PathConfig.RunsDirectory `
+            $DateString
         
-        # Create log directory
-        $logDir = Join-Path $projectRoot "logs"
+        # Create log directory using centralized configuration
+        $logDir = Join-Path $projectRoot $Script:PathConfig.LogsDirectory
         if (-not (Test-Path $logDir)) {
             New-Item -ItemType Directory -Path $logDir -Force | Out-Null
         }
         
-        $Script:Config.LogFile = Join-Path $logDir "capture_collected_runs_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+        # Set log file path using pattern from configuration
+        $logFileName = $Script:PathConfig.LogFilePattern -f `
+            (Get-Date -Format $Script:PathConfig.FileTimestampFormat)
+        $Script:Config.LogFile = Join-Path $logDir $logFileName
         
         return $true
     } catch {

@@ -8,10 +8,39 @@ Monitors face recognition worker process with enhanced resilience and state reco
 Updated with old version's process checking structure that works.
 #>
 
+
+# ====================================================================
+# CONFIGURATION: Extract all hardcoded paths for easy modification
+# ====================================================================
+$Script:HardcodedPaths = @{
+    # File paths
+    CommonPathsScript = "1_common-paths.ps1"           # Relative to PSScriptRoot
+    EmailSenderScript = "1_email-sender-stable.ps1"    # Relative to PSScriptRoot
+    
+    # Directory names
+    RunsDirectory = "runs"
+    LogsDirectory = "logs"
+    ScriptsDirectory = "scripts"
+    
+    # File names
+    WorkerScriptName = "worker.ps1"
+    PythonScriptName = "python_script.py"
+    PIDTrackingFile = "pid_tracking.json"
+    
+    # Log file patterns
+    MonitorLogPattern = "monitor_Magick_{0}.log" -f (Get-Date -Format 'yyyyMMdd_HHmmss')
+    
+    # Folder name patterns
+    DateBasedFolderPattern = "yyyy-MM-dd"
+    OutputFolderPattern = "Magick_Process_MaskDetect_*"
+}
+
+
+
 # ====================================================================
 # ENHANCED: Import common paths module with improved error handling
 # ====================================================================
-$commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
+$commonPathsScript = Join-Path $PSScriptRoot $Script:HardcodedPaths.CommonPathsScript
 
 # Test module load into monitor
 
@@ -39,15 +68,15 @@ try {
     $global:MonitorPaths = $paths
 } catch {
     Write-Host "WARNING: Paths initialization failed, using fallbacks: $_" -ForegroundColor Yellow
-    # Create fallback paths
+    # Create fallback paths using extracted configuration
     $projectRoot = $PSScriptRoot
     $paths = @{
         ProjectRoot = $projectRoot
-        WorkerScript = Join-Path $projectRoot "worker.ps1"
-        PythonScript = Join-Path $projectRoot "python_script.py"
-        DateBasedPath = Join-Path $projectRoot "runs" $(Get-Date -Format 'yyyy-MM-dd')
-        PIDFilePath = Join-Path $projectRoot "pid_tracking.json"
-        LogFile = Join-Path $projectRoot "logs" "monitor_Magick_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+        WorkerScript = Join-Path $projectRoot $Script:HardcodedPaths.WorkerScriptName
+        PythonScript = Join-Path $projectRoot $Script:HardcodedPaths.PythonScriptName
+        DateBasedPath = Join-Path $projectRoot $Script:HardcodedPaths.RunsDirectory $(Get-Date -Format $Script:HardcodedPaths.DateBasedFolderPattern)
+        PIDFilePath = Join-Path $projectRoot $Script:HardcodedPaths.PIDTrackingFile
+        LogFile = Join-Path $projectRoot $Script:HardcodedPaths.LogsDirectory $Script:HardcodedPaths.MonitorLogPattern
     }
     $global:MonitorPaths = $paths
 }
@@ -56,7 +85,7 @@ try {
 $Script:Config = @{
     # Schedule configuration
     StartTime = "13:12"
-    EndTime = "14:55"
+    EndTime = "15:25"
     
     # Process tracking - USING OLD VERSION'S STRUCTURE
     PythonProcessName = "python"
@@ -64,15 +93,15 @@ $Script:Config = @{
     
     # Worker script path - FIX: Ensure not null
     WorkerScript = if ($paths.WorkerScript) { $paths.WorkerScript } else { 
-        Join-Path $paths.ProjectRoot "scripts" "worker.ps1" 
+        Join-Path $paths.ProjectRoot $Script:HardcodedPaths.ScriptsDirectory $Script:HardcodedPaths.WorkerScriptName
     }
     PythonScript = $paths.PythonScript
     
     # Paths for validation
     RunsBasePath = if ($paths.DateBasedPath) { $paths.DateBasedPath } else { 
-        Join-Path $paths.ProjectRoot "runs" $(Get-Date -Format 'yyyy-MM-dd')
+        Join-Path $paths.ProjectRoot $Script:HardcodedPaths.RunsDirectory $(Get-Date -Format $Script:HardcodedPaths.DateBasedFolderPattern)
     }
-    OutputFolderPattern = "Magick_Process_MaskDetect_*"
+    OutputFolderPattern = $Script:HardcodedPaths.OutputFolderPattern
     
     # Expected folder structure
     ExpectedSubfolders = @("logs", "script_output")
@@ -87,17 +116,17 @@ $Script:Config = @{
     
     # PID tracking - FIX: Ensure not null
     PIDFilePath = if ($paths.PIDFilePath) { $paths.PIDFilePath } else { 
-        Join-Path $paths.ProjectRoot "pid_tracking.json"
+        Join-Path $paths.ProjectRoot $Script:HardcodedPaths.PIDTrackingFile
     }
     MaxPIDFileAgeMinutes = 120
     
     # Logging - FIXED: Ensure LogFile path is properly set
     LogFile = if ($paths.LogFile) { $paths.LogFile } else { 
-        Join-Path $paths.ProjectRoot "logs" "monitor_Magick_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+        Join-Path $paths.ProjectRoot $Script:HardcodedPaths.LogsDirectory $Script:HardcodedPaths.MonitorLogPattern
     }
-    CurrentDate = if ($paths.CurrentDate) { $paths.CurrentDate } else { Get-Date -Format "yyyy-MM-dd" }
+    CurrentDate = if ($paths.CurrentDate) { $paths.CurrentDate } else { Get-Date -Format $Script:HardcodedPaths.DateBasedFolderPattern }
     ActiveDatePath = if ($paths.DateBasedPath) { $paths.DateBasedPath } else { 
-        Join-Path $paths.ProjectRoot "runs" $(Get-Date -Format 'yyyy-MM-dd')
+        Join-Path $paths.ProjectRoot $Script:HardcodedPaths.RunsDirectory $(Get-Date -Format $Script:HardcodedPaths.DateBasedFolderPattern)
     }
     
 }
@@ -633,7 +662,7 @@ function Initialize-EmailReporting {
     Write-Log "Initializing email reporting..." -Level "INFO"
     
     # Load email sender script
-    $emailSenderScript = Join-Path $PSScriptRoot "1_email-sender-stable.ps1"
+    $emailSenderScript = Join-Path $PSScriptRoot $Script:HardcodedPaths.EmailSenderScript
     if (Test-Path $emailSenderScript) {
         try {
             # Clear any existing functions to avoid conflicts
@@ -698,7 +727,7 @@ function Invoke-EmailReport {
             Write-Log "Invoke-StableEmailReport function not available, attempting to load email sender..." -Level "WARN"
             
             # Try to re-initialize
-            $emailScript = Join-Path $PSScriptRoot "1_email-sender-stable.ps1"
+            $emailScript = Join-Path $PSScriptRoot $Script:HardcodedPaths.EmailSenderScript
             if (Test-Path $emailScript) {
                 . $emailScript
                 Write-Log "Email sender script reloaded" -Level "INFO"
@@ -1220,7 +1249,7 @@ try {
     $runCollectionInitialized = Initialize-RunCollection
 
     # Quick test of email function availability
-    $emailTestScript = Join-Path $PSScriptRoot "1_email-sender-stable.ps1"
+    $emailTestScript = Join-Path $PSScriptRoot $Script:HardcodedPaths.EmailSenderScript
     if (Test-Path $emailTestScript) {
         try {
             . $emailTestScript
@@ -1228,7 +1257,7 @@ try {
         } catch {
             Write-Host "⚠ Email sender pre-load failed (may load later): $_" -Level "WARN"
         }
-    }    
+    }
     # Main monitoring loop with OLD VERSION'S reliability
     Write-Log "Entering enhanced monitoring loop..." -Level "INFO"
     
