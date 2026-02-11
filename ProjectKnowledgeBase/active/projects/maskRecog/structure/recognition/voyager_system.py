@@ -32,8 +32,61 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
         self.identity_centroids_tensor = None
         self.identity_names_list = []
         
+        # Add validation tracking
+        self.index_validation_errors = 0
+        self.last_validation_time = 0
+        self.max_validation_interval = 300  # 5 minutes
+        
+        # Add index consistency check
+        self._validate_index_consistency()        
+        
         # Now call parent constructor
         super().__init__(config)
+        
+    def _validate_index_consistency(self):
+        """Validate Voyager index matches internal mappings"""
+        if self.voyager_index is None:
+            return True
+            
+        try:
+            item_count = self._get_voyager_item_count()
+            mapping_count = len(self.voyager_id_to_identity)
+            
+            if item_count != mapping_count:
+                self.logger.warning(
+                    f"Index inconsistency detected: "
+                    f"Voyager items={item_count}, mappings={mapping_count}"
+                )
+                self.index_validation_errors += 1
+                
+                # Attempt to rebuild if too many errors
+                if self.index_validation_errors > 3:
+                    self._rebuild_index_from_backup()
+                    return False
+            return True
+        except Exception as e:
+            self.logger.error(f"Index validation failed: {e}")
+            return False
+    
+    def _rebuild_index_from_backup(self):
+        """Rebuild Voyager index from database backup"""
+        self.logger.warning("Rebuilding Voyager index from database...")
+        
+        # Save current state
+        current_db = self.embeddings_db.copy()
+        
+        # Reinitialize
+        self.voyager_index = None
+        self.voyager_id_to_identity = {}
+        self.identity_to_voyager_id = {}
+        self.next_voyager_id = 0
+        
+        # Reload
+        self.embeddings_db = current_db
+        self._load_embeddings_database()
+        
+        self.index_validation_errors = 0
+        self.logger.info("Index rebuild complete")        
         
                
     def _load_embeddings_database(self):
@@ -136,6 +189,167 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
             # Initialize empty index anyway
             self._initialize_voyager_index(512)
             
+    def _recognize_face_gpu_optimized(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
+        """GPU-optimized recognition with fallback to CPU"""
+        if not self.identity_centroids:
+            return None, 0.0
+        
+        # Try GPU first, fallback to CPU if GPU fails
+        try:
+            if torch.cuda.is_available() and self.identity_centroids_tensor is not None:
+                return self._recognize_on_gpu(embedding)
+            else:
+                return self._recognize_on_cpu(embedding, start_time)
+        except (RuntimeError, torch.cuda.OutOfMemoryError) as e:
+            self.logger.warning(f"GPU recognition failed, falling back to CPU: {e}")
+            # Clear GPU cache and retry on CPU
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            return self._recognize_on_cpu(embedding, start_time)
+
+    def _recognize_on_gpu(self, embedding: np.ndarray) -> Tuple[Optional[str], float]:
+        """GPU-based recognition implementation"""
+        embedding_tensor = torch.from_numpy(embedding).to(self.device).float().flatten()
+        centroids_tensor = self.identity_centroids_tensor
+        
+        with torch.no_grad():
+            embedding_norm = F.normalize(embedding_tensor, p=2, dim=0)
+            centroids_norm = F.normalize(centroids_tensor, p=2, dim=1)
+            cosine_similarities = torch.mm(centroids_norm, embedding_norm.unsqueeze(1)).squeeze()
+            best_similarity, best_index = torch.max(cosine_similarities, dim=0)
+            best_similarity = best_similarity.item()
+        
+        best_identity = None
+        if best_similarity >= self.config['recognition_threshold']:
+            best_identity = self.identity_names_list[best_index]
+        
+        return best_identity, best_similarity
+
+    def _recognize_on_cpu(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
+        """CPU-based fallback recognition"""
+        best_identity = None
+        best_similarity = 0.0
+        
+        # Normalize query embedding
+        embedding_norm = embedding / np.linalg.norm(embedding)
+        
+        for identity, centroid in self.identity_centroids.items():
+            if centroid is None:
+                continue
+                
+            # Normalize centroid
+            centroid_norm = centroid / np.linalg.norm(centroid)
+            
+            # Calculate cosine similarity
+            similarity = np.dot(embedding_norm, centroid_norm)
+            
+            if similarity > best_similarity and similarity >= self.config['recognition_threshold']:
+                best_similarity = similarity
+                best_identity = identity
+        
+        recognition_time = (time.time() - start_time) * 1000
+        self.debug_stats['recognition_times'].append(recognition_time)
+        
+        return best_identity, best_similarity   
+    
+    def save_voyager_index(self, filepath: Optional[str] = None):
+        """Save Voyager index to disk with corruption check"""
+        if self.voyager_index is None:
+            self.logger.warning("No Voyager index to save")
+            return False
+        
+        try:
+            if filepath is None:
+                db_path = Path(self.config['embeddings_db_path'])
+                index_path = db_path.parent / f"voyager_index_{int(time.time())}.bin"
+            else:
+                index_path = Path(filepath)
+            
+            # Save with temporary file first
+            temp_path = index_path.with_suffix('.tmp')
+            self.voyager_index.save(str(temp_path))
+            
+            # Verify the saved file
+            if temp_path.exists() and temp_path.stat().st_size > 0:
+                # Move to final location (atomic operation on Unix-like systems)
+                temp_path.replace(index_path)
+                self.logger.info(f"Voyager index saved to {index_path}")
+                
+                # Create checksum for validation
+                self._create_index_checksum(index_path)
+                return True
+            else:
+                self.logger.error("Failed to save Voyager index - file empty or missing")
+                return False
+                
+        except Exception as e:
+            self.logger.error(f"Failed to save Voyager index: {e}")
+            return False
+
+    def load_voyager_index(self, filepath: str) -> bool:
+        """Load Voyager index with validation"""
+        try:
+            index_path = Path(filepath)
+            
+            if not index_path.exists():
+                self.logger.warning(f"Index file not found: {filepath}")
+                return False
+            
+            # Verify checksum if available
+            if not self._verify_index_checksum(index_path):
+                self.logger.warning("Index checksum verification failed")
+                return False
+            
+            # Load the index
+            dimension = self._get_embedding_dimension_from_model()
+            self.voyager_index = Index(Space.Cosine, num_dimensions=dimension)
+            self.voyager_index.load(str(index_path))
+            
+            # Validate loaded index
+            if self._validate_loaded_index():
+                self.logger.info(f"Successfully loaded Voyager index from {filepath}")
+                return True
+            else:
+                self.voyager_index = None
+                return False
+                
+        except Exception as e:
+            self.logger.error(f"Failed to load Voyager index: {e}")
+            return False
+
+    def _create_index_checksum(self, filepath: Path):
+        """Create checksum for index file"""
+        import hashlib
+        checksum_path = filepath.with_suffix('.checksum')
+        
+        with open(filepath, 'rb') as f:
+            file_hash = hashlib.sha256(f.read()).hexdigest()
+        
+        with open(checksum_path, 'w') as f:
+            f.write(f"{file_hash}\n{filepath.name}\n{time.time()}")
+
+    def _verify_index_checksum(self, filepath: Path) -> bool:
+        """Verify index file checksum"""
+        checksum_path = filepath.with_suffix('.checksum')
+        
+        if not checksum_path.exists():
+            self.logger.warning("No checksum file found, skipping verification")
+            return True
+        
+        try:
+            import hashlib
+            with open(filepath, 'rb') as f:
+                file_hash = hashlib.sha256(f.read()).hexdigest()
+            
+            with open(checksum_path, 'r') as f:
+                stored_hash = f.readline().strip()
+            
+            return file_hash == stored_hash
+        except Exception as e:
+            self.logger.warning(f"Checksum verification failed: {e}")
+            return False    
+                 
+            
     def _get_embedding_dimension_from_data(self) -> int:
         """Determine embedding dimension from the actual data"""
         try:
@@ -205,29 +419,75 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
         except Exception as e:
             self.logger.warning(f"Could not get Voyager item count: {e}")
             return len(self.voyager_id_to_identity)
-
+    
+    def _validate_embedding(self, embedding: np.ndarray) -> bool:
+        """Validate embedding shape and values"""
+        if embedding is None or embedding.size == 0:
+            return False
+        
+        # Check for NaN or Inf values
+        if np.any(np.isnan(embedding)) or np.any(np.isinf(embedding)):
+            self.logger.warning("Embedding contains NaN or Inf values")
+            return False
+        
+        # Check expected dimension (based on model)
+        expected_dim = self._get_embedding_dimension_from_model()
+        if embedding.shape[-1] != expected_dim:
+            self.logger.warning(
+                f"Embedding dimension mismatch: expected {expected_dim}, "
+                f"got {embedding.shape[-1]}"
+            )
+            # Try to reshape if possible
+            if embedding.size == expected_dim:
+                embedding = embedding.reshape(-1)
+            else:
+                return False
+        
+        return True
 
     def recognize_face(self, embedding: np.ndarray) -> Tuple[Optional[str], float]:
-        """Enhanced recognition using Voyager's approximate nearest neighbor search"""
+        """Enhanced recognition with robust error recovery"""
         start_time = time.time()
         
-        # Use Voyager if available and configured
-        if (self.voyager_index is not None and 
-            self._get_voyager_item_count() > 0 and
-            self.config.get('use_voyager', True)):
-            
-            result = self._recognize_with_voyager(embedding, start_time)
-            if result[0] is not None:  # If Voyager found a match
-                return result
-            # If Voyager didn't find a match, fall through to original method
+        # Validate input embedding
+        if not self._validate_embedding(embedding):
+            self.logger.warning(f"Invalid embedding provided: shape={embedding.shape}")
+            return None, 0.0
         
-        # Fallback to GPU-optimized recognition method
-        result = self._recognize_face_gpu_optimized(embedding, start_time)
-        self.voyager_performance_monitor.record_voyager_performance(
-            start_time, success=False, used_fallback=True
-        )
-        return result
-
+        try:
+            # Try Voyager first
+            if (self.voyager_index is not None and 
+                self._get_voyager_item_count() > 0 and
+                self.config.get('use_voyager', True)):
+                
+                # Periodic index validation
+                current_time = time.time()
+                if current_time - self.last_validation_time > self.max_validation_interval:
+                    if not self._validate_index_consistency():
+                        self.logger.warning("Index validation failed, using fallback")
+                        result = self._recognize_face_gpu_optimized(embedding, start_time)
+                        self.voyager_performance_monitor.record_voyager_performance(
+                            start_time, success=False, used_fallback=True
+                        )
+                        return result
+                    self.last_validation_time = current_time
+                
+                result = self._recognize_with_voyager(embedding, start_time)
+                if result[0] is not None:
+                    return result
+            
+            # Fallback
+            result = self._recognize_face_gpu_optimized(embedding, start_time)
+            self.voyager_performance_monitor.record_voyager_performance(
+                start_time, success=False, used_fallback=True
+            )
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Recognition failed: {e}")
+            # Return safe default
+            return None, 0.0
+        
     def _recognize_with_voyager(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
         """Recognition using Voyager index"""
         try:
@@ -276,40 +536,6 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
             )
             return None, 0.0
         
-    def _recognize_face_gpu_optimized(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
-        """GPU-optimized recognition method using PyTorch on GTX 1650 Ti"""
-        if not self.identity_centroids or self.identity_centroids_tensor is None:
-            return None, 0.0
-        
-        # Move embedding to GPU and ensure proper shape/type
-        embedding_tensor = torch.from_numpy(embedding).to(self.device).float().flatten()
-        
-        # Use pre-loaded centroids tensor on GPU
-        centroids_tensor = self.identity_centroids_tensor
-        
-        # Calculate cosine similarity on GPU (highly parallel)
-        with torch.no_grad():
-            # Normalize vectors for cosine similarity
-            embedding_norm = F.normalize(embedding_tensor, p=2, dim=0)
-            centroids_norm = F.normalize(centroids_tensor, p=2, dim=1)
-            
-            # Matrix multiplication for batch cosine similarity
-            cosine_similarities = torch.mm(centroids_norm, embedding_norm.unsqueeze(1)).squeeze()
-            
-            # Find the best match
-            best_similarity, best_index = torch.max(cosine_similarities, dim=0)
-            best_similarity = best_similarity.item()
-        
-        # Get identity name from pre-loaded list
-        best_identity = None
-        if best_similarity >= self.config['recognition_threshold']:
-            best_identity = self.identity_names_list[best_index]
-        
-        recognition_time = (time.time() - start_time) * 1000
-        self.debug_stats['recognition_times'].append(recognition_time)
-        
-        return best_identity, best_similarity
-
     def _recognize_face_original(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
         """Original recognition method kept for compatibility - now uses GPU optimization"""
         return self._recognize_face_gpu_optimized(embedding, start_time)
