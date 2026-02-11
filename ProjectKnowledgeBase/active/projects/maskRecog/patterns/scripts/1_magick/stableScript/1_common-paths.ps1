@@ -20,7 +20,7 @@ $Script:CommonConfig = @{
     # ====================== EXTRACTED FILE PATHS ======================
     # File paths for monitor script
     MonitorFilePaths = @{
-        WorkerScript = "patterns\scripts\1_magick\1_mask_portable.ps1"
+        WorkerScript = "patterns\scripts\1_magick\stableScript\1_mask_portable.ps1"
         PythonScriptPath = "patterns\algorithm\entry_multi-USED-Magick.py"
         PIDFileName = "monitor_pid_Magick.json"
         LogFileName = "monitor_Magick.log"
