@@ -1,4 +1,4 @@
-# 1_mask_portable.ps1
+# 1_worker_portable.ps1
 <#
 .SYNOPSIS
 Worker script for face recognition pipeline

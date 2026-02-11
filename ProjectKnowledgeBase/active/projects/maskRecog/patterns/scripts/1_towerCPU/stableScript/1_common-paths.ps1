@@ -20,7 +20,7 @@ $Script:CommonConfig = @{
     # ====================== EXTRACTED FILE PATHS ======================
     # File paths for monitor script
     MonitorFilePaths = @{
-        WorkerScript = "patterns\scripts\1_towerCPU\stableScript\1_mask_portable.ps1"
+        WorkerScript = "patterns\scripts\1_towerCPU\stableScript\1_worker_portable.ps1"
         PythonScriptPath = "patterns\algorithm\entry_multi-USED-TowerCPU.py"
         PIDFileName = "monitor_pid_TowerCPU.json"
         LogFileName = "monitor_TowerCPU.log"

@@ -1,0 +1,6 @@
+Jika ingin menggunakan stableScript, ubahlah endtime dan starttime pada:
+.../1_capture-collected-runs.ps1
+
+dan 
+
+.../1_monitor.ps1
