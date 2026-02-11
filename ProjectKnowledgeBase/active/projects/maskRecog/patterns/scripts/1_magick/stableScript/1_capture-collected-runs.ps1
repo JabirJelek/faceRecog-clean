@@ -33,8 +33,8 @@ $Script:PathConfig = @{
 
 $Script:Config = @{
     # Time window for collection
-    StartTime = "08:00"
-    EndTime = "17:00"
+    StartTime = "10:00"
+    EndTime = "11:04"
     
     # Paths - will be set by Initialize-Paths
     RunsBasePath = $null

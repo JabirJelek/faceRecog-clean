@@ -84,8 +84,8 @@ try {
 # Update configuration with paths 
 $Script:Config = @{
     # Schedule configuration
-    StartTime = "13:12"
-    EndTime = "15:25"
+    StartTime = "12:50"
+    EndTime = "15:52"
     
     # Process tracking - USING OLD VERSION'S STRUCTURE
     PythonProcessName = "python"
@@ -112,7 +112,7 @@ $Script:Config = @{
     RetryDelaySeconds = 10
     
     # Process monitoring
-    ProcessCheckInterval = if ($paths.ProcessCheckInterval) { $paths.ProcessCheckInterval } else { 15 }
+    ProcessCheckInterval = if ($paths.ProcessCheckInterval) { $paths.ProcessCheckInterval } else { 5 }
     
     # PID tracking - FIX: Ensure not null
     PIDFilePath = if ($paths.PIDFilePath) { $paths.PIDFilePath } else { 
@@ -160,25 +160,17 @@ function Check-ProcessStatus {
         PythonPID = $global:PythonPID
     }
     
-    # Check worker process
+    # Check worker process (we need to know this)
     if ($global:WorkerPID -and $global:WorkerPID -ne 0) {
         $status.WorkerRunning = Is-ProcessRunning -ProcessId $global:WorkerPID -ProcessName "powershell"
     }
     
-    # Check Python process
+    # Check Python process - ONLY if we already have the PID from worker output
     if ($global:PythonPID -and $global:PythonPID -ne 0) {
         $status.PythonRunning = Is-ProcessRunning -ProcessId $global:PythonPID -ProcessName "python"
-    } else {
-        # If PythonPID not set but worker is running, try to find it
-        if ($status.WorkerRunning) {
-            $foundPID = Find-PythonProcess
-            if ($foundPID) {
-                $global:PythonPID = $foundPID
-                $status.PythonPID = $foundPID
-                $status.PythonRunning = Is-ProcessRunning -ProcessId $foundPID -ProcessName "python"
-            }
-        }
     }
+    # Note: We do NOT try to find the Python process if we don't have the PID
+    # This prevents capturing the wrong process
     
     # Update global state
     $global:WorkerIsRunning = $status.WorkerRunning
@@ -186,6 +178,7 @@ function Check-ProcessStatus {
     
     return $status
 }
+
 
 function Is-ProcessRunning {
     param(
@@ -209,37 +202,16 @@ function Is-ProcessRunning {
 }
 
 function Find-PythonProcess {
-    # Try to find the Python process running our specific script
-    Write-Log "Searching for Python process..." -Level "DEBUG"
+    # Simplified: Only try to get PID from metadata if we don't have it yet
+    Write-Log "Looking for Python PID from available data..." -Level "DEBUG"
     
-    # Method 1: Check for processes with our script path in command line
-    $pythonProcesses = Get-Process -Name "python*" -ErrorAction SilentlyContinue | 
-        Where-Object { $_.Path -like "*python*" }
-    
-    foreach ($proc in $pythonProcesses) {
-        try {
-            $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
-            if ($cmdLine -like "*$($Script:Config.PythonScript)*") {
-                Write-Log "Found Python process with our script: PID=$($proc.Id)" -Level "SUCCESS"
-                return $proc.Id
-            }
-        } catch { }
+    # Method 1: Already have it from worker output?
+    if ($global:PythonPID -and $global:PythonPID -ne 0) {
+        Write-Log "Using Python PID from worker output: $global:PythonPID" -Level "DEBUG"
+        return $global:PythonPID
     }
     
-    # Method 2: Check for Python processes started after our worker
-    if ($global:WorkerStartTime) {
-        $pythonProcs = Get-Process -Name "python*" -ErrorAction SilentlyContinue |
-            Where-Object { $_.StartTime -gt $global:WorkerStartTime }
-        
-        if ($pythonProcs) {
-            # Take the first one started after our worker
-            $foundPID = $pythonProcs[0].Id
-            Write-Log "Found Python process started after worker: PID=$foundPID" -Level "INFO"
-            return $foundPID
-        }
-    }
-    
-    # Method 3: Look in the latest run folder's metadata for PID
+    # Method 2: Look in the latest run folder's metadata for PID
     $runFolder = Find-LatestRunFolder
     if ($runFolder) {
         $metadataPath = Join-Path $runFolder.FullName "metadata.json"
@@ -249,22 +221,16 @@ function Find-PythonProcess {
                 if ($metadata.PSObject.Properties.Name -contains "python_pid") {
                     $foundPID = $metadata.python_pid
                     Write-Log "Found Python PID in metadata: $foundPID" -Level "INFO"
-                    
-                    # Verify the process still exists
-                    try {
-                        Get-Process -Id $foundPID -ErrorAction Stop | Out-Null
-                        return $foundPID
-                    } catch {
-                        Write-Log "Python PID from metadata no longer exists: $foundPID" -Level "WARN"
-                    }
+                    return $foundPID
                 }
             } catch { }
         }
     }
     
-    Write-Log "No Python process found matching criteria" -Level "DEBUG"
+    Write-Log "No Python process data available yet" -Level "DEBUG"
     return $null
 }
+
 
 
 
@@ -362,10 +328,18 @@ function Start-WorkerProcess {
         $stdOutBuilder = New-Object System.Text.StringBuilder
         $stdErrBuilder = New-Object System.Text.StringBuilder
         
-        # Set up event handlers for async output
+        # better PID parsing:
+
         $outAction = {
             if (-not [String]::IsNullOrEmpty($EventArgs.Data)) {
                 $Event.MessageData.AppendLine($EventArgs.Data)
+                
+                # Parse for Python PID from worker output
+                if ($EventArgs.Data -match "Python process started \(PID: (\d+)\)") {
+                    $global:PythonPID = $matches[1]
+                    Write-Log "Captured Python PID from worker output: $global:PythonPID" -Level "SUCCESS"
+                }
+                
                 # Also log to monitor log
                 Write-Log "Worker Output: $($EventArgs.Data)" -Level "DEBUG"
             }
@@ -544,9 +518,14 @@ function Stop-WorkerProcess {
     foreach ($procInfo in $processesToStop | Where-Object { $_.Type -eq "Python" }) {
         Write-Log "Stopping $($procInfo.Type) process (PID: $($procInfo.PID))..." -Level "INFO"
         
+        # Change from immediate kill to graceful wait
         try {
             # For Python processes, use Kill() directly as they don't respond well to CloseMainWindow
             $procInfo.Process.Kill()
+            
+            # Add waiting time for Python to stop completely
+            Write-Log "Waiting 20 seconds for Python process to stop completely..." -Level "WARN"
+            Start-Sleep -Seconds 20
             
             # Wait for process to exit
             $timeout = 10 # seconds
@@ -595,27 +574,23 @@ function Stop-WorkerProcess {
         }
     }
 
-    # Additional cleanup: Find and stop any orphaned Python processes
-    Write-Log "Checking for orphaned Python processes..." -Level "INFO"
+    # Inside Stop-WorkerProcess function, update the orphaned process section:
+
+    # Additional cleanup: ONLY terminate processes we know about
+    Write-Log "Checking for known orphaned processes..." -Level "INFO"
     $orphanedProcesses = @()
 
-    try {
-        $allPythonProcesses = Get-Process -Name "python*" -ErrorAction SilentlyContinue |
-            Where-Object { $_.Path -like "*python*" -and $_.Id -ne $PID }
-
-        foreach ($proc in $allPythonProcesses) {
-            try {
-                $cmdLine = (Get-WmiObject Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
-                if ($cmdLine -like "*$($Script:Config.PythonScript)*") {
-                    Write-Log "Found orphaned Python process (PID: $($proc.Id)) - terminating" -Level "WARN"
-                    $proc.Kill()
-                    $orphanedProcesses += "Python:$($proc.Id)"
-                    Start-Sleep -Seconds 1
-                }
-            } catch { }
-        }
-    } catch {
-        Write-Log "Error checking for orphaned processes: $_" -Level "DEBUG"
+    # Only kill processes that we specifically know about
+    if ($global:PythonPID -and $global:PythonPID -ne 0) {
+        try {
+            $proc = Get-Process -Id $global:PythonPID -ErrorAction SilentlyContinue
+            if ($proc -and (-not $proc.HasExited)) {
+                Write-Log "Found orphaned Python process (PID: $global:PythonPID) - terminating" -Level "WARN"
+                $proc.Kill()
+                $orphanedProcesses += "Python:$global:PythonPID"
+                Start-Sleep -Seconds 1
+            }
+        } catch { }
     }
 
     # Reset global process variables
@@ -1322,7 +1297,7 @@ try {
             
             # OLD VERSION'S LOGIC: Check if we should start worker
             if ($inWindow -and (-not $processStatus.PythonRunning)) {
-                Write-Log "Time window active and no Python process running - starting worker..." -Level "INFO"
+                Write-Log "Time window active and no Python process running - starting worker..." -Level "WARN"
                 
                 if ($global:LastWorkerAttempt -and ((Get-Date) - $global:LastWorkerAttempt).TotalSeconds -lt 60) {
                     Write-Log "Skipping worker start - too soon after last attempt" -Level "DEBUG"
@@ -1345,7 +1320,9 @@ try {
                 if ($processStatus.PythonRunning -or $processStatus.WorkerRunning) {
                     Write-Log "Stopping running processes..." -Level "INFO"
                     Stop-WorkerProcess
-                    Start-Sleep -Seconds 5
+                    # Add waiting time after stopping processes
+                    Write-Log "Waiting 20 seconds for processes to stop completely..." -Level "WARN"
+                    Start-Sleep -Seconds 20
                 }
                 
                 # FIX: Define window variables here
@@ -1392,20 +1369,20 @@ try {
                 
 
             
-            # If we're in the window and processes should be running, verify health
-            if ($inWindow -and $processStatus.WorkerRunning) {
-                # Send periodic heartbeat request to worker
-                $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
-                if ((Get-Date).Second % 15 -eq 0) {
-                    $workerHealth = Check-WorkerHealth
-                    if (-not $workerHealth) {
-                        Write-Log "Worker health check failed. Attempting to restart..." -Level "WARN"
-                        Stop-WorkerProcess
-                        Start-Sleep -Seconds 2
-                        Start-WorkerProcess
-                    }
-                }
-            }
+            # # If we're in the window and processes should be running, verify health
+            # if ($inWindow -and $processStatus.WorkerRunning) {
+            #     # Send periodic heartbeat request to worker
+            #     $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
+            #     if ((Get-Date).Second % 15 -eq 0) {
+            #         $workerHealth = Check-WorkerHealth
+            #         if (-not $workerHealth) {
+            #             Write-Log "Worker health check failed. Attempting to restart..." -Level "WARN"
+            #             Stop-WorkerProcess
+            #             Start-Sleep -Seconds 2
+            #             Start-WorkerProcess
+            #         }
+            #     }
+            # }
             
             # FIX: Ensure ProcessCheckInterval is not null
             $sleepInterval = if ($Script:Config.ProcessCheckInterval) { 
@@ -1452,7 +1429,7 @@ finally {
         if ($global:LastValidation.Mode -eq "COLLECT_ALL") {
             Write-Host "Run validation on every created folder:" -ForegroundColor White
             Write-Host "  Total Folder Created: $($global:TotalRunFolders.Count)" -ForegroundColor White
-            Write-Host "  Valid runs: $($global:LastValidation.ValidRuns)" -ForegroundColor Green
+            Write-Host "  Full Data: $($global:LastValidation.ValidRuns)" -ForegroundColor Green
             if ($global:LastValidation.InvalidRuns -gt 0) {
                 Write-Host "  Invalid runs: $($global:LastValidation.InvalidRuns)" -ForegroundColor Red
             }
@@ -1467,6 +1444,6 @@ finally {
         }
     }
     
-    Write-Host "Collected valid runs: $($global:CollectedRunFolders.Count)" -ForegroundColor White
+    Write-Host "Collected Folder with full data: $($global:CollectedRunFolders.Count)" -ForegroundColor White
     Write-Host "================================================" -ForegroundColor Cyan
 }

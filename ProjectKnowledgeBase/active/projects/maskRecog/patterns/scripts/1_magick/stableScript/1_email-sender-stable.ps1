@@ -187,7 +187,7 @@ function Get-RunSummaries {
                     # Parse the summary for exit code
                     if ($summaryContent -match "Exit code: (\d+)") {
                         $summary.ExitCode = $matches[1]
-                        $summary.Status = if ($matches[1] -eq "0") { "SUCCESS" } else { "FAILED" }
+                        $summary.Status = if ($matches[1] -eq "1") { "FAILED" } else { "SUCCESS" } # This logic is to determine the success and failed status of the system.
                     }
                     $summary.CollectionType = "SUMMARY_METADATA"
                     $collectedWithSummary++
@@ -196,7 +196,7 @@ function Get-RunSummaries {
                     # Try to get exit code from metadata
                     if ($metadata -and $metadata.worker_exit_code) {
                         $summary.ExitCode = $metadata.worker_exit_code
-                        $summary.Status = if ($metadata.worker_exit_code -eq "0") { "SUCCESS" } else { "FAILED" }
+                        $summary.Status = if ($metadata.worker_exit_code -eq "1") { "FAILED" } else { "SUCCESS" } # This logic is to determine the success and failed status of the system.
                     }
                     $summary.CollectionType = "METADATA_ONLY"
                     $collectedMetadataOnly++
@@ -222,6 +222,14 @@ function Get-RunSummaries {
                         }
                     }
                 }
+                
+                # Create compressed zip for the entire run folder
+                $tempDir = [System.IO.Path]::GetTempPath()
+                $compressedFolder = Compress-RunFolder -FolderPath $folder.FullName -DestinationPath $tempDir
+                if ($compressedFolder) {
+                    $summary.CompressedFolder = $compressedFolder
+                }
+
                 
                 $summaries += $summary
             }
@@ -251,6 +259,42 @@ function Get-RunSummaries {
 # ====================================================================
 # Send Email with Send-MailMessage (No External Dependencies)
 # ====================================================================
+
+# Add this function to handle folder compression
+function Compress-RunFolder {
+    [CmdletBinding()]
+    param(
+        [string]$FolderPath,
+        [string]$DestinationPath
+    )
+    
+    try {
+        # Create zip file name based on folder name
+        $folderName = Split-Path $FolderPath -Leaf
+        $zipPath = Join-Path $DestinationPath "$folderName.zip"
+        
+        # Use Compress-Archive to create zip
+        Compress-Archive -Path "$FolderPath\*" -DestinationPath $zipPath -CompressionLevel Optimal -Force
+        
+        # Return zip file info
+        $zipFile = Get-Item $zipPath
+        return @{
+            Path = $zipFile.FullName
+            Name = $zipFile.Name
+            Size = "$([math]::Round($zipFile.Length / 1KB, 2)) KB"
+            SizeBytes = $zipFile.Length
+            SizeKB = [math]::Round($zipFile.Length / 1KB, 2)
+            SourceFolder = $FolderPath
+        }
+    } catch {
+        Write-Host "  ✗ Failed to compress folder $($FolderPath): $_" -ForegroundColor Red
+        return $null
+    }
+}
+
+
+
+
 function Send-EmailWithAttachments {
     [CmdletBinding()]
     param(
@@ -296,8 +340,21 @@ function Send-EmailWithAttachments {
         Write-Host "Sending email via $($Config.SmtpServer)..." -ForegroundColor Cyan
         Send-MailMessage @mailParams
         
+        # Clean up temporary zip files
+        foreach ($attachment in $mailParams.Attachments) {
+            if ($attachment -like "*.zip") {
+                try {
+                    Remove-Item $attachment -Force -ErrorAction SilentlyContinue
+                    Write-Host "  ✓ Cleaned up temporary zip: $(Split-Path $attachment -Leaf)" -ForegroundColor Gray
+                } catch {
+                    # Silent cleanup - don't fail if cleanup fails
+                }
+            }
+        }
+        
         Write-Host "✓ Email sent successfully!" -ForegroundColor Green
         return $true
+
         
     } catch {
         Write-Host "✗ Failed to send email: $_" -ForegroundColor Red
@@ -573,19 +630,31 @@ function Send-RunReport {
     $noDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
     
     foreach ($summary in $summaries) {
-        foreach ($logFile in $summary.LogFiles) {
-            # Use SizeBytes if available, otherwise calculate from SizeKB
-            $sizeInBytes = if ($logFile.SizeBytes) {
-                $logFile.SizeBytes
-            } elseif ($logFile.SizeKB) {
-                $logFile.SizeKB * 1024
-            } else {
-                0
-            }
+        # Use compressed folder if available, otherwise fall back to individual files
+        if ($summary.CompressedFolder) {
+            $zipFile = $summary.CompressedFolder
+            $sizeInBytes = $zipFile.SizeBytes
             
             if (($totalSize + $sizeInBytes) -lt $maxSize) {
-                $attachments += $logFile.Path
+                $attachments += $zipFile.Path
                 $totalSize += $sizeInBytes
+                Write-Host "  ✓ Will attach compressed folder: $($zipFile.Name) ($($zipFile.Size))" -ForegroundColor Green
+            }
+        } else {
+            # Fallback to individual files if compression failed
+            foreach ($logFile in $summary.LogFiles) {
+                $sizeInBytes = if ($logFile.SizeBytes) {
+                    $logFile.SizeBytes
+                } elseif ($logFile.SizeKB) {
+                    $logFile.SizeKB * 1024
+                } else {
+                    0
+                }
+                
+                if (($totalSize + $sizeInBytes) -lt $maxSize) {
+                    $attachments += $logFile.Path
+                    $totalSize += $sizeInBytes
+                }
             }
         }
     }
@@ -600,6 +669,8 @@ function Send-RunReport {
     
     $body = Create-EmailBody -RunSummaries $summaries -Config $EmailConfig -ScheduleStart $ScheduleStartTime -ScheduleEnd $ScheduleEndTime
     
+    # Update the email details display to show compression info
+    # Find this section in Send-RunReport function (around line 380-390):
     Write-Host "`nEmail Details:" -ForegroundColor Cyan
     Write-Host "  Subject: $subject" -ForegroundColor White
     Write-Host "  To: $($EmailConfig.ToAddress)" -ForegroundColor White
@@ -608,6 +679,10 @@ function Send-RunReport {
     Write-Host "  Metadata only: $metadataOnlyCount" -ForegroundColor Yellow
     Write-Host "  No data: $noDataCount" -ForegroundColor Gray
     Write-Host "  Attachments: $($attachments.Count) files (~$([math]::Round($totalSize/1MB, 2)) MB)" -ForegroundColor White
+
+    # Add a line to show compression status:
+    $compressedCount = ($summaries | Where-Object { $_.CompressedFolder }).Count
+    Write-Host "  Compressed folders: $compressedCount" -ForegroundColor Cyan
     if ($UseTimeWindow) {
         Write-Host "  Time window: $ScheduleStartTime to $ScheduleEndTime" -ForegroundColor Cyan
     }
