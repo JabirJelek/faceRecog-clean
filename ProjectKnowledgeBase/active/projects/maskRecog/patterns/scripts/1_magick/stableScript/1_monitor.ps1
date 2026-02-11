@@ -85,7 +85,7 @@ try {
 $Script:Config = @{
     # Schedule configuration
     StartTime = "12:50"
-    EndTime = "15:52"
+    EndTime = "16:34"
     
     # Process tracking - USING OLD VERSION'S STRUCTURE
     PythonProcessName = "python"

@@ -295,6 +295,9 @@ function Compress-RunFolder {
 
 
 
+# ====================================================================
+# Send Email with MailKit Library (Stable version)
+# ====================================================================
 function Send-EmailWithAttachments {
     [CmdletBinding()]
     param(
@@ -307,54 +310,113 @@ function Send-EmailWithAttachments {
     try {
         Write-Host "Preparing email with $($Attachments.Count) attachments..." -ForegroundColor Cyan
         
-        # Create secure password
-        $securePassword = ConvertTo-SecureString $Config.Password -AsPlainText -Force
-        $credential = New-Object System.Management.Automation.PSCredential($Config.Username, $securePassword)
+        # Load MailKit and MimeKit assemblies
+        $currentLocation = $PSScriptRoot
+        $mailKitPath = Join-Path $currentLocation "MailKit.dll"
+        $mimeKitPath = Join-Path $currentLocation "MimeKit.dll"
         
-        # Prepare email parameters
-        $mailParams = @{
-            SmtpServer = $Config.SmtpServer
-            Port = $Config.SmtpPort
-            UseSsl = $Config.UseSsl
-            Credential = $credential
-            From = $Config.FromAddress
-            To = $Config.ToAddress
-            Subject = $Subject
-            Body = $Body
-            BodyAsHtml = $true
-            ErrorAction = "Stop"
+        if (-not (Test-Path $mailKitPath)) {
+            throw "MailKit.dll not found in current location: $currentLocation"
+        }
+        if (-not (Test-Path $mimeKitPath)) {
+            throw "MimeKit.dll not found in current location: $currentLocation"
         }
         
-        # Add attachments if any
-        if ($Attachments.Count -gt 0) {
-            $mailParams.Attachments = @()
+        Add-Type -Path $mailKitPath
+        Add-Type -Path $mimeKitPath
+        
+        # Create MIME message
+        $message = New-Object MimeKit.MimeMessage
+        $message.From.Add([MimeKit.MailboxAddress]::Parse($Config.FromAddress))
+        $message.To.Add([MimeKit.MailboxAddress]::Parse($Config.ToAddress))
+        $message.Subject = $Subject
+        
+        # Create message body with HTML content
+        $bodyBuilder = New-Object MimeKit.BodyBuilder
+        $bodyBuilder.HtmlBody = $Body
+        $bodyBuilder.TextBody = [System.Text.RegularExpressions.Regex]::Replace($Body, "<[^>]*>", "")
+        
+        # Track opened streams for proper cleanup
+        $attachmentStreams = @()
+        
+        try {
+            # Add attachments if any
+            if ($Attachments.Count -gt 0) {
+                foreach ($attachmentPath in $Attachments) {
+                    if (Test-Path $attachmentPath) {
+                        $fileName = Split-Path $attachmentPath -Leaf
+                        try {
+                            $attachmentStream = [System.IO.File]::OpenRead($attachmentPath)
+                            $attachmentStreams += $attachmentStream
+                            $bodyBuilder.Attachments.Add($fileName, $attachmentStream, [MimeKit.ContentType]::Parse("application/zip"))
+                            Write-Host "  ✓ Attached: $fileName" -ForegroundColor Green
+                        } catch {
+                            Write-Host "  ⚠ Warning: Could not attach: $_" -ForegroundColor Yellow
+                        }
+                    }
+                }
+            }
+            
+            $message.Body = $bodyBuilder.ToMessageBody()
+            
+            # Send using MailKit SmtpClient with correct SSL/TLS options
+            Write-Host "Sending email via $($Config.SmtpServer):$($Config.SmtpPort)..." -ForegroundColor Cyan
+            
+            $smtpClient = New-Object MailKit.Net.Smtp.SmtpClient
+            try {
+                # Determine secure socket options based on port and config
+                $socketOptions = [MailKit.Security.SecureSocketOptions]::Auto
+                if ($Config.SmtpPort -eq 465) {
+                    $socketOptions = [MailKit.Security.SecureSocketOptions]::SslOnConnect
+                } elseif ($Config.SmtpPort -eq 587) {
+                    $socketOptions = [MailKit.Security.SecureSocketOptions]::StartTls
+                } else {
+                    $socketOptions = if ($Config.UseSsl) { 
+                        [MailKit.Security.SecureSocketOptions]::SslOnConnect 
+                    } else { 
+                        [MailKit.Security.SecureSocketOptions]::None 
+                    }
+                }
+                
+                $smtpClient.Connect($Config.SmtpServer, $Config.SmtpPort, $socketOptions)
+                $smtpClient.Authenticate($Config.Username, $Config.Password)
+                $smtpClient.Send($message)
+                $smtpClient.Disconnect($true)
+                
+                Write-Host "✓ Email sent successfully using MailKit!" -ForegroundColor Green
+            } finally {
+                if ($smtpClient -and $smtpClient.IsConnected) {
+                    $smtpClient.Disconnect($true)
+                }
+                if ($smtpClient) {
+                    $smtpClient.Dispose()
+                }
+            }
+            
+            # Clean up temporary zip files
             foreach ($attachment in $Attachments) {
-                if (Test-Path $attachment) {
-                    $mailParams.Attachments += $attachment
-                    Write-Host "  ✓ Attached: $(Split-Path $attachment -Leaf)" -ForegroundColor Green
+                if ($attachment -like "*.zip") {
+                    try {
+                        Remove-Item $attachment -Force -ErrorAction SilentlyContinue
+                        Write-Host "  ✓ Cleaned up temporary zip: $(Split-Path $attachment -Leaf)" -ForegroundColor Gray
+                    } catch {
+                        # Silent cleanup - don't fail if cleanup fails
+                    }
                 }
             }
-        }
-        
-        # Send email
-        Write-Host "Sending email via $($Config.SmtpServer)..." -ForegroundColor Cyan
-        Send-MailMessage @mailParams
-        
-        # Clean up temporary zip files
-        foreach ($attachment in $mailParams.Attachments) {
-            if ($attachment -like "*.zip") {
+            
+            return $true
+            
+        } finally {
+            # Ensure all attachment streams are disposed
+            foreach ($stream in $attachmentStreams) {
                 try {
-                    Remove-Item $attachment -Force -ErrorAction SilentlyContinue
-                    Write-Host "  ✓ Cleaned up temporary zip: $(Split-Path $attachment -Leaf)" -ForegroundColor Gray
+                    $stream.Dispose()
                 } catch {
-                    # Silent cleanup - don't fail if cleanup fails
+                    # Silently continue
                 }
             }
         }
-        
-        Write-Host "✓ Email sent successfully!" -ForegroundColor Green
-        return $true
-
         
     } catch {
         Write-Host "✗ Failed to send email: $_" -ForegroundColor Red
