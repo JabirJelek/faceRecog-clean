@@ -9,7 +9,6 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
-# Now use absolute import
 from structure import create_system, ConfigManager
 from structure import MultiSourceRealTimeProcessor
 import time

@@ -9,9 +9,8 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
-
 from structure import create_system, ConfigManager
-from structure.streaming.multi_realtime import MultiSourceRealTimeProcessor
+from structure import MultiSourceRealTimeProcessor
 import time
 import os
 from typing import Dict
@@ -23,7 +22,7 @@ def test_multi_stream_connections(sources_config: Dict[str, Dict]) -> bool:
     print(f"\n🔍 Testing multi-stream connections for {len(sources_config)} sources...")
     
     # FIXED: Use the correct module name
-    from structure.streaming.stream_manager import StreamManager
+    from structure import StreamManager
     
     successful_sources = []
     failed_sources = []
