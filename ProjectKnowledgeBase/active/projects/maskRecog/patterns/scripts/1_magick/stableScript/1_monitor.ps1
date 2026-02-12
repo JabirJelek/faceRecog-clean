@@ -1,152 +1,132 @@
-# 1_monitor.ps1
+# 1_monitor.ps1 
+
 <#
 .SYNOPSIS
 Enhanced time-based process monitor for Face Recognition pipeline with PID tracking.
-.DESCRIPTION
-Monitors face recognition worker process with enhanced resilience and state recovery.
-.NOTES
-Updated with old version's process checking structure that works.
 #>
 
+# ====================================================================
+# LOAD COMMON MODULE – always first
+# ====================================================================
+$commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
+if (-not (Test-Path $commonPathsScript)) { throw "Common paths script not found" }
+. $commonPathsScript
 
-# ====================================================================
-# CONFIGURATION: Extract all hardcoded paths for easy modification
-# ====================================================================
-$Script:HardcodedPaths = @{
-    # File paths
-    CommonPathsScript = "1_common-paths.ps1"           # Relative to PSScriptRoot
-    EmailSenderScript = "1_email-sender-stable.ps1"    # Relative to PSScriptRoot
-    
-    # Directory names
-    RunsDirectory = "runs"
-    LogsDirectory = "logs"
-    ScriptsDirectory = "scripts"
-    
-    # File names
-    WorkerScriptName = "worker.ps1"
-    PythonScriptName = "python_script.py"
-    PIDTrackingFile = "pid_tracking.json"
-    
-    # Log file patterns
-    MonitorLogPattern = "monitor_Magick_{0}.log" -f (Get-Date -Format 'yyyyMMdd_HHmmss')
-    
-    # Folder name patterns
-    DateBasedFolderPattern = "yyyy-MM-dd"
-    OutputFolderPattern = "Magick_Process_MaskDetect_*"
-}
+$centralConfig = Get-ApplicationConfig
 
 
 
 # ====================================================================
-# ENHANCED: Import common paths module with improved error handling
+# INITIALISE PATHS – single attempt, no fallback clutter
 # ====================================================================
-$commonPathsScript = Join-Path $PSScriptRoot $Script:HardcodedPaths.CommonPathsScript
-
-# Test module load into monitor
-
-if (Test-Path $commonPathsScript) {
-    try {
-        . $commonPathsScript
-        Write-Host "✓ Common paths module loaded" -ForegroundColor Green
-    } catch {
-        Write-Host "ERROR: Failed to load common paths: $_" -ForegroundColor Red
-        exit 1
-    }
-} else {
-    Write-Host "ERROR: Common paths script not found at: $commonPathsScript" -ForegroundColor Red
-    exit 1
-}
-
-# ====================================================================
-# ENHANCED: Initialize paths for monitor with fallbacks
-# ====================================================================
-Write-Host "Initializing enhanced monitor..." -ForegroundColor Cyan
-
-# Use the common paths function with monitor configuration
+Write-Host "Initialising enhanced monitor..." -ForegroundColor Cyan
 try {
     $paths = Initialize-ProjectPortablePaths -IsMonitor
-    $global:MonitorPaths = $paths
 } catch {
-    Write-Host "WARNING: Paths initialization failed, using fallbacks: $_" -ForegroundColor Yellow
-    # Create fallback paths using extracted configuration
-    $projectRoot = $PSScriptRoot
-    $paths = @{
-        ProjectRoot = $projectRoot
-        WorkerScript = Join-Path $projectRoot $Script:HardcodedPaths.WorkerScriptName
-        PythonScript = Join-Path $projectRoot $Script:HardcodedPaths.PythonScriptName
-        DateBasedPath = Join-Path $projectRoot $Script:HardcodedPaths.RunsDirectory $(Get-Date -Format $Script:HardcodedPaths.DateBasedFolderPattern)
-        PIDFilePath = Join-Path $projectRoot $Script:HardcodedPaths.PIDTrackingFile
-        LogFile = Join-Path $projectRoot $Script:HardcodedPaths.LogsDirectory $Script:HardcodedPaths.MonitorLogPattern
-    }
-    $global:MonitorPaths = $paths
+    Write-Host "FATAL: Paths initialisation failed: $_" -ForegroundColor Red
+    exit 1
 }
+$global:MonitorPaths = $paths
 
-# Update configuration with paths 
+
+# ====================================================================
+# MONITOR‑SPECIFIC CONFIG – built from central config + paths
+# ====================================================================
 $Script:Config = @{
-    # Schedule configuration
-    StartTime = "12:50"
-    EndTime = "16:34"
-    
-    # Process tracking - USING OLD VERSION'S STRUCTURE
-    PythonProcessName = "python"
-    WorkerProcessName = "powershell"
-    
-    # Worker script path - FIX: Ensure not null
-    WorkerScript = if ($paths.WorkerScript) { $paths.WorkerScript } else { 
-        Join-Path $paths.ProjectRoot $Script:HardcodedPaths.ScriptsDirectory $Script:HardcodedPaths.WorkerScriptName
-    }
-    PythonScript = $paths.PythonScript
-    
-    # Paths for validation
-    RunsBasePath = if ($paths.DateBasedPath) { $paths.DateBasedPath } else { 
-        Join-Path $paths.ProjectRoot $Script:HardcodedPaths.RunsDirectory $(Get-Date -Format $Script:HardcodedPaths.DateBasedFolderPattern)
-    }
-    OutputFolderPattern = $Script:HardcodedPaths.OutputFolderPattern
-    
-    # Expected folder structure
-    ExpectedSubfolders = @("logs", "script_output")
-    ExpectedFiles = @("metadata.json")
-    
-    # Validation settings
-    MaxValidationRetries = 5
-    RetryDelaySeconds = 10
-    
-    # Process monitoring
-    ProcessCheckInterval = if ($paths.ProcessCheckInterval) { $paths.ProcessCheckInterval } else { 5 }
-    
-    # PID tracking - FIX: Ensure not null
-    PIDFilePath = if ($paths.PIDFilePath) { $paths.PIDFilePath } else { 
-        Join-Path $paths.ProjectRoot $Script:HardcodedPaths.PIDTrackingFile
-    }
-    MaxPIDFileAgeMinutes = 120
-    
-    # Logging - FIXED: Ensure LogFile path is properly set
-    LogFile = if ($paths.LogFile) { $paths.LogFile } else { 
-        Join-Path $paths.ProjectRoot $Script:HardcodedPaths.LogsDirectory $Script:HardcodedPaths.MonitorLogPattern
-    }
-    CurrentDate = if ($paths.CurrentDate) { $paths.CurrentDate } else { Get-Date -Format $Script:HardcodedPaths.DateBasedFolderPattern }
-    ActiveDatePath = if ($paths.DateBasedPath) { $paths.DateBasedPath } else { 
-        Join-Path $paths.ProjectRoot $Script:HardcodedPaths.RunsDirectory $(Get-Date -Format $Script:HardcodedPaths.DateBasedFolderPattern)
-    }
-    
+    StartTime        = $centralConfig.EveryStartTime
+    EndTime          = $centralConfig.EveryEndTime
+    WorkerScript     = $paths.WorkerScript
+    PythonScript     = $paths.PythonScriptPath
+    RunsBasePath     = $paths.DateBasedPath
+    PIDFilePath      = $paths.PIDFilePath
+    LogFile          = $paths.LogFile
+    EmailSenders     = $paths.EmailSendScript
+    ProcessCheckInterval = $centralConfig.MonitorProcessCheckInterval
+    MaxPIDFileAgeMinutes = $centralConfig.MonitorMaxPIDFileAgeMinutes
+    ExpectedSubfolders   = $centralConfig.ExpectedSubfolders
+    ExpectedFiles        = $centralConfig.ExpectedFiles
+    MaxValidationRetries = $centralConfig.MaxValidationRetries
+    RetryDelaySeconds    = $centralConfig.RetryDelaySeconds
 }
 
 # ====================================================================
-# ENHANCED: Global variables - UPDATED WITH OLD VERSION'S TRACKING
+# SINGLETON INSTANCE LOCK – improved lock file path
+# ====================================================================
+$global:MonitorLockFile = Join-Path $env:TEMP "maskRecog_monitor_$PID.lock"
+if (Test-Path $global:MonitorLockFile) {
+    $existingPID = Get-Content $global:MonitorLockFile -ErrorAction SilentlyContinue
+    if ($existingPID) {
+        try {
+            $null = Get-Process -Id $existingPID -ErrorAction Stop
+            Write-Host "Another monitor instance is running (PID: $existingPID). Exiting." -ForegroundColor Yellow
+            exit 0
+        } catch { Remove-Item $global:MonitorLockFile -Force -ErrorAction SilentlyContinue }
+    }
+}
+$PID | Out-File $global:MonitorLockFile -Force
+
+# ====================================================================
+# LOCAL LOGGING WRAPPER – uses shared Write-CommonLog
+# ====================================================================
+function Write-Log {
+    param([string]$Message, [string]$Level = "INFO")
+    Write-CommonLog -Message $Message -Level $Level -LogFile $Script:Config.LogFile
+}
+
+
+# ====================================================================
+# GLOBAL STATE – with missing console‑handler defaults added
 # ====================================================================
 $global:WorkerProcess = $null
 $global:WorkerPID = $null
 $global:PythonPID = $null
 $global:WorkerStartTime = $null
 $global:PythonStartTime = $null
-$global:LastValidation = $null
-$global:CurrentRunFolder = $null
 $global:WorkerIsRunning = $false
 $global:PythonIsRunning = $false
 $global:LastWorkerAttempt = $null
-$global:TotalRunFolders = $null
 $global:CollectedRunFolders = @()
+$global:IsShuttingDown = $false
+$global:ForceStopWindowSeconds = 3
+$global:ForceStopThreshold = 2
+$global:ForceStopAttempts = 0
+$global:LastForceStopTime = $null
 
+# ====================================================================
+# CONSOLE CONTROL HANDLER – uses the newly defined globals
+# ====================================================================
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+public class ConsoleCtrlHandler {
+    public delegate bool ConsoleEventDelegate(int eventType);
+    [DllImport("kernel32.dll")] public static extern bool SetConsoleCtrlHandler(ConsoleEventDelegate handler, bool add);
+}
+"@
+$handler = [ConsoleCtrlHandler+ConsoleEventDelegate]{
+    param($eventType)
+    $current = Get-Date
+    $sinceLast = if ($global:LastForceStopTime) { ($current - $global:LastForceStopTime).TotalSeconds } else { [double]::MaxValue }
+    switch ($eventType) {
+        { $_ -in 0,1 } {
+            Write-Host "`n[Console] Control event detected" -ForegroundColor Yellow
+            if ($sinceLast -lt $global:ForceStopWindowSeconds) {
+                $global:ForceStopAttempts++
+                Write-Host "  Rapid attempt ($global:ForceStopAttempts/$global:ForceStopThreshold)" -ForegroundColor Yellow
+            } else { $global:ForceStopAttempts = 1 }
+            $global:LastForceStopTime = $current
+            if ($global:ForceStopAttempts -ge $global:ForceStopThreshold) {
+                Write-Host "  Force shutdown requested" -ForegroundColor Red
+                $global:IsShuttingDown = $true
+                return $true
+            }
+            Write-Host "  Press Ctrl+C again within $($global:ForceStopWindowSeconds)s to force stop." -ForegroundColor Yellow
+            return $true
+        }
+        default { return $false }
+    }
+}
+[void][ConsoleCtrlHandler]::SetConsoleCtrlHandler($handler, $true)
 
 # ====================================================================
 # CRITICAL UPDATE: Process Management Functions from OLD VERSION
@@ -230,53 +210,6 @@ function Find-PythonProcess {
     Write-Log "No Python process data available yet" -Level "DEBUG"
     return $null
 }
-
-
-
-
-# ====================================================================
-# ENHANCED: Logging function with file and console output
-# ====================================================================
-function Write-Log {
-    param(
-        [string]$Message,
-        [string]$Level = "INFO"
-    )
-    
-    $currentTimestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logEntry = "[$currentTimestamp] [$Level] $Message"
-    
-    # Write to log file
-    if ($Script:Config.LogFile) {
-        try {
-            $logDir = Split-Path $Script:Config.LogFile -Parent
-            if (-not (Test-Path $logDir)) {
-                New-Item -ItemType Directory -Path $logDir -Force | Out-Null
-            }
-            
-            Add-Content -Path $Script:Config.LogFile -Value $logEntry -ErrorAction SilentlyContinue
-        } catch {
-            # Fallback to console if file write fails
-            Write-Host "Log file write failed: $_" -ForegroundColor Yellow
-        }
-    }
-    
-    # Color-coded console output
-    switch ($Level) {
-        "ERROR" { Write-Host $logEntry -ForegroundColor Red }
-        "WARN" { Write-Host $logEntry -ForegroundColor Yellow }
-        "SUCCESS" { Write-Host $logEntry -ForegroundColor Green }
-        "DEBUG" { Write-Host $logEntry -ForegroundColor Gray }
-        "SHUTDOWN" {Write-Host $logEntry -ForegroundColor Blue} 
-        default { Write-Host $logEntry -ForegroundColor White }
-    }
-}
-
-
-
-
-
-
 
 
 
@@ -524,8 +457,8 @@ function Stop-WorkerProcess {
             $procInfo.Process.Kill()
             
             # Add waiting time for Python to stop completely
-            Write-Log "Waiting 20 seconds for Python process to stop completely..." -Level "WARN"
-            Start-Sleep -Seconds 20
+            Write-Log "Waiting 10 seconds for Python process to stop completely..." -Level "WARN"
+            Start-Sleep -Seconds 10
             
             # Wait for process to exit
             $timeout = 10 # seconds
@@ -602,12 +535,6 @@ function Stop-WorkerProcess {
     $global:WorkerStartTime = $null
     $global:PythonStartTime = $null
 
-    # # Remove PID tracking file
-    # if (Test-Path $Script:Config.PIDFilePath) {
-    #     Remove-Item -Path $Script:Config.PIDFilePath -Force -ErrorAction SilentlyContinue
-    #     Write-Log "Removed PID tracking file" -Level "DEBUG"
-    # }
-
     # Clean up communication directory
     $commPaths = Initialize-CommunicationPaths -Paths $global:MonitorPaths -IsMonitor
     if (Test-Path $commPaths.CommunicationDir) {
@@ -637,7 +564,7 @@ function Initialize-EmailReporting {
     Write-Log "Initializing email reporting..." -Level "INFO"
     
     # Load email sender script
-    $emailSenderScript = Join-Path $PSScriptRoot $Script:HardcodedPaths.EmailSenderScript
+    $emailSenderScript = $Script:Config.EmailSenders
     if (Test-Path $emailSenderScript) {
         try {
             # Clear any existing functions to avoid conflicts
@@ -702,12 +629,12 @@ function Invoke-EmailReport {
             Write-Log "Invoke-StableEmailReport function not available, attempting to load email sender..." -Level "WARN"
             
             # Try to re-initialize
-            $emailScript = Join-Path $PSScriptRoot $Script:HardcodedPaths.EmailSenderScript
-            if (Test-Path $emailScript) {
-                . $emailScript
+            $emailTestScript = $Script:Config.EmailSenders
+            if (Test-Path $emailTestScript) {
+                . $emailTestScript
                 Write-Log "Email sender script reloaded" -Level "INFO"
             } else {
-                Write-Log "ERROR: Email sender script not found at: $emailScript" -Level "ERROR"
+                Write-Log "ERROR: Email sender script not found at: $emailTestScript" -Level "ERROR"
                 return $false
             }
         }
@@ -795,8 +722,9 @@ function Find-LatestRunFolder {
     }
 }
 
+
 # ====================================================================
-# UPDATED: Enhanced Validate-Output Function
+# VALIDATION – now uses shared functions, no duplicate definitions
 # ====================================================================
 function Validate-Output {
     param(
@@ -805,98 +733,39 @@ function Validate-Output {
         [DateTime]$CollectionStart = $null,
         [DateTime]$CollectionEnd = $null
     )
-    
-    Write-Log "Validating face recognition output structure..." -Level "INFO"
-    
-    # If CollectAll is specified, use the new collection method
     if ($CollectAll) {
-        Write-Log "Using enhanced collection mode for all runs in time window" -Level "INFO"
-        
-        # Determine time window
-        if (-not $CollectionStart) {
-            $CollectionStart = [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.StartTime, "yyyy-MM-dd HH:mm", $null)
-        }
-        if (-not $CollectionEnd) {
-            $CollectionEnd = [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.EndTime, "yyyy-MM-dd HH:mm", $null)
-        }
-        
-        # Collect and validate all runs
-        $collectionResults = Collect-RunsFromTimeWindow -StartTime $CollectionStart -EndTime $CollectionEnd
-        
-        # Return comprehensive results
+        $start = $CollectionStart ?? [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.StartTime, "yyyy-MM-dd HH:mm", $null)
+        $end   = $CollectionEnd   ?? [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.EndTime,   "yyyy-MM-dd HH:mm", $null)
+        $collected = Collect-RunsFromTimeWindow -BasePath $Script:Config.RunsBasePath -WindowStart $start -WindowEnd $end -ValidateEach
+        $global:CollectedRunFolders = $collected
+        $valid = ($collected | Where-Object { $_.Status -eq "VALID" }).Count
+        $invalid = ($collected | Where-Object { $_.Status -eq "INVALID" }).Count
         return @{
-            Success = ($collectionResults.InvalidRuns -eq 0)
+            Success = ($invalid -eq 0)
             Mode = "COLLECT_ALL"
-            CollectionResults = $collectionResults
-            TotalRuns = $collectionResults.TotalRuns
-            ValidRuns = $collectionResults.ValidRuns
-            InvalidRuns = $collectionResults.InvalidRuns
-            Error = if ($collectionResults.InvalidRuns -gt 0) { "$($collectionResults.InvalidRuns) invalid runs found" } else { $null }
+            CollectionResults = @{ TotalRuns = $collected.Count; ValidRuns = $valid; InvalidRuns = $invalid }
+            TotalRuns = $collected.Count
+            ValidRuns = $valid
+            InvalidRuns = $invalid
         }
-    }
-    
-    # Original single-folder validation logic (for backward compatibility)
-    $runFolder = Find-LatestRunFolder
-    
-    if (-not $runFolder) {
-        if ($RetryCount -lt $Script:Config.MaxValidationRetries) {
-            Write-Log "No output folder found. Retrying..." -Level "WARN"
-            Start-Sleep -Seconds $Script:Config.RetryDelaySeconds
-            return Validate-Output -RetryCount ($RetryCount + 1)
-        } else {
-            Write-Log "VALIDATION FAILED: No output folder found" -Level "ERROR"
-            return @{
-                Success = $false
-                Mode = "SINGLE"
-                Error = "No output folder created"
-                RunFolder = $null
-            }
-        }
-    }
-    
-    $global:CurrentRunFolder = $runFolder.FullName
-    
-    # Use the integrated validation function if available
-    $validationResult = if (Get-Command -Name "Validate-RunFolder-Integrated" -ErrorAction SilentlyContinue) {
-        Validate-RunFolder-Integrated -FolderPath $runFolder.FullName
     } else {
-        # Simple fallback validation
-        $missing = @()
-        foreach ($subfolder in $Script:Config.ExpectedSubfolders) {
-            if (-not (Test-Path (Join-Path $runFolder.FullName $subfolder))) {
-                $missing += $subfolder
+        $folder = Get-LatestRunFolder -BasePath $Script:Config.RunsBasePath
+        if (-not $folder) {
+            if ($RetryCount -lt $Script:Config.MaxValidationRetries) {
+                Start-Sleep -Seconds $Script:Config.RetryDelaySeconds
+                return Validate-Output -RetryCount ($RetryCount+1)
             }
+            return @{ Success = $false; Mode = "SINGLE"; Error = "No output folder created" }
         }
-        foreach ($file in $Script:Config.ExpectedFiles) {
-            if (-not (Test-Path (Join-Path $runFolder.FullName $file))) {
-                $missing += $file
-            }
+        $validation = Test-RunFolder -FolderPath $folder.FullName
+        $global:CurrentRunFolder = $folder.FullName
+        return @{
+            Success = $validation.Success
+            Mode = "SINGLE"
+            RunFolder = $folder.FullName
+            FolderName = $folder.Name
+            ValidationDetails = $validation
         }
-        
-        @{
-            Success = ($missing.Count -eq 0)
-            RunFolder = $runFolder.FullName
-            FolderName = $runFolder.Name
-            CreationTime = $runFolder.CreationTime
-            MissingItems = $missing
-            Errors = @()
-        }
-    }
-    
-    # Summary
-    if ($validationResult.Success) {
-        Write-Log "VALIDATION SUCCESS: Folder structure complete" -Level "SUCCESS"
-    } else {
-        Write-Log "VALIDATION FAILED" -Level "ERROR"
-    }
-    
-    return @{
-        Success = $validationResult.Success
-        Mode = "SINGLE"
-        RunFolder = $validationResult.RunFolder
-        FolderName = $validationResult.FolderName
-        ValidationDetails = $validationResult
-        Error = if (-not $validationResult.Success) { "Validation failed" } else { $null }
     }
 }
 
@@ -1190,260 +1059,102 @@ function Initialize-RunCollection {
 
  
 # ====================================================================
-# MAIN EXECUTION - UPDATED WITH OLD VERSION'S RELIABILITY
+# MAIN EXECUTION – streamlined
 # ====================================================================
-
 try {
-    # Create log directory if it doesn't exist
+    # Create log directory
     if ($Script:Config.LogFile) {
-        $logDir = Split-Path $Script:Config.LogFile -Parent
-        if (-not (Test-Path $logDir)) {
-            New-Item -ItemType Directory -Path $logDir -Force | Out-Null
-        }
+        $null = New-Item -ItemType Directory -Path (Split-Path $Script:Config.LogFile -Parent) -Force
     }
-    
+
     Write-Log "=== Enhanced Face Recognition Monitor Started ===" -Level "INFO"
-    Write-Log "Version: 2.1 (Updated with old version's process checking)" -Level "INFO"
+    Write-Log "Version: 2.1 (Cleaned structure)" -Level "INFO"
     Write-Log "Start Time: $($Script:Config.StartTime)" -Level "INFO"
     Write-Log "End Time: $($Script:Config.EndTime)" -Level "INFO"
-    Write-Log "Log File: $($Script:Config.LogFile)" -Level "INFO"
-    
+
     # Ensure runs base path exists
-    if ($Script:Config.RunsBasePath -and -not (Test-Path $Script:Config.RunsBasePath)) {
-        Write-Log "Creating runs base directory" -Level "WARN"
+    if (-not (Test-Path $Script:Config.RunsBasePath)) {
         New-Item -ItemType Directory -Path $Script:Config.RunsBasePath -Force | Out-Null
     }
-    
-    # Clear console for clean display
-    #Clear-Host
 
-    # Add to main try block (before the monitoring loop):
+    # Initialise email and run‑collection (no duplicate function definitions)
     $emailReportingInitialized = Initialize-EmailReporting
+    # No need to call Initialize-RunCollection – functions now in common module
 
-    # Add to main try block (before the monitoring loop):
-    $runCollectionInitialized = Initialize-RunCollection
-
-    # Quick test of email function availability
-    $emailTestScript = Join-Path $PSScriptRoot $Script:HardcodedPaths.EmailSenderScript
-    if (Test-Path $emailTestScript) {
-        try {
-            . $emailTestScript
-            Write-Host "✓ Email sender functions pre-loaded" -Level "SUCCESS"
-        } catch {
-            Write-Host "⚠ Email sender pre-load failed (may load later): $_" -Level "WARN"
-        }
-    }
-    # Main monitoring loop with OLD VERSION'S reliability
-    Write-Log "Entering enhanced monitoring loop..." -Level "INFO"
-    
-    
-    # Check if we're already past end time
-    $now = Get-Date
+    # Determine if we are already past end time
     $today = Get-Date -Format "yyyy-MM-dd"
     $startDateTime = [DateTime]::ParseExact("$today $($Script:Config.StartTime)", "yyyy-MM-dd HH:mm", $null)
-    $endDateTime = [DateTime]::ParseExact("$today $($Script:Config.EndTime)", "yyyy-MM-dd HH:mm", $null)
-    
-    Write-Log "Current time: $($now.ToString('yyyy-MM-dd HH:mm:ss'))" -Level "INFO"
-    Write-Log "Monitor window: $($startDateTime.ToString('HH:mm')) to $($endDateTime.ToString('HH:mm'))" -Level "INFO"
-    
-    if ($now -gt $endDateTime) {
+    $endDateTime   = [DateTime]::ParseExact("$today $($Script:Config.EndTime)",   "yyyy-MM-dd HH:mm", $null)
+
+    if ((Get-Date) -gt $endDateTime) {
         Write-Log "Current time is past end time. Starting immediate shutdown and validation." -Level "WARN"
         $monitoringActive = $false
-        
-        # Validate runs from the window that just passed
-        Write-Log "Validating runs from completed time window..." -Level "INFO"
         $global:LastValidation = Validate-Output -CollectAll -CollectionStart $startDateTime -CollectionEnd $endDateTime
-        
-        if ($global:LastValidation.TotalRuns -gt 0) {
-            Write-Log "Found $($global:LastValidation.TotalRuns) runs in time window" -Level "INFO"
-        }
     } else {
         $monitoringActive = $true
         Write-Log "Monitoring window: $($startDateTime.ToString('HH:mm:ss')) to $($endDateTime.ToString('HH:mm:ss'))" -Level "INFO"
-    }  
-
+    }
 
     while ($monitoringActive) {
         try {
-            # OLD VERSION'S PROCESS CHECKING LOGIC
             $processStatus = Check-ProcessStatus
-            
             $startPassed = Test-TimeWindow -TargetTime $Script:Config.StartTime
-            $endPassed = Test-TimeWindow -TargetTime $Script:Config.EndTime
-            
-            # FIXED: Correct syntax for boolean condition
-            if ($startPassed -and (-not $endPassed)) {
-                $inWindow = $true
-            } else {
-                $inWindow = $false
-            }
-            
-            $currentTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-            
-            # Show status banner every 10 seconds
-            $currentSecond = (Get-Date).Second
-            if ($currentSecond % 10 -eq 0) {
+            $endPassed   = Test-TimeWindow -TargetTime $Script:Config.EndTime
+            $inWindow = $startPassed -and (-not $endPassed)
+
+            # Status banner every 10 seconds
+            if ((Get-Date).Second % 10 -eq 0) {
                 Write-Host "================================================" -ForegroundColor Cyan
                 Write-Host "    FACE RECOGNITION MONITOR" -ForegroundColor Cyan
                 Write-Host "================================================" -ForegroundColor Cyan
-                Write-Host "Time: $currentTime | Schedule: $($Script:Config.StartTime)-$($Script:Config.EndTime)" -ForegroundColor Yellow
+                Write-Host "Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') | Schedule: $($Script:Config.StartTime)-$($Script:Config.EndTime)" -ForegroundColor Yellow
                 Write-Host "Status: $(if ($inWindow) {'ACTIVE'} else {'WAITING'})" -ForegroundColor $(if ($inWindow) {'Green'} else {'Yellow'})
                 Write-Host "Python: $(if ($processStatus.PythonRunning) {'RUNNING'} else {'STOPPED'})" -ForegroundColor $(if ($processStatus.PythonRunning) {'Green'} else {'Red'})
                 Write-Host "Worker: $(if ($processStatus.WorkerRunning) {'RUNNING'} else {'STOPPED'})" -ForegroundColor $(if ($processStatus.WorkerRunning) {'Green'} else {'Red'})
                 Write-Host "================================================" -ForegroundColor Cyan
             }
-            
-            Write-Log "Check: $currentTime | Window: $(if ($inWindow) {'Active'} else {'Inactive'}) | Worker: $(if ($processStatus.WorkerRunning) {'Running'} else {'Stopped'}) | Python: $(if ($processStatus.PythonRunning) {'Running'} else {'Stopped'})" -Level "DEBUG"
-            
-            # OLD VERSION'S LOGIC: Check if we should start worker
+
+            # Start worker if needed
             if ($inWindow -and (-not $processStatus.PythonRunning)) {
-                Write-Log "Time window active and no Python process running - starting worker..." -Level "WARN"
-                
-                if ($global:LastWorkerAttempt -and ((Get-Date) - $global:LastWorkerAttempt).TotalSeconds -lt 60) {
-                    Write-Log "Skipping worker start - too soon after last attempt" -Level "DEBUG"
-                } else {
+                if (-not $global:LastWorkerAttempt -or ((Get-Date) - $global:LastWorkerAttempt).TotalSeconds -ge 60) {
                     $started = Start-WorkerProcess
                     $global:LastWorkerAttempt = Get-Date
-                    
-                    if ($started) {
-                        Write-Log "Worker started. Monitoring Python process..." -Level "SUCCESS"
-                    } else {
-                        Write-Log "Failed to start worker process" -Level "ERROR"
-                    }
+                    if ($started) { Write-Log "Worker started." -Level "SUCCESS" }
                 }
             }
-            
-            # In the main monitoring loop, update the end-time section:
+
+            # End time reached
             elseif ($endPassed) {
-                Write-Log "End time reached - initiating shutdown sequence..." -Level "SHUTDOWN"
-                
+                Write-Log "End time reached – shutting down." -Level "SHUTDOWN"
                 if ($processStatus.PythonRunning -or $processStatus.WorkerRunning) {
-                    Write-Log "Stopping running processes..." -Level "INFO"
                     Stop-WorkerProcess
-                    # Add waiting time after stopping processes
-                    Write-Log "Waiting 20 seconds for processes to stop completely..." -Level "WARN"
-                    Start-Sleep -Seconds 20
+                    Start-Sleep -Seconds 10   # allow graceful exit
                 }
-                
-                # FIX: Define window variables here
-                $today = Get-Date -Format "yyyy-MM-dd"
-                $windowStart = [DateTime]::ParseExact("$today $($Script:Config.StartTime)", "yyyy-MM-dd HH:mm", $null)
-                $windowEnd = [DateTime]::ParseExact("$today $($Script:Config.EndTime)", "yyyy-MM-dd HH:mm", $null)
-                
-                Write-Log "Time window for validation: $($windowStart.ToString('HH:mm')) to $($windowEnd.ToString('HH:mm'))" -Level "INFO"
-                Write-Log "Current time: $(Get-Date -Format 'HH:mm:ss')" -Level "INFO"
-                
-                # ENHANCED: Validate ALL runs from start to end time
-                Write-Log "Validating ALL runs from today's monitoring window..." -Level "INFO"
-                $global:LastValidation = Validate-Output -CollectAll -CollectionStart $windowStart -CollectionEnd $windowEnd
-                
-                if ($global:LastValidation.TotalRuns -gt 0) {
-                    if ($global:LastValidation.InvalidRuns -eq 0) {
-                        Write-Log "All runs validation successful: $($global:LastValidation.ValidRuns)/$($global:LastValidation.TotalRuns) valid" -Level "SUCCESS"
-                    } else {
-                        Write-Log "Validation issues found: $($global:LastValidation.InvalidRuns) invalid runs" -Level "WARN"
-                    }
-                } else {
-                    Write-Log "No runs found in the specified time window" -Level "INFO"
-                    $global:LastValidation.Success = $true  # Treat no runs as success
+                $global:LastValidation = Validate-Output -CollectAll -CollectionStart $startDateTime -CollectionEnd $endDateTime
+                if ($emailReportingInitialized) {
+                    Invoke-EmailReport -Force
                 }
-                
-                # Send final email report for the day
-                if ($emailReportingInitialized -or $global:StableEmailSender) {
-                    Write-Log "Sending final daily email report..." -Level "INFO"
-                    
-                    # Double-check the function exists
-                    if (Get-Command -Name "Invoke-EmailReport" -ErrorAction SilentlyContinue) {
-                        Invoke-EmailReport -Force
-                    } else {
-                        Write-Log "ERROR: Invoke-EmailReport function not available" -Level "ERROR"
-                    }
-                } else {
-                    Write-Log "Email reporting not initialized, skipping final report" -Level "WARN"
-                }
-                
-                Write-Log "Daily process completed. Stopping monitor..." -Level "INFO"
                 $monitoringActive = $false
                 break
             }
-                
 
-            
-            # # If we're in the window and processes should be running, verify health
-            # if ($inWindow -and $processStatus.WorkerRunning) {
-            #     # Send periodic heartbeat request to worker
-            #     $commPaths = Initialize-CommunicationPaths -Paths $paths -IsMonitor
-            #     if ((Get-Date).Second % 15 -eq 0) {
-            #         $workerHealth = Check-WorkerHealth
-            #         if (-not $workerHealth) {
-            #             Write-Log "Worker health check failed. Attempting to restart..." -Level "WARN"
-            #             Stop-WorkerProcess
-            #             Start-Sleep -Seconds 2
-            #             Start-WorkerProcess
-            #         }
-            #     }
-            # }
-            
-            # FIX: Ensure ProcessCheckInterval is not null
-            $sleepInterval = if ($Script:Config.ProcessCheckInterval) { 
-                $Script:Config.ProcessCheckInterval 
-            } else { 
-                15  # Default value
-            }
-            
-            Start-Sleep -Seconds $sleepInterval
-            
+            Start-Sleep -Seconds $Script:Config.ProcessCheckInterval
         } catch {
             Write-Log "Error in main loop: $_" -Level "ERROR"
-            Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
-            
-            # FIX: Use default sleep interval on error
+            Write-Log $_.ScriptStackTrace -Level "DEBUG"
             Start-Sleep -Seconds 15
         }
     }
-}
-catch {
+} catch {
     Write-Log "FATAL ERROR: $_" -Level "ERROR"
-    Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
-}
-finally {
+} finally {
     Write-Log "Cleaning up..." -Level "INFO"
-    
-    # Stop any running processes
     Stop-WorkerProcess
-    
-    Write-Log "=== Enhanced Face Recognition Monitor Stopped ===" -Level "INFO"
-    
-    # Final console output
-    Write-Host ""
-    Write-Host "================================================" -ForegroundColor Cyan
+    if (Test-Path $global:MonitorLockFile) { Remove-Item $global:MonitorLockFile -Force }
+    Write-Log "=== Monitor Stopped ===" -Level "INFO"
+    Write-Host "`n================================================" -ForegroundColor Cyan
     Write-Host "MONITOR STOPPED" -ForegroundColor Yellow
-    Write-Host "================================================" -ForegroundColor Cyan
-    
-    if ($Script:Config.LogFile) {
-        Write-Host "Log file: $($Script:Config.LogFile)" -ForegroundColor White
-    }
-    
-    # Handle new validation format
-    if ($global:LastValidation) {
-        if ($global:LastValidation.Mode -eq "COLLECT_ALL") {
-            Write-Host "Run validation on every created folder:" -ForegroundColor White
-            Write-Host "  Total Folder Created: $($global:TotalRunFolders.Count)" -ForegroundColor White
-            Write-Host "  Full Data: $($global:LastValidation.ValidRuns)" -ForegroundColor Green
-            if ($global:LastValidation.InvalidRuns -gt 0) {
-                Write-Host "  Invalid runs: $($global:LastValidation.InvalidRuns)" -ForegroundColor Red
-            }
-        } else {
-            if ($global:LastValidation.Success) {
-                Write-Host "Last run validation: SUCCESS" -ForegroundColor Green
-                Write-Host "  Folder: $($global:LastValidation.FolderName)" -ForegroundColor White
-            } else {
-                Write-Host "Last run validation: FAILED" -ForegroundColor Red
-                Write-Host "  Error: $($global:LastValidation.Error)" -ForegroundColor White
-            }
-        }
-    }
-    
-    Write-Host "Collected Folder with full data: $($global:CollectedRunFolders.Count)" -ForegroundColor White
+    Write-Host "Log file: $($Script:Config.LogFile)" -ForegroundColor White
+    Write-Host "Collected folders with full data: $($global:CollectedRunFolders.Count)" -ForegroundColor White
     Write-Host "================================================" -ForegroundColor Cyan
 }

@@ -1,4 +1,5 @@
-# 1_worker_portable.ps1
+# 1_worker_portable.ps1 
+
 <#
 .SYNOPSIS
 Worker script for face recognition pipeline
@@ -6,30 +7,20 @@ Worker script for face recognition pipeline
 Basic worker script that just runs Python
 #>
 
-# ======================= CONFIGURABLE PATHS =======================
-# Extract hardcoded values for easy modification
-$COMMON_PATHS_SCRIPT_NAME = "1_common-paths.ps1"
-$RUN_FOLDER_PREFIX = "Magick_Process_MaskDetect_"
-$LOG_SUBFOLDER_NAME = "logs"
-$OUTPUT_SUBFOLDER_NAME = "script_output"
-$METADATA_FILENAME = "metadata.json"
-$PYTHON_OUTPUT_FILENAME_PREFIX = "python_output_"
-$COMPLETION_SUMMARY_FILENAME = "completion_summary.txt"
-$PYTHON_ARGUMENT = "--multi-source"
-# ===============================================================
-
 try {
     Write-Host "=== WORKER SCRIPT STARTING ===" -ForegroundColor Cyan
     Write-Host "Worker PID: $PID" -ForegroundColor Yellow
     
-    # Load common paths
-    $commonPathsScript = Join-Path $PSScriptRoot $COMMON_PATHS_SCRIPT_NAME
+    # Load common paths and central config
+    $commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
     if (-not (Test-Path $commonPathsScript)) {
         throw "Common paths script not found: $commonPathsScript"
     }
     
     . $commonPathsScript
     Write-Host "Common paths script loaded" -ForegroundColor Green
+    
+    $appConfig = Get-ApplicationConfig   # load central configuration
     
     # Initialize paths
     $paths = Initialize-ProjectPortablePaths -IsWorker -Silent
@@ -40,6 +31,15 @@ try {
     $PYTHON_EXE = $paths.PythonExe
     $PYTHON_SCRIPT = $paths.PythonScript
     $RUNS_BASE_PATH = $paths.DateBasedPath
+    
+    # Centralised constants
+    $RUN_FOLDER_PREFIX          = $appConfig.WorkerRunFolderPrefix
+    $LOG_SUBFOLDER_NAME        = $appConfig.WorkerLogSubfolder
+    $OUTPUT_SUBFOLDER_NAME     = $appConfig.WorkerOutputSubfolder
+    $METADATA_FILENAME         = $appConfig.WorkerMetadataFile
+    $PYTHON_OUTPUT_FILENAME_PREFIX = $appConfig.WorkerPythonOutputPrefix
+    $COMPLETION_SUMMARY_FILENAME = $appConfig.WorkerCompletionSummary
+    $PYTHON_ARGUMENT           = $appConfig.WorkerPythonArgument
     
     Write-Host "Python executable: $PYTHON_EXE" -ForegroundColor Green
     Write-Host "Python script: $PYTHON_SCRIPT" -ForegroundColor Green

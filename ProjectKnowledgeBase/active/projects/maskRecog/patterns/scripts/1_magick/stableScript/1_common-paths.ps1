@@ -1,4 +1,4 @@
-# 1_common-paths.ps1
+# 1_common-paths.ps1 
 
 <#
 .SYNOPSIS
@@ -17,13 +17,13 @@ $Script:CommonConfig = @{
     DateTimeFormat = "yyyy-MM-dd_HH-mm-ss"
     LogDateTimeFormat = "yyyy-MM-dd HH:mm:ss"
     
-    # ====================== EXTRACTED FILE PATHS ======================
     # File paths for monitor script
     MonitorFilePaths = @{
         WorkerScript = "patterns\scripts\1_magick\stableScript\1_worker_portable.ps1"
         PythonScriptPath = "patterns\algorithm\entry_multi-USED-Magick.py"
         PIDFileName = "monitor_pid_Magick.json"
         LogFileName = "monitor_Magick.log"
+        EmailSendScript = "patterns\scripts\1_magick\stableScript\1_email-sender-stable.ps1"
     }
     
     # File paths for worker script
@@ -38,6 +38,66 @@ $Script:CommonConfig = @{
         WorkerPIDFileName = "worker_pid.txt"
         WorkerStatusFileName = "worker_status.json"
     }
+}
+
+# ====================================================================
+# NEW: Centralised Application Configuration
+# ====================================================================
+$Script:ApplicationConfig = @{
+    # ---------------------- Monitor Settings ----------------------
+    EveryStartTime       = "12:50"
+    EveryEndTime         = "17:10"
+    MonitorProcessCheckInterval = 5
+    MonitorMaxPIDFileAgeMinutes = 120
+    MonitorPIDTrackingFile = "pid_tracking.json"
+    MonitorLogPattern      = "monitor_Magick_{0}.log"
+    
+    # ---------------------- Worker Settings ----------------------
+    WorkerRunFolderPrefix  = "Magick_Process_MaskDetect_"
+    WorkerLogSubfolder     = "logs"
+    WorkerOutputSubfolder  = "script_output"
+    WorkerMetadataFile     = "metadata.json"
+    WorkerPythonOutputPrefix = "python_output_"
+    WorkerCompletionSummary = "completion_summary.txt"
+    WorkerPythonArgument   = "--multi-source"
+    
+    # ---------------------- Email Sender Settings ----------------
+    EmailCredentialPath    = "$env:USERPROFILE\.face-recog\email-credential.xml"
+    EmailRunFolderFilter   = "Magick_Process_MaskDetect_*"
+    EmailCompletionSummaryFile = "completion_summary.txt"
+    EmailMetadataFile      = "metadata.json"
+    EmailLogsFolder        = "logs"
+    EmailLogFileFilter     = "*.txt"
+    EmailCommonPathsScript = "1_common-paths.ps1"
+    EmailMaxRunsToCollect  = 10
+    EmailDefaultHoursBack  = 24
+    EmailMaxAttachmentSizeMB = 3
+    EmailSmtpServer        = "smtp.gmail.com"
+    EmailSmtpPort          = 587
+    EmailUseSsl            = $true
+    EmailSubjectPrefix     = "[FaceRecog]"
+    EmailSenderScript      = "1_email-sender-stable.ps1"
+    
+    # ---------------------- Capture Script Settings --------------
+    # CaptureStartTime       = "10:00"
+    # CaptureEndTime         = "11:04"
+    CaptureRunsDirectory   = "runs"
+    CaptureLogsDirectory   = "logs"
+    CaptureOutputFolderPattern = "Magick_Process_MaskDetect_*"
+    CaptureLogFilePattern  = "capture_collected_runs_{0}.log"
+    CaptureDateFormat      = "yyyy-MM-dd"
+    CaptureDateTimeFormat  = "yyyy-MM-dd HH:mm"
+    CaptureFileTimestampFormat = "yyyyMMdd_HHmmss"
+    
+    # ---------------------- Shared Validation Settings -----------
+    ExpectedSubfolders     = @("logs", "script_output")
+    ExpectedFiles          = @("metadata.json")
+    MaxValidationRetries   = 5
+    RetryDelaySeconds      = 10
+}
+
+function Get-ApplicationConfig {
+    return $Script:ApplicationConfig
 }
 
 # ====================================================================
@@ -158,6 +218,7 @@ function Add-ScriptSpecificPaths {
         $Paths.PIDFilePath = Join-Path $DateBasedPath $Script:CommonConfig.MonitorFilePaths.PIDFileName
         $Paths.LogFile = Join-Path $DateBasedPath $Script:CommonConfig.MonitorFilePaths.LogFileName
         $Paths.PythonExe = Join-Path $Paths.VenvRoot $Script:CommonConfig.CommonFilePaths.PythonExe
+        $paths.EmailSendScript = Join-Path $Paths.ProjectRoot $Script:CommonConfig.MonitorFilePaths.EmailSendScript
     }
     
     if ($IsWorker) {
@@ -260,46 +321,119 @@ function Release-Lock {
     return $true
 }
 
-function Write-Log {
+function Write-CommonLog {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string]$Message,
         [string]$Level = "INFO",
         [string]$LogFile,
         [switch]$NoConsole
     )
-    
-    $currentTimestamp = Get-Date -Format $Script:CommonConfig.LogDateTimeFormat
-    $logEntry = "[$currentTimestamp] [$Level] $Message"
-    
-    if ($LogFile -and (-not [string]::IsNullOrEmpty($LogFile))) {
-        try {
-            $logDir = Split-Path $LogFile -Parent
-            if (-not (Test-Path $logDir)) {
-                New-Item -ItemType Directory -Path $logDir -Force | Out-Null
-            }
-            Add-Content -Path $LogFile -Value $logEntry -ErrorAction Stop
-        } catch {
-            if (-not $NoConsole) {
-                Write-Host "Log file write failed: $_" -ForegroundColor Yellow
-            }
-        }
+    $timestamp = Get-Date -Format $Script:CommonConfig.LogDateTimeFormat
+    $entry = "[$timestamp] [$Level] $Message"
+    if ($LogFile) {
+        $dir = Split-Path $LogFile -Parent
+        if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+        Add-Content -Path $LogFile -Value $entry -ErrorAction SilentlyContinue
     }
-    
     if (-not $NoConsole) {
-        $color = switch ($Level) {
-            "ERROR"   { "Red" }
-            "WARN"    { "Yellow" }
-            "SUCCESS" { "Green" }
-            "DEBUG"   { "Gray" }
-            default   { "White" }
-        }
-        Write-Host $logEntry -ForegroundColor $color
+        $color = @{ ERROR='Red'; WARN='Yellow'; SUCCESS='Green'; DEBUG='Gray'; SHUTDOWN='Blue' }[$Level]
+        Write-Host $entry -ForegroundColor ($color ?? 'White')
     }
-    
-    return $logEntry
 }
+
+# ====================================================================
+# SHARED VALIDATION & COLLECTION – NEW / MOVED HERE
+# ====================================================================
+function Test-RunFolder {
+    [CmdletBinding()]
+    param(
+        [string]$FolderPath,
+        [switch]$Detailed
+    )
+    $cfg = Get-ApplicationConfig
+    $result = @{
+        Success = $false
+        FolderPath = $FolderPath
+        FolderName = Split-Path $FolderPath -Leaf
+        CreationTime = $null
+        MissingItems = @()
+        Errors = @()
+        Warnings = @()
+        Details = @{}
+    }
+    try {
+        $folder = Get-Item -Path $FolderPath -ErrorAction Stop
+        $result.CreationTime = $folder.CreationTime
+        foreach ($sub in $cfg.ExpectedSubfolders) {
+            if (-not (Test-Path (Join-Path $FolderPath $sub))) {
+                $result.MissingItems += $sub
+                $result.Warnings += "Missing subfolder: $sub"
+            }
+        }
+        foreach ($file in $cfg.ExpectedFiles) {
+            if (-not (Test-Path (Join-Path $FolderPath $file))) {
+                $result.MissingItems += $file
+                $result.Warnings += "Missing file: $file"
+            }
+        }
+        $result.Success = ($result.MissingItems.Count -eq 0) -and ($result.Errors.Count -eq 0)
+    } catch {
+        $result.Errors += "Error validating folder: $_"
+    }
+    return $result
+}
+
+function Get-RunFoldersInWindow {
+    [CmdletBinding()]
+    param(
+        [string]$BasePath,
+        [DateTime]$WindowStart,
+        [DateTime]$WindowEnd,
+        [string]$FolderFilter = (Get-ApplicationConfig).WorkerRunFolderPrefix
+    )
+    if (-not (Test-Path $BasePath)) { return @() }
+    $folders = Get-ChildItem -Path $BasePath -Directory -Filter "$FolderFilter*" -ErrorAction SilentlyContinue |
+               Where-Object { $_.CreationTime -ge $WindowStart -and $_.CreationTime -le $WindowEnd }
+    return $folders
+}
+
+function Get-LatestRunFolder {
+    [CmdletBinding()]
+    param(
+        [string]$BasePath,
+        [string]$FolderFilter = (Get-ApplicationConfig).WorkerRunFolderPrefix
+    )
+    if (-not (Test-Path $BasePath)) { return $null }
+    return Get-ChildItem -Path $BasePath -Directory -Filter "$FolderFilter*" -ErrorAction SilentlyContinue |
+           Sort-Object CreationTime -Descending | Select-Object -First 1
+}
+
+function Collect-RunsFromTimeWindow {
+    [CmdletBinding()]
+    param(
+        [string]$BasePath,
+        [DateTime]$WindowStart,
+        [DateTime]$WindowEnd,
+        [switch]$ValidateEach
+    )
+    $runs = Get-RunFoldersInWindow -BasePath $BasePath -WindowStart $WindowStart -WindowEnd $WindowEnd
+    $collected = @()
+    foreach ($run in $runs) {
+        $validation = if ($ValidateEach) { Test-RunFolder -FolderPath $run.FullName } else { $null }
+        $collected += @{
+            Folder       = $run.FullName
+            Name         = $run.Name
+            CreationTime = $run.CreationTime
+            Validation   = $validation
+            Status       = if ($validation -and $validation.Success) { "VALID" } elseif ($validation) { "INVALID" } else { "COLLECTED" }
+        }
+    }
+    return $collected
+}
+
+
 
 # ====================================================================
 # Communication Functions (Basic)

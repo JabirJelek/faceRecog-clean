@@ -1,124 +1,61 @@
-# 1_capture-collected-runs.ps1
+ # 1_capture-collected-runs.ps1  
 
 <#
 .SYNOPSIS
 Captures and validates all run folders created between start and end times.
-
-.DESCRIPTION
-Collects run folders created during the monitoring window and validates each one.
-This ensures that even if the worker process stops suddenly, all runs are captured.
+Now uses shared functions from 1_common-paths.ps1.
 #>
 
+# ====================================================================
+# Configuration – loaded from 1_common-paths.ps1
+# ====================================================================
+$commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
+if (-not (Test-Path $commonPathsScript)) { throw "Common paths script not found" }
+. $commonPathsScript
+
+$appConfig = Get-ApplicationConfig
 
 # ====================================================================
-# Configuration and Setup
+# SCRIPT‑SCOPED CONFIG
 # ====================================================================
-
-# Centralized path configuration
-$Script:PathConfig = @{
-    # Base directories
-    ProjectRootRelativePath = ".."  # Relative path to project root from script location
-    RunsDirectory = "runs"          # Base runs directory name
-    LogsDirectory = "logs"          # Base logs directory name
-    
-    # File and folder patterns
-    OutputFolderPattern = "Magick_Process_MaskDetect_*"
-    LogFilePattern = "capture_collected_runs_{0}.log"
-    
-    # Default date format
-    DateFormat = "yyyy-MM-dd"
-    DateTimeFormat = "yyyy-MM-dd HH:mm"
-    FileTimestampFormat = "yyyyMMdd_HHmmss"
-}
-
 $Script:Config = @{
-    # Time window for collection
-    StartTime = "10:00"
-    EndTime = "11:04"
-    
-    # Paths - will be set by Initialize-Paths
+    StartTime    = $appConfig.EveryStartTime
+    EndTime      = $appConfig.EveryEndTime
     RunsBasePath = $null
-    LogFile = $null
-    
-    # Validation settings
-    ExpectedSubfolders = @("logs", "script_output")
-    ExpectedFiles = @("metadata.json")
+    LogFile      = $null
 }
 
+
 # ====================================================================
-# Initialize Paths 
+# PATH INITIALISATION
 # ====================================================================
 function Initialize-Paths {
-    param(
-        [string]$DateString = (Get-Date -Format $Script:PathConfig.DateFormat)
-    )
-    
-    try {
-        # Get project root (adjust as needed)
-        $projectRoot = if ($PSScriptRoot) {
-            Join-Path $PSScriptRoot $Script:PathConfig.ProjectRootRelativePath
-        } else {
-            $PWD.Path
-        }
-        
-        # Build paths using centralized configuration
-        $Script:Config.RunsBasePath = Join-Path $projectRoot `
-            $Script:PathConfig.RunsDirectory `
-            $DateString
-        
-        # Create log directory using centralized configuration
-        $logDir = Join-Path $projectRoot $Script:PathConfig.LogsDirectory
-        if (-not (Test-Path $logDir)) {
-            New-Item -ItemType Directory -Path $logDir -Force | Out-Null
-        }
-        
-        # Set log file path using pattern from configuration
-        $logFileName = $Script:PathConfig.LogFilePattern -f `
-            (Get-Date -Format $Script:PathConfig.FileTimestampFormat)
-        $Script:Config.LogFile = Join-Path $logDir $logFileName
-        
-        return $true
-    } catch {
-        Write-Error "Failed to initialize paths: $_"
-        return $false
-    }
+    $dateStr = Get-Date -Format $appConfig.CaptureDateFormat
+    $projectRoot = if ($PSScriptRoot) { Join-Path $PSScriptRoot ".." } else { $PWD.Path }
+    $Script:Config.RunsBasePath = Join-Path $projectRoot $appConfig.CaptureRunsDirectory $dateStr
+    $logDir = Join-Path $projectRoot $appConfig.CaptureLogsDirectory
+    if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force | Out-Null }
+    $logFileName = $appConfig.CaptureLogFilePattern -f (Get-Date -Format $appConfig.CaptureFileTimestampFormat)
+    $Script:Config.LogFile = Join-Path $logDir $logFileName
+    return $true
 }
 
+
+
 # ====================================================================
-# Logging Function
+# LOCAL LOGGING WRAPPER
 # ====================================================================
 function Write-CaptureLog {
-    param(
-        [string]$Message,
-        [string]$Level = "INFO"
-    )
-    
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logEntry = "[$timestamp] [$Level] $Message"
-    
-    # Write to console with colors
-    switch ($Level) {
-        "ERROR" { Write-Host $logEntry -ForegroundColor Red }
-        "WARN" { Write-Host $logEntry -ForegroundColor Yellow }
-        "SUCCESS" { Write-Host $logEntry -ForegroundColor Green }
-        "INFO" { Write-Host $logEntry -ForegroundColor Cyan }
-        default { Write-Host $logEntry -ForegroundColor White }
-    }
-    
-    # Write to log file
-    try {
-        Add-Content -Path $Script:Config.LogFile -Value $logEntry -ErrorAction SilentlyContinue
-    } catch {
-        Write-Host "Failed to write to log file: $_" -ForegroundColor Yellow
-    }
+    param([string]$Message, [string]$Level = "INFO")
+    Write-CommonLog -Message $Message -Level $Level -LogFile $Script:Config.LogFile
 }
 
+
 # ====================================================================
-# Time Window Functions
+# TIME CONVERSION
 # ====================================================================
 function Convert-ToDateTime {
     param([string]$TimeString)
-    
     try {
         $today = Get-Date -Format "yyyy-MM-dd"
         return [DateTime]::ParseExact("$today $TimeString", "yyyy-MM-dd HH:mm", $null)
@@ -246,89 +183,41 @@ function Validate-RunFolder {
 }
 
 # ====================================================================
-# Main Collection Function
+# MAIN COLLECTION – now uses shared functions
 # ====================================================================
 function Capture-CollectedRuns {
-    param(
-        [DateTime]$WindowStart,
-        [DateTime]$WindowEnd
-    )
-    
+    param([DateTime]$WindowStart, [DateTime]$WindowEnd)
     Write-CaptureLog "Starting run collection..." -Level "INFO"
-    Write-CaptureLog "Time window: $($WindowStart.ToString('HH:mm')) to $($WindowEnd.ToString('HH:mm'))" -Level "INFO"
-    
-    $collectedRuns = @()
-    
-    try {
-        # Check if runs base path exists
-        if (-not (Test-Path $Script:Config.RunsBasePath)) {
-            Write-CaptureLog "Runs base path does not exist: $($Script:Config.RunsBasePath)" -Level "WARN"
-            return $collectedRuns
-        }
-        
-        # Get all run folders matching the pattern
-        $allRunFolders = Get-ChildItem -Path $Script:Config.RunsBasePath -Directory -Filter $Script:Config.OutputFolderPattern -ErrorAction SilentlyContinue
-        
-        if (-not $allRunFolders) {
-            Write-CaptureLog "No run folders found in: $($Script:Config.RunsBasePath)" -Level "WARN"
-            return $collectedRuns
-        }
-        
-        Write-CaptureLog "Found $($allRunFolders.Count) total run folders" -Level "INFO"
-        
-        # Filter folders within time window
-        $windowRuns = $allRunFolders | Where-Object {
-            Is-WithinTimeWindow -CheckTime $_.CreationTime -WindowStart $WindowStart -WindowEnd $WindowEnd
-        }
-        
-        Write-CaptureLog "$($windowRuns.Count) runs within specified time window" -Level "INFO"
-        
-        # Validate each folder
-        foreach ($runFolder in $windowRuns) {
-            Write-CaptureLog "Processing: $($runFolder.Name) (Created: $($runFolder.CreationTime.ToString('HH:mm:ss')))" -Level "INFO"
-            
-            $validationResult = Validate-RunFolder -FolderPath $runFolder.FullName -Detailed:$true
-            
-            # Add to collected runs
-            $collectedRuns += @{
-                Folder = $runFolder.FullName
-                Name = $runFolder.Name
-                CreationTime = $runFolder.CreationTime
-                Validation = $validationResult
-                Status = if ($validationResult.Success) { "VALID" } else { "INVALID" }
-            }
-            
-            # Log summary
-            if ($validationResult.Success) {
-                Write-CaptureLog "✓ Collected: $($runFolder.Name)" -Level "SUCCESS"
-            } else {
-                Write-CaptureLog "✗ Issues found in: $($runFolder.Name)" -Level "WARN"
-            }
-        }
-        
-    } catch {
-        Write-CaptureLog "Error during run collection: $_" -Level "ERROR"
+    if (-not (Test-Path $Script:Config.RunsBasePath)) {
+        Write-CaptureLog "Runs base path does not exist: $($Script:Config.RunsBasePath)" -Level "WARN"
+        return @()
     }
-    
-    return $collectedRuns
+    $collected = Collect-RunsFromTimeWindow -BasePath $Script:Config.RunsBasePath `
+                                            -WindowStart $WindowStart `
+                                            -WindowEnd $WindowEnd `
+                                            -ValidateEach
+    foreach ($run in $collected) {
+        if ($run.Status -eq "VALID") {
+            Write-CaptureLog "✓ Collected: $($run.Name)" -Level "SUCCESS"
+        } else {
+            Write-CaptureLog "✗ Issues found: $($run.Name)" -Level "WARN"
+        }
+    }
+    return $collected
 }
+
 
 # ====================================================================
 # Summary Reporting
 # ====================================================================
 function Show-CollectionSummary {
-    param(
-        [array]$CollectedRuns
-    )
-    
+    param([array]$CollectedRuns)
+    $valid   = ($CollectedRuns | Where-Object { $_.Status -eq "VALID" }).Count
+    $invalid = ($CollectedRuns | Where-Object { $_.Status -eq "INVALID" }).Count
     Write-CaptureLog "`n=== COLLECTION SUMMARY ===" -Level "INFO"
     Write-CaptureLog "Total runs collected: $($CollectedRuns.Count)" -Level "INFO"
-    
-    $validRuns = $CollectedRuns | Where-Object { $_.Status -eq "VALID" }
-    $invalidRuns = $CollectedRuns | Where-Object { $_.Status -eq "INVALID" }
-    
-    Write-CaptureLog "Valid runs: $($validRuns.Count)" -Level "SUCCESS"
-    Write-CaptureLog "Invalid runs: $($invalidRuns.Count)" -Level $(if ($invalidRuns.Count -gt 0) { "WARN" } else { "INFO" })
+    Write-CaptureLog "Valid runs: $valid" -Level "SUCCESS"
+    Write-CaptureLog "Invalid runs: $invalid" -Level $(if ($invalid -gt 0) { "WARN" } else { "INFO" })
     
     # Show invalid runs details
     if ($invalidRuns.Count -gt 0) {
@@ -354,12 +243,7 @@ function Show-CollectionSummary {
     $sizeMB = [math]::Round($totalSize / 1MB, 2)
     Write-CaptureLog "Total data collected: $sizeMB MB" -Level "INFO"
     
-    return @{
-        TotalRuns = $CollectedRuns.Count
-        ValidRuns = $validRuns.Count
-        InvalidRuns = $invalidRuns.Count
-        TotalSizeMB = $sizeMB
-    }
+    return @{ TotalRuns = $CollectedRuns.Count; ValidRuns = $valid; InvalidRuns = $invalid }
 }
 
 # ====================================================================
@@ -400,48 +284,24 @@ function Start-RunCollection {
         [string]$EndTime = $null,
         [string]$ExportTo = $null
     )
-    
     Write-CaptureLog "=== Run Collection Script Started ===" -Level "INFO"
-    Write-CaptureLog "Script Version: 1.0" -Level "INFO"
-    
-    # Initialize paths
-    if (-not (Initialize-Paths)) {
-        Write-CaptureLog "Failed to initialize paths. Exiting." -Level "ERROR"
-        return
-    }
-    
-    # Use provided times or config defaults
-    $collectionStart = if ($StartTime) { Convert-ToDateTime $StartTime } else { Convert-ToDateTime $Script:Config.StartTime }
-    $collectionEnd = if ($EndTime) { Convert-ToDateTime $EndTime } else { Convert-ToDateTime $Script:Config.EndTime }
-    
-    if (-not $collectionStart -or -not $collectionEnd) {
-        Write-CaptureLog "Invalid time window specified. Exiting." -Level "ERROR"
-        return
-    }
-    
-    # Capture runs
-    $collectedRuns = Capture-CollectedRuns -WindowStart $collectionStart -WindowEnd $collectionEnd
-    
-    # Show summary
-    $summary = Show-CollectionSummary -CollectedRuns $collectedRuns
-    
-    # Export if requested
-    if ($ExportTo) {
-        Export-CollectedRuns -CollectedRuns $collectedRuns -ExportPath $ExportTo
-    }
-    
+    if (-not (Initialize-Paths)) { return }
+    $start = if ($StartTime) { Convert-ToDateTime $StartTime } else { Convert-ToDateTime $Script:Config.StartTime }
+    $end   = if ($EndTime)   { Convert-ToDateTime $EndTime }   else { Convert-ToDateTime $Script:Config.EndTime }
+    if (-not $start -or -not $end) { return }
+    $collected = Capture-CollectedRuns -WindowStart $start -WindowEnd $end
+    $summary = Show-CollectionSummary -CollectedRuns $collected
+    if ($ExportTo) { Export-CollectedRuns -CollectedRuns $collected -ExportPath $ExportTo }
     Write-CaptureLog "=== Run Collection Completed ===" -Level "INFO"
-    
-    return $collectedRuns
+    return $collected
 }
+
 
 # ====================================================================
 # Export functions for use in monitor
 # ====================================================================
 if ($MyInvocation.InvocationName -ne '.') {
-    # If script is run directly
     Start-RunCollection
 } else {
-    # If script is dot-sourced, export the functions
-    Export-ModuleMember -Function Start-RunCollection, Validate-RunFolder, Show-CollectionSummary
+    Export-ModuleMember -Function Start-RunCollection, Test-RunFolder, Show-CollectionSummary
 }

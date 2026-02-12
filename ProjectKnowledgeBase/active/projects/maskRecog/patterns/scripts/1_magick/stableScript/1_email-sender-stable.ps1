@@ -1,49 +1,33 @@
-# 1_email-sender-stable.ps1
+# 1_email-sender-stable.ps1 (updated)
+
 <#
 .SYNOPSIS
 Stable email sender for face recognition run reports
-.DESCRIPTION
-Collects run completion summaries and sends them via email
 #>
 
 # ====================================================================
-# CONFIGURATION - MODIFY THESE VALUES AS NEEDED
+# CONFIGURATION – LOADED FROM 1_common-paths.ps1
 # ====================================================================
-$ScriptConfig = @{
-    # Credentials file location
-    CredentialPath = "$env:USERPROFILE\.face-recog\email-credential.xml"
-    
-    # Run folder naming pattern
-    RunFolderFilter = "Magick_Process_MaskDetect_*"
-    
-    # File and folder names
-    CompletionSummaryFile = "completion_summary.txt"
-    MetadataFile = "metadata.json"
-    LogsFolder = "logs"
-    LogFileFilter = "*.txt"
-    
-    # Common paths script (if used)
-    CommonPathsScript = "1_common-paths.ps1"
-    
-    # Default collection settings
-    MaxRunsToCollect = 10
-    DefaultHoursBack = 24
-    MaxAttachmentSizeMB = 3
-}
+$commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
+if (-not (Test-Path $commonPathsScript)) { throw "Common paths script not found" }
+. $commonPathsScript
+
+$appConfig = Get-ApplicationConfig
 
 # ====================================================================
-# Email Configuration - Loaded from credentials or environment
+# Email Configuration (sensitive parts remain local)
 # ====================================================================
 $EmailConfig = @{
-    SmtpServer = "smtp.gmail.com"
-    SmtpPort = 587
-    UseSsl = $true
-    Username = ""
-    Password = ""
-    FromAddress = ""
-    ToAddress = ""
-    SubjectPrefix = "[FaceRecog]"
+    SmtpServer   = $appConfig.EmailSmtpServer
+    SmtpPort     = $appConfig.EmailSmtpPort
+    UseSsl       = $appConfig.EmailUseSsl
+    Username     = ""   # loaded from credential file
+    Password     = ""   # loaded from credential file
+    FromAddress  = ""   # loaded from credential file
+    ToAddress    = ""   # loaded from credential file
+    SubjectPrefix = $appConfig.EmailSubjectPrefix
 }
+
 
 # ====================================================================
 # Initialize Email Configuration
@@ -51,10 +35,9 @@ $EmailConfig = @{
 function Initialize-EmailConfig {
     [CmdletBinding()]
     param(
-        [string]$CredentialPath = $ScriptConfig.CredentialPath,
+        [string]$CredentialPath = $appConfig.EmailCredentialPath,
         [hashtable]$OverrideConfig = @{}
     )
-    
     Write-Host "Initializing email configuration..." -ForegroundColor Cyan
     
     # Check if credentials file exists
@@ -112,11 +95,10 @@ function Initialize-EmailConfig {
 # Collect Run Summaries
 # ====================================================================
 function Get-RunSummaries {
-    [CmdletBinding()]
     param(
         [string]$BasePath,
         [datetime]$Since,
-        [int]$MaxRuns = $ScriptConfig.MaxRunsToCollect,
+        [int]$MaxRuns = $appConfig.EmailMaxRunsToCollect,
         [DateTime]$ScheduleStart = $null,
         [DateTime]$ScheduleEnd = $null,
         [switch]$TimeWindowMode = $false
@@ -126,7 +108,7 @@ function Get-RunSummaries {
     
     try {
         # Find all run folders
-        $runFolders = Get-ChildItem -Path $BasePath -Directory -Filter $ScriptConfig.RunFolderFilter -ErrorAction SilentlyContinue | 
+        $runFolders = Get-ChildItem -Path $BasePath -Directory -Filter $appConfig.EmailRunFolderFilter -ErrorAction SilentlyContinue | 
             Sort-Object CreationTime -Descending |
             Select-Object -First $MaxRuns
         
@@ -149,12 +131,12 @@ function Get-RunSummaries {
             
             # Check if folder was created after the specified time
             if ($folder.CreationTime -ge $Since) {
-                $summaryPath = Join-Path $folder.FullName "$($ScriptConfig.LogsFolder)\$($ScriptConfig.CompletionSummaryFile)"
+                $summaryPath = Join-Path $folder.FullName "$($appConfig.EmailLogsFolder)\$($appConfig.EmailCompletionSummaryFile)"
                 $hasSummary = Test-Path $summaryPath
                 
                 # Get metadata if available
                 $metadata = $null
-                $metadataPath = Join-Path $folder.FullName $ScriptConfig.MetadataFile
+                $metadataPath = Join-Path $folder.FullName $appConfig.EmailMetadataFile
                 $hasMetadata = Test-Path $metadataPath
                 
                 if ($hasMetadata) {
@@ -208,9 +190,9 @@ function Get-RunSummaries {
                 }
                 
                 # Find log files (even if no summary, we might still have logs)
-                $logDir = Join-Path $folder.FullName $ScriptConfig.LogsFolder
+                $logDir = Join-Path $folder.FullName $appConfig.EmailLogsFolder
                 if (Test-Path $logDir) {
-                    $logFiles = Get-ChildItem -Path $logDir -File -Filter $ScriptConfig.LogFileFilter -ErrorAction SilentlyContinue
+                    $logFiles = Get-ChildItem -Path $logDir -File -Filter $appConfig.EmailLogFileFilter -ErrorAction SilentlyContinue
                     foreach ($logFile in $logFiles) {
                         $sizeInKB = [math]::Round($logFile.Length / 1KB, 2)
                         $summary.LogFiles += @{
@@ -623,7 +605,7 @@ function Send-RunReport {
     }
     
     # Determine time range based on mode
-    $since = (Get-Date).AddHours(-$ScriptConfig.DefaultHoursBack)  # Default: last 24 hours
+    $since = (Get-Date).AddHours(-$appConfig.EmailDefaultHoursBack)  # Default: last 24 hours
     
     # If using schedule time window, parse the times
     $windowStart = $null
@@ -639,7 +621,7 @@ function Send-RunReport {
             Write-Host "  End: $ScheduleEndTime" -ForegroundColor White
             Write-Host "  Window: $($windowStart.ToString('HH:mm')) to $($windowEnd.ToString('HH:mm'))" -ForegroundColor White
         } catch {
-            Write-Host "Warning: Failed to parse schedule times. Using default $($ScriptConfig.DefaultHoursBack)-hour window." -ForegroundColor Yellow
+            Write-Host "Warning: Failed to parse schedule times. Using default $($appConfig.EmailDefaultHoursBack)-hour window." -ForegroundColor Yellow
             Write-Host "  Error: $_" -ForegroundColor Red
             $UseTimeWindow = $false
         }
@@ -647,7 +629,8 @@ function Send-RunReport {
     
     # Collect run summaries
     Write-Host "Collecting run summaries from: $BasePath" -ForegroundColor Cyan
-    $summaries = Get-RunSummaries -BasePath $BasePath -Since $since -MaxRuns $ScriptConfig.MaxRunsToCollect `
+    $summaries = Get-RunSummaries -BasePath $BasePath -Since $since `
+        -MaxRuns $appConfig.EmailMaxRunsToCollect `   # <-- FIXED: $ScriptConfig -> $appConfig
         -ScheduleStart $windowStart -ScheduleEnd $windowEnd -TimeWindowMode:$UseTimeWindow
     
     if ($summaries.Count -eq 0) {
@@ -684,7 +667,7 @@ function Send-RunReport {
     # Prepare attachments - only attach from runs that have data
     $attachments = @()
     $totalSize = 0
-    $maxSize = $ScriptConfig.MaxAttachmentSizeMB * 1024 * 1024  # Convert MB to bytes
+    $maxSize = $appConfig.EmailMaxAttachmentSizeMB * 1024 * 1024  # Convert MB to bytes
     
     # Calculate counts correctly
     $summaryCount = ($summaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
@@ -762,23 +745,20 @@ function Send-RunReport {
 # Monitor Integration Functions
 # ====================================================================
 function Register-StableEmailSender {
-    [CmdletBinding()]
     param(
         [hashtable]$MonitorConfig,
         [hashtable]$CustomEmailConfig = @{}
     )
-    
-    # Create global email sender object
     $global:StableEmailSender = @{
-        Config = $CustomEmailConfig
-        LastSent = $null
-        MonitorConfig = $MonitorConfig
-        Enabled = $true
-        CredentialPath = $ScriptConfig.CredentialPath
+        Config         = $CustomEmailConfig
+        LastSent       = $null
+        MonitorConfig  = $MonitorConfig
+        Enabled        = $true
+        CredentialPath = $appConfig.EmailCredentialPath   # <-- FIXED: was $ScriptConfig.CredentialPath
     }
-    
     return $true
 }
+
 
 function Invoke-StableEmailReport {
     [CmdletBinding()]
@@ -850,7 +830,7 @@ if ($MyInvocation.InvocationName -ne '.') {
     Write-Host ""
     
     # Get base path from common paths
-    $commonPathsScript = Join-Path $PSScriptRoot $ScriptConfig.CommonPathsScript
+    $commonPathsScript = Join-Path $PSScriptRoot $appConfig.EmailCommonPathsScript
     if (Test-Path $commonPathsScript) {
         try {
             . $commonPathsScript
