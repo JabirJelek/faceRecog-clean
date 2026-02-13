@@ -28,11 +28,11 @@ $Script:HardcodedPaths = @{
     PIDTrackingFile = "pid_tracking.json"
     
     # Log file patterns
-    MonitorLogPattern = "monitor_Laptop_{0}.log" -f (Get-Date -Format 'yyyyMMdd_HHmmss')
+    MonitorLogPattern = "monitor_CPU_{0}.log" -f (Get-Date -Format 'yyyyMMdd_HHmmss')
     
     # Folder name patterns
     DateBasedFolderPattern = "yyyy-MM-dd"
-    OutputFolderPattern = "Laptop_Process_MaskDetect_*"
+    OutputFolderPattern = "CPU_Process_MaskDetect_*"
 }
 
 
@@ -84,8 +84,8 @@ try {
 # Update configuration with paths 
 $Script:Config = @{
     # Schedule configuration
-    StartTime = "09:47"
-    EndTime = "09:49"
+    StartTime = "15:50"
+    EndTime = "16:55"
     
     # Process tracking - USING OLD VERSION'S STRUCTURE
     PythonProcessName = "python"

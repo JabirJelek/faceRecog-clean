@@ -14,7 +14,7 @@ $ScriptConfig = @{
     CredentialPath = "$env:USERPROFILE\.face-recog\email-credential.xml"
     
     # Run folder naming pattern
-    RunFolderFilter = "Laptop_Process_MaskDetect_*"
+    RunFolderFilter = "CPU_Process_MaskDetect_*"
     
     # File and folder names
     CompletionSummaryFile = "completion_summary.txt"

@@ -12,7 +12,7 @@ Handles portable path discovery and date-based folder creation
 # ====================================================================
 $Script:CommonConfig = @{
     ProjectName = "maskRecog"
-    LogBasePath = "logs-running\laptop"
+    LogBasePath = "logs-running\cpu"
     DateFormat = "yyyy-MM-dd"
     DateTimeFormat = "yyyy-MM-dd_HH-mm-ss"
     LogDateTimeFormat = "yyyy-MM-dd HH:mm:ss"
@@ -20,15 +20,15 @@ $Script:CommonConfig = @{
     # ====================== EXTRACTED FILE PATHS ======================
     # File paths for monitor script
     MonitorFilePaths = @{
-        WorkerScript = "patterns\scripts\1_laptop\stableScript\1_worker_portable.ps1"
-        PythonScriptPath = "patterns\algorithm\entry_multi-USED-Laptop.py"
-        PIDFileName = "monitor_pid_Laptop.json"
-        LogFileName = "monitor_Laptop.log"
+        WorkerScript = "patterns\scripts\1_cpu\stableScript\1_worker_portable.ps1"
+        PythonScriptPath = "patterns\algorithm\entry_multi-USED-CPU.py"
+        PIDFileName = "monitor_pid_CPU.json"
+        LogFileName = "monitor_CPU.log"
     }
     
     # File paths for worker script
     WorkerFilePaths = @{
-        PythonScript = "patterns\algorithm\entry_multi-USED-Laptop.py"
+        PythonScript = "patterns\algorithm\entry_multi-USED-CPU.py"
     }
     
     # Common file paths
@@ -127,13 +127,13 @@ function Initialize-DateBasedStructure {
     param([hashtable]$Paths)
     
     # Create base folder
-    $laptopBasePath = Join-Path $Paths.ActiveRoot $Script:CommonConfig.LogBasePath
-    if (-not (Test-Path $laptopBasePath)) {
-        New-Item -ItemType Directory -Path $laptopBasePath -Force | Out-Null
+    $cpuBasePath = Join-Path $Paths.ActiveRoot $Script:CommonConfig.LogBasePath
+    if (-not (Test-Path $cpuBasePath)) {
+        New-Item -ItemType Directory -Path $cpuBasePath -Force | Out-Null
     }
     
     # Create date-specific folder
-    $dateBasedPath = Join-Path $laptopBasePath $Paths.CurrentDate
+    $dateBasedPath = Join-Path $cpuBasePath $Paths.CurrentDate
     if (-not (Test-Path $dateBasedPath)) {
         New-Item -ItemType Directory -Path $dateBasedPath -Force | Out-Null
     }

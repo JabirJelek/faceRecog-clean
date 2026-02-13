@@ -9,7 +9,7 @@ Basic worker script that just runs Python
 # ======================= CONFIGURABLE PATHS =======================
 # Extract hardcoded values for easy modification
 $COMMON_PATHS_SCRIPT_NAME = "1_common-paths.ps1"
-$RUN_FOLDER_PREFIX = "Laptop_Process_MaskDetect_"
+$RUN_FOLDER_PREFIX = "CPU_Process_MaskDetect_"
 $LOG_SUBFOLDER_NAME = "logs"
 $OUTPUT_SUBFOLDER_NAME = "script_output"
 $METADATA_FILENAME = "metadata.json"

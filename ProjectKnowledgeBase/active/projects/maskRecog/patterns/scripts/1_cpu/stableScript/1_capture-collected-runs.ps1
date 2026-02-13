@@ -22,7 +22,7 @@ $Script:PathConfig = @{
     LogsDirectory = "logs"          # Base logs directory name
     
     # File and folder patterns
-    OutputFolderPattern = "Laptop_Process_MaskDetect_*"
+    OutputFolderPattern = "CPU_Process_MaskDetect_*"
     LogFilePattern = "capture_collected_runs_{0}.log"
     
     # Default date format
