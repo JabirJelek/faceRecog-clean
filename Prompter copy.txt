@@ -8,54 +8,12 @@
 
 #### Instructions
 
-Provide cleanup of the structure. Maintain the debug, and critical changes of the core structure
+check the structure of the codebase.
 
 
+#### Debug of the codebase 
 
-
-
-
-
-#### Debug of the codebase
-
-
-
-
-#### Debug of the codebase
-
-[2026-02-13 08:57:00] [INFO] Starting worker process...
-[2026-02-13 08:57:00] [SUCCESS] Worker process started (PID: 7152)
-[2026-02-13 08:57:02] [DEBUG] Worker Output: === WORKER SCRIPT STARTING ===
-[2026-02-13 08:57:02] [DEBUG] Worker Output: Worker PID: 7152
-[2026-02-13 08:57:02] [DEBUG] Worker Output: ERROR: At C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\stableScript\1_common-paths.ps1:342 char:52
-[2026-02-13 08:57:02] [DEBUG] Worker Output: +         Write-Host $entry -ForegroundColor ($color ?? 'White')
-[2026-02-13 08:57:02] [DEBUG] Worker Output: +                                                    ~~
-[2026-02-13 08:57:02] [DEBUG] Worker Output: At C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\stableScript\1_common-paths.ps1:342 char:51
-[2026-02-13 08:57:02] [DEBUG] Worker Output: +         Write-Host $entry -ForegroundColor ($color ?? 'White')
-[2026-02-13 08:57:02] [DEBUG] Worker Output: +                                                   ~
-[2026-02-13 08:57:02] [DEBUG] Worker Output: Missing closing ')' in expression.
-[2026-02-13 08:57:02] [DEBUG] Worker Output: At C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\stableScript\1_common-paths.ps1:340 char:26
-[2026-02-13 08:57:02] [DEBUG] Worker Output: +     if (-not $NoConsole) {
-[2026-02-13 08:57:02] [DEBUG] Worker Output: +                          ~
-[2026-02-13 08:57:02] [ERROR] Worker process exited immediately with code: 1
-[2026-02-13 08:57:02] [DEBUG] Worker Output: Missing closing '}' in statement block or type definition.
-[2026-02-13 08:57:02] [DEBUG] Worker Output: At C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\stableScript\1_common-paths.ps1:324 char:26
-[2026-02-13 08:57:02] [DEBUG] Worker Output: + function Write-CommonLog {
-[2026-02-13 08:57:02] [DEBUG] Worker Output: +                          ~
-[2026-02-13 08:57:02] [DEBUG] Worker Output: Missing closing '}' in statement block or type definition.
-[2026-02-13 08:57:02] [DEBUG] Worker Output: At C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\stableScript\1_common-paths.ps1:342 char:62
-[2026-02-13 08:57:02] [DEBUG] Worker Output: +         Write-Host $entry -ForegroundColor ($color ?? 'White')
-[2026-02-13 08:57:02] [DEBUG] Worker Output: +                                                              ~
-[2026-02-13 08:57:02] [DEBUG] Worker Output: Unexpected token ')' in expression or statement.
-[2026-02-13 08:57:02] [DEBUG] Worker Output: At C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\stableScript\1_common-paths.ps1:343 char:5
-[2026-02-13 08:57:02] [DEBUG] Worker Output: +     }
-[2026-02-13 08:57:02] [DEBUG] Worker Output: +     ~
-[2026-02-13 08:57:02] [DEBUG] Worker Output: Unexpected token '}' in expression or statement.
-[2026-02-13 08:57:02] [DEBUG] Worker Output: At C:\raihan\dokumen\project\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_towerCPU\stableScript\1_common-paths.ps1:344 char:1
-[2026-02-13 08:57:02] [DEBUG] Worker Output: + }
-[2026-02-13 08:57:02] [DEBUG] Worker Output: + ~
-[2026-02-13 08:57:02] [DEBUG] Worker Output: Unexpected token '}' in expression or statement.
-[2026-02-13 08:57:02] [DEBUG] Worker Output: Unexpected token '??' in expression or statement.
+currently, the system still 
 
 
 #### Tips
@@ -100,13 +58,7 @@ https://learn.microsoft.com/en-us/powershell/
 
 
 
-
-
-
-
-
-# 1_worker_portable.ps1 
-
+# 1_worker-portable.ps1
 <#
 .SYNOPSIS
 Worker script for face recognition pipeline
@@ -118,7 +70,6 @@ try {
     Write-Host "=== WORKER SCRIPT STARTING ===" -ForegroundColor Cyan
     Write-Host "Worker PID: $PID" -ForegroundColor Yellow
     
-    # Load common paths and central config
     $commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
     if (-not (Test-Path $commonPathsScript)) {
         throw "Common paths script not found: $commonPathsScript"
@@ -127,9 +78,8 @@ try {
     . $commonPathsScript
     Write-Host "Common paths script loaded" -ForegroundColor Green
     
-    $appConfig = Get-ApplicationConfig   # load central configuration
+    $appConfig = Get-ApplicationConfig
     
-    # Initialize paths
     $paths = Initialize-ProjectPortablePaths -IsWorker -Silent
     if (-not $paths) {
         throw "Failed to initialize paths"
@@ -139,7 +89,6 @@ try {
     $PYTHON_SCRIPT = $paths.PythonScript
     $RUNS_BASE_PATH = $paths.DateBasedPath
     
-    # Centralised constants
     $RUN_FOLDER_PREFIX          = $appConfig.WorkerRunFolderPrefix
     $LOG_SUBFOLDER_NAME        = $appConfig.WorkerLogSubfolder
     $OUTPUT_SUBFOLDER_NAME     = $appConfig.WorkerOutputSubfolder
@@ -151,7 +100,6 @@ try {
     Write-Host "Python executable: $PYTHON_EXE" -ForegroundColor Green
     Write-Host "Python script: $PYTHON_SCRIPT" -ForegroundColor Green
     
-    # Validate paths
     if (-not (Test-Path $PYTHON_EXE)) {
         throw "Python executable not found: $PYTHON_EXE"
     }
@@ -160,7 +108,6 @@ try {
         throw "Python script not found: $PYTHON_SCRIPT"
     }
     
-    # Create run folder
     $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
     $runFolder = Join-Path $RUNS_BASE_PATH "$RUN_FOLDER_PREFIX$timestamp"
     Write-Host "Creating run folder: $runFolder" -ForegroundColor Yellow
@@ -169,7 +116,6 @@ try {
     New-Item -ItemType Directory -Path (Join-Path $runFolder $LOG_SUBFOLDER_NAME) -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $runFolder $OUTPUT_SUBFOLDER_NAME) -Force | Out-Null
     
-    # Create metadata
     $metadata = @{
         run_id = $timestamp
         start_time = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -181,13 +127,11 @@ try {
     
     $metadata | ConvertTo-Json | Out-File (Join-Path $runFolder $METADATA_FILENAME)
     
-    # Run Python
     Write-Host "Starting Python script..." -ForegroundColor Cyan
     
     $pythonOutputFile = Join-Path $runFolder "$LOG_SUBFOLDER_NAME\${PYTHON_OUTPUT_FILENAME_PREFIX}${timestamp}.txt"
     $workingDir = Join-Path $runFolder $OUTPUT_SUBFOLDER_NAME
     
-    # Start Python process
     $processInfo = New-Object System.Diagnostics.ProcessStartInfo
     $processInfo.FileName = $PYTHON_EXE
     $processInfo.Arguments = "`"$PYTHON_SCRIPT`" $PYTHON_ARGUMENT"
@@ -204,11 +148,9 @@ try {
         $pythonPID = $pythonProcess.Id
         Write-Host "Python process started (PID: $pythonPID)" -ForegroundColor Green
         
-        # Update metadata
         $metadata.python_pid = $pythonPID
         $metadata | ConvertTo-Json | Out-File (Join-Path $runFolder $METADATA_FILENAME) -Force
         
-        # Wait for completion
         Write-Host "Waiting for Python to complete..." -ForegroundColor Yellow
         
         $output = $pythonProcess.StandardOutput.ReadToEnd()
@@ -217,7 +159,6 @@ try {
         
         $exitCode = $pythonProcess.ExitCode
         
-        # Write output
         $output | Out-File $pythonOutputFile -Force
         if ($errorOutput) {
             $errorOutput | Out-File $pythonOutputFile -Append
@@ -225,13 +166,24 @@ try {
         
         Write-Host "Python completed with exit code: $exitCode" -ForegroundColor $(if ($exitCode -eq 0) { "Green" } else { "Red" })
         
-        # Create summary
+        # --- Add end_time to metadata and update the file ---
+        $metadata.end_time = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        $metadata | ConvertTo-Json | Out-File (Join-Path $runFolder $METADATA_FILENAME) -Force
+        
+        # --- Enhanced summary with explicit end time and duration ---
+        $start = [datetime]::ParseExact($metadata.start_time, "yyyy-MM-dd HH:mm:ss", $null)
+        $end   = [datetime]::ParseExact($metadata.end_time,   "yyyy-MM-dd HH:mm:ss", $null)
+        $duration = $end - $start
+        $durationStr = "{0:hh\:mm\:ss}" -f $duration   # format as HH:MM:SS
+        
         $summary = @"
-Run completed: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
-Exit code: $exitCode
-Run folder: $runFolder
-Worker PID: $PID
-Python PID: $pythonPID
+Run started:  $($metadata.start_time)
+Run ended:    $($metadata.end_time)
+Duration:     $durationStr
+Exit code:    $exitCode
+Run folder:   $runFolder
+Worker PID:   $PID
+Python PID:   $pythonPID
 "@
         
         $summary | Out-File (Join-Path $runFolder "$LOG_SUBFOLDER_NAME\$COMPLETION_SUMMARY_FILENAME")
@@ -247,15 +199,14 @@ Python PID: $pythonPID
     exit 1
 }
 
-# 1_monitor.ps1 
-
+# 1_monitor.ps1
 <#
 .SYNOPSIS
 Enhanced time-based process monitor for Face Recognition pipeline with PID tracking.
 #>
 
 # ====================================================================
-# LOAD COMMON MODULE – always first
+# LOAD COMMON MODULE
 # ====================================================================
 $commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
 if (-not (Test-Path $commonPathsScript)) { throw "Common paths script not found" }
@@ -263,10 +214,8 @@ if (-not (Test-Path $commonPathsScript)) { throw "Common paths script not found"
 
 $centralConfig = Get-ApplicationConfig
 
-
-
 # ====================================================================
-# INITIALISE PATHS – single attempt, no fallback clutter
+# INITIALISE PATHS
 # ====================================================================
 Write-Host "Initialising enhanced monitor..." -ForegroundColor Cyan
 try {
@@ -277,9 +226,8 @@ try {
 }
 $global:MonitorPaths = $paths
 
-
 # ====================================================================
-# MONITOR‑SPECIFIC CONFIG – built from central config + paths
+# MONITOR‑SPECIFIC CONFIG
 # ====================================================================
 $Script:Config = @{
     StartTime        = $centralConfig.EveryStartTime
@@ -290,6 +238,7 @@ $Script:Config = @{
     PIDFilePath      = $paths.PIDFilePath
     LogFile          = $paths.LogFile
     EmailSenders     = $paths.EmailSendScript
+    MonitorMetadataFile = $paths.MonitorMetadataFile           # <-- NEW
     ProcessCheckInterval = $centralConfig.MonitorProcessCheckInterval
     MaxPIDFileAgeMinutes = $centralConfig.MonitorMaxPIDFileAgeMinutes
     ExpectedSubfolders   = $centralConfig.ExpectedSubfolders
@@ -299,7 +248,7 @@ $Script:Config = @{
 }
 
 # ====================================================================
-# SINGLETON INSTANCE LOCK – improved lock file path
+# SINGLETON INSTANCE LOCK
 # ====================================================================
 $global:MonitorLockFile = Join-Path $env:TEMP "maskRecog_monitor_$PID.lock"
 if (Test-Path $global:MonitorLockFile) {
@@ -315,16 +264,15 @@ if (Test-Path $global:MonitorLockFile) {
 $PID | Out-File $global:MonitorLockFile -Force
 
 # ====================================================================
-# LOCAL LOGGING WRAPPER – uses shared Write-CommonLog
+# LOCAL LOGGING WRAPPER
 # ====================================================================
 function Write-Log {
     param([string]$Message, [string]$Level = "INFO")
     Write-CommonLog -Message $Message -Level $Level -LogFile $Script:Config.LogFile
 }
 
-
 # ====================================================================
-# GLOBAL STATE – with missing console‑handler defaults added
+# GLOBAL STATE
 # ====================================================================
 $global:WorkerProcess = $null
 $global:WorkerPID = $null
@@ -341,8 +289,12 @@ $global:ForceStopThreshold = 2
 $global:ForceStopAttempts = 0
 $global:LastForceStopTime = $null
 
+# --- Monitor metadata ---
+$global:MonitorStartTime = Get-Date
+$global:MonitorExitCode = 0
+
 # ====================================================================
-# CONSOLE CONTROL HANDLER – uses the newly defined globals
+# CONSOLE CONTROL HANDLER
 # ====================================================================
 Add-Type -TypeDefinition @"
 using System;
@@ -367,6 +319,7 @@ $handler = [ConsoleCtrlHandler+ConsoleEventDelegate]{
             if ($global:ForceStopAttempts -ge $global:ForceStopThreshold) {
                 Write-Host "  Force shutdown requested" -ForegroundColor Red
                 $global:IsShuttingDown = $true
+                $global:MonitorExitCode = 1
                 return $true
             }
             Write-Host "  Press Ctrl+C again within $($global:ForceStopWindowSeconds)s to force stop." -ForegroundColor Yellow
@@ -378,9 +331,40 @@ $handler = [ConsoleCtrlHandler+ConsoleEventDelegate]{
 [void][ConsoleCtrlHandler]::SetConsoleCtrlHandler($handler, $true)
 
 # ====================================================================
-# CRITICAL UPDATE: Process Management Functions from OLD VERSION
+# CREATE / UPDATE MONITOR METADATA
 # ====================================================================
+function Write-MonitorMetadata {
+    param([switch]$Final = $false)
+    
+    $metadata = @{
+        monitor_pid = $PID
+        monitor_start_time = $global:MonitorStartTime.ToString("yyyy-MM-dd HH:mm:ss")
+        scheduled_start = $Script:Config.StartTime
+        scheduled_end   = $Script:Config.EndTime
+        runs_base_path  = $Script:Config.RunsBasePath
+        log_file        = $Script:Config.LogFile
+    }
+    
+    if ($Final) {
+        $metadata.monitor_end_time = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+        $start = [datetime]::ParseExact($metadata.monitor_start_time, "yyyy-MM-dd HH:mm:ss", $null)
+        $end   = [datetime]::ParseExact($metadata.monitor_end_time,   "yyyy-MM-dd HH:mm:ss", $null)
+        $metadata.duration = "{0:hh\:mm\:ss}" -f ($end - $start)
+        $metadata.exit_code = $global:MonitorExitCode
+    }
+    
+    try {
+        $metadata | ConvertTo-Json | Out-File $Script:Config.MonitorMetadataFile -Force
+        Write-Log "Monitor metadata $(if($Final){'final'}else{'initial'}) written" -Level "DEBUG"
+    } catch {
+        Write-Log "Failed to write monitor metadata: $_" -Level "ERROR"
+    }
+}
 
+
+# ====================================================================
+# PROCESS MANAGEMENT FUNCTIONS
+# ====================================================================
 function Check-ProcessStatus {
     $status = @{
         WorkerRunning = $false
@@ -388,59 +372,35 @@ function Check-ProcessStatus {
         WorkerPID = $global:WorkerPID
         PythonPID = $global:PythonPID
     }
-    
-    # Check worker process (we need to know this)
     if ($global:WorkerPID -and $global:WorkerPID -ne 0) {
         $status.WorkerRunning = Is-ProcessRunning -ProcessId $global:WorkerPID -ProcessName "powershell"
     }
-    
-    # Check Python process - ONLY if we already have the PID from worker output
     if ($global:PythonPID -and $global:PythonPID -ne 0) {
         $status.PythonRunning = Is-ProcessRunning -ProcessId $global:PythonPID -ProcessName "python"
     }
-    # Note: We do NOT try to find the Python process if we don't have the PID
-    # This prevents capturing the wrong process
-    
-    # Update global state
     $global:WorkerIsRunning = $status.WorkerRunning
     $global:PythonIsRunning = $status.PythonRunning
-    
     return $status
 }
 
-
 function Is-ProcessRunning {
-    param(
-        [int]$ProcessId, 
-        [string]$ProcessName
-    )
-    
-    if (-not $ProcessId -or $ProcessId -eq 0) {
-        return $false
-    }
-    
+    param([int]$ProcessId, [string]$ProcessName)
+    if (-not $ProcessId -or $ProcessId -eq 0) { return $false }
     try {
         $process = Get-Process -Id $ProcessId -ErrorAction Stop
         if ($ProcessName) {
             return ($process.ProcessName -like "*$ProcessName*" -and (-not $process.HasExited))
         }
         return (-not $process.HasExited)
-    } catch {
-        return $false
-    }
+    } catch { return $false }
 }
 
 function Find-PythonProcess {
-    # Simplified: Only try to get PID from metadata if we don't have it yet
     Write-Log "Looking for Python PID from available data..." -Level "DEBUG"
-    
-    # Method 1: Already have it from worker output?
     if ($global:PythonPID -and $global:PythonPID -ne 0) {
         Write-Log "Using Python PID from worker output: $global:PythonPID" -Level "DEBUG"
         return $global:PythonPID
     }
-    
-    # Method 2: Look in the latest run folder's metadata for PID
     $runFolder = Find-LatestRunFolder
     if ($runFolder) {
         $metadataPath = Join-Path $runFolder.FullName "metadata.json"
@@ -455,49 +415,31 @@ function Find-PythonProcess {
             } catch { }
         }
     }
-    
     Write-Log "No Python process data available yet" -Level "DEBUG"
     return $null
 }
 
-
-
-# ====================================================================
-# Modified Start-WorkerProcess with communication
-# ====================================================================
-
-
 function Start-WorkerProcess {
     Write-Log "Starting face recognition worker..." -Level "INFO"
-    
     try {
         Write-Log "Worker script path: $($Script:Config.WorkerScript)" -Level "INFO"
-        
-        # Verify worker script exists - FIX: Better error handling
         if ([string]::IsNullOrEmpty($Script:Config.WorkerScript)) {
             Write-Log "ERROR: Worker script path is null or empty" -Level "ERROR"
             return $false
         }
-        
         if (-not (Test-Path $Script:Config.WorkerScript)) {
             Write-Log "ERROR: Worker script not found at: $($Script:Config.WorkerScript)" -Level "ERROR"
             return $false
         }
-        
-        # Start worker process with explicit output capture
         Write-Log "Starting worker process..." -Level "INFO"
-        
         $processInfo = New-Object System.Diagnostics.ProcessStartInfo
         $processInfo.FileName = "powershell.exe"
-        
-        # FIXED: Properly formatted arguments array
         $arguments = @(
             "-NoProfile",
             "-ExecutionPolicy", "Bypass",
             "-File", "`"$($Script:Config.WorkerScript)`""
         )
         $processInfo.Arguments = $arguments
-        
         $processInfo.UseShellExecute = $false
         $processInfo.RedirectStandardOutput = $true
         $processInfo.RedirectStandardError = $true
@@ -506,145 +448,83 @@ function Start-WorkerProcess {
         $WorkerProcess = New-Object System.Diagnostics.Process
         $WorkerProcess.StartInfo = $processInfo
         
-        # Create output collectors
         $stdOutBuilder = New-Object System.Text.StringBuilder
         $stdErrBuilder = New-Object System.Text.StringBuilder
         
-        # better PID parsing:
-
         $outAction = {
             if (-not [String]::IsNullOrEmpty($EventArgs.Data)) {
                 $Event.MessageData.AppendLine($EventArgs.Data)
-                
-                # Parse for Python PID from worker output
                 if ($EventArgs.Data -match "Python process started \(PID: (\d+)\)") {
                     $global:PythonPID = $matches[1]
                     Write-Log "Captured Python PID from worker output: $global:PythonPID" -Level "SUCCESS"
                 }
-                
-                # Also log to monitor log
                 Write-Log "Worker Output: $($EventArgs.Data)" -Level "DEBUG"
             }
         }
-        
         $errAction = {
             if (-not [String]::IsNullOrEmpty($EventArgs.Data)) {
                 $Event.MessageData.AppendLine($EventArgs.Data)
-                # Also log to monitor log
                 Write-Log "Worker Error: $($EventArgs.Data)" -Level "ERROR"
             }
         }
         
-        # Register events
-        $stdOutEvent = Register-ObjectEvent -InputObject $WorkerProcess `
-            -EventName 'OutputDataReceived' `
-            -Action $outAction `
-            -MessageData $stdOutBuilder
+        $stdOutEvent = Register-ObjectEvent -InputObject $WorkerProcess -EventName 'OutputDataReceived' -Action $outAction -MessageData $stdOutBuilder
+        $stdErrEvent = Register-ObjectEvent -InputObject $WorkerProcess -EventName 'ErrorDataReceived' -Action $errAction -MessageData $stdErrBuilder
         
-        $stdErrEvent = Register-ObjectEvent -InputObject $WorkerProcess `
-            -EventName 'ErrorDataReceived' `
-            -Action $errAction `
-            -MessageData $stdErrBuilder
-        
-        # Start the process
         if ($WorkerProcess.Start()) {
             $global:WorkerPID = $WorkerProcess.Id
             $global:WorkerStartTime = Get-Date
             $global:WorkerIsRunning = $true
-            
             Write-Log "Worker process started (PID: $global:WorkerPID)" -Level "SUCCESS"
-            
-            # Begin async output reading
             $WorkerProcess.BeginOutputReadLine()
             $WorkerProcess.BeginErrorReadLine()
-            
-            # Wait a moment for initial output
             Start-Sleep -Seconds 2
             
-            # Check if process is still running
             if ($WorkerProcess.HasExited) {
                 $exitCode = $WorkerProcess.ExitCode
                 $output = $stdOutBuilder.ToString()
                 $errorOutput = $stdErrBuilder.ToString()
-                
                 Write-Log "Worker process exited immediately with code: $exitCode" -Level "ERROR"
-                
                 if ($output) {
-                    Write-Log "Worker output:" -Level "DEBUG"
                     foreach ($line in $output -split "`n") {
-                        if ($line.Trim()) {
-                            Write-Log "  $line" -Level "DEBUG"
-                        }
+                        if ($line.Trim()) { Write-Log "  $line" -Level "DEBUG" }
                     }
                 }
-                
                 if ($errorOutput) {
-                    Write-Log "Worker error output:" -Level "ERROR"
                     foreach ($line in $errorOutput -split "`n") {
-                        if ($line.Trim()) {
-                            Write-Log "  $line" -Level "ERROR"
-                        }
+                        if ($line.Trim()) { Write-Log "  $line" -Level "ERROR" }
                     }
                 }
-                
-                # Clean up events
-                if ($stdOutEvent) {
-                    Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
-                }
-                if ($stdErrEvent) {
-                    Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
-                }
-                
+                if ($stdOutEvent) { Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue }
+                if ($stdErrEvent) { Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue }
                 return $false
             }
             
             Write-Log "Worker process is running, waiting for Python..." -Level "INFO"
-            
-            # Look for Python process
             $maxWait = 60
             $waited = 0
-            
             while ($waited -lt $maxWait) {
                 $foundPID = Find-PythonProcess
                 if ($foundPID) {
                     $global:PythonPID = $foundPID
                     $global:PythonIsRunning = $true
                     $global:PythonStartTime = Get-Date
-                    
                     Write-Log "Python process found (PID: $global:PythonPID)" -Level "SUCCESS"
                     Save-PIDTracking
-                    
-                    # Clean up events
-                    if ($stdOutEvent) {
-                        Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
-                    }
-                    if ($stdErrEvent) {
-                        Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
-                    }
-                    
+                    if ($stdOutEvent) { Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue }
+                    if ($stdErrEvent) { Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue }
                     return $true
                 }
-                
                 Start-Sleep -Seconds 5
                 $waited += 5
-                
-                # Check if worker is still running
                 if ($WorkerProcess.HasExited) {
                     Write-Log "Worker process exited while waiting for Python" -Level "ERROR"
                     break
                 }
             }
-            
             Write-Log "Python process not found within $maxWait seconds" -Level "WARN"
-            
-            # Clean up events
-            if ($stdOutEvent) {
-                Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
-            }
-            if ($stdErrEvent) {
-                Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
-            }
-            
+            if ($stdOutEvent) { Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue }
+            if ($stdErrEvent) { Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue }
             Save-PIDTracking
             return $true
         } else {
@@ -658,124 +538,98 @@ function Start-WorkerProcess {
     }
 }
 
-
 function Stop-WorkerProcess {
     Write-Log "Stopping worker process..." -Level "INFO"
-
     $stoppedProcesses = @()
     $processesToStop = @()
-
-    # Collect all processes to stop
+    
+    # ---- Python process ----
     if ($global:PythonPID -and $global:PythonPID -ne 0) {
         try {
             $pythonProcess = Get-Process -Id $global:PythonPID -ErrorAction SilentlyContinue
             if ($pythonProcess -and (-not $pythonProcess.HasExited)) {
-                $processesToStop += @{
-                    Type = "Python"
-                    PID = $global:PythonPID
-                    Process = $pythonProcess
-                }
+                $processesToStop += @{ Type = "Python"; PID = $global:PythonPID; Process = $pythonProcess }
+            } else {
+                Write-Log "Python process already exited (PID: $global:PythonPID)" -Level "DEBUG"
             }
-        } catch {
+        } catch { 
             Write-Log "Python process not found (PID: $global:PythonPID) - $_" -Level "DEBUG"
         }
     }
-
+    
+    # ---- Worker process ----
     if ($global:WorkerPID -and $global:WorkerPID -ne 0) {
         try {
             $workerProcess = Get-Process -Id $global:WorkerPID -ErrorAction SilentlyContinue
             if ($workerProcess -and (-not $workerProcess.HasExited)) {
-                $processesToStop += @{
-                    Type = "Worker"
-                    PID = $global:WorkerPID
-                    Process = $workerProcess
-                }
+                $processesToStop += @{ Type = "Worker"; PID = $global:WorkerPID; Process = $workerProcess }
+            } else {
+                Write-Log "Worker process already exited (PID: $global:WorkerPID)" -Level "DEBUG"
             }
-        } catch {
+        } catch { 
             Write-Log "Worker process not found (PID: $global:WorkerPID) - $_" -Level "DEBUG"
         }
     }
-
-    # Stop processes in reverse order (Python first, then Worker)
+    
+    # Stop Python first
     foreach ($procInfo in $processesToStop | Where-Object { $_.Type -eq "Python" }) {
         Write-Log "Stopping $($procInfo.Type) process (PID: $($procInfo.PID))..." -Level "INFO"
-        
-        # Change from immediate kill to graceful wait
         try {
-            # For Python processes, use Kill() directly as they don't respond well to CloseMainWindow
             $procInfo.Process.Kill()
-            
-            # Add waiting time for Python to stop completely
-            Write-Log "Waiting 10 seconds for Python process to stop completely..." -Level "WARN"
-            Start-Sleep -Seconds 10
-            
-            # Wait for process to exit
-            $timeout = 10 # seconds
+            Write-Log "Waiting for Python process to exit..." -Level "INFO"
+            $timeout = 10  # seconds
             $startTime = Get-Date
             while ((-not $procInfo.Process.HasExited) -and ((Get-Date) - $startTime).TotalSeconds -lt $timeout) {
                 Start-Sleep -Milliseconds 100
             }
-            
             if ($procInfo.Process.HasExited) {
                 $stoppedProcesses += $procInfo.Type
                 Write-Log "$($procInfo.Type) process stopped successfully" -Level "SUCCESS"
             } else {
                 Write-Log "$($procInfo.Type) process did not stop within timeout" -Level "WARN"
             }
-        } catch {
-            Write-Log "Error stopping $($procInfo.Type) process: $_" -Level "ERROR"
+        } catch { 
+            Write-Log "Error stopping $($procInfo.Type) process: $_" -Level "ERROR" 
         }
     }
-
-    # Now stop Worker processes
+    
+    # Stop Worker second
     foreach ($procInfo in $processesToStop | Where-Object { $_.Type -eq "Worker" }) {
         Write-Log "Stopping $($procInfo.Type) process (PID: $($procInfo.PID))..." -Level "INFO"
-        
         try {
-            # Try to close gracefully first
             if ($procInfo.Process.CloseMainWindow()) {
-                $timeout = 5 # seconds
+                $timeout = 5
                 $startTime = Get-Date
                 while ((-not $procInfo.Process.HasExited) -and ((Get-Date) - $startTime).TotalSeconds -lt $timeout) {
                     Start-Sleep -Milliseconds 100
                 }
             }
-            
-            # Force kill if still running
             if (-not $procInfo.Process.HasExited) {
                 $procInfo.Process.Kill()
                 Start-Sleep -Seconds 2
             }
-            
             if ($procInfo.Process.HasExited) {
                 $stoppedProcesses += $procInfo.Type
                 Write-Log "$($procInfo.Type) process stopped successfully" -Level "SUCCESS"
             }
-        } catch {
-            Write-Log "Error stopping $($procInfo.Type) process: $_" -Level "ERROR"
+        } catch { 
+            Write-Log "Error stopping $($procInfo.Type) process: $_" -Level "ERROR" 
         }
     }
-
-    # Inside Stop-WorkerProcess function, update the orphaned process section:
-
-    # Additional cleanup: ONLY terminate processes we know about
+    
+    # Orphaned process check (only if still running after above)
     Write-Log "Checking for known orphaned processes..." -Level "INFO"
-    $orphanedProcesses = @()
-
-    # Only kill processes that we specifically know about
     if ($global:PythonPID -and $global:PythonPID -ne 0) {
         try {
             $proc = Get-Process -Id $global:PythonPID -ErrorAction SilentlyContinue
             if ($proc -and (-not $proc.HasExited)) {
                 Write-Log "Found orphaned Python process (PID: $global:PythonPID) - terminating" -Level "WARN"
                 $proc.Kill()
-                $orphanedProcesses += "Python:$global:PythonPID"
                 Start-Sleep -Seconds 1
             }
         } catch { }
     }
-
-    # Reset global process variables
+    
     $global:WorkerProcess = $null
     $global:WorkerPID = $null
     $global:PythonPID = $null
@@ -783,146 +637,30 @@ function Stop-WorkerProcess {
     $global:PythonIsRunning = $false
     $global:WorkerStartTime = $null
     $global:PythonStartTime = $null
-
-    # Clean up communication directory
+    
     $commPaths = Initialize-CommunicationPaths -Paths $global:MonitorPaths -IsMonitor
     if (Test-Path $commPaths.CommunicationDir) {
         Remove-Item -Path $commPaths.CommunicationDir -Recurse -Force -ErrorAction SilentlyContinue
         Write-Log "Cleaned up communication directory" -Level "DEBUG"
     }
-
-    # Summary
+    
     if ($stoppedProcesses.Count -gt 0) {
         Write-Log "Successfully stopped processes: $($stoppedProcesses -join ', ')" -Level "INFO"
     }
-    
-    if ($orphanedProcesses.Count -gt 0) {
-        Write-Log "Cleaned up orphaned processes: $($orphanedProcesses.Count)" -Level "INFO"
-    }
-
     Write-Log "Worker process cleanup completed" -Level "INFO"
 }
 
-
-
-
-# ====================================================================
-# Email Reporting Integration
-# ====================================================================
-function Initialize-EmailReporting {
-    Write-Log "Initializing email reporting..." -Level "INFO"
-    
-    # Load email sender script
-    $emailSenderScript = $Script:Config.EmailSenders
-    if (Test-Path $emailSenderScript) {
-        try {
-            # Clear any existing functions to avoid conflicts
-            Remove-Item "function:Invoke-StableEmailReport" -ErrorAction SilentlyContinue
-            Remove-Item "function:Register-StableEmailSender" -ErrorAction SilentlyContinue
-            Remove-Item "function:Send-RunReport" -ErrorAction SilentlyContinue
-            
-            # Dot-source the script to load functions into current scope
-            . $emailSenderScript
-            
-            # Verify the function exists after loading
-            if (-not (Get-Command -Name "Invoke-StableEmailReport" -ErrorAction SilentlyContinue)) {
-                Write-Log "ERROR: Invoke-StableEmailReport function not found after loading script" -Level "ERROR"
-                return $false
-            }
-            
-            # Create email config with schedule information
-            $emailConfig = @{
-                ScheduleStartTime = $Script:Config.StartTime
-                ScheduleEndTime = $Script:Config.EndTime
-                EmailSubject = "[FaceRecog] Runs - $(Get-Date -Format 'yyyy-MM-dd') - Schedule: $($Script:Config.StartTime)-$($Script:Config.EndTime)"
-            }
-            
-            # Initialize and register the email sender
-            $registrationResult = Register-StableEmailSender -MonitorConfig $Script:Config -CustomEmailConfig $emailConfig
-            
-            if ($registrationResult -and $global:StableEmailSender) {
-                Write-Log "Stable Email sender initialized successfully" -Level "SUCCESS"
-                return $true
-            } else {
-                Write-Log "Failed to register stable email sender" -Level "ERROR"
-                return $false
-            }
-            
-        } catch {
-            Write-Log "Failed to initialize email reporting: $_" -Level "ERROR"
-            Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
-            return $false
-        }
-    } else {
-        Write-Log "Email sender script not found: $emailSenderScript" -Level "WARN"
-        return $false
-    }
-}
-
-
-    
-function Invoke-EmailReport {
-    [CmdletBinding()]
-    param([switch]$Force = $false)
-
-    Write-Log "Scheduled email report triggered..." -Level "INFO"
-    Write-Log "Email configuration:" -Level "DEBUG"
-    Write-Log "  Start time: $($Script:Config.StartTime)" -Level "DEBUG"
-    Write-Log "  End time: $($Script:Config.EndTime)" -Level "DEBUG"
-    Write-Log "  Runs base path: $($Script:Config.RunsBasePath)" -Level "DEBUG"
-
-
+function Find-LatestRunFolder {
     try {
-        # First, ensure the function is available
-        if (-not (Get-Command -Name "Invoke-StableEmailReport" -ErrorAction SilentlyContinue)) {
-            Write-Log "Invoke-StableEmailReport function not available, attempting to load email sender..." -Level "WARN"
-            
-            # Try to re-initialize
-            $emailTestScript = $Script:Config.EmailSenders
-            if (Test-Path $emailTestScript) {
-                . $emailTestScript
-                Write-Log "Email sender script reloaded" -Level "INFO"
-            } else {
-                Write-Log "ERROR: Email sender script not found at: $emailTestScript" -Level "ERROR"
-                return $false
-            }
-        }
-
-        # Check if email sender is properly initialized
-        if (-not $global:StableEmailSender -or -not $global:StableEmailSender.Enabled) {
-            Write-Log "Stable email sender not registered or disabled, attempting to initialize..." -Level "WARN"
-            
-            $reinitialized = Initialize-EmailReporting
-            if (-not $reinitialized) {
-                Write-Log "Failed to re-initialize email reporting" -Level "ERROR"
-                return $false
-            }
-        }
-
-        Write-Log "Sending email report for schedule starting at: $($Script:Config.StartTime)" -Level "INFO"
-
-        # Call the function - now it should be available
-        $success = Invoke-StableEmailReport -Force:$Force
-
-        if ($success) {
-            Write-Log "Email report sent successfully!" -Level "SUCCESS"
-        } else {
-            Write-Log "Failed to send email report" -Level "ERROR"
-        }
-
-        return $success
+        if (-not $Script:Config.RunsBasePath -or -not (Test-Path $Script:Config.RunsBasePath)) { return $null }
+        $folders = Get-ChildItem -Path $Script:Config.RunsBasePath -Directory -Filter $centralConfig.WorkerRunFolderPrefix -ErrorAction SilentlyContinue
+        if (-not $folders) { return $null }
+        return $folders | Sort-Object CreationTime -Descending | Select-Object -First 1
     } catch {
-        Write-Log "Error in email report: $_" -Level "ERROR"
-        Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
-        return $false
+        Write-Log "Error finding run folders: $_" -Level "ERROR"
+        return $null
     }
 }
-
-
-
-# ====================================================================
-# ENHANCED: PID Tracking with persistent data (from old version)
-# ====================================================================
 
 function Save-PIDTracking {
     $PIDTracking = @{
@@ -933,47 +671,16 @@ function Save-PIDTracking {
         RunFolder = $global:CurrentRunFolder
         LastUpdate = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
     }
-    
     try {
         if ($Script:Config.PIDFilePath) {
             $PIDTracking | ConvertTo-Json -Depth 5 | Out-File -FilePath $Script:Config.PIDFilePath -Force
-            Write-Log "PID tracking saved" -Level "DEBUG" -LogFile $Script:Config.LogFile
+            Write-Log "PID tracking saved" -Level "DEBUG"
         }
-    } catch {
-        Write-Log "Failed to save PID tracking: $_" -Level "ERROR" -LogFile $Script:Config.LogFile
-    }
+    } catch { Write-Log "Failed to save PID tracking: $_" -Level "ERROR" }
 }
 
-
-
 # ====================================================================
-# ENHANCED: Validation and Folder Functions (improved)
-# ====================================================================
-
-function Find-LatestRunFolder {
-    try {
-        if (-not $Script:Config.RunsBasePath -or -not (Test-Path $Script:Config.RunsBasePath)) {
-            return $null
-        }
-        
-        $folders = Get-ChildItem -Path $Script:Config.RunsBasePath -Directory -Filter $Script:Config.OutputFolderPattern -ErrorAction SilentlyContinue
-        
-        if (-not $folders) {
-            return $null
-        }
-        
-        $latestFolder = $folders | Sort-Object CreationTime -Descending | Select-Object -First 1
-        return $latestFolder
-    }
-    catch {
-        Write-Log "Error finding run folders: $_" -Level "ERROR"
-        return $null
-    }
-}
-
-
-# ====================================================================
-# VALIDATION – now uses shared functions, no duplicate definitions
+# VALIDATION – using shared functions from common-paths
 # ====================================================================
 function Validate-Output {
     param(
@@ -983,8 +690,12 @@ function Validate-Output {
         [DateTime]$CollectionEnd = $null
     )
     if ($CollectAll) {
-        $start = $CollectionStart ?? [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.StartTime, "yyyy-MM-dd HH:mm", $null)
-        $end   = $CollectionEnd   ?? [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.EndTime,   "yyyy-MM-dd HH:mm", $null)
+        $start = if ($CollectionStart) { $CollectionStart } else {
+            [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.StartTime, "yyyy-MM-dd HH:mm", $null)
+        }
+        $end = if ($CollectionEnd) { $CollectionEnd } else {
+            [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.EndTime, "yyyy-MM-dd HH:mm", $null)
+        }
         $collected = Collect-RunsFromTimeWindow -BasePath $Script:Config.RunsBasePath -WindowStart $start -WindowEnd $end -ValidateEach
         $global:CollectedRunFolders = $collected
         $valid = ($collected | Where-Object { $_.Status -eq "VALID" }).Count
@@ -1018,91 +729,8 @@ function Validate-Output {
     }
 }
 
-
-function Collect-RunsFromTimeWindow {
-    param(
-        [DateTime]$StartTime,
-        [DateTime]$EndTime,
-        [switch]$ForceValidation = $false
-    )
-    
-    Write-Log "Collecting runs from $($StartTime.ToString('HH:mm')) to $($EndTime.ToString('HH:mm'))..." -Level "INFO"
-    
-    $collectionResults = @{
-        TotalRuns = 0
-        ValidRuns = 0
-        InvalidRuns = 0
-        Runs = @()
-        Summary = $null
-    }
-    
-    try {
-        # FIX: Use just the time portion (HH:mm) instead of full datetime
-        $startTimeStr = $StartTime.ToString("HH:mm")
-        $endTimeStr = $EndTime.ToString("HH:mm")
-        
-        Write-Log "Time window for collection: $startTimeStr to $endTimeStr" -Level "INFO"
-        
-        # Check if integrated functions are available
-        if (Get-Command -Name "Start-RunCollection-Integrated" -ErrorAction SilentlyContinue) {
-            $collectedRuns = Start-RunCollection-Integrated -StartTime $startTimeStr -EndTime $endTimeStr
-        } else {
-            # Fallback to simple manual collection using TimeOfDay
-            Write-Log "Integrated functions not available, using manual collection" -Level "WARN"
-            $collectedRuns = @()
-            
-            if ($Script:Config.RunsBasePath -and (Test-Path $Script:Config.RunsBasePath)) {
-                $folders = Get-ChildItem -Path $Script:Config.RunsBasePath -Directory -Filter $Script:Config.OutputFolderPattern -ErrorAction SilentlyContinue
-                
-                Write-Log "Found $($folders.Count) total folders to check" -Level "INFO"
-                
-                foreach ($folder in $folders) {
-                    # Check if folder creation time is within window using TimeOfDay
-                    $folderTime = $folder.CreationTime.TimeOfDay
-                    $startTimeOfDay = $StartTime.TimeOfDay
-                    $endTimeOfDay = $EndTime.TimeOfDay
-                    
-                    if ($folderTime -ge $startTimeOfDay -and $folderTime -le $endTimeOfDay) {
-                        $collectedRuns += @{
-                            Folder = $folder.FullName
-                            Name = $folder.Name
-                            CreationTime = $folder.CreationTime
-                            Validation = @{ Success = $true; MissingItems = @() }
-                            Status = "VALID"
-                        }
-                        Write-Log "✓ Manual collection added: $($folder.Name)" -Level "INFO"
-                    }
-                }
-            }
-        }
-        
-        if ($collectedRuns) {
-            $collectionResults.TotalRuns = $collectedRuns.Count
-            $collectionResults.ValidRuns = ($collectedRuns | Where-Object { $_.Status -eq "VALID" }).Count
-            $collectionResults.InvalidRuns = ($collectedRuns | Where-Object { $_.Status -eq "INVALID" }).Count
-            $collectionResults.Runs = $collectedRuns
-            
-            Write-Log "Collection completed: $($collectionResults.ValidRuns)/$($collectionResults.TotalRuns) valid runs" -Level "INFO"
-            
-            # Store in global variable
-            $global:CollectedRunFolders = $collectedRuns
-        } else {
-            Write-Log "No runs collected in the specified time window" -Level "WARN"
-        }
-        
-    } catch {
-        Write-Log "Error during run collection: $_" -Level "ERROR"
-        Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
-    }
-    
-    return $collectionResults
-}
-
-
-
 function Test-TimeWindow {
     param([string]$TargetTime)
-    
     $now = Get-Date
     try {
         $target = [DateTime]::ParseExact($TargetTime, "HH:mm", $null)
@@ -1112,229 +740,115 @@ function Test-TimeWindow {
         return $false
     }
 }
-function Register-ConsoleControlHandler {
-    Add-Type -TypeDefinition @"
-    using System;
-    using System.Runtime.InteropServices;
-    
-    public class ConsoleCtrlHandler {
-        public delegate bool ConsoleEventDelegate(int eventType);
-        
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool SetConsoleCtrlHandler(ConsoleEventDelegate handler, bool add);
-        
-        public const int CTRL_C_EVENT = 0;
-        public const int CTRL_BREAK_EVENT = 1;
-        public const int CTRL_CLOSE_EVENT = 2;
-        public const int CTRL_LOGOFF_EVENT = 5;
-        public const int CTRL_SHUTDOWN_EVENT = 6;
-    }
-"@
 
-    $handler = [ConsoleCtrlHandler+ConsoleEventDelegate]{
-        param([int]$eventHostType)
-        
-        $currentTime = Get-Date
-        $timeSinceLast = if ($global:LastForceStopTime) { 
-            ($currentTime - $global:LastForceStopTime).TotalSeconds 
-        } else { 
-            [double]::MaxValue 
-        }
-        
-        switch ($eventHostType) {
-            { $_ -in 0, 1 } {
-                Write-Host "`n[Console Control Handler] Control event detected" -ForegroundColor Yellow
-                
-                if ($timeSinceLast -lt $global:ForceStopWindowSeconds) {
-                    $global:ForceStopAttempts++
-                    Write-Host "  Rapid attempt detected ($global:ForceStopAttempts/$global:ForceStopThreshold)" -ForegroundColor Yellow
-                } else {
-                    $global:ForceStopAttempts = 1
-                }
-                
-                $global:LastForceStopTime = $currentTime
-                
-                if ($global:ForceStopAttempts -ge $global:ForceStopThreshold) {
-                    Write-Host "  Force shutdown requested by user" -ForegroundColor Red
-                    $global:IsShuttingDown = $true
-                    return $true
-                } else {
-                    Write-Host "  Monitor will continue until end time. Press Ctrl+C again within $($global:ForceStopWindowSeconds)s to force stop." -ForegroundColor Yellow
-                    Write-Log "Ctrl+C intercepted - monitor will continue until end time. Attempts: $global:ForceStopAttempts/$global:ForceStopThreshold" -Level "WARN"
-                    return $true
-                }
-            }
-            default {
+# ====================================================================
+# EMAIL REPORTING
+# ====================================================================
+function Initialize-EmailReporting {
+    Write-Log "Initializing email reporting..." -Level "INFO"
+    $emailSenderScript = $Script:Config.EmailSenders
+    if (Test-Path $emailSenderScript) {
+        try {
+            Remove-Item "function:Invoke-StableEmailReport" -ErrorAction SilentlyContinue
+            Remove-Item "function:Register-StableEmailSender" -ErrorAction SilentlyContinue
+            Remove-Item "function:Send-RunReport" -ErrorAction SilentlyContinue
+            . $emailSenderScript
+            if (-not (Get-Command -Name "Invoke-StableEmailReport" -ErrorAction SilentlyContinue)) {
+                Write-Log "ERROR: Invoke-StableEmailReport function not found after loading script" -Level "ERROR"
                 return $false
             }
-        }
-    }
-
-    [void][ConsoleCtrlHandler]::SetConsoleCtrlHandler($handler, $true)
-    Write-Log "Console control handler registered" -Level "DEBUG"
-}
-
-function Initialize-RunCollection {
-    Write-Log "Initializing run collection system..." -Level "INFO"
-    
-    # Instead of loading external script, integrate key functions directly
-    try {
-        # Define the core collection function inline
-        function global:Validate-RunFolder-Integrated {
-            param(
-                [string]$FolderPath
-            )
-            
-            Write-Log "Validating folder: $FolderPath" -Level "DEBUG"
-            
-            $result = @{
-                Success = $false
-                FolderPath = $FolderPath
-                FolderName = Split-Path $FolderPath -Leaf
-                MissingItems = @()
+            $emailConfig = @{
+                ScheduleStartTime = $Script:Config.StartTime
+                ScheduleEndTime = $Script:Config.EndTime
+                EmailSubject = "[FaceRecog] Runs - $(Get-Date -Format 'yyyy-MM-dd') - Schedule: $($Script:Config.StartTime)-$($Script:Config.EndTime)"
             }
-
-            try {
-                $folder = Get-Item -Path $FolderPath -ErrorAction Stop
-
-                # Check subfolders
-                foreach ($subfolder in $Script:Config.ExpectedSubfolders) {
-                    $subfolderPath = Join-Path $FolderPath $subfolder
-                    if (-not (Test-Path $subfolderPath)) {
-                        $result.MissingItems += $subfolder
-                    }
-                }
-
-                # Check files
-                foreach ($file in $Script:Config.ExpectedFiles) {
-                    $filePath = Join-Path $FolderPath $file
-                    if (-not (Test-Path $filePath)) {
-                        $result.MissingItems += $file
-                    }
-                }
-
-                $result.Success = ($result.MissingItems.Count -eq 0)
-                return $result
-            } catch {
-                Write-Log "Error validating folder: $_" -Level "ERROR"
-                return $result
+            $registrationResult = Register-StableEmailSender -MonitorConfig $Script:Config -CustomEmailConfig $emailConfig
+            if ($registrationResult -and $global:StableEmailSender) {
+                Write-Log "Stable Email sender initialized successfully" -Level "SUCCESS"
+                return $true
+            } else {
+                Write-Log "Failed to register stable email sender" -Level "ERROR"
+                return $false
             }
+        } catch {
+            Write-Log "Failed to initialize email reporting: $_" -Level "ERROR"
+            Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
+            return $false
         }
-        
-        # Define simple collection function
-        function global:Start-RunCollection-Integrated {
-            param(
-                [string]$StartTime,
-                [string]$EndTime
-            )
-            
-            $collectedRuns = @()
-            
-            try {
-                # Debug: Log what we're receiving
-                Write-Log "Integrated collection called with StartTime: '$StartTime', EndTime: '$EndTime'" -Level "DEBUG"
-                
-                # Check if runs path exists
-                if (-not $Script:Config.RunsBasePath -or -not (Test-Path $Script:Config.RunsBasePath)) {
-                    Write-Log "Runs base path not found: $($Script:Config.RunsBasePath)" -Level "WARN"
-                    return $collectedRuns
-                }
-                
-                # Get all run folders
-                $global:TotalRunFolders = Get-ChildItem -Path $Script:Config.RunsBasePath -Directory -Filter $Script:Config.OutputFolderPattern -ErrorAction SilentlyContinue
-                
-                Write-Log "Found $($global:TotalRunFolders.Count) total run folders" -Level "INFO"
-                
-                if ($global:TotalRunFolders) {
-                    # Parse time window - FIX: Check what format we're getting
-                    $windowStart = $null
-                    $windowEnd = $null
-                    
-                    try {
-                        # Try to parse as full datetime first
-                        if ($StartTime -match '^\d{4}-\d{2}-\d{2}') {
-                            $windowStart = [DateTime]::ParseExact($StartTime, "yyyy-MM-dd HH:mm:ss", $null)
-                            $windowEnd = [DateTime]::ParseExact($EndTime, "yyyy-MM-dd HH:mm:ss", $null)
-                        } else {
-                            # Parse as time only (HH:mm)
-                            $today = Get-Date -Format "yyyy-MM-dd"
-                            $windowStart = [DateTime]::ParseExact("$today $StartTime", "yyyy-MM-dd HH:mm", $null)
-                            $windowEnd = [DateTime]::ParseExact("$today $EndTime", "yyyy-MM-dd HH:mm", $null)
-                        }
-                    } catch {
-                        Write-Log "Error parsing time window: $_" -Level "ERROR"
-                        Write-Log "StartTime was: '$StartTime', EndTime was: '$EndTime'" -Level "DEBUG"
-                        return $collectedRuns
-                    }
-                    
-                    Write-Log "Time window parsed: $($windowStart.ToString('yyyy-MM-dd HH:mm:ss')) to $($windowEnd.ToString('yyyy-MM-dd HH:mm:ss'))" -Level "INFO"
-                    
-                    foreach ($runFolder in $global:TotalRunFolders) {
-                        # Check if folder is within time window
-                        $folderTime = $runFolder.CreationTime
-                        
-                        if ($folderTime -ge $windowStart -and $folderTime -le $windowEnd) {
-                            $validation = Validate-RunFolder-Integrated -FolderPath $runFolder.FullName
-
-                            $collectedRuns += @{
-                                Folder = $runFolder.FullName
-                                Name = $runFolder.Name
-                                CreationTime = $runFolder.CreationTime
-                                Validation = $validation
-                                Status = if ($validation.Success) { "VALID" } else { "INVALID" }
-                            }
-
-                            Write-Log "✓ Collected: $($runFolder.Name)" -Level "INFO"
-                        }
-                    }
-                }
-            } catch {
-                Write-Log "Error in integrated collection: $_" -Level "ERROR"
-                Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
-            }
-            
-            Write-Log "Collection complete. Found $($collectedRuns.Count) runs within time window." -Level "INFO"
-            return $collectedRuns
-        }
-        
-        Write-Log "Integrated run collection functions initialized" -Level "SUCCESS"
-        return $true
-        
-    } catch {
-        Write-Log "Failed to initialize integrated run collection: $_" -Level "ERROR"
+    } else {
+        Write-Log "Email sender script not found: $emailSenderScript" -Level "WARN"
         return $false
     }
 }
 
- 
+function Invoke-EmailReport {
+    [CmdletBinding()]
+    param([switch]$Force = $false)
+    Write-Log "Scheduled email report triggered..." -Level "INFO"
+    Write-Log "Email configuration:" -Level "DEBUG"
+    Write-Log "  Start time: $($Script:Config.StartTime)" -Level "DEBUG"
+    Write-Log "  End time: $($Script:Config.EndTime)" -Level "DEBUG"
+    Write-Log "  Runs base path: $($Script:Config.RunsBasePath)" -Level "DEBUG"
+    try {
+        if (-not (Get-Command -Name "Invoke-StableEmailReport" -ErrorAction SilentlyContinue)) {
+            $emailTestScript = $Script:Config.EmailSenders
+            if (Test-Path $emailTestScript) {
+                . $emailTestScript
+                Write-Log "Email sender script reloaded" -Level "INFO"
+            } else {
+                Write-Log "ERROR: Email sender script not found at: $emailTestScript" -Level "ERROR"
+                return $false
+            }
+        }
+        if (-not $global:StableEmailSender -or -not $global:StableEmailSender.Enabled) {
+            Write-Log "Stable email sender not registered or disabled, attempting to initialize..." -Level "WARN"
+            $reinitialized = Initialize-EmailReporting
+            if (-not $reinitialized) {
+                Write-Log "Failed to re-initialize email reporting" -Level "ERROR"
+                return $false
+            }
+        }
+        Write-Log "Sending email report for schedule starting at: $($Script:Config.StartTime)" -Level "INFO"
+        $success = Invoke-StableEmailReport -Force:$Force
+        if ($success) {
+            Write-Log "Email report sent successfully!" -Level "SUCCESS"
+        } else {
+            Write-Log "Failed to send email report" -Level "ERROR"
+        }
+        return $success
+    } catch {
+        Write-Log "Error in email report: $_" -Level "ERROR"
+        Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
+        return $false
+    }
+}
+
 # ====================================================================
-# MAIN EXECUTION – streamlined
+# MAIN EXECUTION
 # ====================================================================
 try {
-    # Create log directory
     if ($Script:Config.LogFile) {
         $null = New-Item -ItemType Directory -Path (Split-Path $Script:Config.LogFile -Parent) -Force
     }
-
+    
+    # --- Write initial monitor metadata ---
+    Write-MonitorMetadata
+    
     Write-Log "=== Enhanced Face Recognition Monitor Started ===" -Level "INFO"
-    Write-Log "Version: 2.1 (Cleaned structure)" -Level "INFO"
+    Write-Log "Version: 2.1 (with monitor metadata)" -Level "INFO"
     Write-Log "Start Time: $($Script:Config.StartTime)" -Level "INFO"
     Write-Log "End Time: $($Script:Config.EndTime)" -Level "INFO"
-
-    # Ensure runs base path exists
+    
     if (-not (Test-Path $Script:Config.RunsBasePath)) {
         New-Item -ItemType Directory -Path $Script:Config.RunsBasePath -Force | Out-Null
     }
-
-    # Initialise email and run‑collection (no duplicate function definitions)
+    
     $emailReportingInitialized = Initialize-EmailReporting
-    # No need to call Initialize-RunCollection – functions now in common module
-
-    # Determine if we are already past end time
+    
     $today = Get-Date -Format "yyyy-MM-dd"
     $startDateTime = [DateTime]::ParseExact("$today $($Script:Config.StartTime)", "yyyy-MM-dd HH:mm", $null)
     $endDateTime   = [DateTime]::ParseExact("$today $($Script:Config.EndTime)",   "yyyy-MM-dd HH:mm", $null)
-
+    
     if ((Get-Date) -gt $endDateTime) {
         Write-Log "Current time is past end time. Starting immediate shutdown and validation." -Level "WARN"
         $monitoringActive = $false
@@ -1343,15 +857,14 @@ try {
         $monitoringActive = $true
         Write-Log "Monitoring window: $($startDateTime.ToString('HH:mm:ss')) to $($endDateTime.ToString('HH:mm:ss'))" -Level "INFO"
     }
-
+    
     while ($monitoringActive) {
         try {
             $processStatus = Check-ProcessStatus
             $startPassed = Test-TimeWindow -TargetTime $Script:Config.StartTime
             $endPassed   = Test-TimeWindow -TargetTime $Script:Config.EndTime
             $inWindow = $startPassed -and (-not $endPassed)
-
-            # Status banner every 10 seconds
+            
             if ((Get-Date).Second % 10 -eq 0) {
                 Write-Host "================================================" -ForegroundColor Cyan
                 Write-Host "    FACE RECOGNITION MONITOR" -ForegroundColor Cyan
@@ -1362,8 +875,7 @@ try {
                 Write-Host "Worker: $(if ($processStatus.WorkerRunning) {'RUNNING'} else {'STOPPED'})" -ForegroundColor $(if ($processStatus.WorkerRunning) {'Green'} else {'Red'})
                 Write-Host "================================================" -ForegroundColor Cyan
             }
-
-            # Start worker if needed
+            
             if ($inWindow -and (-not $processStatus.PythonRunning)) {
                 if (-not $global:LastWorkerAttempt -or ((Get-Date) - $global:LastWorkerAttempt).TotalSeconds -ge 60) {
                     $started = Start-WorkerProcess
@@ -1371,13 +883,11 @@ try {
                     if ($started) { Write-Log "Worker started." -Level "SUCCESS" }
                 }
             }
-
-            # End time reached
             elseif ($endPassed) {
                 Write-Log "End time reached – shutting down." -Level "SHUTDOWN"
                 if ($processStatus.PythonRunning -or $processStatus.WorkerRunning) {
                     Stop-WorkerProcess
-                    Start-Sleep -Seconds 10   # allow graceful exit
+                    Start-Sleep -Seconds 10
                 }
                 $global:LastValidation = Validate-Output -CollectAll -CollectionStart $startDateTime -CollectionEnd $endDateTime
                 if ($emailReportingInitialized) {
@@ -1386,7 +896,6 @@ try {
                 $monitoringActive = $false
                 break
             }
-
             Start-Sleep -Seconds $Script:Config.ProcessCheckInterval
         } catch {
             Write-Log "Error in main loop: $_" -Level "ERROR"
@@ -1396,22 +905,25 @@ try {
     }
 } catch {
     Write-Log "FATAL ERROR: $_" -Level "ERROR"
+    $global:MonitorExitCode = 1
 } finally {
     Write-Log "Cleaning up..." -Level "INFO"
     Stop-WorkerProcess
     if (Test-Path $global:MonitorLockFile) { Remove-Item $global:MonitorLockFile -Force }
+    
+    # --- Write final monitor metadata ---
+    Write-MonitorMetadata -Final
+    
     Write-Log "=== Monitor Stopped ===" -Level "INFO"
     Write-Host "`n================================================" -ForegroundColor Cyan
     Write-Host "MONITOR STOPPED" -ForegroundColor Yellow
-    Write-Host "Log file: $($Script:Config.LogFile)" -ForegroundColor White
+    Write-Host "Monitor metadata: $($Script:Config.MonitorMetadataFile)" -ForegroundColor White
     Write-Host "Collected folders with full data: $($global:CollectedRunFolders.Count)" -ForegroundColor White
     Write-Host "================================================" -ForegroundColor Cyan
 }
 
 
-
-# 1_email-sender-stable.ps1 (updated)
-
+# 1_email-sender-stable.ps1
 <#
 .SYNOPSIS
 Stable email sender for face recognition run reports
@@ -1440,7 +952,6 @@ $EmailConfig = @{
     SubjectPrefix = $appConfig.EmailSubjectPrefix
 }
 
-
 # ====================================================================
 # Initialize Email Configuration
 # ====================================================================
@@ -1452,7 +963,6 @@ function Initialize-EmailConfig {
     )
     Write-Host "Initializing email configuration..." -ForegroundColor Cyan
     
-    # Check if credentials file exists
     if (Test-Path $CredentialPath) {
         try {
             $credential = Import-Clixml -Path $CredentialPath -ErrorAction Stop
@@ -1460,7 +970,6 @@ function Initialize-EmailConfig {
             $EmailConfig.Password = $credential.GetNetworkCredential().Password
             $EmailConfig.FromAddress = $credential.GetNetworkCredential().UserName
             $EmailConfig.ToAddress = $credential.GetNetworkCredential().UserName
-            
             Write-Host "✓ Email credentials loaded from: $CredentialPath" -ForegroundColor Green
         } catch {
             Write-Host "✗ Failed to load credentials: $_" -ForegroundColor Red
@@ -1468,38 +977,27 @@ function Initialize-EmailConfig {
         }
     } else {
         Write-Host "✗ Credential file not found: $CredentialPath" -ForegroundColor Red
-        
-        # Prompt for credentials
         Write-Host "`nPlease enter email configuration:" -ForegroundColor Yellow
         $EmailConfig.Username = Read-Host "Email address"
         $EmailConfig.Password = Read-Host "App password" -AsSecureString
-        
-        # Convert secure string to plain text (not recommended for production)
         $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($EmailConfig.Password)
         $EmailConfig.Password = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
         [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
-        
         $EmailConfig.FromAddress = $EmailConfig.Username
         $EmailConfig.ToAddress = $EmailConfig.Username
-        
-        # Save credentials for future use
         $credentialDir = Split-Path $CredentialPath -Parent
         if (-not (Test-Path $credentialDir)) {
             New-Item -ItemType Directory -Path $credentialDir -Force | Out-Null
         }
-        
         $securePassword = ConvertTo-SecureString $EmailConfig.Password -AsPlainText -Force
         $credential = New-Object System.Management.Automation.PSCredential($EmailConfig.Username, $securePassword)
         $credential | Export-Clixml -Path $CredentialPath
-        
         Write-Host "✓ Credentials saved to: $CredentialPath" -ForegroundColor Green
     }
     
-    # Apply any overrides
     foreach ($key in $OverrideConfig.Keys) {
         $EmailConfig[$key] = $OverrideConfig[$key]
     }
-    
     return $true
 }
 
@@ -1519,7 +1017,6 @@ function Get-RunSummaries {
     $summaries = @()
     
     try {
-        # Find all run folders
         $runFolders = Get-ChildItem -Path $BasePath -Directory -Filter $appConfig.EmailRunFolderFilter -ErrorAction SilentlyContinue | 
             Sort-Object CreationTime -Descending |
             Select-Object -First $MaxRuns
@@ -1531,7 +1028,6 @@ function Get-RunSummaries {
         $outsideTimeWindow = 0
         
         foreach ($folder in $runFolders) {
-            # If TimeWindowMode is enabled, filter by schedule time
             $inTimeWindow = $true
             if ($TimeWindowMode -and $ScheduleStart -and $ScheduleEnd) {
                 $inTimeWindow = ($folder.CreationTime -ge $ScheduleStart -and $folder.CreationTime -le $ScheduleEnd)
@@ -1541,12 +1037,10 @@ function Get-RunSummaries {
                 }
             }
             
-            # Check if folder was created after the specified time
             if ($folder.CreationTime -ge $Since) {
                 $summaryPath = Join-Path $folder.FullName "$($appConfig.EmailLogsFolder)\$($appConfig.EmailCompletionSummaryFile)"
                 $hasSummary = Test-Path $summaryPath
                 
-                # Get metadata if available
                 $metadata = $null
                 $metadataPath = Join-Path $folder.FullName $appConfig.EmailMetadataFile
                 $hasMetadata = Test-Path $metadataPath
@@ -1559,7 +1053,6 @@ function Get-RunSummaries {
                     }
                 }
                 
-                # Create summary object
                 $summary = @{
                     FolderPath = $folder.FullName
                     FolderName = $folder.Name
@@ -1577,31 +1070,26 @@ function Get-RunSummaries {
                 if ($hasSummary) {
                     $summaryContent = Get-Content $summaryPath -Raw
                     $summary.SummaryText = $summaryContent
-                    
-                    # Parse the summary for exit code
                     if ($summaryContent -match "Exit code: (\d+)") {
                         $summary.ExitCode = $matches[1]
-                        $summary.Status = if ($matches[1] -eq "1") { "FAILED" } else { "SUCCESS" } # This logic is to determine the success and failed status of the system.
+                        $summary.Status = if ($matches[1] -eq "1") { "FAILED" } else { "SUCCESS" }
                     }
                     $summary.CollectionType = "SUMMARY_METADATA"
                     $collectedWithSummary++
                     Write-Host "  ✓ Collected with summary: $($folder.Name) (Exit: $($summary.ExitCode))" -ForegroundColor Green
                 } elseif ($hasMetadata) {
-                    # Try to get exit code from metadata
                     if ($metadata -and $metadata.worker_exit_code) {
                         $summary.ExitCode = $metadata.worker_exit_code
-                        $summary.Status = if ($metadata.worker_exit_code -eq "1") { "FAILED" } else { "SUCCESS" } # This logic is to determine the success and failed status of the system.
+                        $summary.Status = if ($metadata.worker_exit_code -eq "1") { "FAILED" } else { "SUCCESS" }
                     }
                     $summary.CollectionType = "METADATA_ONLY"
                     $collectedMetadataOnly++
                     Write-Host "  ⚠ Collected metadata only: $($folder.Name) (Exit: $($summary.ExitCode))" -ForegroundColor Yellow
                 } else {
-                    # No summary or metadata
                     $summary.CollectionType = "NO_DATA"
                     Write-Host "  ✗ No data found: $($folder.Name)" -ForegroundColor Red
                 }
                 
-                # Find log files (even if no summary, we might still have logs)
                 $logDir = Join-Path $folder.FullName $appConfig.EmailLogsFolder
                 if (Test-Path $logDir) {
                     $logFiles = Get-ChildItem -Path $logDir -File -Filter $appConfig.EmailLogFileFilter -ErrorAction SilentlyContinue
@@ -1617,19 +1105,16 @@ function Get-RunSummaries {
                     }
                 }
                 
-                # Create compressed zip for the entire run folder
                 $tempDir = [System.IO.Path]::GetTempPath()
                 $compressedFolder = Compress-RunFolder -FolderPath $folder.FullName -DestinationPath $tempDir
                 if ($compressedFolder) {
                     $summary.CompressedFolder = $compressedFolder
                 }
-
                 
                 $summaries += $summary
             }
         }
         
-        # Calculate final counts correctly
         $totalInWindow = $runFolders.Count - $outsideTimeWindow
         $noDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
         
@@ -1651,10 +1136,8 @@ function Get-RunSummaries {
 }
 
 # ====================================================================
-# Send Email with Send-MailMessage (No External Dependencies)
+# Helper: Compress Run Folder
 # ====================================================================
-
-# Add this function to handle folder compression
 function Compress-RunFolder {
     [CmdletBinding()]
     param(
@@ -1663,14 +1146,9 @@ function Compress-RunFolder {
     )
     
     try {
-        # Create zip file name based on folder name
         $folderName = Split-Path $FolderPath -Leaf
         $zipPath = Join-Path $DestinationPath "$folderName.zip"
-        
-        # Use Compress-Archive to create zip
         Compress-Archive -Path "$FolderPath\*" -DestinationPath $zipPath -CompressionLevel Optimal -Force
-        
-        # Return zip file info
         $zipFile = Get-Item $zipPath
         return @{
             Path = $zipFile.FullName
@@ -1685,9 +1163,6 @@ function Compress-RunFolder {
         return $null
     }
 }
-
-
-
 
 # ====================================================================
 # Send Email with MailKit Library (Stable version)
@@ -1704,7 +1179,6 @@ function Send-EmailWithAttachments {
     try {
         Write-Host "Preparing email with $($Attachments.Count) attachments..." -ForegroundColor Cyan
         
-        # Load MailKit and MimeKit assemblies
         $currentLocation = $PSScriptRoot
         $mailKitPath = Join-Path $currentLocation "MailKit.dll"
         $mimeKitPath = Join-Path $currentLocation "MimeKit.dll"
@@ -1719,22 +1193,18 @@ function Send-EmailWithAttachments {
         Add-Type -Path $mailKitPath
         Add-Type -Path $mimeKitPath
         
-        # Create MIME message
         $message = New-Object MimeKit.MimeMessage
         $message.From.Add([MimeKit.MailboxAddress]::Parse($Config.FromAddress))
         $message.To.Add([MimeKit.MailboxAddress]::Parse($Config.ToAddress))
         $message.Subject = $Subject
         
-        # Create message body with HTML content
         $bodyBuilder = New-Object MimeKit.BodyBuilder
         $bodyBuilder.HtmlBody = $Body
         $bodyBuilder.TextBody = [System.Text.RegularExpressions.Regex]::Replace($Body, "<[^>]*>", "")
         
-        # Track opened streams for proper cleanup
         $attachmentStreams = @()
         
         try {
-            # Add attachments if any
             if ($Attachments.Count -gt 0) {
                 foreach ($attachmentPath in $Attachments) {
                     if (Test-Path $attachmentPath) {
@@ -1753,12 +1223,10 @@ function Send-EmailWithAttachments {
             
             $message.Body = $bodyBuilder.ToMessageBody()
             
-            # Send using MailKit SmtpClient with correct SSL/TLS options
             Write-Host "Sending email via $($Config.SmtpServer):$($Config.SmtpPort)..." -ForegroundColor Cyan
             
             $smtpClient = New-Object MailKit.Net.Smtp.SmtpClient
             try {
-                # Determine secure socket options based on port and config
                 $socketOptions = [MailKit.Security.SecureSocketOptions]::Auto
                 if ($Config.SmtpPort -eq 465) {
                     $socketOptions = [MailKit.Security.SecureSocketOptions]::SslOnConnect
@@ -1787,28 +1255,19 @@ function Send-EmailWithAttachments {
                 }
             }
             
-            # Clean up temporary zip files
             foreach ($attachment in $Attachments) {
                 if ($attachment -like "*.zip") {
                     try {
                         Remove-Item $attachment -Force -ErrorAction SilentlyContinue
                         Write-Host "  ✓ Cleaned up temporary zip: $(Split-Path $attachment -Leaf)" -ForegroundColor Gray
-                    } catch {
-                        # Silent cleanup - don't fail if cleanup fails
-                    }
+                    } catch { }
                 }
             }
-            
             return $true
             
         } finally {
-            # Ensure all attachment streams are disposed
             foreach ($stream in $attachmentStreams) {
-                try {
-                    $stream.Dispose()
-                } catch {
-                    # Silently continue
-                }
+                try { $stream.Dispose() } catch { }
             }
         }
         
@@ -1914,7 +1373,6 @@ function Create-EmailBody {
 "@
 
     foreach ($summary in $RunSummaries) {
-        # Determine status class and badge
         $statusClass = "run-unknown"
         $statusBadge = "status-unknown"
         $statusText = "UNKNOWN"
@@ -1929,12 +1387,10 @@ function Create-EmailBody {
             $statusText = "FAILED"
         }
         
-        # Add metadata-only styling
         if ($summary.CollectionType -eq "METADATA_ONLY") {
             $statusClass = "run-metadata-only"
         }
         
-        # Determine collection badge
         $collectionBadge = ""
         $collectionText = ""
         if ($summary.CollectionType -eq "SUMMARY_METADATA") {
@@ -2011,15 +1467,12 @@ function Send-RunReport {
     Write-Host "==============================" -ForegroundColor Cyan
     Write-Host ""
     
-    # Initialize configuration
     if (-not (Initialize-EmailConfig -OverrideConfig $ConfigOverride)) {
         return $false
     }
     
-    # Determine time range based on mode
-    $since = (Get-Date).AddHours(-$appConfig.EmailDefaultHoursBack)  # Default: last 24 hours
+    $since = (Get-Date).AddHours(-$appConfig.EmailDefaultHoursBack)
     
-    # If using schedule time window, parse the times
     $windowStart = $null
     $windowEnd = $null
     if ($UseTimeWindow -and $ScheduleStartTime -and $ScheduleEndTime) {
@@ -2039,16 +1492,13 @@ function Send-RunReport {
         }
     }
     
-    # Collect run summaries
     Write-Host "Collecting run summaries from: $BasePath" -ForegroundColor Cyan
     $summaries = Get-RunSummaries -BasePath $BasePath -Since $since `
-        -MaxRuns $appConfig.EmailMaxRunsToCollect `   # <-- FIXED: $ScriptConfig -> $appConfig
+        -MaxRuns $appConfig.EmailMaxRunsToCollect `
         -ScheduleStart $windowStart -ScheduleEnd $windowEnd -TimeWindowMode:$UseTimeWindow
     
     if ($summaries.Count -eq 0) {
         Write-Host "No runs found to report." -ForegroundColor Yellow
-        
-        # Still send a summary email if needed
         if (-not $TestMode) {
             $subject = "$($EmailConfig.SubjectPrefix) No Runs Found - $(Get-Date -Format 'yyyy-MM-dd')"
             if ($UseTimeWindow) {
@@ -2060,13 +1510,11 @@ function Send-RunReport {
         return $true
     }
 
-    # Validate the counts
     $totalCollected = $summaries.Count
     $calcSummaryCount = ($summaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
     $calcMetadataOnlyCount = ($summaries | Where-Object { $_.CollectionType -eq "METADATA_ONLY" }).Count
     $calcNoDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
     
-    # Verify counts add up
     $calculatedTotal = $calcSummaryCount + $calcMetadataOnlyCount + $calcNoDataCount
     if ($calculatedTotal -ne $totalCollected) {
         Write-Host "Warning: Count mismatch! Calculated: $calculatedTotal, Actual: $totalCollected" -ForegroundColor Red
@@ -2076,29 +1524,24 @@ function Send-RunReport {
         $noDataCount = $calcNoDataCount
     }    
     
-    # Prepare attachments - only attach from runs that have data
     $attachments = @()
     $totalSize = 0
-    $maxSize = $appConfig.EmailMaxAttachmentSizeMB * 1024 * 1024  # Convert MB to bytes
+    $maxSize = $appConfig.EmailMaxAttachmentSizeMB * 1024 * 1024
     
-    # Calculate counts correctly
     $summaryCount = ($summaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
     $metadataOnlyCount = ($summaries | Where-Object { $_.CollectionType -eq "METADATA_ONLY" }).Count
     $noDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
     
     foreach ($summary in $summaries) {
-        # Use compressed folder if available, otherwise fall back to individual files
         if ($summary.CompressedFolder) {
             $zipFile = $summary.CompressedFolder
             $sizeInBytes = $zipFile.SizeBytes
-            
             if (($totalSize + $sizeInBytes) -lt $maxSize) {
                 $attachments += $zipFile.Path
                 $totalSize += $sizeInBytes
                 Write-Host "  ✓ Will attach compressed folder: $($zipFile.Name) ($($zipFile.Size))" -ForegroundColor Green
             }
         } else {
-            # Fallback to individual files if compression failed
             foreach ($logFile in $summary.LogFiles) {
                 $sizeInBytes = if ($logFile.SizeBytes) {
                     $logFile.SizeBytes
@@ -2107,7 +1550,6 @@ function Send-RunReport {
                 } else {
                     0
                 }
-                
                 if (($totalSize + $sizeInBytes) -lt $maxSize) {
                     $attachments += $logFile.Path
                     $totalSize += $sizeInBytes
@@ -2116,18 +1558,14 @@ function Send-RunReport {
         }
     }
     
-    # Create email
     $runCount = $summaries.Count
     $subject = "$($EmailConfig.SubjectPrefix) $runCount Runs - $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
-    
     if ($UseTimeWindow) {
         $subject = "$($EmailConfig.SubjectPrefix) $runCount Runs ($ScheduleStartTime-$ScheduleEndTime) - $(Get-Date -Format 'yyyy-MM-dd')"
     }
     
     $body = Create-EmailBody -RunSummaries $summaries -Config $EmailConfig -ScheduleStart $ScheduleStartTime -ScheduleEnd $ScheduleEndTime
     
-    # Update the email details display to show compression info
-    # Find this section in Send-RunReport function (around line 380-390):
     Write-Host "`nEmail Details:" -ForegroundColor Cyan
     Write-Host "  Subject: $subject" -ForegroundColor White
     Write-Host "  To: $($EmailConfig.ToAddress)" -ForegroundColor White
@@ -2136,8 +1574,6 @@ function Send-RunReport {
     Write-Host "  Metadata only: $metadataOnlyCount" -ForegroundColor Yellow
     Write-Host "  No data: $noDataCount" -ForegroundColor Gray
     Write-Host "  Attachments: $($attachments.Count) files (~$([math]::Round($totalSize/1MB, 2)) MB)" -ForegroundColor White
-
-    # Add a line to show compression status:
     $compressedCount = ($summaries | Where-Object { $_.CompressedFolder }).Count
     Write-Host "  Compressed folders: $compressedCount" -ForegroundColor Cyan
     if ($UseTimeWindow) {
@@ -2149,7 +1585,6 @@ function Send-RunReport {
         return $true
     }
     
-    # Send email
     return Send-EmailWithAttachments -Subject $subject -Body $body -Attachments $attachments -Config $EmailConfig
 }
 
@@ -2166,11 +1601,10 @@ function Register-StableEmailSender {
         LastSent       = $null
         MonitorConfig  = $MonitorConfig
         Enabled        = $true
-        CredentialPath = $appConfig.EmailCredentialPath   # <-- FIXED: was $ScriptConfig.CredentialPath
+        CredentialPath = $appConfig.EmailCredentialPath
     }
     return $true
 }
-
 
 function Invoke-StableEmailReport {
     [CmdletBinding()]
@@ -2183,7 +1617,6 @@ function Invoke-StableEmailReport {
         return $false
     }
     
-    # Determine if we should send (every hour or if forced)
     $shouldSend = $Force -or (
         $global:StableEmailSender.LastSent -eq $null -or 
         ((Get-Date) - $global:StableEmailSender.LastSent).TotalHours -ge 1
@@ -2193,18 +1626,12 @@ function Invoke-StableEmailReport {
         Write-Host "Sending email report..." -ForegroundColor Cyan
         Write-Host "Time: $(Get-Date -Format 'HH:mm:ss')" -ForegroundColor Gray
         
-        # Initialize the configuration if needed
         if (-not $global:StableEmailSender.Config -or $global:StableEmailSender.Config.Count -eq 0) {
-            $global:StableEmailSender.Config = @{
-                SubjectPrefix = "[FaceRecog]"
-            }
+            $global:StableEmailSender.Config = @{ SubjectPrefix = "[FaceRecog]" }
         }
         
-        # Extract schedule times from config
         $scheduleStart = $global:StableEmailSender.Config.ScheduleStartTime
         $scheduleEnd = $global:StableEmailSender.Config.ScheduleEndTime
-        
-        # Send the report with time window if schedule times are available
         $useTimeWindow = ($scheduleStart -and $scheduleEnd)
         
         if ($useTimeWindow) {
@@ -2223,7 +1650,6 @@ function Invoke-StableEmailReport {
         } else {
             Write-Host "Failed to send email" -ForegroundColor Red
         }
-        
         return $success
     } else {
         Write-Host "Email report not sent (recently sent at $($global:StableEmailSender.LastSent.ToString('HH:mm:ss')))" -ForegroundColor Gray
@@ -2235,13 +1661,11 @@ function Invoke-StableEmailReport {
 # Direct Execution
 # ====================================================================
 if ($MyInvocation.InvocationName -ne '.') {
-    # This script is being run directly
     Write-Host "==============================" -ForegroundColor Cyan
     Write-Host "DIRECT EMAIL REPORT TEST" -ForegroundColor Cyan
     Write-Host "==============================" -ForegroundColor Cyan
     Write-Host ""
     
-    # Get base path from common paths
     $commonPathsScript = Join-Path $PSScriptRoot $appConfig.EmailCommonPathsScript
     if (Test-Path $commonPathsScript) {
         try {
@@ -2249,14 +1673,8 @@ if ($MyInvocation.InvocationName -ne '.') {
             $paths = Initialize-ProjectPortablePaths -IsMonitor -Silent
             if ($paths -and $paths.DateBasedPath) {
                 Write-Host "Found base path: $($paths.DateBasedPath)" -ForegroundColor Green
-                
-                # Test email sending
-                $testConfig = @{
-                    SubjectPrefix = "[Test] FaceRecog"
-                }
-                
+                $testConfig = @{ SubjectPrefix = "[Test] FaceRecog" }
                 $result = Send-RunReport -BasePath $paths.DateBasedPath -ConfigOverride $testConfig -TestMode
-                
                 if ($result) {
                     Write-Host "`n✓ Email test completed successfully!" -ForegroundColor Green
                     Write-Host "   Run with -TestMode:`$false to send actual email." -ForegroundColor Yellow
@@ -2274,9 +1692,7 @@ if ($MyInvocation.InvocationName -ne '.') {
     }
 }
 
-
-# 1_common-paths.ps1 
-
+# 1_common-paths.ps1
 <#
 .SYNOPSIS
 Common path initialization module shared by monitor and worker scripts
@@ -2301,6 +1717,7 @@ $Script:CommonConfig = @{
         PIDFileName = "monitor_pid_TowerCPU.json"
         LogFileName = "monitor_TowerCPU.log"
         EmailSendScript = "patterns\scripts\1_towerCPU\stableScript\1_email-sender-stable.ps1"
+        MonitorMetadataFileName = "monitor_metadata.json"          # <-- NEW        
     }
     
     # File paths for worker script
@@ -2318,12 +1735,12 @@ $Script:CommonConfig = @{
 }
 
 # ====================================================================
-# NEW: Centralised Application Configuration
+# Centralised Application Configuration
 # ====================================================================
 $Script:ApplicationConfig = @{
     # ---------------------- Monitor Settings ----------------------
-    EveryStartTime       = "08:57"
-    EveryEndTime         = "09:00"
+    EveryStartTime       = "09:50"
+    EveryEndTime         = "10:18"
     MonitorProcessCheckInterval = 5
     MonitorMaxPIDFileAgeMinutes = 120
     MonitorPIDTrackingFile = "pid_tracking.json"
@@ -2356,8 +1773,6 @@ $Script:ApplicationConfig = @{
     EmailSenderScript      = "1_email-sender-stable.ps1"
     
     # ---------------------- Capture Script Settings --------------
-    # CaptureStartTime       = "10:00"
-    # CaptureEndTime         = "11:04"
     CaptureRunsDirectory   = "runs"
     CaptureLogsDirectory   = "logs"
     CaptureOutputFolderPattern = "TowerCPU_Process_MaskDetect_*"
@@ -2413,7 +1828,6 @@ function Initialize-ProjectPortablePaths {
 # ====================================================================
 # Helper Functions
 # ====================================================================
-
 function Find-ProjectRoot {
     [CmdletBinding()]
     param([switch]$Silent)
@@ -2421,7 +1835,6 @@ function Find-ProjectRoot {
     $scriptPath = $PSScriptRoot
     $currentPath = $scriptPath
     
-    # Look for maskRecog directory by going up
     while ($currentPath -and (Split-Path $currentPath -Parent)) {
         $currentDirName = Split-Path $currentPath -Leaf
         if ($currentDirName -eq $Script:CommonConfig.ProjectName) {
@@ -2433,7 +1846,6 @@ function Find-ProjectRoot {
         $currentPath = Split-Path $currentPath -Parent
     }
     
-    # Check current directory
     $currentDir = Get-Location
     if ((Split-Path $currentDir -Leaf) -eq $Script:CommonConfig.ProjectName) {
         return $currentDir
@@ -2446,7 +1858,6 @@ function Build-ProjectPaths {
     [CmdletBinding()]
     param([string]$ProjectRoot)
     
-    # Calculate paths
     $ActiveRoot = Split-Path $ProjectRoot -Parent | Split-Path -Parent
     $VenvRoot = Split-Path $ProjectRoot -Parent | Split-Path -Parent | Split-Path -Parent | Split-Path -Parent
     $currentDate = Get-Date -Format $Script:CommonConfig.DateFormat
@@ -2463,13 +1874,11 @@ function Initialize-DateBasedStructure {
     [CmdletBinding()]
     param([hashtable]$Paths)
     
-    # Create base folder
     $towerCPUBasePath = Join-Path $Paths.ActiveRoot $Script:CommonConfig.LogBasePath
     if (-not (Test-Path $towerCPUBasePath)) {
         New-Item -ItemType Directory -Path $towerCPUBasePath -Force | Out-Null
     }
     
-    # Create date-specific folder
     $dateBasedPath = Join-Path $towerCPUBasePath $Paths.CurrentDate
     if (-not (Test-Path $dateBasedPath)) {
         New-Item -ItemType Directory -Path $dateBasedPath -Force | Out-Null
@@ -2496,6 +1905,7 @@ function Add-ScriptSpecificPaths {
         $Paths.LogFile = Join-Path $DateBasedPath $Script:CommonConfig.MonitorFilePaths.LogFileName
         $Paths.PythonExe = Join-Path $Paths.VenvRoot $Script:CommonConfig.CommonFilePaths.PythonExe
         $paths.EmailSendScript = Join-Path $Paths.ProjectRoot $Script:CommonConfig.MonitorFilePaths.EmailSendScript
+        $paths.MonitorMetadataFile = Join-Path $DateBasedPath $Script:CommonConfig.MonitorFilePaths.MonitorMetadataFileName   # <-- NEW
     }
     
     if ($IsWorker) {
@@ -2507,26 +1917,18 @@ function Add-ScriptSpecificPaths {
 }
 
 # ====================================================================
-# MISSING FUNCTION IMPLEMENTATIONS
+# Shared Utility Functions
 # ====================================================================
-
 function Check-Heartbeat {
     [CmdletBinding()]
     param([string]$HeartbeatFile)
     
-    if (-not (Test-Path $HeartbeatFile)) {
-        return $false
-    }
-    
+    if (-not (Test-Path $HeartbeatFile)) { return $false }
     try {
         $heartbeatTime = (Get-Item $HeartbeatFile).LastWriteTime
         $ageMinutes = ((Get-Date) - $heartbeatTime).TotalMinutes
-        
-        # Heartbeat is considered alive if updated within last 2 minutes
         return $ageMinutes -le 2
-    } catch {
-        return $false
-    }
+    } catch { return $false }
 }
 
 function Send-Heartbeat {
@@ -2535,56 +1937,34 @@ function Send-Heartbeat {
     
     try {
         $heartbeatDir = Split-Path $HeartbeatFile -Parent
-        if (-not (Test-Path $heartbeatDir)) {
-            New-Item -ItemType Directory -Path $heartbeatDir -Force | Out-Null
-        }
-        
+        if (-not (Test-Path $heartbeatDir)) { New-Item -ItemType Directory -Path $heartbeatDir -Force | Out-Null }
         Set-Content -Path $HeartbeatFile -Value (Get-Date -Format "yyyy-MM-dd HH:mm:ss") -Force
         return $true
-    } catch {
-        return $false
-    }
+    } catch { return $false }
 }
 
 function Acquire-Lock {
     [CmdletBinding()]
-    param(
-        [string]$LockFile,
-        [int]$TimeoutSeconds = 30
-    )
+    param([string]$LockFile, [int]$TimeoutSeconds = 30)
     
     $startTime = Get-Date
     $lockAcquired = $false
-    
     while (((Get-Date) - $startTime).TotalSeconds -lt $TimeoutSeconds) {
         try {
             if (Test-Path $LockFile) {
                 $lockTime = [DateTime]::Parse((Get-Content $LockFile -First 1))
                 $lockAge = ((Get-Date) - $lockTime).TotalSeconds
-                
-                # If lock is older than 30 seconds, consider it stale
-                if ($lockAge -gt 30) {
-                    Remove-Item $LockFile -Force -ErrorAction SilentlyContinue
-                }
+                if ($lockAge -gt 30) { Remove-Item $LockFile -Force -ErrorAction SilentlyContinue }
             }
-            
-            # Try to create lock file
             $lockDir = Split-Path $LockFile -Parent
-            if (-not (Test-Path $lockDir)) {
-                New-Item -ItemType Directory -Path $lockDir -Force | Out-Null
-            }
-            
+            if (-not (Test-Path $lockDir)) { New-Item -ItemType Directory -Path $lockDir -Force | Out-Null }
             $tempFile = "$LockFile.tmp"
             (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") | Out-File $tempFile -Force
             Move-Item $tempFile $LockFile -Force -ErrorAction Stop
-            
             $lockAcquired = $true
             break
-        } catch {
-            Start-Sleep -Milliseconds 500
-        }
+        } catch { Start-Sleep -Milliseconds 500 }
     }
-    
     return $lockAcquired
 }
 
@@ -2592,9 +1972,7 @@ function Release-Lock {
     [CmdletBinding()]
     param([string]$LockFile)
     
-    if (Test-Path $LockFile) {
-        Remove-Item $LockFile -Force -ErrorAction SilentlyContinue
-    }
+    if (Test-Path $LockFile) { Remove-Item $LockFile -Force -ErrorAction SilentlyContinue }
     return $true
 }
 
@@ -2616,12 +1994,16 @@ function Write-CommonLog {
     }
     if (-not $NoConsole) {
         $color = @{ ERROR='Red'; WARN='Yellow'; SUCCESS='Green'; DEBUG='Gray'; SHUTDOWN='Blue' }[$Level]
-        Write-Host $entry -ForegroundColor ($color ?? 'White')
+        if ($color) {
+            Write-Host $entry -ForegroundColor $color
+        } else {
+            Write-Host $entry -ForegroundColor 'White'
+        }
     }
 }
 
 # ====================================================================
-# SHARED VALIDATION & COLLECTION – NEW / MOVED HERE
+# Shared Validation & Collection
 # ====================================================================
 function Test-RunFolder {
     [CmdletBinding()]
@@ -2710,12 +2092,9 @@ function Collect-RunsFromTimeWindow {
     return $collected
 }
 
-
-
 # ====================================================================
-# Communication Functions (Basic)
+# Communication Functions
 # ====================================================================
-
 function Initialize-CommunicationPaths {
     [CmdletBinding()]
     param(
@@ -2723,30 +2102,18 @@ function Initialize-CommunicationPaths {
         [switch]$IsMonitor,
         [switch]$IsWorker
     )
-    
-    if (-not $Paths -or -not $Paths.DateBasedPath) {
-        return $null
-    }
-    
+    if (-not $Paths -or -not $Paths.DateBasedPath) { return $null }
     $communicationPaths = @{}
-    
     try {
         $commDir = Join-Path $Paths.DateBasedPath $Script:CommonConfig.CommonFilePaths.CommunicationDirName
-        if (-not (Test-Path $commDir)) {
-            New-Item -ItemType Directory -Path $commDir -Force -ErrorAction Stop | Out-Null
-        }
-        
+        if (-not (Test-Path $commDir)) { New-Item -ItemType Directory -Path $commDir -Force -ErrorAction Stop | Out-Null }
         $communicationPaths.CommunicationDir = $commDir
         $communicationPaths.StatusFile = Join-Path $commDir $Script:CommonConfig.CommonFilePaths.WorkerStatusFileName
-        
         if ($IsWorker) {
             $communicationPaths.PIDFile = Join-Path $commDir $Script:CommonConfig.CommonFilePaths.WorkerPIDFileName
         }
-        
         return $communicationPaths
-    } catch {
-        return $null
-    }
+    } catch { return $null }
 }
 
 function Write-WorkerStatus {
@@ -2758,7 +2125,6 @@ function Write-WorkerStatus {
         [int]$PythonPID = 0,
         [string]$Message = ""
     )
-    
     $statusData = @{
         Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
         Status = $Status
@@ -2766,537 +2132,18 @@ function Write-WorkerStatus {
         PythonPID = $PythonPID
         Message = $Message
     }
-    
     try {
         $statusData | ConvertTo-Json | Out-File $StatusFile -Force
         return $true
-    } catch {
-        return $false
-    }
+    } catch { return $false }
 }
 
 function Read-WorkerStatus {
     [CmdletBinding()]
     param([string]$StatusFile)
-    
     if (-not (Test-Path $StatusFile)) {
         return @{ Status = "NOT_FOUND"; WorkerPID = 0; PythonPID = 0 }
     }
-    
-    try {
-        $content = Get-Content $StatusFile -Raw
-        return $content | ConvertFrom-Json -AsHashtable
-    } catch {
-        return @{ Status = "ERROR"; Error = $_; WorkerPID = 0; PythonPID = 0 }
-    }
-}# 1_common-paths.ps1 
-
-<#
-.SYNOPSIS
-Common path initialization module shared by monitor and worker scripts
-.DESCRIPTION
-Handles portable path discovery and date-based folder creation
-#>
-
-# ====================================================================
-# Module Configuration - MODIFIABLE SECTION
-# ====================================================================
-$Script:CommonConfig = @{
-    ProjectName = "maskRecog"
-    LogBasePath = "logs-running\towerCPU"
-    DateFormat = "yyyy-MM-dd"
-    DateTimeFormat = "yyyy-MM-dd_HH-mm-ss"
-    LogDateTimeFormat = "yyyy-MM-dd HH:mm:ss"
-    
-    # File paths for monitor script
-    MonitorFilePaths = @{
-        WorkerScript = "patterns\scripts\1_towerCPU\stableScript\1_worker_portable.ps1"
-        PythonScriptPath = "patterns\algorithm\entry_multi-USED-TowerCPU.py"
-        PIDFileName = "monitor_pid_TowerCPU.json"
-        LogFileName = "monitor_TowerCPU.log"
-        EmailSendScript = "patterns\scripts\1_towerCPU\stableScript\1_email-sender-stable.ps1"
-    }
-    
-    # File paths for worker script
-    WorkerFilePaths = @{
-        PythonScript = "patterns\algorithm\entry_multi-USED-TowerCPU.py"
-    }
-    
-    # Common file paths
-    CommonFilePaths = @{
-        PythonExe = ".venv\Scripts\python.exe"
-        CommunicationDirName = "communication"
-        WorkerPIDFileName = "worker_pid.txt"
-        WorkerStatusFileName = "worker_status.json"
-    }
-}
-
-# ====================================================================
-# NEW: Centralised Application Configuration
-# ====================================================================
-$Script:ApplicationConfig = @{
-    # ---------------------- Monitor Settings ----------------------
-    EveryStartTime       = "08:57"
-    EveryEndTime         = "09:00"
-    MonitorProcessCheckInterval = 5
-    MonitorMaxPIDFileAgeMinutes = 120
-    MonitorPIDTrackingFile = "pid_tracking.json"
-    MonitorLogPattern      = "monitor_TowerCPU_{0}.log"
-    
-    # ---------------------- Worker Settings ----------------------
-    WorkerRunFolderPrefix  = "TowerCPU_Process_MaskDetect_"
-    WorkerLogSubfolder     = "logs"
-    WorkerOutputSubfolder  = "script_output"
-    WorkerMetadataFile     = "metadata.json"
-    WorkerPythonOutputPrefix = "python_output_"
-    WorkerCompletionSummary = "completion_summary.txt"
-    WorkerPythonArgument   = "--multi-source"
-    
-    # ---------------------- Email Sender Settings ----------------
-    EmailCredentialPath    = "$env:USERPROFILE\.face-recog\email-credential.xml"
-    EmailRunFolderFilter   = "TowerCPU_Process_MaskDetect_*"
-    EmailCompletionSummaryFile = "completion_summary.txt"
-    EmailMetadataFile      = "metadata.json"
-    EmailLogsFolder        = "logs"
-    EmailLogFileFilter     = "*.txt"
-    EmailCommonPathsScript = "1_common-paths.ps1"
-    EmailMaxRunsToCollect  = 10
-    EmailDefaultHoursBack  = 24
-    EmailMaxAttachmentSizeMB = 3
-    EmailSmtpServer        = "smtp.gmail.com"
-    EmailSmtpPort          = 587
-    EmailUseSsl            = $true
-    EmailSubjectPrefix     = "[FaceRecog]"
-    EmailSenderScript      = "1_email-sender-stable.ps1"
-    
-    # ---------------------- Capture Script Settings --------------
-    # CaptureStartTime       = "10:00"
-    # CaptureEndTime         = "11:04"
-    CaptureRunsDirectory   = "runs"
-    CaptureLogsDirectory   = "logs"
-    CaptureOutputFolderPattern = "TowerCPU_Process_MaskDetect_*"
-    CaptureLogFilePattern  = "capture_collected_runs_{0}.log"
-    CaptureDateFormat      = "yyyy-MM-dd"
-    CaptureDateTimeFormat  = "yyyy-MM-dd HH:mm"
-    CaptureFileTimestampFormat = "yyyyMMdd_HHmmss"
-    
-    # ---------------------- Shared Validation Settings -----------
-    ExpectedSubfolders     = @("logs", "script_output")
-    ExpectedFiles          = @("metadata.json")
-    MaxValidationRetries   = 5
-    RetryDelaySeconds      = 10
-}
-
-function Get-ApplicationConfig {
-    return $Script:ApplicationConfig
-}
-
-# ====================================================================
-# Initialize Project Paths
-# ====================================================================
-function Initialize-ProjectPortablePaths {
-    [CmdletBinding()]
-    param(
-        [switch]$IsMonitor,
-        [switch]$IsWorker,
-        [switch]$Silent = $false
-    )
-    
-    if (-not $Silent) {
-        Write-Host "Initializing portable paths for $($Script:CommonConfig.ProjectName) project..." -ForegroundColor Cyan
-    }
-    
-    # Find the project root
-    $projectRoot = Find-ProjectRoot -Silent:$Silent
-    if (-not $projectRoot) {
-        throw "Project root directory '$($Script:CommonConfig.ProjectName)' not found"
-    }
-    
-    # Build paths relative to project root
-    $paths = Build-ProjectPaths -ProjectRoot $projectRoot
-    
-    # Create date-based folder structure
-    $dateBasedPath = Initialize-DateBasedStructure -Paths $paths
-    
-    # Add script-specific paths
-    $paths = Add-ScriptSpecificPaths -Paths $paths -DateBasedPath $dateBasedPath -IsMonitor:$IsMonitor -IsWorker:$IsWorker
-    
-    return $paths
-}
-
-# ====================================================================
-# Helper Functions
-# ====================================================================
-
-function Find-ProjectRoot {
-    [CmdletBinding()]
-    param([switch]$Silent)
-    
-    $scriptPath = $PSScriptRoot
-    $currentPath = $scriptPath
-    
-    # Look for maskRecog directory by going up
-    while ($currentPath -and (Split-Path $currentPath -Parent)) {
-        $currentDirName = Split-Path $currentPath -Leaf
-        if ($currentDirName -eq $Script:CommonConfig.ProjectName) {
-            if (-not $Silent) {
-                Write-Host "Found project root: $currentPath" -ForegroundColor Green
-            }
-            return $currentPath
-        }
-        $currentPath = Split-Path $currentPath -Parent
-    }
-    
-    # Check current directory
-    $currentDir = Get-Location
-    if ((Split-Path $currentDir -Leaf) -eq $Script:CommonConfig.ProjectName) {
-        return $currentDir
-    }
-    
-    return $null
-}
-
-function Build-ProjectPaths {
-    [CmdletBinding()]
-    param([string]$ProjectRoot)
-    
-    # Calculate paths
-    $ActiveRoot = Split-Path $ProjectRoot -Parent | Split-Path -Parent
-    $VenvRoot = Split-Path $ProjectRoot -Parent | Split-Path -Parent | Split-Path -Parent | Split-Path -Parent
-    $currentDate = Get-Date -Format $Script:CommonConfig.DateFormat
-    
-    return @{
-        ProjectRoot = $ProjectRoot
-        ActiveRoot = $ActiveRoot
-        VenvRoot = $VenvRoot
-        CurrentDate = $currentDate
-    }
-}
-
-function Initialize-DateBasedStructure {
-    [CmdletBinding()]
-    param([hashtable]$Paths)
-    
-    # Create base folder
-    $towerCPUBasePath = Join-Path $Paths.ActiveRoot $Script:CommonConfig.LogBasePath
-    if (-not (Test-Path $towerCPUBasePath)) {
-        New-Item -ItemType Directory -Path $towerCPUBasePath -Force | Out-Null
-    }
-    
-    # Create date-specific folder
-    $dateBasedPath = Join-Path $towerCPUBasePath $Paths.CurrentDate
-    if (-not (Test-Path $dateBasedPath)) {
-        New-Item -ItemType Directory -Path $dateBasedPath -Force | Out-Null
-    }
-    
-    return $dateBasedPath
-}
-
-function Add-ScriptSpecificPaths {
-    [CmdletBinding()]
-    param(
-        [hashtable]$Paths,
-        [string]$DateBasedPath,
-        [switch]$IsMonitor,
-        [switch]$IsWorker
-    )
-    
-    $Paths.DateBasedPath = $DateBasedPath
-    
-    if ($IsMonitor) {
-        $Paths.WorkerScript = Join-Path $Paths.ProjectRoot $Script:CommonConfig.MonitorFilePaths.WorkerScript
-        $Paths.PythonScriptPath = Join-Path $Paths.ProjectRoot $Script:CommonConfig.MonitorFilePaths.PythonScriptPath
-        $Paths.PIDFilePath = Join-Path $DateBasedPath $Script:CommonConfig.MonitorFilePaths.PIDFileName
-        $Paths.LogFile = Join-Path $DateBasedPath $Script:CommonConfig.MonitorFilePaths.LogFileName
-        $Paths.PythonExe = Join-Path $Paths.VenvRoot $Script:CommonConfig.CommonFilePaths.PythonExe
-        $paths.EmailSendScript = Join-Path $Paths.ProjectRoot $Script:CommonConfig.MonitorFilePaths.EmailSendScript
-    }
-    
-    if ($IsWorker) {
-        $Paths.PythonScript = Join-Path $Paths.ProjectRoot $Script:CommonConfig.WorkerFilePaths.PythonScript
-        $Paths.PythonExe = Join-Path $Paths.VenvRoot $Script:CommonConfig.CommonFilePaths.PythonExe
-    }
-    
-    return $Paths
-}
-
-# ====================================================================
-# MISSING FUNCTION IMPLEMENTATIONS
-# ====================================================================
-
-function Check-Heartbeat {
-    [CmdletBinding()]
-    param([string]$HeartbeatFile)
-    
-    if (-not (Test-Path $HeartbeatFile)) {
-        return $false
-    }
-    
-    try {
-        $heartbeatTime = (Get-Item $HeartbeatFile).LastWriteTime
-        $ageMinutes = ((Get-Date) - $heartbeatTime).TotalMinutes
-        
-        # Heartbeat is considered alive if updated within last 2 minutes
-        return $ageMinutes -le 2
-    } catch {
-        return $false
-    }
-}
-
-function Send-Heartbeat {
-    [CmdletBinding()]
-    param([string]$HeartbeatFile)
-    
-    try {
-        $heartbeatDir = Split-Path $HeartbeatFile -Parent
-        if (-not (Test-Path $heartbeatDir)) {
-            New-Item -ItemType Directory -Path $heartbeatDir -Force | Out-Null
-        }
-        
-        Set-Content -Path $HeartbeatFile -Value (Get-Date -Format "yyyy-MM-dd HH:mm:ss") -Force
-        return $true
-    } catch {
-        return $false
-    }
-}
-
-function Acquire-Lock {
-    [CmdletBinding()]
-    param(
-        [string]$LockFile,
-        [int]$TimeoutSeconds = 30
-    )
-    
-    $startTime = Get-Date
-    $lockAcquired = $false
-    
-    while (((Get-Date) - $startTime).TotalSeconds -lt $TimeoutSeconds) {
-        try {
-            if (Test-Path $LockFile) {
-                $lockTime = [DateTime]::Parse((Get-Content $LockFile -First 1))
-                $lockAge = ((Get-Date) - $lockTime).TotalSeconds
-                
-                # If lock is older than 30 seconds, consider it stale
-                if ($lockAge -gt 30) {
-                    Remove-Item $LockFile -Force -ErrorAction SilentlyContinue
-                }
-            }
-            
-            # Try to create lock file
-            $lockDir = Split-Path $LockFile -Parent
-            if (-not (Test-Path $lockDir)) {
-                New-Item -ItemType Directory -Path $lockDir -Force | Out-Null
-            }
-            
-            $tempFile = "$LockFile.tmp"
-            (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") | Out-File $tempFile -Force
-            Move-Item $tempFile $LockFile -Force -ErrorAction Stop
-            
-            $lockAcquired = $true
-            break
-        } catch {
-            Start-Sleep -Milliseconds 500
-        }
-    }
-    
-    return $lockAcquired
-}
-
-function Release-Lock {
-    [CmdletBinding()]
-    param([string]$LockFile)
-    
-    if (Test-Path $LockFile) {
-        Remove-Item $LockFile -Force -ErrorAction SilentlyContinue
-    }
-    return $true
-}
-
-function Write-CommonLog {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory)]
-        [string]$Message,
-        [string]$Level = "INFO",
-        [string]$LogFile,
-        [switch]$NoConsole
-    )
-    $timestamp = Get-Date -Format $Script:CommonConfig.LogDateTimeFormat
-    $entry = "[$timestamp] [$Level] $Message"
-    if ($LogFile) {
-        $dir = Split-Path $LogFile -Parent
-        if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
-        Add-Content -Path $LogFile -Value $entry -ErrorAction SilentlyContinue
-    }
-    if (-not $NoConsole) {
-        $color = @{ ERROR='Red'; WARN='Yellow'; SUCCESS='Green'; DEBUG='Gray'; SHUTDOWN='Blue' }[$Level]
-        Write-Host $entry -ForegroundColor ($color ?? 'White')
-    }
-}
-
-# ====================================================================
-# SHARED VALIDATION & COLLECTION – NEW / MOVED HERE
-# ====================================================================
-function Test-RunFolder {
-    [CmdletBinding()]
-    param(
-        [string]$FolderPath,
-        [switch]$Detailed
-    )
-    $cfg = Get-ApplicationConfig
-    $result = @{
-        Success = $false
-        FolderPath = $FolderPath
-        FolderName = Split-Path $FolderPath -Leaf
-        CreationTime = $null
-        MissingItems = @()
-        Errors = @()
-        Warnings = @()
-        Details = @{}
-    }
-    try {
-        $folder = Get-Item -Path $FolderPath -ErrorAction Stop
-        $result.CreationTime = $folder.CreationTime
-        foreach ($sub in $cfg.ExpectedSubfolders) {
-            if (-not (Test-Path (Join-Path $FolderPath $sub))) {
-                $result.MissingItems += $sub
-                $result.Warnings += "Missing subfolder: $sub"
-            }
-        }
-        foreach ($file in $cfg.ExpectedFiles) {
-            if (-not (Test-Path (Join-Path $FolderPath $file))) {
-                $result.MissingItems += $file
-                $result.Warnings += "Missing file: $file"
-            }
-        }
-        $result.Success = ($result.MissingItems.Count -eq 0) -and ($result.Errors.Count -eq 0)
-    } catch {
-        $result.Errors += "Error validating folder: $_"
-    }
-    return $result
-}
-
-function Get-RunFoldersInWindow {
-    [CmdletBinding()]
-    param(
-        [string]$BasePath,
-        [DateTime]$WindowStart,
-        [DateTime]$WindowEnd,
-        [string]$FolderFilter = (Get-ApplicationConfig).WorkerRunFolderPrefix
-    )
-    if (-not (Test-Path $BasePath)) { return @() }
-    $folders = Get-ChildItem -Path $BasePath -Directory -Filter "$FolderFilter*" -ErrorAction SilentlyContinue |
-               Where-Object { $_.CreationTime -ge $WindowStart -and $_.CreationTime -le $WindowEnd }
-    return $folders
-}
-
-function Get-LatestRunFolder {
-    [CmdletBinding()]
-    param(
-        [string]$BasePath,
-        [string]$FolderFilter = (Get-ApplicationConfig).WorkerRunFolderPrefix
-    )
-    if (-not (Test-Path $BasePath)) { return $null }
-    return Get-ChildItem -Path $BasePath -Directory -Filter "$FolderFilter*" -ErrorAction SilentlyContinue |
-           Sort-Object CreationTime -Descending | Select-Object -First 1
-}
-
-function Collect-RunsFromTimeWindow {
-    [CmdletBinding()]
-    param(
-        [string]$BasePath,
-        [DateTime]$WindowStart,
-        [DateTime]$WindowEnd,
-        [switch]$ValidateEach
-    )
-    $runs = Get-RunFoldersInWindow -BasePath $BasePath -WindowStart $WindowStart -WindowEnd $WindowEnd
-    $collected = @()
-    foreach ($run in $runs) {
-        $validation = if ($ValidateEach) { Test-RunFolder -FolderPath $run.FullName } else { $null }
-        $collected += @{
-            Folder       = $run.FullName
-            Name         = $run.Name
-            CreationTime = $run.CreationTime
-            Validation   = $validation
-            Status       = if ($validation -and $validation.Success) { "VALID" } elseif ($validation) { "INVALID" } else { "COLLECTED" }
-        }
-    }
-    return $collected
-}
-
-
-
-# ====================================================================
-# Communication Functions (Basic)
-# ====================================================================
-
-function Initialize-CommunicationPaths {
-    [CmdletBinding()]
-    param(
-        [hashtable]$Paths,
-        [switch]$IsMonitor,
-        [switch]$IsWorker
-    )
-    
-    if (-not $Paths -or -not $Paths.DateBasedPath) {
-        return $null
-    }
-    
-    $communicationPaths = @{}
-    
-    try {
-        $commDir = Join-Path $Paths.DateBasedPath $Script:CommonConfig.CommonFilePaths.CommunicationDirName
-        if (-not (Test-Path $commDir)) {
-            New-Item -ItemType Directory -Path $commDir -Force -ErrorAction Stop | Out-Null
-        }
-        
-        $communicationPaths.CommunicationDir = $commDir
-        $communicationPaths.StatusFile = Join-Path $commDir $Script:CommonConfig.CommonFilePaths.WorkerStatusFileName
-        
-        if ($IsWorker) {
-            $communicationPaths.PIDFile = Join-Path $commDir $Script:CommonConfig.CommonFilePaths.WorkerPIDFileName
-        }
-        
-        return $communicationPaths
-    } catch {
-        return $null
-    }
-}
-
-function Write-WorkerStatus {
-    [CmdletBinding()]
-    param(
-        [string]$StatusFile,
-        [string]$Status,
-        [int]$WorkerPID,
-        [int]$PythonPID = 0,
-        [string]$Message = ""
-    )
-    
-    $statusData = @{
-        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        Status = $Status
-        WorkerPID = $WorkerPID
-        PythonPID = $PythonPID
-        Message = $Message
-    }
-    
-    try {
-        $statusData | ConvertTo-Json | Out-File $StatusFile -Force
-        return $true
-    } catch {
-        return $false
-    }
-}
-
-function Read-WorkerStatus {
-    [CmdletBinding()]
-    param([string]$StatusFile)
-    
-    if (-not (Test-Path $StatusFile)) {
-        return @{ Status = "NOT_FOUND"; WorkerPID = 0; PythonPID = 0 }
-    }
-    
     try {
         $content = Get-Content $StatusFile -Raw
         return $content | ConvertFrom-Json -AsHashtable
@@ -3305,9 +2152,7 @@ function Read-WorkerStatus {
     }
 }
 
-
- # 1_capture-collected-runs.ps1  
-
+# 1_capture-collected-runs.ps1
 <#
 .SYNOPSIS
 Captures and validates all run folders created between start and end times.
@@ -3333,7 +2178,6 @@ $Script:Config = @{
     LogFile      = $null
 }
 
-
 # ====================================================================
 # PATH INITIALISATION
 # ====================================================================
@@ -3348,8 +2192,6 @@ function Initialize-Paths {
     return $true
 }
 
-
-
 # ====================================================================
 # LOCAL LOGGING WRAPPER
 # ====================================================================
@@ -3357,7 +2199,6 @@ function Write-CaptureLog {
     param([string]$Message, [string]$Level = "INFO")
     Write-CommonLog -Message $Message -Level $Level -LogFile $Script:Config.LogFile
 }
-
 
 # ====================================================================
 # TIME CONVERSION
@@ -3379,119 +2220,11 @@ function Is-WithinTimeWindow {
         [DateTime]$WindowStart,
         [DateTime]$WindowEnd
     )
-    
     return ($CheckTime -ge $WindowStart) -and ($CheckTime -le $WindowEnd)
 }
 
 # ====================================================================
-# UPDATED: Enhanced Validate-Output Function
-# ====================================================================
-function Validate-RunFolder {
-    param(
-        [string]$FolderPath,
-        [switch]$Detailed = $false
-    )
-    
-    $result = @{
-        Success = $false
-        FolderPath = $FolderPath
-        FolderName = Split-Path $FolderPath -Leaf
-        CreationTime = $null
-        MissingItems = @()
-        Errors = @()
-        Warnings = @()
-        Details = @{
-            FileSizes = @{}
-            FileCount = 0
-            HasMetadata = $false
-            Metadata = $null
-        }
-    }
-    
-    try {
-        # Get folder info
-        $folder = Get-Item -Path $FolderPath -ErrorAction Stop
-        $result.CreationTime = $folder.CreationTime
-        
-        Write-CaptureLog "Validating folder: $($result.FolderName)" -Level "INFO"
-        
-        # Check subfolders
-        foreach ($subfolder in $Script:Config.ExpectedSubfolders) {
-            $subfolderPath = Join-Path $FolderPath $subfolder
-            if (-not (Test-Path $subfolderPath)) {
-                $result.MissingItems += $subfolder
-                $result.Warnings += "Missing subfolder: $subfolder"
-            } else {
-                # Count files in subfolder if detailed validation
-                if ($Detailed) {
-                    $files = Get-ChildItem -Path $subfolderPath -File -Recurse -ErrorAction SilentlyContinue
-                    $result.Details.FileCount += $files.Count
-                }
-            }
-        }
-        
-        # Check expected files
-        foreach ($file in $Script:Config.ExpectedFiles) {
-            $filePath = Join-Path $FolderPath $file
-            if (-not (Test-Path $filePath)) {
-                $result.MissingItems += $file
-                $result.Warnings += "Missing file: $file"
-            } else {
-                # Get file info
-                $fileInfo = Get-Item -Path $filePath -ErrorAction SilentlyContinue
-                if ($fileInfo) {
-                    $result.Details.FileSizes[$file] = $fileInfo.Length
-                    
-                    # Parse metadata.json if it exists
-                    if ($file -eq "metadata.json") {
-                        try {
-                            $metadata = Get-Content $filePath -Raw | ConvertFrom-Json -ErrorAction Stop
-                            $result.Details.Metadata = $metadata
-                            $result.Details.HasMetadata = $true
-                        } catch {
-                            $result.Errors += "Invalid JSON in metadata.json: $_"
-                        }
-                    }
-                }
-            }
-        }
-        
-        # Additional checks for data files
-        $dataFiles = Get-ChildItem -Path $FolderPath -File -Filter "*.json" -ErrorAction SilentlyContinue | 
-            Where-Object { $_.Name -ne "metadata.json" }
-        
-        if ($dataFiles.Count -eq 0) {
-            $result.Warnings += "No data JSON files found"
-        } else {
-            $result.Details.FileCount += $dataFiles.Count
-        }
-        
-        # Determine success
-        $result.Success = ($result.MissingItems.Count -eq 0) -and ($result.Errors.Count -eq 0)
-        
-        if ($result.Success) {
-            Write-CaptureLog "✓ Folder validation passed: $($result.FolderName)" -Level "SUCCESS"
-        } else {
-            Write-CaptureLog "✗ Folder validation failed: $($result.FolderName)" -Level "WARN"
-            if ($result.MissingItems.Count -gt 0) {
-                Write-CaptureLog "  Missing: $($result.MissingItems -join ', ')" -Level "WARN"
-            }
-            if ($result.Errors.Count -gt 0) {
-                Write-CaptureLog "  Errors: $($result.Errors -join ', ')" -Level "ERROR"
-            }
-        }
-        
-    } catch {
-        $result.Errors += "Error validating folder: $_"
-        $result.Success = $false
-        Write-CaptureLog "Error validating folder: $_" -Level "ERROR"
-    }
-    
-    return $result
-}
-
-# ====================================================================
-# MAIN COLLECTION – now uses shared functions
+# MAIN COLLECTION – uses shared Collect-RunsFromTimeWindow
 # ====================================================================
 function Capture-CollectedRuns {
     param([DateTime]$WindowStart, [DateTime]$WindowEnd)
@@ -3514,7 +2247,6 @@ function Capture-CollectedRuns {
     return $collected
 }
 
-
 # ====================================================================
 # Summary Reporting
 # ====================================================================
@@ -3527,17 +2259,15 @@ function Show-CollectionSummary {
     Write-CaptureLog "Valid runs: $valid" -Level "SUCCESS"
     Write-CaptureLog "Invalid runs: $invalid" -Level $(if ($invalid -gt 0) { "WARN" } else { "INFO" })
     
-    # Show invalid runs details
-    if ($invalidRuns.Count -gt 0) {
+    if ($invalid -gt 0) {
         Write-CaptureLog "`nInvalid runs details:" -Level "WARN"
-        foreach ($run in $invalidRuns) {
+        foreach ($run in $CollectedRuns | Where-Object { $_.Status -eq "INVALID" }) {
             $folderName = $run.Name
             $missing = $run.Validation.MissingItems -join ', '
-            Write-CaptureLog "  - : Missing $missing" -Level "WARN"
+            Write-CaptureLog "  - $folderName : Missing $missing" -Level "WARN"
         }
     }
     
-    # Show folder sizes
     $totalSize = 0
     foreach ($run in $CollectedRuns) {
         $folder = Get-Item -Path $run.Folder -ErrorAction SilentlyContinue
@@ -3547,7 +2277,6 @@ function Show-CollectionSummary {
             $totalSize += $size
         }
     }
-    
     $sizeMB = [math]::Round($totalSize / 1MB, 2)
     Write-CaptureLog "Total data collected: $sizeMB MB" -Level "INFO"
     
@@ -3573,7 +2302,6 @@ function Export-CollectedRuns {
             Runs = $CollectedRuns
             Summary = Show-CollectionSummary -CollectedRuns $CollectedRuns
         }
-        
         $exportData | ConvertTo-Json -Depth 5 | Out-File -FilePath $ExportPath -Force
         Write-CaptureLog "Exported collection data to: $ExportPath" -Level "SUCCESS"
         return $true
@@ -3604,320 +2332,11 @@ function Start-RunCollection {
     return $collected
 }
 
-
 # ====================================================================
 # Export functions for use in monitor
 # ====================================================================
 if ($MyInvocation.InvocationName -ne '.') {
     Start-RunCollection
 } else {
-    Export-ModuleMember -Function Start-RunCollection, Test-RunFolder, Show-CollectionSummary
-} # 1_capture-collected-runs.ps1  
-
-<#
-.SYNOPSIS
-Captures and validates all run folders created between start and end times.
-Now uses shared functions from 1_common-paths.ps1.
-#>
-
-# ====================================================================
-# Configuration – loaded from 1_common-paths.ps1
-# ====================================================================
-$commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
-if (-not (Test-Path $commonPathsScript)) { throw "Common paths script not found" }
-. $commonPathsScript
-
-$appConfig = Get-ApplicationConfig
-
-# ====================================================================
-# SCRIPT‑SCOPED CONFIG
-# ====================================================================
-$Script:Config = @{
-    StartTime    = $appConfig.EveryStartTime
-    EndTime      = $appConfig.EveryEndTime
-    RunsBasePath = $null
-    LogFile      = $null
+    Export-ModuleMember -Function Start-RunCollection, Show-CollectionSummary
 }
-
-
-# ====================================================================
-# PATH INITIALISATION
-# ====================================================================
-function Initialize-Paths {
-    $dateStr = Get-Date -Format $appConfig.CaptureDateFormat
-    $projectRoot = if ($PSScriptRoot) { Join-Path $PSScriptRoot ".." } else { $PWD.Path }
-    $Script:Config.RunsBasePath = Join-Path $projectRoot $appConfig.CaptureRunsDirectory $dateStr
-    $logDir = Join-Path $projectRoot $appConfig.CaptureLogsDirectory
-    if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force | Out-Null }
-    $logFileName = $appConfig.CaptureLogFilePattern -f (Get-Date -Format $appConfig.CaptureFileTimestampFormat)
-    $Script:Config.LogFile = Join-Path $logDir $logFileName
-    return $true
-}
-
-
-
-# ====================================================================
-# LOCAL LOGGING WRAPPER
-# ====================================================================
-function Write-CaptureLog {
-    param([string]$Message, [string]$Level = "INFO")
-    Write-CommonLog -Message $Message -Level $Level -LogFile $Script:Config.LogFile
-}
-
-
-# ====================================================================
-# TIME CONVERSION
-# ====================================================================
-function Convert-ToDateTime {
-    param([string]$TimeString)
-    try {
-        $today = Get-Date -Format "yyyy-MM-dd"
-        return [DateTime]::ParseExact("$today $TimeString", "yyyy-MM-dd HH:mm", $null)
-    } catch {
-        Write-CaptureLog "Invalid time format: $TimeString" -Level "ERROR"
-        return $null
-    }
-}
-
-function Is-WithinTimeWindow {
-    param(
-        [DateTime]$CheckTime,
-        [DateTime]$WindowStart,
-        [DateTime]$WindowEnd
-    )
-    
-    return ($CheckTime -ge $WindowStart) -and ($CheckTime -le $WindowEnd)
-}
-
-# ====================================================================
-# UPDATED: Enhanced Validate-Output Function
-# ====================================================================
-function Validate-RunFolder {
-    param(
-        [string]$FolderPath,
-        [switch]$Detailed = $false
-    )
-    
-    $result = @{
-        Success = $false
-        FolderPath = $FolderPath
-        FolderName = Split-Path $FolderPath -Leaf
-        CreationTime = $null
-        MissingItems = @()
-        Errors = @()
-        Warnings = @()
-        Details = @{
-            FileSizes = @{}
-            FileCount = 0
-            HasMetadata = $false
-            Metadata = $null
-        }
-    }
-    
-    try {
-        # Get folder info
-        $folder = Get-Item -Path $FolderPath -ErrorAction Stop
-        $result.CreationTime = $folder.CreationTime
-        
-        Write-CaptureLog "Validating folder: $($result.FolderName)" -Level "INFO"
-        
-        # Check subfolders
-        foreach ($subfolder in $Script:Config.ExpectedSubfolders) {
-            $subfolderPath = Join-Path $FolderPath $subfolder
-            if (-not (Test-Path $subfolderPath)) {
-                $result.MissingItems += $subfolder
-                $result.Warnings += "Missing subfolder: $subfolder"
-            } else {
-                # Count files in subfolder if detailed validation
-                if ($Detailed) {
-                    $files = Get-ChildItem -Path $subfolderPath -File -Recurse -ErrorAction SilentlyContinue
-                    $result.Details.FileCount += $files.Count
-                }
-            }
-        }
-        
-        # Check expected files
-        foreach ($file in $Script:Config.ExpectedFiles) {
-            $filePath = Join-Path $FolderPath $file
-            if (-not (Test-Path $filePath)) {
-                $result.MissingItems += $file
-                $result.Warnings += "Missing file: $file"
-            } else {
-                # Get file info
-                $fileInfo = Get-Item -Path $filePath -ErrorAction SilentlyContinue
-                if ($fileInfo) {
-                    $result.Details.FileSizes[$file] = $fileInfo.Length
-                    
-                    # Parse metadata.json if it exists
-                    if ($file -eq "metadata.json") {
-                        try {
-                            $metadata = Get-Content $filePath -Raw | ConvertFrom-Json -ErrorAction Stop
-                            $result.Details.Metadata = $metadata
-                            $result.Details.HasMetadata = $true
-                        } catch {
-                            $result.Errors += "Invalid JSON in metadata.json: $_"
-                        }
-                    }
-                }
-            }
-        }
-        
-        # Additional checks for data files
-        $dataFiles = Get-ChildItem -Path $FolderPath -File -Filter "*.json" -ErrorAction SilentlyContinue | 
-            Where-Object { $_.Name -ne "metadata.json" }
-        
-        if ($dataFiles.Count -eq 0) {
-            $result.Warnings += "No data JSON files found"
-        } else {
-            $result.Details.FileCount += $dataFiles.Count
-        }
-        
-        # Determine success
-        $result.Success = ($result.MissingItems.Count -eq 0) -and ($result.Errors.Count -eq 0)
-        
-        if ($result.Success) {
-            Write-CaptureLog "✓ Folder validation passed: $($result.FolderName)" -Level "SUCCESS"
-        } else {
-            Write-CaptureLog "✗ Folder validation failed: $($result.FolderName)" -Level "WARN"
-            if ($result.MissingItems.Count -gt 0) {
-                Write-CaptureLog "  Missing: $($result.MissingItems -join ', ')" -Level "WARN"
-            }
-            if ($result.Errors.Count -gt 0) {
-                Write-CaptureLog "  Errors: $($result.Errors -join ', ')" -Level "ERROR"
-            }
-        }
-        
-    } catch {
-        $result.Errors += "Error validating folder: $_"
-        $result.Success = $false
-        Write-CaptureLog "Error validating folder: $_" -Level "ERROR"
-    }
-    
-    return $result
-}
-
-# ====================================================================
-# MAIN COLLECTION – now uses shared functions
-# ====================================================================
-function Capture-CollectedRuns {
-    param([DateTime]$WindowStart, [DateTime]$WindowEnd)
-    Write-CaptureLog "Starting run collection..." -Level "INFO"
-    if (-not (Test-Path $Script:Config.RunsBasePath)) {
-        Write-CaptureLog "Runs base path does not exist: $($Script:Config.RunsBasePath)" -Level "WARN"
-        return @()
-    }
-    $collected = Collect-RunsFromTimeWindow -BasePath $Script:Config.RunsBasePath `
-                                            -WindowStart $WindowStart `
-                                            -WindowEnd $WindowEnd `
-                                            -ValidateEach
-    foreach ($run in $collected) {
-        if ($run.Status -eq "VALID") {
-            Write-CaptureLog "✓ Collected: $($run.Name)" -Level "SUCCESS"
-        } else {
-            Write-CaptureLog "✗ Issues found: $($run.Name)" -Level "WARN"
-        }
-    }
-    return $collected
-}
-
-
-# ====================================================================
-# Summary Reporting
-# ====================================================================
-function Show-CollectionSummary {
-    param([array]$CollectedRuns)
-    $valid   = ($CollectedRuns | Where-Object { $_.Status -eq "VALID" }).Count
-    $invalid = ($CollectedRuns | Where-Object { $_.Status -eq "INVALID" }).Count
-    Write-CaptureLog "`n=== COLLECTION SUMMARY ===" -Level "INFO"
-    Write-CaptureLog "Total runs collected: $($CollectedRuns.Count)" -Level "INFO"
-    Write-CaptureLog "Valid runs: $valid" -Level "SUCCESS"
-    Write-CaptureLog "Invalid runs: $invalid" -Level $(if ($invalid -gt 0) { "WARN" } else { "INFO" })
-    
-    # Show invalid runs details
-    if ($invalidRuns.Count -gt 0) {
-        Write-CaptureLog "`nInvalid runs details:" -Level "WARN"
-        foreach ($run in $invalidRuns) {
-            $folderName = $run.Name
-            $missing = $run.Validation.MissingItems -join ', '
-            Write-CaptureLog "  - : Missing $missing" -Level "WARN"
-        }
-    }
-    
-    # Show folder sizes
-    $totalSize = 0
-    foreach ($run in $CollectedRuns) {
-        $folder = Get-Item -Path $run.Folder -ErrorAction SilentlyContinue
-        if ($folder) {
-            $size = (Get-ChildItem -Path $run.Folder -Recurse -File -ErrorAction SilentlyContinue | 
-                    Measure-Object -Property Length -Sum).Sum
-            $totalSize += $size
-        }
-    }
-    
-    $sizeMB = [math]::Round($totalSize / 1MB, 2)
-    Write-CaptureLog "Total data collected: $sizeMB MB" -Level "INFO"
-    
-    return @{ TotalRuns = $CollectedRuns.Count; ValidRuns = $valid; InvalidRuns = $invalid }
-}
-
-# ====================================================================
-# Export Function for Monitor Integration
-# ====================================================================
-function Export-CollectedRuns {
-    param(
-        [array]$CollectedRuns,
-        [string]$ExportPath
-    )
-    
-    try {
-        $exportData = @{
-            CollectionTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-            TimeWindow = @{
-                Start = $Script:Config.StartTime
-                End = $Script:Config.EndTime
-            }
-            Runs = $CollectedRuns
-            Summary = Show-CollectionSummary -CollectedRuns $CollectedRuns
-        }
-        
-        $exportData | ConvertTo-Json -Depth 5 | Out-File -FilePath $ExportPath -Force
-        Write-CaptureLog "Exported collection data to: $ExportPath" -Level "SUCCESS"
-        return $true
-    } catch {
-        Write-CaptureLog "Failed to export collection data: $_" -Level "ERROR"
-        return $false
-    }
-}
-
-# ====================================================================
-# Main Execution
-# ====================================================================
-function Start-RunCollection {
-    param(
-        [string]$StartTime = $null,
-        [string]$EndTime = $null,
-        [string]$ExportTo = $null
-    )
-    Write-CaptureLog "=== Run Collection Script Started ===" -Level "INFO"
-    if (-not (Initialize-Paths)) { return }
-    $start = if ($StartTime) { Convert-ToDateTime $StartTime } else { Convert-ToDateTime $Script:Config.StartTime }
-    $end   = if ($EndTime)   { Convert-ToDateTime $EndTime }   else { Convert-ToDateTime $Script:Config.EndTime }
-    if (-not $start -or -not $end) { return }
-    $collected = Capture-CollectedRuns -WindowStart $start -WindowEnd $end
-    $summary = Show-CollectionSummary -CollectedRuns $collected
-    if ($ExportTo) { Export-CollectedRuns -CollectedRuns $collected -ExportPath $ExportTo }
-    Write-CaptureLog "=== Run Collection Completed ===" -Level "INFO"
-    return $collected
-}
-
-
-# ====================================================================
-# Export functions for use in monitor
-# ====================================================================
-if ($MyInvocation.InvocationName -ne '.') {
-    Start-RunCollection
-} else {
-    Export-ModuleMember -Function Start-RunCollection, Test-RunFolder, Show-CollectionSummary
-}
-
-

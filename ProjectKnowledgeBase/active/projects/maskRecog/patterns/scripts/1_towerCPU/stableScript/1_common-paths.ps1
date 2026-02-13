@@ -1,5 +1,4 @@
-# 1_common-paths.ps1 
-
+# 1_common-paths.ps1
 <#
 .SYNOPSIS
 Common path initialization module shared by monitor and worker scripts
@@ -24,6 +23,7 @@ $Script:CommonConfig = @{
         PIDFileName = "monitor_pid_TowerCPU.json"
         LogFileName = "monitor_TowerCPU.log"
         EmailSendScript = "patterns\scripts\1_towerCPU\stableScript\1_email-sender-stable.ps1"
+        MonitorMetadataFileName = "monitor_metadata.json"          # <-- NEW        
     }
     
     # File paths for worker script
@@ -41,12 +41,12 @@ $Script:CommonConfig = @{
 }
 
 # ====================================================================
-# NEW: Centralised Application Configuration
+# Centralised Application Configuration
 # ====================================================================
 $Script:ApplicationConfig = @{
     # ---------------------- Monitor Settings ----------------------
-    EveryStartTime       = "08:57"
-    EveryEndTime         = "09:00"
+    EveryStartTime       = "10:50"
+    EveryEndTime         = "11:15"
     MonitorProcessCheckInterval = 5
     MonitorMaxPIDFileAgeMinutes = 120
     MonitorPIDTrackingFile = "pid_tracking.json"
@@ -79,8 +79,6 @@ $Script:ApplicationConfig = @{
     EmailSenderScript      = "1_email-sender-stable.ps1"
     
     # ---------------------- Capture Script Settings --------------
-    # CaptureStartTime       = "10:00"
-    # CaptureEndTime         = "11:04"
     CaptureRunsDirectory   = "runs"
     CaptureLogsDirectory   = "logs"
     CaptureOutputFolderPattern = "TowerCPU_Process_MaskDetect_*"
@@ -136,7 +134,6 @@ function Initialize-ProjectPortablePaths {
 # ====================================================================
 # Helper Functions
 # ====================================================================
-
 function Find-ProjectRoot {
     [CmdletBinding()]
     param([switch]$Silent)
@@ -144,7 +141,6 @@ function Find-ProjectRoot {
     $scriptPath = $PSScriptRoot
     $currentPath = $scriptPath
     
-    # Look for maskRecog directory by going up
     while ($currentPath -and (Split-Path $currentPath -Parent)) {
         $currentDirName = Split-Path $currentPath -Leaf
         if ($currentDirName -eq $Script:CommonConfig.ProjectName) {
@@ -156,7 +152,6 @@ function Find-ProjectRoot {
         $currentPath = Split-Path $currentPath -Parent
     }
     
-    # Check current directory
     $currentDir = Get-Location
     if ((Split-Path $currentDir -Leaf) -eq $Script:CommonConfig.ProjectName) {
         return $currentDir
@@ -169,7 +164,6 @@ function Build-ProjectPaths {
     [CmdletBinding()]
     param([string]$ProjectRoot)
     
-    # Calculate paths
     $ActiveRoot = Split-Path $ProjectRoot -Parent | Split-Path -Parent
     $VenvRoot = Split-Path $ProjectRoot -Parent | Split-Path -Parent | Split-Path -Parent | Split-Path -Parent
     $currentDate = Get-Date -Format $Script:CommonConfig.DateFormat
@@ -186,13 +180,11 @@ function Initialize-DateBasedStructure {
     [CmdletBinding()]
     param([hashtable]$Paths)
     
-    # Create base folder
     $towerCPUBasePath = Join-Path $Paths.ActiveRoot $Script:CommonConfig.LogBasePath
     if (-not (Test-Path $towerCPUBasePath)) {
         New-Item -ItemType Directory -Path $towerCPUBasePath -Force | Out-Null
     }
     
-    # Create date-specific folder
     $dateBasedPath = Join-Path $towerCPUBasePath $Paths.CurrentDate
     if (-not (Test-Path $dateBasedPath)) {
         New-Item -ItemType Directory -Path $dateBasedPath -Force | Out-Null
@@ -219,6 +211,7 @@ function Add-ScriptSpecificPaths {
         $Paths.LogFile = Join-Path $DateBasedPath $Script:CommonConfig.MonitorFilePaths.LogFileName
         $Paths.PythonExe = Join-Path $Paths.VenvRoot $Script:CommonConfig.CommonFilePaths.PythonExe
         $paths.EmailSendScript = Join-Path $Paths.ProjectRoot $Script:CommonConfig.MonitorFilePaths.EmailSendScript
+        $paths.MonitorMetadataFile = Join-Path $DateBasedPath $Script:CommonConfig.MonitorFilePaths.MonitorMetadataFileName   # <-- NEW
     }
     
     if ($IsWorker) {
@@ -230,26 +223,18 @@ function Add-ScriptSpecificPaths {
 }
 
 # ====================================================================
-# MISSING FUNCTION IMPLEMENTATIONS
+# Shared Utility Functions
 # ====================================================================
-
 function Check-Heartbeat {
     [CmdletBinding()]
     param([string]$HeartbeatFile)
     
-    if (-not (Test-Path $HeartbeatFile)) {
-        return $false
-    }
-    
+    if (-not (Test-Path $HeartbeatFile)) { return $false }
     try {
         $heartbeatTime = (Get-Item $HeartbeatFile).LastWriteTime
         $ageMinutes = ((Get-Date) - $heartbeatTime).TotalMinutes
-        
-        # Heartbeat is considered alive if updated within last 2 minutes
         return $ageMinutes -le 2
-    } catch {
-        return $false
-    }
+    } catch { return $false }
 }
 
 function Send-Heartbeat {
@@ -258,56 +243,34 @@ function Send-Heartbeat {
     
     try {
         $heartbeatDir = Split-Path $HeartbeatFile -Parent
-        if (-not (Test-Path $heartbeatDir)) {
-            New-Item -ItemType Directory -Path $heartbeatDir -Force | Out-Null
-        }
-        
+        if (-not (Test-Path $heartbeatDir)) { New-Item -ItemType Directory -Path $heartbeatDir -Force | Out-Null }
         Set-Content -Path $HeartbeatFile -Value (Get-Date -Format "yyyy-MM-dd HH:mm:ss") -Force
         return $true
-    } catch {
-        return $false
-    }
+    } catch { return $false }
 }
 
 function Acquire-Lock {
     [CmdletBinding()]
-    param(
-        [string]$LockFile,
-        [int]$TimeoutSeconds = 30
-    )
+    param([string]$LockFile, [int]$TimeoutSeconds = 30)
     
     $startTime = Get-Date
     $lockAcquired = $false
-    
     while (((Get-Date) - $startTime).TotalSeconds -lt $TimeoutSeconds) {
         try {
             if (Test-Path $LockFile) {
                 $lockTime = [DateTime]::Parse((Get-Content $LockFile -First 1))
                 $lockAge = ((Get-Date) - $lockTime).TotalSeconds
-                
-                # If lock is older than 30 seconds, consider it stale
-                if ($lockAge -gt 30) {
-                    Remove-Item $LockFile -Force -ErrorAction SilentlyContinue
-                }
+                if ($lockAge -gt 30) { Remove-Item $LockFile -Force -ErrorAction SilentlyContinue }
             }
-            
-            # Try to create lock file
             $lockDir = Split-Path $LockFile -Parent
-            if (-not (Test-Path $lockDir)) {
-                New-Item -ItemType Directory -Path $lockDir -Force | Out-Null
-            }
-            
+            if (-not (Test-Path $lockDir)) { New-Item -ItemType Directory -Path $lockDir -Force | Out-Null }
             $tempFile = "$LockFile.tmp"
             (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") | Out-File $tempFile -Force
             Move-Item $tempFile $LockFile -Force -ErrorAction Stop
-            
             $lockAcquired = $true
             break
-        } catch {
-            Start-Sleep -Milliseconds 500
-        }
+        } catch { Start-Sleep -Milliseconds 500 }
     }
-    
     return $lockAcquired
 }
 
@@ -315,9 +278,7 @@ function Release-Lock {
     [CmdletBinding()]
     param([string]$LockFile)
     
-    if (Test-Path $LockFile) {
-        Remove-Item $LockFile -Force -ErrorAction SilentlyContinue
-    }
+    if (Test-Path $LockFile) { Remove-Item $LockFile -Force -ErrorAction SilentlyContinue }
     return $true
 }
 
@@ -339,12 +300,86 @@ function Write-CommonLog {
     }
     if (-not $NoConsole) {
         $color = @{ ERROR='Red'; WARN='Yellow'; SUCCESS='Green'; DEBUG='Gray'; SHUTDOWN='Blue' }[$Level]
-        Write-Host $entry -ForegroundColor ($color ?? 'White')
+        if ($color) {
+            Write-Host $entry -ForegroundColor $color
+        } else {
+            Write-Host $entry -ForegroundColor 'White'
+        }
     }
 }
 
+
+function Test-TimeWindow {
+    <#
+    .SYNOPSIS
+    Checks if current time is at or past the given target time.
+    #>
+    param([string]$TargetTime)
+    try {
+        $target = [DateTime]::ParseExact($TargetTime, "HH:mm", $null)
+        return ((Get-Date).TimeOfDay -ge $target.TimeOfDay)
+    } catch {
+        Write-CommonLog -Message "Invalid time format: $TargetTime" -Level "ERROR"
+        return $false
+    }
+}
+
+
+function Get-RunsDatePath {
+    <#
+    .SYNOPSIS
+    Returns the date‑based path where worker run folders are stored.
+    #>
+    param(
+        [string]$DateString = (Get-Date -Format $Script:CommonConfig.DateFormat),
+        [switch]$Silent
+    )
+    $projectRoot = Find-ProjectRoot -Silent:$Silent
+    if (-not $projectRoot) { throw "Project root not found" }
+    $ActiveRoot = Split-Path $projectRoot -Parent | Split-Path -Parent
+    $towerCPUBasePath = Join-Path $ActiveRoot $Script:CommonConfig.LogBasePath
+    return Join-Path $towerCPUBasePath $DateString
+}
+
+
+function Acquire-SingletonLock {
+    <#
+    .SYNOPSIS
+    Acquires a lock file to ensure only one instance of a script runs.
+    #>
+    param(
+        [string]$LockName,
+        [int]$TimeoutSeconds = 30
+    )
+    $lockFile = Join-Path $env:TEMP "$($Script:CommonConfig.ProjectName)_$LockName.lock"
+    $lockAcquired = $false
+    $start = Get-Date
+    while (((Get-Date) - $start).TotalSeconds -lt $TimeoutSeconds) {
+        try {
+            if (Test-Path $lockFile) {
+                $lockTime = [DateTime]::Parse((Get-Content $lockFile -First 1 -ErrorAction Stop))
+                if (((Get-Date) - $lockTime).TotalSeconds -gt 30) {
+                    Remove-Item $lockFile -Force -ErrorAction SilentlyContinue
+                }
+            }
+            $tempFile = "$lockFile.tmp"
+            (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") | Out-File $tempFile -Force
+            Move-Item $tempFile $lockFile -Force -ErrorAction Stop
+            $lockAcquired = $true
+            break
+        } catch { Start-Sleep -Milliseconds 500 }
+    }
+    return @{ Acquired = $lockAcquired; LockFile = $lockFile }
+}
+
+function Release-SingletonLock {
+    param([string]$LockFile)
+    if (Test-Path $LockFile) { Remove-Item $LockFile -Force -ErrorAction SilentlyContinue }
+}
+
+
 # ====================================================================
-# SHARED VALIDATION & COLLECTION – NEW / MOVED HERE
+# Shared Validation & Collection
 # ====================================================================
 function Test-RunFolder {
     [CmdletBinding()]
@@ -433,12 +468,9 @@ function Collect-RunsFromTimeWindow {
     return $collected
 }
 
-
-
 # ====================================================================
-# Communication Functions (Basic)
+# Communication Functions
 # ====================================================================
-
 function Initialize-CommunicationPaths {
     [CmdletBinding()]
     param(
@@ -446,30 +478,18 @@ function Initialize-CommunicationPaths {
         [switch]$IsMonitor,
         [switch]$IsWorker
     )
-    
-    if (-not $Paths -or -not $Paths.DateBasedPath) {
-        return $null
-    }
-    
+    if (-not $Paths -or -not $Paths.DateBasedPath) { return $null }
     $communicationPaths = @{}
-    
     try {
         $commDir = Join-Path $Paths.DateBasedPath $Script:CommonConfig.CommonFilePaths.CommunicationDirName
-        if (-not (Test-Path $commDir)) {
-            New-Item -ItemType Directory -Path $commDir -Force -ErrorAction Stop | Out-Null
-        }
-        
+        if (-not (Test-Path $commDir)) { New-Item -ItemType Directory -Path $commDir -Force -ErrorAction Stop | Out-Null }
         $communicationPaths.CommunicationDir = $commDir
         $communicationPaths.StatusFile = Join-Path $commDir $Script:CommonConfig.CommonFilePaths.WorkerStatusFileName
-        
         if ($IsWorker) {
             $communicationPaths.PIDFile = Join-Path $commDir $Script:CommonConfig.CommonFilePaths.WorkerPIDFileName
         }
-        
         return $communicationPaths
-    } catch {
-        return $null
-    }
+    } catch { return $null }
 }
 
 function Write-WorkerStatus {
@@ -481,7 +501,6 @@ function Write-WorkerStatus {
         [int]$PythonPID = 0,
         [string]$Message = ""
     )
-    
     $statusData = @{
         Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
         Status = $Status
@@ -489,23 +508,18 @@ function Write-WorkerStatus {
         PythonPID = $PythonPID
         Message = $Message
     }
-    
     try {
         $statusData | ConvertTo-Json | Out-File $StatusFile -Force
         return $true
-    } catch {
-        return $false
-    }
+    } catch { return $false }
 }
 
 function Read-WorkerStatus {
     [CmdletBinding()]
     param([string]$StatusFile)
-    
     if (-not (Test-Path $StatusFile)) {
         return @{ Status = "NOT_FOUND"; WorkerPID = 0; PythonPID = 0 }
     }
-    
     try {
         $content = Get-Content $StatusFile -Raw
         return $content | ConvertFrom-Json -AsHashtable

@@ -1,12 +1,11 @@
-# 1_email-sender-stable.ps1 (updated)
-
+# 1_email-sender-stable.ps1
 <#
 .SYNOPSIS
 Stable email sender for face recognition run reports
 #>
 
 # ====================================================================
-# CONFIGURATION – LOADED FROM 1_common-paths.ps1
+# LOAD COMMON MODULE
 # ====================================================================
 $commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
 if (-not (Test-Path $commonPathsScript)) { throw "Common paths script not found" }
@@ -15,7 +14,7 @@ if (-not (Test-Path $commonPathsScript)) { throw "Common paths script not found"
 $appConfig = Get-ApplicationConfig
 
 # ====================================================================
-# Email Configuration (sensitive parts remain local)
+# Email Configuration – now sourced entirely from $appConfig
 # ====================================================================
 $EmailConfig = @{
     SmtpServer   = $appConfig.EmailSmtpServer
@@ -28,9 +27,21 @@ $EmailConfig = @{
     SubjectPrefix = $appConfig.EmailSubjectPrefix
 }
 
+# ====================================================================
+# Logging – use common logger, accept log file parameter
+# ====================================================================
+$script:EmailLogFile = $null
+function Write-EmailLog {
+    param([string]$Message, [string]$Level = "INFO")
+    if ($script:EmailLogFile) {
+        Write-CommonLog -Message $Message -Level $Level -LogFile $script:EmailLogFile
+    } else {
+        Write-CommonLog -Message $Message -Level $Level -NoConsole:$false
+    }
+}
 
 # ====================================================================
-# Initialize Email Configuration
+# Initialize Email Configuration   
 # ====================================================================
 function Initialize-EmailConfig {
     [CmdletBinding()]
@@ -38,9 +49,8 @@ function Initialize-EmailConfig {
         [string]$CredentialPath = $appConfig.EmailCredentialPath,
         [hashtable]$OverrideConfig = @{}
     )
-    Write-Host "Initializing email configuration..." -ForegroundColor Cyan
+    Write-EmailLog "Initializing email configuration..." -Level "INFO"
     
-    # Check if credentials file exists
     if (Test-Path $CredentialPath) {
         try {
             $credential = Import-Clixml -Path $CredentialPath -ErrorAction Stop
@@ -48,7 +58,6 @@ function Initialize-EmailConfig {
             $EmailConfig.Password = $credential.GetNetworkCredential().Password
             $EmailConfig.FromAddress = $credential.GetNetworkCredential().UserName
             $EmailConfig.ToAddress = $credential.GetNetworkCredential().UserName
-            
             Write-Host "✓ Email credentials loaded from: $CredentialPath" -ForegroundColor Green
         } catch {
             Write-Host "✗ Failed to load credentials: $_" -ForegroundColor Red
@@ -56,43 +65,30 @@ function Initialize-EmailConfig {
         }
     } else {
         Write-Host "✗ Credential file not found: $CredentialPath" -ForegroundColor Red
-        
-        # Prompt for credentials
         Write-Host "`nPlease enter email configuration:" -ForegroundColor Yellow
         $EmailConfig.Username = Read-Host "Email address"
         $EmailConfig.Password = Read-Host "App password" -AsSecureString
-        
-        # Convert secure string to plain text (not recommended for production)
         $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($EmailConfig.Password)
         $EmailConfig.Password = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
         [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
-        
         $EmailConfig.FromAddress = $EmailConfig.Username
         $EmailConfig.ToAddress = $EmailConfig.Username
-        
-        # Save credentials for future use
         $credentialDir = Split-Path $CredentialPath -Parent
         if (-not (Test-Path $credentialDir)) {
             New-Item -ItemType Directory -Path $credentialDir -Force | Out-Null
         }
-        
         $securePassword = ConvertTo-SecureString $EmailConfig.Password -AsPlainText -Force
         $credential = New-Object System.Management.Automation.PSCredential($EmailConfig.Username, $securePassword)
         $credential | Export-Clixml -Path $CredentialPath
-        
         Write-Host "✓ Credentials saved to: $CredentialPath" -ForegroundColor Green
     }
     
-    # Apply any overrides
-    foreach ($key in $OverrideConfig.Keys) {
-        $EmailConfig[$key] = $OverrideConfig[$key]
-    }
-    
+    foreach ($key in $OverrideConfig.Keys) { $EmailConfig[$key] = $OverrideConfig[$key] }
     return $true
 }
 
 # ====================================================================
-# Collect Run Summaries
+# Collect Run Summaries – now using shared Collect-RunsFromTimeWindow
 # ====================================================================
 function Get-RunSummaries {
     param(
@@ -105,144 +101,97 @@ function Get-RunSummaries {
     )
     
     $summaries = @()
-    
     try {
-        # Find all run folders
-        $runFolders = Get-ChildItem -Path $BasePath -Directory -Filter $appConfig.EmailRunFolderFilter -ErrorAction SilentlyContinue | 
-            Sort-Object CreationTime -Descending |
-            Select-Object -First $MaxRuns
+        # Use shared function to get run folders in the time window
+        if ($TimeWindowMode -and $ScheduleStart -and $ScheduleEnd) {
+            $windowStart = $ScheduleStart
+            $windowEnd   = $ScheduleEnd
+            Write-EmailLog "Using schedule time window: $($windowStart.ToString('HH:mm')) to $($windowEnd.ToString('HH:mm'))" -Level "INFO"
+        } else {
+            $windowStart = $Since
+            $windowEnd   = Get-Date
+            Write-EmailLog "Using rolling window since $($Since.ToString('yyyy-MM-dd HH:mm'))" -Level "INFO"
+        }
         
-        Write-Host "Found $($runFolders.Count) run folders" -ForegroundColor Cyan
+        $collectedRuns = Collect-RunsFromTimeWindow -BasePath $BasePath -WindowStart $windowStart -WindowEnd $windowEnd -ValidateEach
+        Write-EmailLog "Found $($collectedRuns.Count) run folders in window" -Level "INFO"
         
-        $collectedWithSummary = 0
-        $collectedMetadataOnly = 0
-        $outsideTimeWindow = 0
-        
-        foreach ($folder in $runFolders) {
-            # If TimeWindowMode is enabled, filter by schedule time
-            $inTimeWindow = $true
-            if ($TimeWindowMode -and $ScheduleStart -and $ScheduleEnd) {
-                $inTimeWindow = ($folder.CreationTime -ge $ScheduleStart -and $folder.CreationTime -le $ScheduleEnd)
-                if (-not $inTimeWindow) {
-                    $outsideTimeWindow++
-                    continue
+        # Enrich each run with summary/metadata details
+        foreach ($run in $collectedRuns) {
+            $folderPath = $run.Folder
+            $summaryPath = Join-Path $folderPath "$($appConfig.EmailLogsFolder)\$($appConfig.EmailCompletionSummaryFile)"
+            $hasSummary = Test-Path $summaryPath
+            $metadataPath = Join-Path $folderPath $appConfig.EmailMetadataFile
+            $hasMetadata = Test-Path $metadataPath
+            $metadata = $null
+            if ($hasMetadata) {
+                try { $metadata = Get-Content $metadataPath -Raw | ConvertFrom-Json } catch { $hasMetadata = $false }
+            }
+            
+            $summary = @{
+                FolderPath = $folderPath
+                FolderName = $run.Name
+                CreationTime = $run.CreationTime
+                ExitCode = "UNKNOWN"
+                SummaryText = $null
+                Metadata = $metadata
+                LogFiles = @()
+                HasSummary = $hasSummary
+                HasMetadata = $hasMetadata
+                CollectionType = if ($hasSummary) { "SUMMARY_METADATA" } elseif ($hasMetadata) { "METADATA_ONLY" } else { "NO_DATA" }
+                Status = $run.Status   # VALID/INVALID/COLLECTED from shared validation
+            }
+            
+            if ($hasSummary) {
+                $summaryContent = Get-Content $summaryPath -Raw
+                $summary.SummaryText = $summaryContent
+                if ($summaryContent -match "Exit code: (\d+)") {
+                    $summary.ExitCode = $matches[1]
+                    $summary.Status = if ($matches[1] -eq "1") { "FAILED" } else { "SUCCESS" }
+                }
+            } elseif ($hasMetadata -and $metadata.worker_exit_code) {
+                $summary.ExitCode = $metadata.worker_exit_code
+                $summary.Status = if ($metadata.worker_exit_code -eq "1") { "FAILED" } else { "SUCCESS" }
+            }
+            
+            # Collect log files
+            $logDir = Join-Path $folderPath $appConfig.EmailLogsFolder
+            if (Test-Path $logDir) {
+                $logFiles = Get-ChildItem -Path $logDir -File -Filter $appConfig.EmailLogFileFilter -ErrorAction SilentlyContinue
+                foreach ($logFile in $logFiles) {
+                    $sizeInKB = [math]::Round($logFile.Length / 1KB, 2)
+                    $summary.LogFiles += @{
+                        Path = $logFile.FullName
+                        Name = $logFile.Name
+                        Size = "$sizeInKB KB"
+                        SizeBytes = $logFile.Length
+                        SizeKB = $sizeInKB
+                    }
                 }
             }
             
-            # Check if folder was created after the specified time
-            if ($folder.CreationTime -ge $Since) {
-                $summaryPath = Join-Path $folder.FullName "$($appConfig.EmailLogsFolder)\$($appConfig.EmailCompletionSummaryFile)"
-                $hasSummary = Test-Path $summaryPath
-                
-                # Get metadata if available
-                $metadata = $null
-                $metadataPath = Join-Path $folder.FullName $appConfig.EmailMetadataFile
-                $hasMetadata = Test-Path $metadataPath
-                
-                if ($hasMetadata) {
-                    try {
-                        $metadata = Get-Content $metadataPath -Raw | ConvertFrom-Json
-                    } catch { 
-                        $hasMetadata = $false
-                    }
-                }
-                
-                # Create summary object
-                $summary = @{
-                    FolderPath = $folder.FullName
-                    FolderName = $folder.Name
-                    CreationTime = $folder.CreationTime
-                    ExitCode = "UNKNOWN"
-                    SummaryText = $null
-                    Metadata = $metadata
-                    LogFiles = @()
-                    HasSummary = $hasSummary
-                    HasMetadata = $hasMetadata
-                    CollectionType = "UNKNOWN"
-                    Status = "UNKNOWN"
-                }
-                
-                if ($hasSummary) {
-                    $summaryContent = Get-Content $summaryPath -Raw
-                    $summary.SummaryText = $summaryContent
-                    
-                    # Parse the summary for exit code
-                    if ($summaryContent -match "Exit code: (\d+)") {
-                        $summary.ExitCode = $matches[1]
-                        $summary.Status = if ($matches[1] -eq "1") { "FAILED" } else { "SUCCESS" } # This logic is to determine the success and failed status of the system.
-                    }
-                    $summary.CollectionType = "SUMMARY_METADATA"
-                    $collectedWithSummary++
-                    Write-Host "  ✓ Collected with summary: $($folder.Name) (Exit: $($summary.ExitCode))" -ForegroundColor Green
-                } elseif ($hasMetadata) {
-                    # Try to get exit code from metadata
-                    if ($metadata -and $metadata.worker_exit_code) {
-                        $summary.ExitCode = $metadata.worker_exit_code
-                        $summary.Status = if ($metadata.worker_exit_code -eq "1") { "FAILED" } else { "SUCCESS" } # This logic is to determine the success and failed status of the system.
-                    }
-                    $summary.CollectionType = "METADATA_ONLY"
-                    $collectedMetadataOnly++
-                    Write-Host "  ⚠ Collected metadata only: $($folder.Name) (Exit: $($summary.ExitCode))" -ForegroundColor Yellow
-                } else {
-                    # No summary or metadata
-                    $summary.CollectionType = "NO_DATA"
-                    Write-Host "  ✗ No data found: $($folder.Name)" -ForegroundColor Red
-                }
-                
-                # Find log files (even if no summary, we might still have logs)
-                $logDir = Join-Path $folder.FullName $appConfig.EmailLogsFolder
-                if (Test-Path $logDir) {
-                    $logFiles = Get-ChildItem -Path $logDir -File -Filter $appConfig.EmailLogFileFilter -ErrorAction SilentlyContinue
-                    foreach ($logFile in $logFiles) {
-                        $sizeInKB = [math]::Round($logFile.Length / 1KB, 2)
-                        $summary.LogFiles += @{
-                            Path = $logFile.FullName
-                            Name = $logFile.Name
-                            Size = "$sizeInKB KB"
-                            SizeBytes = $logFile.Length
-                            SizeKB = $sizeInKB
-                        }
-                    }
-                }
-                
-                # Create compressed zip for the entire run folder
-                $tempDir = [System.IO.Path]::GetTempPath()
-                $compressedFolder = Compress-RunFolder -FolderPath $folder.FullName -DestinationPath $tempDir
-                if ($compressedFolder) {
-                    $summary.CompressedFolder = $compressedFolder
-                }
-
-                
-                $summaries += $summary
-            }
+            # Compress folder (if not too large)
+            $tempDir = [System.IO.Path]::GetTempPath()
+            $compressedFolder = Compress-RunFolder -FolderPath $folderPath -DestinationPath $tempDir
+            if ($compressedFolder) { $summary.CompressedFolder = $compressedFolder }
+            
+            $summaries += $summary
         }
         
-        # Calculate final counts correctly
-        $totalInWindow = $runFolders.Count - $outsideTimeWindow
-        $noDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
-        
-        Write-Host "`nCollection Summary:" -ForegroundColor Cyan
-        Write-Host "  Total folders checked: $($runFolders.Count)" -ForegroundColor White
-        Write-Host "  Runs in time window: $totalInWindow" -ForegroundColor White
-        Write-Host "  With completion summary: $collectedWithSummary" -ForegroundColor Green
-        Write-Host "  Metadata only: $collectedMetadataOnly" -ForegroundColor Yellow
-        Write-Host "  No data available: $noDataCount" -ForegroundColor Red
-        if ($TimeWindowMode) {
-            Write-Host "  Outside time window: $outsideTimeWindow" -ForegroundColor Gray
-        }
+        # Apply MaxRuns limit (newest first)
+        $summaries = $summaries | Sort-Object CreationTime -Descending | Select-Object -First $MaxRuns
+        Write-EmailLog "After limiting to $MaxRuns most recent runs, collected $($summaries.Count) summaries" -Level "INFO"
         
     } catch {
-        Write-Host "Error collecting run summaries: $_" -ForegroundColor Red
+        Write-EmailLog "Error collecting run summaries: $_" -Level "ERROR"
     }
     
     return $summaries
 }
 
 # ====================================================================
-# Send Email with Send-MailMessage (No External Dependencies)
+# Helper: Compress Run Folder
 # ====================================================================
-
-# Add this function to handle folder compression
 function Compress-RunFolder {
     [CmdletBinding()]
     param(
@@ -251,14 +200,9 @@ function Compress-RunFolder {
     )
     
     try {
-        # Create zip file name based on folder name
         $folderName = Split-Path $FolderPath -Leaf
         $zipPath = Join-Path $DestinationPath "$folderName.zip"
-        
-        # Use Compress-Archive to create zip
         Compress-Archive -Path "$FolderPath\*" -DestinationPath $zipPath -CompressionLevel Optimal -Force
-        
-        # Return zip file info
         $zipFile = Get-Item $zipPath
         return @{
             Path = $zipFile.FullName
@@ -273,9 +217,6 @@ function Compress-RunFolder {
         return $null
     }
 }
-
-
-
 
 # ====================================================================
 # Send Email with MailKit Library (Stable version)
@@ -292,7 +233,6 @@ function Send-EmailWithAttachments {
     try {
         Write-Host "Preparing email with $($Attachments.Count) attachments..." -ForegroundColor Cyan
         
-        # Load MailKit and MimeKit assemblies
         $currentLocation = $PSScriptRoot
         $mailKitPath = Join-Path $currentLocation "MailKit.dll"
         $mimeKitPath = Join-Path $currentLocation "MimeKit.dll"
@@ -307,22 +247,18 @@ function Send-EmailWithAttachments {
         Add-Type -Path $mailKitPath
         Add-Type -Path $mimeKitPath
         
-        # Create MIME message
         $message = New-Object MimeKit.MimeMessage
         $message.From.Add([MimeKit.MailboxAddress]::Parse($Config.FromAddress))
         $message.To.Add([MimeKit.MailboxAddress]::Parse($Config.ToAddress))
         $message.Subject = $Subject
         
-        # Create message body with HTML content
         $bodyBuilder = New-Object MimeKit.BodyBuilder
         $bodyBuilder.HtmlBody = $Body
         $bodyBuilder.TextBody = [System.Text.RegularExpressions.Regex]::Replace($Body, "<[^>]*>", "")
         
-        # Track opened streams for proper cleanup
         $attachmentStreams = @()
         
         try {
-            # Add attachments if any
             if ($Attachments.Count -gt 0) {
                 foreach ($attachmentPath in $Attachments) {
                     if (Test-Path $attachmentPath) {
@@ -341,12 +277,10 @@ function Send-EmailWithAttachments {
             
             $message.Body = $bodyBuilder.ToMessageBody()
             
-            # Send using MailKit SmtpClient with correct SSL/TLS options
             Write-Host "Sending email via $($Config.SmtpServer):$($Config.SmtpPort)..." -ForegroundColor Cyan
             
             $smtpClient = New-Object MailKit.Net.Smtp.SmtpClient
             try {
-                # Determine secure socket options based on port and config
                 $socketOptions = [MailKit.Security.SecureSocketOptions]::Auto
                 if ($Config.SmtpPort -eq 465) {
                     $socketOptions = [MailKit.Security.SecureSocketOptions]::SslOnConnect
@@ -375,28 +309,19 @@ function Send-EmailWithAttachments {
                 }
             }
             
-            # Clean up temporary zip files
             foreach ($attachment in $Attachments) {
                 if ($attachment -like "*.zip") {
                     try {
                         Remove-Item $attachment -Force -ErrorAction SilentlyContinue
                         Write-Host "  ✓ Cleaned up temporary zip: $(Split-Path $attachment -Leaf)" -ForegroundColor Gray
-                    } catch {
-                        # Silent cleanup - don't fail if cleanup fails
-                    }
+                    } catch { }
                 }
             }
-            
             return $true
             
         } finally {
-            # Ensure all attachment streams are disposed
             foreach ($stream in $attachmentStreams) {
-                try {
-                    $stream.Dispose()
-                } catch {
-                    # Silently continue
-                }
+                try { $stream.Dispose() } catch { }
             }
         }
         
@@ -502,7 +427,6 @@ function Create-EmailBody {
 "@
 
     foreach ($summary in $RunSummaries) {
-        # Determine status class and badge
         $statusClass = "run-unknown"
         $statusBadge = "status-unknown"
         $statusText = "UNKNOWN"
@@ -517,12 +441,10 @@ function Create-EmailBody {
             $statusText = "FAILED"
         }
         
-        # Add metadata-only styling
         if ($summary.CollectionType -eq "METADATA_ONLY") {
             $statusClass = "run-metadata-only"
         }
         
-        # Determine collection badge
         $collectionBadge = ""
         $collectionText = ""
         if ($summary.CollectionType -eq "SUMMARY_METADATA") {
@@ -581,7 +503,7 @@ function Create-EmailBody {
 }
 
 # ====================================================================
-# Main Email Sending Function
+# Main Email Sending Function – now accepts log file parameter
 # ====================================================================
 function Send-RunReport {
     [CmdletBinding()]
@@ -591,52 +513,40 @@ function Send-RunReport {
         [switch]$TestMode = $false,
         [string]$ScheduleStartTime = $null,
         [string]$ScheduleEndTime = $null,
-        [switch]$UseTimeWindow = $false
+        [switch]$UseTimeWindow = $false,
+        [string]$LogFile = $null   # new parameter
     )
     
-    Write-Host "==============================" -ForegroundColor Cyan
-    Write-Host "FACE RECOGNITION EMAIL REPORT" -ForegroundColor Cyan
-    Write-Host "==============================" -ForegroundColor Cyan
-    Write-Host ""
+    $script:EmailLogFile = $LogFile   # set global log file for Write-EmailLog
     
-    # Initialize configuration
-    if (-not (Initialize-EmailConfig -OverrideConfig $ConfigOverride)) {
-        return $false
-    }
+    Write-EmailLog "==============================" -Level "INFO"
+    Write-EmailLog "FACE RECOGNITION EMAIL REPORT" -Level "INFO"
+    Write-EmailLog "==============================" -Level "INFO"
     
-    # Determine time range based on mode
-    $since = (Get-Date).AddHours(-$appConfig.EmailDefaultHoursBack)  # Default: last 24 hours
+    if (-not (Initialize-EmailConfig -OverrideConfig $ConfigOverride)) { return $false }
     
-    # If using schedule time window, parse the times
-    $windowStart = $null
-    $windowEnd = $null
+    $since = (Get-Date).AddHours(-$appConfig.EmailDefaultHoursBack)
+    
+    $windowStart = $null; $windowEnd = $null
     if ($UseTimeWindow -and $ScheduleStartTime -and $ScheduleEndTime) {
         try {
             $today = Get-Date -Format "yyyy-MM-dd"
             $windowStart = [DateTime]::ParseExact("$today $ScheduleStartTime", "yyyy-MM-dd HH:mm", $null)
-            $windowEnd = [DateTime]::ParseExact("$today $ScheduleEndTime", "yyyy-MM-dd HH:mm", $null)
-            
-            Write-Host "Using schedule time window:" -ForegroundColor Cyan
-            Write-Host "  Start: $ScheduleStartTime" -ForegroundColor White
-            Write-Host "  End: $ScheduleEndTime" -ForegroundColor White
-            Write-Host "  Window: $($windowStart.ToString('HH:mm')) to $($windowEnd.ToString('HH:mm'))" -ForegroundColor White
+            $windowEnd   = [DateTime]::ParseExact("$today $ScheduleEndTime",   "yyyy-MM-dd HH:mm", $null)
         } catch {
-            Write-Host "Warning: Failed to parse schedule times. Using default $($appConfig.EmailDefaultHoursBack)-hour window." -ForegroundColor Yellow
-            Write-Host "  Error: $_" -ForegroundColor Red
+            Write-EmailLog "Failed to parse schedule times, using default $($appConfig.EmailDefaultHoursBack)-hour window." -Level "WARN"
             $UseTimeWindow = $false
         }
     }
     
-    # Collect run summaries
-    Write-Host "Collecting run summaries from: $BasePath" -ForegroundColor Cyan
+    Write-EmailLog "Collecting run summaries from: $BasePath" -Level "INFO"
     $summaries = Get-RunSummaries -BasePath $BasePath -Since $since `
-        -MaxRuns $appConfig.EmailMaxRunsToCollect `   # <-- FIXED: $ScriptConfig -> $appConfig
+        -MaxRuns $appConfig.EmailMaxRunsToCollect `
         -ScheduleStart $windowStart -ScheduleEnd $windowEnd -TimeWindowMode:$UseTimeWindow
+
     
     if ($summaries.Count -eq 0) {
         Write-Host "No runs found to report." -ForegroundColor Yellow
-        
-        # Still send a summary email if needed
         if (-not $TestMode) {
             $subject = "$($EmailConfig.SubjectPrefix) No Runs Found - $(Get-Date -Format 'yyyy-MM-dd')"
             if ($UseTimeWindow) {
@@ -648,13 +558,11 @@ function Send-RunReport {
         return $true
     }
 
-    # Validate the counts
     $totalCollected = $summaries.Count
     $calcSummaryCount = ($summaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
     $calcMetadataOnlyCount = ($summaries | Where-Object { $_.CollectionType -eq "METADATA_ONLY" }).Count
     $calcNoDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
     
-    # Verify counts add up
     $calculatedTotal = $calcSummaryCount + $calcMetadataOnlyCount + $calcNoDataCount
     if ($calculatedTotal -ne $totalCollected) {
         Write-Host "Warning: Count mismatch! Calculated: $calculatedTotal, Actual: $totalCollected" -ForegroundColor Red
@@ -664,29 +572,24 @@ function Send-RunReport {
         $noDataCount = $calcNoDataCount
     }    
     
-    # Prepare attachments - only attach from runs that have data
     $attachments = @()
     $totalSize = 0
-    $maxSize = $appConfig.EmailMaxAttachmentSizeMB * 1024 * 1024  # Convert MB to bytes
+    $maxSize = $appConfig.EmailMaxAttachmentSizeMB * 1024 * 1024
     
-    # Calculate counts correctly
     $summaryCount = ($summaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
     $metadataOnlyCount = ($summaries | Where-Object { $_.CollectionType -eq "METADATA_ONLY" }).Count
     $noDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
     
     foreach ($summary in $summaries) {
-        # Use compressed folder if available, otherwise fall back to individual files
         if ($summary.CompressedFolder) {
             $zipFile = $summary.CompressedFolder
             $sizeInBytes = $zipFile.SizeBytes
-            
             if (($totalSize + $sizeInBytes) -lt $maxSize) {
                 $attachments += $zipFile.Path
                 $totalSize += $sizeInBytes
                 Write-Host "  ✓ Will attach compressed folder: $($zipFile.Name) ($($zipFile.Size))" -ForegroundColor Green
             }
         } else {
-            # Fallback to individual files if compression failed
             foreach ($logFile in $summary.LogFiles) {
                 $sizeInBytes = if ($logFile.SizeBytes) {
                     $logFile.SizeBytes
@@ -695,7 +598,6 @@ function Send-RunReport {
                 } else {
                     0
                 }
-                
                 if (($totalSize + $sizeInBytes) -lt $maxSize) {
                     $attachments += $logFile.Path
                     $totalSize += $sizeInBytes
@@ -704,18 +606,14 @@ function Send-RunReport {
         }
     }
     
-    # Create email
     $runCount = $summaries.Count
     $subject = "$($EmailConfig.SubjectPrefix) $runCount Runs - $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
-    
     if ($UseTimeWindow) {
         $subject = "$($EmailConfig.SubjectPrefix) $runCount Runs ($ScheduleStartTime-$ScheduleEndTime) - $(Get-Date -Format 'yyyy-MM-dd')"
     }
     
     $body = Create-EmailBody -RunSummaries $summaries -Config $EmailConfig -ScheduleStart $ScheduleStartTime -ScheduleEnd $ScheduleEndTime
     
-    # Update the email details display to show compression info
-    # Find this section in Send-RunReport function (around line 380-390):
     Write-Host "`nEmail Details:" -ForegroundColor Cyan
     Write-Host "  Subject: $subject" -ForegroundColor White
     Write-Host "  To: $($EmailConfig.ToAddress)" -ForegroundColor White
@@ -724,8 +622,6 @@ function Send-RunReport {
     Write-Host "  Metadata only: $metadataOnlyCount" -ForegroundColor Yellow
     Write-Host "  No data: $noDataCount" -ForegroundColor Gray
     Write-Host "  Attachments: $($attachments.Count) files (~$([math]::Round($totalSize/1MB, 2)) MB)" -ForegroundColor White
-
-    # Add a line to show compression status:
     $compressedCount = ($summaries | Where-Object { $_.CompressedFolder }).Count
     Write-Host "  Compressed folders: $compressedCount" -ForegroundColor Cyan
     if ($UseTimeWindow) {
@@ -737,12 +633,11 @@ function Send-RunReport {
         return $true
     }
     
-    # Send email
     return Send-EmailWithAttachments -Subject $subject -Body $body -Attachments $attachments -Config $EmailConfig
 }
 
 # ====================================================================
-# Monitor Integration Functions
+# Monitor Integration Functions – now use Write-EmailLog
 # ====================================================================
 function Register-StableEmailSender {
     param(
@@ -754,11 +649,10 @@ function Register-StableEmailSender {
         LastSent       = $null
         MonitorConfig  = $MonitorConfig
         Enabled        = $true
-        CredentialPath = $appConfig.EmailCredentialPath   # <-- FIXED: was $ScriptConfig.CredentialPath
+        CredentialPath = $appConfig.EmailCredentialPath
     }
     return $true
 }
-
 
 function Invoke-StableEmailReport {
     [CmdletBinding()]
@@ -771,7 +665,6 @@ function Invoke-StableEmailReport {
         return $false
     }
     
-    # Determine if we should send (every hour or if forced)
     $shouldSend = $Force -or (
         $global:StableEmailSender.LastSent -eq $null -or 
         ((Get-Date) - $global:StableEmailSender.LastSent).TotalHours -ge 1
@@ -781,18 +674,12 @@ function Invoke-StableEmailReport {
         Write-Host "Sending email report..." -ForegroundColor Cyan
         Write-Host "Time: $(Get-Date -Format 'HH:mm:ss')" -ForegroundColor Gray
         
-        # Initialize the configuration if needed
         if (-not $global:StableEmailSender.Config -or $global:StableEmailSender.Config.Count -eq 0) {
-            $global:StableEmailSender.Config = @{
-                SubjectPrefix = "[FaceRecog]"
-            }
+            $global:StableEmailSender.Config = @{ SubjectPrefix = "[FaceRecog]" }
         }
         
-        # Extract schedule times from config
         $scheduleStart = $global:StableEmailSender.Config.ScheduleStartTime
         $scheduleEnd = $global:StableEmailSender.Config.ScheduleEndTime
-        
-        # Send the report with time window if schedule times are available
         $useTimeWindow = ($scheduleStart -and $scheduleEnd)
         
         if ($useTimeWindow) {
@@ -801,9 +688,8 @@ function Invoke-StableEmailReport {
         
         $success = Send-RunReport -BasePath $global:StableEmailSender.MonitorConfig.RunsBasePath `
             -ConfigOverride $global:StableEmailSender.Config `
-            -ScheduleStartTime $scheduleStart `
-            -ScheduleEndTime $scheduleEnd `
-            -UseTimeWindow:$useTimeWindow
+            -ScheduleStartTime $scheduleStart -ScheduleEndTime $scheduleEnd -UseTimeWindow:$useTimeWindow `
+            -LogFile $global:StableEmailSender.MonitorConfig.LogFile   # <-- new
         
         if ($success) {
             $global:StableEmailSender.LastSent = Get-Date
@@ -811,7 +697,6 @@ function Invoke-StableEmailReport {
         } else {
             Write-Host "Failed to send email" -ForegroundColor Red
         }
-        
         return $success
     } else {
         Write-Host "Email report not sent (recently sent at $($global:StableEmailSender.LastSent.ToString('HH:mm:ss')))" -ForegroundColor Gray
@@ -820,10 +705,9 @@ function Invoke-StableEmailReport {
 }
 
 # ====================================================================
-# Direct Execution
+# Direct Execution – now uses shared path initialisation
 # ====================================================================
 if ($MyInvocation.InvocationName -ne '.') {
-    # This script is being run directly
     Write-Host "==============================" -ForegroundColor Cyan
     Write-Host "DIRECT EMAIL REPORT TEST" -ForegroundColor Cyan
     Write-Host "==============================" -ForegroundColor Cyan
@@ -833,25 +717,19 @@ if ($MyInvocation.InvocationName -ne '.') {
     $commonPathsScript = Join-Path $PSScriptRoot $appConfig.EmailCommonPathsScript
     if (Test-Path $commonPathsScript) {
         try {
-            . $commonPathsScript
             $paths = Initialize-ProjectPortablePaths -IsMonitor -Silent
             if ($paths -and $paths.DateBasedPath) {
                 Write-Host "Found base path: $($paths.DateBasedPath)" -ForegroundColor Green
-                
-                # Test email sending
-                $testConfig = @{
-                    SubjectPrefix = "[Test] FaceRecog"
-                }
-                
+                $testConfig = @{ SubjectPrefix = "[Test] FaceRecog" }
+                # In test mode we still want console output, so no log file
                 $result = Send-RunReport -BasePath $paths.DateBasedPath -ConfigOverride $testConfig -TestMode
-                
                 if ($result) {
                     Write-Host "`n✓ Email test completed successfully!" -ForegroundColor Green
                     Write-Host "   Run with -TestMode:`$false to send actual email." -ForegroundColor Yellow
                 } else {
                     Write-Host "`n✗ Email test failed" -ForegroundColor Red
                 }
-            } else {
+            } else {    
                 Write-Host "Could not initialize paths" -ForegroundColor Red
             }
         } catch {

@@ -953,7 +953,7 @@ def main():
     # Create robust face recognition system using factory
     print("\n🔄 Creating face recognition system...")
     try:
-        face_system = create_system(config, system_type="chroma")
+        face_system = create_system(config, system_type="voyager")
         
         # Verify GPU usage
         verify_gpu_usage(face_system)
@@ -962,7 +962,7 @@ def main():
         print(f"❌ Failed to create face recognition system: {e}")
         print("🔄 Falling back to CPU mode...")
         config['use_gpu'] = False
-        face_system = create_system(config, system_type="chroma")
+        face_system = create_system(config, system_type="voyager")
     
     # Apply multi-source specific configurations
     multi_source_config = {
