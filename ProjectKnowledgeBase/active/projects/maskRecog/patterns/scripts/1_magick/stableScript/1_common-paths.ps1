@@ -45,8 +45,8 @@ $Script:CommonConfig = @{
 # ====================================================================
 $Script:ApplicationConfig = @{
     # ---------------------- Monitor Settings ----------------------
-    EveryStartTime       = "08:40"
-    EveryEndTime         = "11:12"
+    EveryStartTime       = "10:40"
+    EveryEndTime         = "16:37"
     MonitorProcessCheckInterval = 5
     MonitorMaxPIDFileAgeMinutes = 120
     MonitorPIDTrackingFile = "pid_tracking.json"

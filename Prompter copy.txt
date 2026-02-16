@@ -6,30 +6,41 @@
 - Focus on what is being queried in the instructions, only take note other non-related with instructions unless user asks for it.
 - Small and effective changes
 
+
 #### Instructions
 
-Currently, the codebase always send the attachment regardless of the requirement. Is it possible to create a conditional,
-an entry point whether the attachment should be included or not? make it so that, there is an option not to include attachment into
-specific target email address.
+This module is part of a big system.
+
+Propose stability from the codebase.
 
 
 #### Debug of the codebase
  
 
+Ignore this section, focus on other section.
 
 
 #### Tips
 
 follow instructions, no need to add non-related solution.
 
+
+
+
+
 #### References
 
 Use this as references.
 
-https://github.com/MicrosoftDocs/PowerShell-Docs
+https://github-com.translate.goog/karanpratapsingh/system-design?_x_tr_sl=en&_x_tr_tl=id&_x_tr_hl=id&_x_tr_pto=tc
 
-https://learn.microsoft.com/en-us/powershell/
 
+
+
+
+
+
+#### Summary from previous update
 
 
 
@@ -62,4 +73,1685 @@ https://learn.microsoft.com/en-us/powershell/
 
 
 
+
+
+# recognition/voyager_system.py
+import json
+from pathlib import Path
+from ultralytics import YOLO
+import numpy as np
+from collections import deque
+from typing import Dict, Tuple, Optional
+import time
+import torch
+import torch.nn.functional as F
+from voyager import Index, Space
+from .base_system import FaceRecognitionSystem
+import logging
+
+class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
+    def __init__(self, config: Dict):
+        # Initialize logger
+        self.logger = logging.getLogger(__name__)
+        
+        # Initialize GPU device FIRST
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.logger.info(f"Using device: {self.device}")
+        
+        # Initialize Voyager-specific attributes
+        self.voyager_index = None
+        self.voyager_id_to_identity = {}
+        self.identity_to_voyager_id = {}
+        self.next_voyager_id = 0
+        self.voyager_performance_monitor = VoyagerPerformanceMonitor()
+        
+        # GPU-optimized tensor storage for centroids
+        self.identity_centroids_tensor = None
+        self.identity_names_list = []
+        
+        # Add validation tracking
+        self.index_validation_errors = 0
+        self.last_validation_time = 0
+        self.max_validation_interval = 300  # 5 minutes
+        
+        # Add index consistency check
+        self._validate_index_consistency()        
+        
+        # Now call parent constructor
+        super().__init__(config)
+        
+    def _validate_index_consistency(self):
+        """Validate Voyager index matches internal mappings"""
+        if self.voyager_index is None:
+            return True
+            
+        try:
+            item_count = self._get_voyager_item_count()
+            mapping_count = len(self.voyager_id_to_identity)
+            
+            if item_count != mapping_count:
+                self.logger.warning(
+                    f"Index inconsistency detected: "
+                    f"Voyager items={item_count}, mappings={mapping_count}"
+                )
+                self.index_validation_errors += 1
+                
+                # Attempt to rebuild if too many errors
+                if self.index_validation_errors > 3:
+                    self._rebuild_index_from_backup()
+                    return False
+            return True
+        except Exception as e:
+            self.logger.error(f"Index validation failed: {e}")
+            return False
+    
+    def _rebuild_index_from_backup(self):
+        """Rebuild Voyager index from database backup"""
+        self.logger.warning("Rebuilding Voyager index from database...")
+        
+        # Save current state
+        current_db = self.embeddings_db.copy()
+        
+        # Reinitialize
+        self.voyager_index = None
+        self.voyager_id_to_identity = {}
+        self.identity_to_voyager_id = {}
+        self.next_voyager_id = 0
+        
+        # Reload
+        self.embeddings_db = current_db
+        self._load_embeddings_database()
+        
+        self.index_validation_errors = 0
+        self.logger.info("Index rebuild complete")        
+        
+               
+    def _load_embeddings_database(self):
+        """Load embeddings into Voyager index with GPU optimization"""
+        try:
+            db_path = Path(self.config['embeddings_db_path'])
+            if not db_path.exists():
+                self.logger.warning("Embeddings database not found, starting fresh")
+                self.embeddings_db = {"persons": {}, "metadata": {}}
+                # Initialize empty Voyager index for future additions
+                self._initialize_voyager_index(512)  # Default dimension
+                return
+                
+            with open(db_path, 'r') as f:
+                self.embeddings_db = json.load(f)
+                
+            if "persons" in self.embeddings_db:
+                # First, determine embedding dimension from the data
+                embedding_dim = self._get_embedding_dimension_from_data()
+                self.logger.info(f"Detected embedding dimension: {embedding_dim}")
+                
+                # Initialize Voyager index with correct dimension
+                self._initialize_voyager_index(embedding_dim)
+                
+                vectors = []
+                voyager_ids = []
+                identities = []
+                centroid_tensors = []
+                
+                for person_id, person_data in self.embeddings_db["persons"].items():
+                    display_name = person_data["display_name"]
+                    
+                    # Extract centroid embedding from your database structure
+                    if "centroid_embedding" in person_data and person_data["centroid_embedding"]:
+                        centroid = np.array(person_data["centroid_embedding"])
+                    else:
+                        # Fallback: use first embedding if no centroid
+                        if (person_data.get("embeddings") and 
+                            len(person_data["embeddings"]) > 0 and
+                            "vector" in person_data["embeddings"][0]):
+                            centroid = np.array(person_data["embeddings"][0]["vector"])
+                            self.logger.warning(f"Using first embedding as centroid for {display_name}")
+                        else:
+                            self.logger.warning(f"No embeddings found for {display_name}, skipping")
+                            continue
+                    
+                    # Store mapping and prepare for batch addition
+                    voyager_id = self.next_voyager_id
+                    self.voyager_id_to_identity[voyager_id] = display_name
+                    self.identity_to_voyager_id[display_name] = voyager_id
+                    self.identity_centroids[display_name] = centroid  # Keep for compatibility
+                    
+                    vectors.append(centroid)
+                    voyager_ids.append(voyager_id)
+                    identities.append(display_name)
+                    
+                    # Create GPU tensor for this centroid
+                    centroid_tensor = torch.from_numpy(centroid).to(self.device).float()
+                    centroid_tensors.append(centroid_tensor)
+                    
+                    self.next_voyager_id += 1
+                
+                # Batch add to Voyager for better performance
+                if vectors:
+                    vectors_array = np.array(vectors)
+                    self.voyager_index.add_items(vectors_array, voyager_ids)
+                    
+                    # Create GPU tensor for all centroids
+                    if centroid_tensors:
+                        self.identity_centroids_tensor = torch.stack(centroid_tensors)
+                        self.identity_names_list = identities
+                    
+                    self.logger.info(f"Loaded {len(vectors)} identities into Voyager index")
+                    self.logger.info(f"Pre-loaded {len(centroid_tensors)} centroids to GPU memory")
+                    
+                    # Get the correct item count attribute
+                    item_count = self._get_voyager_item_count()
+                    self.logger.info(f"Voyager index size: {item_count} items")
+                    
+                    # Test query to verify index is working
+                    if len(vectors) > 0:
+                        try:
+                            test_neighbors, test_distances = self.voyager_index.query(vectors[0], k=1)
+                            if test_neighbors and len(test_neighbors) > 0:
+                                self.logger.info(f"Voyager test query successful: {len(test_neighbors)} results")
+                        except Exception as e:
+                            self.logger.warning(f"Voyager test query failed: {e}")
+                
+                self.logger.info(f"Loaded {len(self.voyager_id_to_identity)} identities from database")
+                self.logger.info(f"Available persons: {list(self.voyager_id_to_identity.values())}")
+                
+            else:
+                self.logger.warning("No 'persons' key found in JSON database")
+                self._initialize_voyager_index(512)  # Default dimension
+                
+        except Exception as e:
+            self.logger.error(f"Failed to load embeddings database: {e}")
+            import traceback
+            traceback.print_exc()
+            # Initialize empty index anyway
+            self._initialize_voyager_index(512)
+            
+    def _recognize_face_gpu_optimized(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
+        """GPU-optimized recognition with fallback to CPU"""
+        if not self.identity_centroids:
+            return None, 0.0
+        
+        # Try GPU first, fallback to CPU if GPU fails
+        try:
+            if torch.cuda.is_available() and self.identity_centroids_tensor is not None:
+                return self._recognize_on_gpu(embedding)
+            else:
+                return self._recognize_on_cpu(embedding, start_time)
+        except (RuntimeError, torch.cuda.OutOfMemoryError) as e:
+            self.logger.warning(f"GPU recognition failed, falling back to CPU: {e}")
+            # Clear GPU cache and retry on CPU
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            return self._recognize_on_cpu(embedding, start_time)
+
+    def _recognize_on_gpu(self, embedding: np.ndarray) -> Tuple[Optional[str], float]:
+        """GPU-based recognition implementation"""
+        embedding_tensor = torch.from_numpy(embedding).to(self.device).float().flatten()
+        centroids_tensor = self.identity_centroids_tensor
+        
+        with torch.no_grad():
+            embedding_norm = F.normalize(embedding_tensor, p=2, dim=0)
+            centroids_norm = F.normalize(centroids_tensor, p=2, dim=1)
+            cosine_similarities = torch.mm(centroids_norm, embedding_norm.unsqueeze(1)).squeeze()
+            best_similarity, best_index = torch.max(cosine_similarities, dim=0)
+            best_similarity = best_similarity.item()
+        
+        best_identity = None
+        if best_similarity >= self.config['recognition_threshold']:
+            best_identity = self.identity_names_list[best_index]
+        
+        return best_identity, best_similarity
+
+    def _recognize_on_cpu(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
+        """CPU-based fallback recognition"""
+        best_identity = None
+        best_similarity = 0.0
+        
+        # Normalize query embedding
+        embedding_norm = embedding / np.linalg.norm(embedding)
+        
+        for identity, centroid in self.identity_centroids.items():
+            if centroid is None:
+                continue
+                
+            # Normalize centroid
+            centroid_norm = centroid / np.linalg.norm(centroid)
+            
+            # Calculate cosine similarity
+            similarity = np.dot(embedding_norm, centroid_norm)
+            
+            if similarity > best_similarity and similarity >= self.config['recognition_threshold']:
+                best_similarity = similarity
+                best_identity = identity
+        
+        recognition_time = (time.time() - start_time) * 1000
+        self.debug_stats['recognition_times'].append(recognition_time)
+        
+        return best_identity, best_similarity   
+    
+    def save_voyager_index(self, filepath: Optional[str] = None):
+        """Save Voyager index to disk with corruption check"""
+        if self.voyager_index is None:
+            self.logger.warning("No Voyager index to save")
+            return False
+        
+        try:
+            if filepath is None:
+                db_path = Path(self.config['embeddings_db_path'])
+                index_path = db_path.parent / f"voyager_index_{int(time.time())}.bin"
+            else:
+                index_path = Path(filepath)
+            
+            # Save with temporary file first
+            temp_path = index_path.with_suffix('.tmp')
+            self.voyager_index.save(str(temp_path))
+            
+            # Verify the saved file
+            if temp_path.exists() and temp_path.stat().st_size > 0:
+                # Move to final location (atomic operation on Unix-like systems)
+                temp_path.replace(index_path)
+                self.logger.info(f"Voyager index saved to {index_path}")
+                
+                # Create checksum for validation
+                self._create_index_checksum(index_path)
+                return True
+            else:
+                self.logger.error("Failed to save Voyager index - file empty or missing")
+                return False
+                
+        except Exception as e:
+            self.logger.error(f"Failed to save Voyager index: {e}")
+            return False
+
+    def load_voyager_index(self, filepath: str) -> bool:
+        """Load Voyager index with validation"""
+        try:
+            index_path = Path(filepath)
+            
+            if not index_path.exists():
+                self.logger.warning(f"Index file not found: {filepath}")
+                return False
+            
+            # Verify checksum if available
+            if not self._verify_index_checksum(index_path):
+                self.logger.warning("Index checksum verification failed")
+                return False
+            
+            # Load the index
+            dimension = self._get_embedding_dimension_from_model()
+            self.voyager_index = Index(Space.Cosine, num_dimensions=dimension)
+            self.voyager_index.load(str(index_path))
+            
+            # Validate loaded index
+            if self._validate_loaded_index():
+                self.logger.info(f"Successfully loaded Voyager index from {filepath}")
+                return True
+            else:
+                self.voyager_index = None
+                return False
+                
+        except Exception as e:
+            self.logger.error(f"Failed to load Voyager index: {e}")
+            return False
+
+    def _create_index_checksum(self, filepath: Path):
+        """Create checksum for index file"""
+        import hashlib
+        checksum_path = filepath.with_suffix('.checksum')
+        
+        with open(filepath, 'rb') as f:
+            file_hash = hashlib.sha256(f.read()).hexdigest()
+        
+        with open(checksum_path, 'w') as f:
+            f.write(f"{file_hash}\n{filepath.name}\n{time.time()}")
+
+    def _verify_index_checksum(self, filepath: Path) -> bool:
+        """Verify index file checksum"""
+        checksum_path = filepath.with_suffix('.checksum')
+        
+        if not checksum_path.exists():
+            self.logger.warning("No checksum file found, skipping verification")
+            return True
+        
+        try:
+            import hashlib
+            with open(filepath, 'rb') as f:
+                file_hash = hashlib.sha256(f.read()).hexdigest()
+            
+            with open(checksum_path, 'r') as f:
+                stored_hash = f.readline().strip()
+            
+            return file_hash == stored_hash
+        except Exception as e:
+            self.logger.warning(f"Checksum verification failed: {e}")
+            return False    
+                 
+            
+    def _get_embedding_dimension_from_data(self) -> int:
+        """Determine embedding dimension from the actual data"""
+        try:
+            # Look at the first person's centroid to determine dimension
+            first_person = next(iter(self.embeddings_db["persons"].values()))
+            
+            if "centroid_embedding" in first_person and first_person["centroid_embedding"]:
+                return len(first_person["centroid_embedding"])
+            elif (first_person.get("embeddings") and 
+                  len(first_person["embeddings"]) > 0 and
+                  "vector" in first_person["embeddings"][0]):
+                return len(first_person["embeddings"][0]["vector"])
+            else:
+                # Check embedding_length field
+                if first_person.get("embeddings") and len(first_person["embeddings"]) > 0:
+                    return first_person["embeddings"][0].get("embedding_length", 512)
+        except Exception as e:
+            self.logger.warning(f"Could not determine embedding dimension from data: {e}")
+        
+        # Fallback to model-based dimension
+        return self._get_embedding_dimension_from_model()
+    
+    def _get_embedding_dimension_from_model(self) -> int:
+        """Determine embedding dimension based on model (fallback)"""
+        model_dimensions = {
+            'Facenet': 128,      # Based on your data, Facenet uses 128
+            'VGGFace': 4096,     # VGGFace uses 4096
+            'OpenFace': 128,     # OpenFace uses 128
+            'Facenet512': 512,   # Facenet512 uses 512
+            'DeepFace': 4096,    # DeepFace default (VGGFace)
+            'ArcFace':512,
+        }
+        model = self.config.get('embedding_model', 'ArcFace')
+        dimension = model_dimensions.get(model, 512)  # Default based on your data
+        self.logger.info(f"Using model-based dimension {dimension} for {model}")
+        return dimension
+
+
+    def _initialize_voyager_index(self, dimension: int):
+        """Initialize Voyager index with specific dimension"""
+        self.logger.info(f"Initializing Voyager index with dimension {dimension}")
+        
+        try:
+            # Use cosine similarity as it matches your current approach
+            self.voyager_index = Index(Space.Cosine, num_dimensions=dimension)
+            self.logger.info("Voyager index initialized with auto-tuning")
+        except Exception as e:
+            self.logger.error(f"Failed to initialize Voyager index: {e}")
+            self.voyager_index = None
+            
+    def _get_voyager_item_count(self) -> int:
+        """Safely get the number of items in Voyager index"""
+        if self.voyager_index is None:
+            return 0
+        
+        # Try different possible attribute names for item count
+        try:
+            if hasattr(self.voyager_index, 'get_n_items'):
+                return self.voyager_index.get_n_items()
+            elif hasattr(self.voyager_index, 'num_items'):
+                return self.voyager_index.num_items
+            elif hasattr(self.voyager_index, 'n_items'):
+                return self.voyager_index.n_items
+            else:
+                # If we can't determine, return the count from our mapping
+                return len(self.voyager_id_to_identity)
+        except Exception as e:
+            self.logger.warning(f"Could not get Voyager item count: {e}")
+            return len(self.voyager_id_to_identity)
+    
+    def _validate_embedding(self, embedding: np.ndarray) -> bool:
+        """Validate embedding shape and values"""
+        if embedding is None or embedding.size == 0:
+            return False
+        
+        # Check for NaN or Inf values
+        if np.any(np.isnan(embedding)) or np.any(np.isinf(embedding)):
+            self.logger.warning("Embedding contains NaN or Inf values")
+            return False
+        
+        # Check expected dimension (based on model)
+        expected_dim = self._get_embedding_dimension_from_model()
+        if embedding.shape[-1] != expected_dim:
+            self.logger.warning(
+                f"Embedding dimension mismatch: expected {expected_dim}, "
+                f"got {embedding.shape[-1]}"
+            )
+            # Try to reshape if possible
+            if embedding.size == expected_dim:
+                embedding = embedding.reshape(-1)
+            else:
+                return False
+        
+        return True
+
+    def recognize_face(self, embedding: np.ndarray) -> Tuple[Optional[str], float]:
+        """Enhanced recognition with robust error recovery"""
+        start_time = time.time()
+        
+        # Validate input embedding
+        if not self._validate_embedding(embedding):
+            self.logger.warning(f"Invalid embedding provided: shape={embedding.shape}")
+            return None, 0.0
+        
+        try:
+            # Try Voyager first
+            if (self.voyager_index is not None and 
+                self._get_voyager_item_count() > 0 and
+                self.config.get('use_voyager', True)):
+                
+                # Periodic index validation
+                current_time = time.time()
+                if current_time - self.last_validation_time > self.max_validation_interval:
+                    if not self._validate_index_consistency():
+                        self.logger.warning("Index validation failed, using fallback")
+                        result = self._recognize_face_gpu_optimized(embedding, start_time)
+                        self.voyager_performance_monitor.record_voyager_performance(
+                            start_time, success=False, used_fallback=True
+                        )
+                        return result
+                    self.last_validation_time = current_time
+                
+                result = self._recognize_with_voyager(embedding, start_time)
+                if result[0] is not None:
+                    return result
+            
+            # Fallback
+            result = self._recognize_face_gpu_optimized(embedding, start_time)
+            self.voyager_performance_monitor.record_voyager_performance(
+                start_time, success=False, used_fallback=True
+            )
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Recognition failed: {e}")
+            # Return safe default
+            return None, 0.0
+        
+    def _recognize_with_voyager(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
+        """Recognition using Voyager index"""
+        try:
+            # Ensure embedding is the right shape and type
+            embedding = embedding.flatten().astype(np.float32)
+            
+            # Query Voyager for nearest neighbors - use adaptive k based on index size
+            item_count = self._get_voyager_item_count()
+            k = min(5, item_count)
+            
+            neighbors, distances = self.voyager_index.query(embedding, k=k)
+            
+            if len(neighbors) == 0 or len(distances) == 0:
+                return None, 0.0
+            
+            # Convert Voyager distance to similarity score 
+            # Voyager Cosine space: distance = 1 - cosine_similarity
+            best_similarity = 1.0 - distances[0]
+            best_voyager_id = neighbors[0]
+            
+            threshold = self.config['recognition_threshold']
+            
+            if best_similarity >= threshold:
+                identity = self.voyager_id_to_identity.get(best_voyager_id)
+                
+                # Record successful Voyager query
+                self.voyager_performance_monitor.record_voyager_performance(
+                    start_time, success=True, used_fallback=False
+                )
+                
+                if self.config.get('verbose_voyager', False):
+                    self.logger.debug(f"Voyager matched: {identity} (similarity: {best_similarity:.3f})")
+                
+                return identity, best_similarity
+            
+            # No match above threshold
+            self.voyager_performance_monitor.record_voyager_performance(
+                start_time, success=False, used_fallback=False
+            )
+            return None, best_similarity
+            
+        except Exception as e:
+            self.logger.error(f"Voyager recognition error: {e}")
+            self.voyager_performance_monitor.record_voyager_performance(
+                start_time, success=False, used_fallback=True
+            )
+            return None, 0.0
+        
+    def _recognize_face_original(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
+        """Original recognition method kept for compatibility - now uses GPU optimization"""
+        return self._recognize_face_gpu_optimized(embedding, start_time)
+
+    def add_identity_to_voyager(self, identity: str, embedding: np.ndarray):
+        """Add new identity to Voyager index with GPU optimization"""
+        if self.voyager_index is None:
+            # Initialize with the dimension of the new embedding
+            dimension = len(embedding.flatten())
+            self._initialize_voyager_index(dimension)
+        
+        # Check if identity already exists
+        if identity in self.identity_to_voyager_id:
+            voyager_id = self.identity_to_voyager_id[identity]
+            self.logger.info(f"Updating existing identity '{identity}' in Voyager index")
+            
+            # Update GPU tensor
+            if self.identity_centroids_tensor is not None:
+                index = self.identity_names_list.index(identity)
+                new_centroid_tensor = torch.from_numpy(embedding).to(self.device).float()
+                self.identity_centroids_tensor[index] = new_centroid_tensor
+        else:
+            voyager_id = self.next_voyager_id
+            self.next_voyager_id += 1
+            
+            # Add to GPU tensor
+            new_centroid_tensor = torch.from_numpy(embedding).to(self.device).float()
+            if self.identity_centroids_tensor is None:
+                self.identity_centroids_tensor = new_centroid_tensor.unsqueeze(0)
+                self.identity_names_list = [identity]
+            else:
+                self.identity_centroids_tensor = torch.cat([
+                    self.identity_centroids_tensor, 
+                    new_centroid_tensor.unsqueeze(0)
+                ])
+                self.identity_names_list.append(identity)
+        
+        # Update mappings
+        self.voyager_id_to_identity[voyager_id] = identity
+        self.identity_to_voyager_id[identity] = voyager_id
+        self.identity_centroids[identity] = embedding  # Maintain compatibility
+        
+        # Add to Voyager index
+        embedding_flat = embedding.flatten().astype(np.float32)
+        self.voyager_index.add_items(np.array([embedding_flat]), [voyager_id])
+        
+        item_count = self._get_voyager_item_count()
+        self.logger.info(f"Added/updated identity '{identity}' in Voyager index (ID: {voyager_id})")
+        self.logger.info(f"Voyager index now contains {item_count} items")
+        self.logger.info(f"GPU tensor now contains {len(self.identity_names_list)} centroids")
+        
+    def get_voyager_stats(self) -> Dict:
+        """Get Voyager performance statistics"""
+        stats = self.voyager_performance_monitor.get_voyager_stats()
+        item_count = self._get_voyager_item_count()
+        
+        # Add GPU memory info if available
+        gpu_info = {}
+        if torch.cuda.is_available():
+            gpu_info = {
+                'gpu_memory_allocated': torch.cuda.memory_allocated() / 1024**2,  # MB
+                'gpu_memory_cached': torch.cuda.memory_cached() / 1024**2,  # MB
+                'gpu_centroids_loaded': len(self.identity_names_list) if self.identity_names_list else 0
+            }
+        
+        stats.update({
+            'voyager_index_size': item_count,
+            'total_identities': len(self.voyager_id_to_identity),
+            'index_initialized': self.voyager_index is not None,
+            **gpu_info
+        })
+        return stats
+
+    def print_voyager_status(self):
+        """Print Voyager system status with GPU info"""
+        stats = self.get_voyager_stats()
+        self.logger.info("\n" + "="*50)
+        self.logger.info("VOYAGER VECTOR SEARCH STATUS")
+        self.logger.info("="*50)
+        self.logger.info(f"Index Initialized: {stats['index_initialized']}")
+        self.logger.info(f"Index Size: {stats['voyager_index_size']} items")
+        self.logger.info(f"Total Identities: {stats['total_identities']}")
+        self.logger.info(f"GPU Centroids Loaded: {stats.get('gpu_centroids_loaded', 0)}")
+        
+        if torch.cuda.is_available():
+            self.logger.info(f"GPU Memory Used: {stats.get('gpu_memory_allocated', 0):.1f} MB")
+            self.logger.info(f"GPU Memory Cached: {stats.get('gpu_memory_cached', 0):.1f} MB")
+        
+        self.logger.info(f"Total Queries: {stats['total_queries']}")
+        if stats['total_queries'] > 0:
+            self.logger.info(f"Average Query Time: {stats['avg_query_time']:.2f}ms")
+            self.logger.info(f"Fallback Rate: {(stats['fallback_count']/stats['total_queries'])*100:.1f}%")
+            self.logger.info(f"Success Rate: {stats['recall_rate']*100:.1f}%")
+        else:
+            self.logger.info("Average Query Time: N/A")
+            self.logger.info("Fallback Rate: N/A")
+            self.logger.info("Success Rate: N/A")
+        self.logger.info("="*50)
+                               
+class VoyagerPerformanceMonitor:
+    def __init__(self):
+        self.recognition_times = deque(maxlen=100)
+        self.voyager_stats = {
+            'total_queries': 0,
+            'successful_queries': 0,
+            'avg_query_time': 0.0,
+            'recall_rate': 0.0,
+            'fallback_count': 0
+        }
+        self.logger = logging.getLogger(__name__)
+        
+    
+    def record_voyager_performance(self, start_time: float, success: bool, used_fallback: bool = False):
+        query_time = (time.time() - start_time) * 1000
+        self.recognition_times.append(query_time)
+        
+        self.voyager_stats['total_queries'] += 1
+        
+        if success:
+            self.voyager_stats['successful_queries'] += 1
+        
+        if used_fallback:
+            self.voyager_stats['fallback_count'] += 1
+        
+        # Update averages
+        if self.recognition_times:
+            self.voyager_stats['avg_query_time'] = np.mean(self.recognition_times)
+        
+        # Update recall rate
+        if self.voyager_stats['total_queries'] > 0:
+            self.voyager_stats['recall_rate'] = (
+                self.voyager_stats['successful_queries'] / 
+                self.voyager_stats['total_queries']
+            )            
+    def get_voyager_stats(self) -> Dict:
+        return self.voyager_stats.copy()
+
+
+# recognition/robust_system.py
+import numpy as np
+from collections import deque
+from typing import Dict, List
+import time
+from ..processing.temporal_processing import MultiScaleFaceProcessor, TemporalFusion
+from ..processing.quality_assessment import FaceQualityAssessor, AdaptiveThresholdManager
+from ..recognition.voyager_system import VoyagerFaceRecognitionSystem
+import logging
+
+class RobustFaceRecognitionSystem(VoyagerFaceRecognitionSystem):
+    def __init__(self, config: Dict):
+        super().__init__(config)
+        
+        # Enhanced components
+        self.multi_scale_processor = MultiScaleFaceProcessor(config)
+        self.temporal_fusion = TemporalFusion(config)
+        self.quality_assessor = FaceQualityAssessor(config)
+        self.threshold_manager = AdaptiveThresholdManager(config)
+        
+        # Enhanced configuration with optimization parameters
+        self.robust_config = {
+            'enable_multi_scale': config.get('enable_multi_scale', True),
+            'enable_temporal_fusion': config.get('enable_temporal_fusion', True),
+            'enable_quality_aware': config.get('enable_quality_aware', True),
+            'min_face_quality': config.get('min_face_quality', 0.3),
+            'temporal_buffer_size': config.get('temporal_buffer_size', 10),
+            # Optimization thresholds
+            'quality_marginal_lower': config.get('quality_marginal_lower', 0.3),
+            'quality_marginal_upper': config.get('quality_marginal_upper', 0.6),
+            'quality_high_threshold': config.get('quality_high_threshold', 0.7),
+            'min_face_size': config.get('min_face_size', 20),
+            'near_min_size_multiplier': config.get('near_min_size_multiplier', 1.5),
+        }
+        
+        # Initialize for statistics
+        self.last_results = []
+        self.multi_scale_usage_stats = {'enabled': 0, 'disabled': 0, 'skipped_low': 0, 'skipped_high': 0}
+        
+        self.logger.info("Robust Face Recognition with VOYAGER similarity engine")
+                    
+    def process_frame_robust(self, frame: np.ndarray) -> List[Dict]:
+        """Enhanced robust processing with quality-adaptive similarity and optimized multi-scale usage"""
+        start_time = time.time()
+        results = []
+        
+        # Detect faces
+        detections = self.detect_faces(frame)
+        
+        for detection in detections:
+            x1, y1, x2, y2 = detection['bbox']
+            
+            # Extract face ROI with padding
+            padding = self.config.get('roi_padding', 15)
+            h, w = frame.shape[:2]
+            x1_pad = max(0, x1 - padding)
+            y1_pad = max(0, y1 - padding)
+            x2_pad = min(w, x2 + padding)
+            y2_pad = min(h, y2 + padding)
+            
+            face_roi = frame[y1_pad:y2_pad, x1_pad:x2_pad]
+            
+            # Skip if ROI is invalid
+            if face_roi.size == 0:
+                continue
+                
+            # Calculate face size for optimization
+            face_height = y2 - y1
+            face_width = x2 - x1
+            min_face_side = min(face_height, face_width)
+            
+            # Quality assessment
+            quality_scores = self.quality_assessor.assess_face_quality(face_roi, detection['bbox'])
+            overall_quality = quality_scores.get('overall', 0)
+            
+            # Skip very low quality faces entirely
+            if not self.threshold_manager.should_process_face(quality_scores):
+                self.multi_scale_usage_stats['skipped_low'] += 1
+                if self.config.get('verbose', False):
+                    self.logger.debug(f"Skipping low quality face (score: {overall_quality:.2f})")
+                continue
+                
+            # Mask detection
+            mask_status, mask_confidence = self.detect_mask(face_roi)
+            
+            # OPTIMIZED MULTI-SCALE DECISION LOGIC
+            use_multi_scale = False
+            multi_scale_reason = "standard"
+            
+            if self.robust_config['enable_multi_scale']:
+                # Condition 1: Face quality is marginal (0.3 < quality < 0.6)
+                condition_marginal_quality = (
+                    overall_quality > self.robust_config['quality_marginal_lower'] and
+                    overall_quality < self.robust_config['quality_marginal_upper']
+                )
+                
+                # Condition 2: Face size is near the minimum threshold
+                min_face_size = self.robust_config['min_face_size']
+                near_min_threshold = min_face_size * self.robust_config['near_min_size_multiplier']
+                condition_near_min_size = min_face_side < near_min_threshold
+                
+                # Decision logic based on optimization strategy
+                if condition_marginal_quality:
+                    # Quality is marginal - use multi-scale for boost
+                    use_multi_scale = True
+                    multi_scale_reason = "marginal_quality"
+                elif condition_near_min_size and overall_quality > 0.3:
+                    # Face is small and not extremely low quality - use multi-scale
+                    use_multi_scale = True
+                    multi_scale_reason = "near_min_size"
+                elif overall_quality >= self.robust_config['quality_high_threshold']:
+                    # High quality - skip multi-scale (fast path)
+                    use_multi_scale = False
+                    multi_scale_reason = "high_quality"
+                    self.multi_scale_usage_stats['skipped_high'] += 1
+                elif overall_quality <= self.robust_config['quality_marginal_lower']:
+                    # Very low quality - skip multi-scale
+                    use_multi_scale = False
+                    multi_scale_reason = "low_quality"
+                else:
+                    # Default: use standard embedding
+                    use_multi_scale = False
+                    multi_scale_reason = "default"
+                
+                # Update statistics
+                if use_multi_scale:
+                    self.multi_scale_usage_stats['enabled'] += 1
+                    if self.config.get('verbose', False):
+                        self.logger.debug(f"Multi-scale enabled ({multi_scale_reason}): Q={overall_quality:.2f}, Size={min_face_side}")
+                else:
+                    self.multi_scale_usage_stats['disabled'] += 1
+
+            
+            # Enhanced embedding extraction with optimized multi-scale usage
+            if use_multi_scale:
+                embeddings = self.multi_scale_processor.extract_multi_scale_embeddings(face_roi)
+                if embeddings:
+                    embedding = self.multi_scale_processor.fuse_embeddings(embeddings)
+                else:
+                    embedding = self.extract_embedding(face_roi)
+            else:
+                # Fast path: single embedding extraction
+                embedding = self.extract_embedding(face_roi)
+            
+            if embedding is None:
+                continue
+            
+            # VOYAGER-BASED RECOGNITION
+            identity, recognition_confidence = self.recognize_face(embedding)
+            
+            # Adaptive threshold for display
+            adaptive_threshold = self.threshold_manager.compute_adaptive_threshold(quality_scores)            
+            
+            results.append({
+                'bbox': detection['bbox'],
+                'detection_confidence': detection['confidence'],
+                'mask_status': mask_status,
+                'mask_confidence': mask_confidence,
+                'identity': identity,
+                'recognition_confidence': recognition_confidence,
+                'embedding': embedding.tolist(),
+                'quality_scores': quality_scores,
+                'adaptive_threshold': adaptive_threshold,
+                'similarity_engine': 'voyager',
+                'quality_adaptive': True,
+                'multi_scale_used': use_multi_scale,
+                'multi_scale_reason': multi_scale_reason,
+                'face_size': min_face_side
+            })
+        
+        # Update stats and store last results
+        self._update_robust_stats(results, start_time)
+        self.last_results = results
+        return results
+                  
+    def _update_robust_stats(self, results: List[Dict], start_time: float):
+        """Update enhanced statistics"""
+        self.debug_stats['total_frames_processed'] += 1
+        self.debug_stats['total_faces_detected'] += len(results)
+        self.debug_stats['total_faces_recognized'] += len([r for r in results if r['identity']])
+        self.debug_stats['last_processing_time'] = (time.time() - start_time) * 1000
+        
+        # Quality statistics
+        if results:
+            avg_quality = np.mean([r.get('quality_scores', {}).get('overall', 0) for r in results])
+            self.debug_stats.setdefault('avg_face_quality', deque(maxlen=50)).append(avg_quality)
+
+         
+    def get_robust_stats(self) -> Dict:
+        """Get robust engine statistics"""
+        stats = self.get_voyager_stats()
+        
+        # Add recognition statistics
+        if hasattr(self, 'last_results'):
+            total_faces = len(self.last_results)
+            recognized_faces = len([r for r in self.last_results if r['identity']])
+            stats['recognition_rate'] = recognized_faces / total_faces if total_faces > 0 else 0
+        
+        # Add multi-scale optimization statistics
+        total_multi_scale_decisions = (self.multi_scale_usage_stats['enabled'] + 
+                                      self.multi_scale_usage_stats['disabled'])
+        if total_multi_scale_decisions > 0:
+            stats['multi_scale_usage'] = {
+                'enabled_percentage': (self.multi_scale_usage_stats['enabled'] / 
+                                      total_multi_scale_decisions * 100),
+                'disabled_percentage': (self.multi_scale_usage_stats['disabled'] / 
+                                       total_multi_scale_decisions * 100),
+                'skipped_low_quality': self.multi_scale_usage_stats['skipped_low'],
+                'skipped_high_quality': self.multi_scale_usage_stats['skipped_high'],
+                'total_decisions': total_multi_scale_decisions
+            }
+        
+        return stats
+    # recognition/robust_system.py
+import numpy as np
+from collections import deque
+from typing import Dict, List
+import time
+from ..processing.temporal_processing import MultiScaleFaceProcessor, TemporalFusion
+from ..processing.quality_assessment import FaceQualityAssessor, AdaptiveThresholdManager
+from ..recognition.voyager_system import VoyagerFaceRecognitionSystem
+import logging
+
+class RobustFaceRecognitionSystem(VoyagerFaceRecognitionSystem):
+    def __init__(self, config: Dict):
+        super().__init__(config)
+        
+        # Enhanced components
+        self.multi_scale_processor = MultiScaleFaceProcessor(config)
+        self.temporal_fusion = TemporalFusion(config)
+        self.quality_assessor = FaceQualityAssessor(config)
+        self.threshold_manager = AdaptiveThresholdManager(config)
+        
+        # Enhanced configuration with optimization parameters
+        self.robust_config = {
+            'enable_multi_scale': config.get('enable_multi_scale', True),
+            'enable_temporal_fusion': config.get('enable_temporal_fusion', True),
+            'enable_quality_aware': config.get('enable_quality_aware', True),
+            'min_face_quality': config.get('min_face_quality', 0.3),
+            'temporal_buffer_size': config.get('temporal_buffer_size', 10),
+            # Optimization thresholds
+            'quality_marginal_lower': config.get('quality_marginal_lower', 0.3),
+            'quality_marginal_upper': config.get('quality_marginal_upper', 0.6),
+            'quality_high_threshold': config.get('quality_high_threshold', 0.7),
+            'min_face_size': config.get('min_face_size', 20),
+            'near_min_size_multiplier': config.get('near_min_size_multiplier', 1.5),
+        }
+        
+        # Initialize for statistics
+        self.last_results = []
+        self.multi_scale_usage_stats = {'enabled': 0, 'disabled': 0, 'skipped_low': 0, 'skipped_high': 0}
+        
+        self.logger.info("Robust Face Recognition with VOYAGER similarity engine")
+                    
+    def process_frame_robust(self, frame: np.ndarray) -> List[Dict]:
+        """Enhanced robust processing with quality-adaptive similarity and optimized multi-scale usage"""
+        start_time = time.time()
+        results = []
+        
+        # Detect faces
+        detections = self.detect_faces(frame)
+        
+        for detection in detections:
+            x1, y1, x2, y2 = detection['bbox']
+            
+            # Extract face ROI with padding
+            padding = self.config.get('roi_padding', 15)
+            h, w = frame.shape[:2]
+            x1_pad = max(0, x1 - padding)
+            y1_pad = max(0, y1 - padding)
+            x2_pad = min(w, x2 + padding)
+            y2_pad = min(h, y2 + padding)
+            
+            face_roi = frame[y1_pad:y2_pad, x1_pad:x2_pad]
+            
+            # Skip if ROI is invalid
+            if face_roi.size == 0:
+                continue
+                
+            # Calculate face size for optimization
+            face_height = y2 - y1
+            face_width = x2 - x1
+            min_face_side = min(face_height, face_width)
+            
+            # Quality assessment
+            quality_scores = self.quality_assessor.assess_face_quality(face_roi, detection['bbox'])
+            overall_quality = quality_scores.get('overall', 0)
+            
+            # Skip very low quality faces entirely
+            if not self.threshold_manager.should_process_face(quality_scores):
+                self.multi_scale_usage_stats['skipped_low'] += 1
+                if self.config.get('verbose', False):
+                    self.logger.debug(f"Skipping low quality face (score: {overall_quality:.2f})")
+                continue
+                
+            # Mask detection
+            mask_status, mask_confidence = self.detect_mask(face_roi)
+            
+            # OPTIMIZED MULTI-SCALE DECISION LOGIC
+            use_multi_scale = False
+            multi_scale_reason = "standard"
+            
+            if self.robust_config['enable_multi_scale']:
+                # Condition 1: Face quality is marginal (0.3 < quality < 0.6)
+                condition_marginal_quality = (
+                    overall_quality > self.robust_config['quality_marginal_lower'] and
+                    overall_quality < self.robust_config['quality_marginal_upper']
+                )
+                
+                # Condition 2: Face size is near the minimum threshold
+                min_face_size = self.robust_config['min_face_size']
+                near_min_threshold = min_face_size * self.robust_config['near_min_size_multiplier']
+                condition_near_min_size = min_face_side < near_min_threshold
+                
+                # Decision logic based on optimization strategy
+                if condition_marginal_quality:
+                    # Quality is marginal - use multi-scale for boost
+                    use_multi_scale = True
+                    multi_scale_reason = "marginal_quality"
+                elif condition_near_min_size and overall_quality > 0.3:
+                    # Face is small and not extremely low quality - use multi-scale
+                    use_multi_scale = True
+                    multi_scale_reason = "near_min_size"
+                elif overall_quality >= self.robust_config['quality_high_threshold']:
+                    # High quality - skip multi-scale (fast path)
+                    use_multi_scale = False
+                    multi_scale_reason = "high_quality"
+                    self.multi_scale_usage_stats['skipped_high'] += 1
+                elif overall_quality <= self.robust_config['quality_marginal_lower']:
+                    # Very low quality - skip multi-scale
+                    use_multi_scale = False
+                    multi_scale_reason = "low_quality"
+                else:
+                    # Default: use standard embedding
+                    use_multi_scale = False
+                    multi_scale_reason = "default"
+                
+                # Update statistics
+                if use_multi_scale:
+                    self.multi_scale_usage_stats['enabled'] += 1
+                    if self.config.get('verbose', False):
+                        self.logger.debug(f"Multi-scale enabled ({multi_scale_reason}): Q={overall_quality:.2f}, Size={min_face_side}")
+                else:
+                    self.multi_scale_usage_stats['disabled'] += 1
+
+            
+            # Enhanced embedding extraction with optimized multi-scale usage
+            if use_multi_scale:
+                embeddings = self.multi_scale_processor.extract_multi_scale_embeddings(face_roi)
+                if embeddings:
+                    embedding = self.multi_scale_processor.fuse_embeddings(embeddings)
+                else:
+                    embedding = self.extract_embedding(face_roi)
+            else:
+                # Fast path: single embedding extraction
+                embedding = self.extract_embedding(face_roi)
+            
+            if embedding is None:
+                continue
+            
+            # VOYAGER-BASED RECOGNITION
+            identity, recognition_confidence = self.recognize_face(embedding)
+            
+            # Adaptive threshold for display
+            adaptive_threshold = self.threshold_manager.compute_adaptive_threshold(quality_scores)            
+            
+            results.append({
+                'bbox': detection['bbox'],
+                'detection_confidence': detection['confidence'],
+                'mask_status': mask_status,
+                'mask_confidence': mask_confidence,
+                'identity': identity,
+                'recognition_confidence': recognition_confidence,
+                'embedding': embedding.tolist(),
+                'quality_scores': quality_scores,
+                'adaptive_threshold': adaptive_threshold,
+                'similarity_engine': 'voyager',
+                'quality_adaptive': True,
+                'multi_scale_used': use_multi_scale,
+                'multi_scale_reason': multi_scale_reason,
+                'face_size': min_face_side
+            })
+        
+        # Update stats and store last results
+        self._update_robust_stats(results, start_time)
+        self.last_results = results
+        return results
+                  
+    def _update_robust_stats(self, results: List[Dict], start_time: float):
+        """Update enhanced statistics"""
+        self.debug_stats['total_frames_processed'] += 1
+        self.debug_stats['total_faces_detected'] += len(results)
+        self.debug_stats['total_faces_recognized'] += len([r for r in results if r['identity']])
+        self.debug_stats['last_processing_time'] = (time.time() - start_time) * 1000
+        
+        # Quality statistics
+        if results:
+            avg_quality = np.mean([r.get('quality_scores', {}).get('overall', 0) for r in results])
+            self.debug_stats.setdefault('avg_face_quality', deque(maxlen=50)).append(avg_quality)
+
+         
+    def get_robust_stats(self) -> Dict:
+        """Get robust engine statistics"""
+        stats = self.get_voyager_stats()
+        
+        # Add recognition statistics
+        if hasattr(self, 'last_results'):
+            total_faces = len(self.last_results)
+            recognized_faces = len([r for r in self.last_results if r['identity']])
+            stats['recognition_rate'] = recognized_faces / total_faces if total_faces > 0 else 0
+        
+        # Add multi-scale optimization statistics
+        total_multi_scale_decisions = (self.multi_scale_usage_stats['enabled'] + 
+                                      self.multi_scale_usage_stats['disabled'])
+        if total_multi_scale_decisions > 0:
+            stats['multi_scale_usage'] = {
+                'enabled_percentage': (self.multi_scale_usage_stats['enabled'] / 
+                                      total_multi_scale_decisions * 100),
+                'disabled_percentage': (self.multi_scale_usage_stats['disabled'] / 
+                                       total_multi_scale_decisions * 100),
+                'skipped_low_quality': self.multi_scale_usage_stats['skipped_low'],
+                'skipped_high_quality': self.multi_scale_usage_stats['skipped_high'],
+                'total_decisions': total_multi_scale_decisions
+            }
+        
+        return stats
+
+# recognition/base_system.py
+import cv2
+import json
+from pathlib import Path
+from ultralytics import YOLO
+from deepface import DeepFace
+from sklearn.metrics.pairwise import cosine_similarity
+import onnxruntime as ort
+import numpy as np
+from collections import deque
+from typing import Dict, List, Tuple, Optional
+import time
+import torch
+import logging
+
+class FaceRecognitionSystem:
+    def __init__(self, config: Dict):
+        # Initialize logger
+        self.logger = logging.getLogger(__name__)
+        
+        self.config = config
+        self.detection_model = None
+        self.mask_detector = None
+        self.mask_input_size = None  # Will be dynamically set from model
+        self.embeddings_db = {}
+        self.identity_centroids = {}
+        
+        # ENHANCED: Use circular buffers to prevent memory leaks
+        self.debug_stats = {
+            'total_frames_processed': 0,
+            'total_faces_detected': 0,
+            'total_faces_recognized': 0,
+            'total_masks_detected': 0,
+            'detection_times': deque(maxlen=50),
+            'mask_detection_times': deque(maxlen=50),
+            'embedding_times': deque(maxlen=50),
+            'recognition_times': deque(maxlen=50),
+            'last_processing_time': 0
+        }
+        
+        # Check GPU availability and update config
+        self._verify_gpu_config()
+        
+        self._load_models()
+        self._load_mask_detector()  
+        self._load_embeddings_database()
+
+    def _verify_gpu_config(self):
+        """Verify and update GPU configuration based on actual availability"""
+        if self.config.get('use_gpu', False):
+            try:
+                if torch.cuda.is_available():
+                    device_count = torch.cuda.device_count()
+                    current_device = self.config.get('gpu_device', 0)
+                    
+                    if current_device < device_count:
+                        gpu_name = torch.cuda.get_device_name(current_device)
+                        self.logger.info(f"GPU {current_device}: {gpu_name} confirmed available")
+                        self.config['use_gpu'] = True
+                    else:
+                        self.logger.warning(f"GPU device {current_device} not available, falling back to CPU")
+                        self.config['use_gpu'] = False
+                else:
+                    self.logger.warning("CUDA not available, falling back to CPU")
+                    self.config['use_gpu'] = False
+            except Exception as e:
+                self.logger.warning(f"GPU verification failed: {e}, falling back to CPU")
+                self.config['use_gpu'] = False
+        
+    def _load_mask_detector(self):
+        """Load ONNX mask detection model with GPU support and dynamic input size detection"""
+        try:
+            mask_model_path = Path(self.config.get('mask_model_path', ''))
+            if not mask_model_path.exists():
+                self.logger.warning("Mask model not found, continuing without mask detection")
+                return
+                
+            # Set providers for GPU acceleration
+            providers = []
+            if self.config.get('use_gpu', False):
+                # Try CUDA first, then fall back to CPU
+                try:
+                    providers = [
+                        ('CUDAExecutionProvider', {
+                            'device_id': self.config.get('gpu_device', 0),
+                            'arena_extend_strategy': 'kNextPowerOfTwo',
+                            'gpu_mem_limit': 2 * 1024 * 1024 * 1024,  # 2GB limit
+                            'cudnn_conv_algo_search': 'EXHAUSTIVE',
+                            'do_copy_in_default_stream': True,
+                        }),
+                        'CPUExecutionProvider'
+                    ]
+                    self.logger.info("Using CUDA for mask detection")
+                except Exception as e:
+                    self.logger.warning(f"CUDA not available for mask detection: {e}")
+                    providers = ['CPUExecutionProvider']
+            else:
+                providers = ['CPUExecutionProvider']
+                
+            # Initialize ONNX Runtime session with providers
+            self.mask_detector = ort.InferenceSession(
+                str(mask_model_path), 
+                providers=providers
+            )
+            
+            # DYNAMIC INPUT SIZE DETECTION
+            # Get input shape from model
+            input_details = self.mask_detector.get_inputs()[0]
+            input_shape = input_details.shape
+            
+            # Determine input size based on shape format
+            # Common formats: (batch, channels, height, width) or (batch, height, width, channels)
+            if len(input_shape) == 4:
+                if input_shape[1] == 3:  # NCHW format (batch, channels, height, width)
+                    # Your model structure shows (None, 40, 50, 3) which is NHWC
+                    # But ONNX often uses NCHW, so we need to check
+                    height, width = input_shape[2], input_shape[3]
+                    self.channel_format = 'NCHW'
+                elif input_shape[3] == 3:  # NHWC format (batch, height, width, channels)
+                    height, width = input_shape[1], input_shape[2]
+                    self.channel_format = 'NHWC'
+                else:
+                    # Try to infer from the shape
+                    # Find dimensions that look like spatial dimensions (larger than 3)
+                    spatial_dims = [dim for dim in input_shape[1:] if dim > 3]
+                    if len(spatial_dims) >= 2:
+                        height, width = spatial_dims[0], spatial_dims[1]
+                        self.channel_format = 'UNKNOWN'
+                    else:
+                        # Default fallback
+                        height, width = 40, 50  # Based on your model structure
+                        self.channel_format = 'DEFAULT'
+                        self.logger.warning(f"Could not determine input shape, using default: {height}x{width}")
+            else:
+                # Unexpected shape format, use default from your model
+                height, width = 40, 50
+                self.channel_format = 'UNKNOWN'
+                self.logger.warning(f"Unexpected input shape {input_shape}, using default: {height}x{width}")
+            
+            # Store the dynamic input size
+            self.mask_input_size = (height, width)
+            
+            # Validate model input/output
+            input_name = input_details.name
+            output_name = self.mask_detector.get_outputs()[0].name
+            
+            self.logger.info(f"Mask detection model loaded with input size: {width}x{height}")
+            self.logger.info(f"Channel format: {self.channel_format}")
+            self.logger.info(f"Input: {input_name}, Output: {output_name}")
+            self.logger.info(f"Input shape: {input_shape}")
+            self.logger.info(f"Using providers: {[p if isinstance(p, str) else p[0] for p in providers]}")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to load mask detection model: {e}")
+            # Don't raise exception, continue without mask detection
+                      
+    def detect_mask(self, face_roi: np.ndarray) -> Tuple[str, float]:
+        """Enhanced mask detection with dynamic input size and better ROI handling"""
+        if self.mask_detector is None or self.mask_input_size is None:
+            return "no_mask", 0.0
+            
+        start_time = time.time()
+        
+        try:
+            # More thorough ROI validation
+            if (face_roi.size == 0 or face_roi.shape[0] < 40 or face_roi.shape[1] < 40 or
+                np.std(face_roi) < 15):  # Check for low variance (blurry/featureless)
+                return "unknown", 0.0
+            
+            # Use dynamic input size from model
+            input_height, input_width = self.mask_input_size
+            
+            # DYNAMIC: Use the detected input size
+            input_size = (input_height, input_width)
+            h, w = face_roi.shape[:2]
+            
+            # Calculate scaling factor that preserves aspect ratio
+            scale = min(input_size[0] / h, input_size[1] / w)
+            new_h, new_w = int(h * scale), int(w * scale)
+            
+            # Resize with aspect ratio preservation
+            resized_face = cv2.resize(face_roi, (new_w, new_h), interpolation=cv2.INTER_AREA)
+            
+            # Create padded image
+            padded_face = np.zeros((input_size[0], input_size[1], 3), dtype=np.float32)
+            y_offset = (input_size[0] - new_h) // 2
+            x_offset = (input_size[1] - new_w) // 2
+            padded_face[y_offset:y_offset+new_h, x_offset:x_offset+new_w] = resized_face
+            
+            # Convert to RGB and normalize
+            rgb_face = cv2.cvtColor(padded_face.astype(np.uint8), cv2.COLOR_BGR2RGB)
+            normalized_face = rgb_face.astype(np.float32) / 255.0
+            
+            # Prepare input based on channel format
+            if self.channel_format == 'NCHW':
+                # Convert from NHWC to NCHW (batch, channels, height, width)
+                input_data = np.transpose(normalized_face, (2, 0, 1))  # HWC to CHW
+                input_data = np.expand_dims(input_data, axis=0)  # Add batch dimension
+            elif self.channel_format == 'NHWC':
+                # Keep as NHWC (batch, height, width, channels)
+                input_data = np.expand_dims(normalized_face, axis=0)
+            else:
+                # Try both formats
+                try:
+                    # First try NCHW
+                    input_data = np.transpose(normalized_face, (2, 0, 1))
+                    input_data = np.expand_dims(input_data, axis=0)
+                except:
+                    # Fall back to NHWC
+                    input_data = np.expand_dims(normalized_face, axis=0)
+            
+            # Run inference
+            input_name = self.mask_detector.get_inputs()[0].name
+            output_name = self.mask_detector.get_outputs()[0].name
+            
+            outputs = self.mask_detector.run([output_name], {input_name: input_data})
+            predictions = outputs[0][0]  # First batch, first prediction
+            
+            # 🎯 ENHANCED FRAMEWORK LOGIC WITH CONFIDENCE THRESHOLDING
+            mask_prob = float(predictions[0])
+            without_mask_prob = float(predictions[1])
+            
+            # Get the configuration threshold (default to 0.8 if not set)
+            mask_threshold = self.config.get('mask_detection_threshold', 0.8)
+            
+            # Use threshold to reduce false positives
+            if mask_prob > without_mask_prob and mask_prob >= mask_threshold:
+                mask_status = "mask"
+                confidence = mask_prob
+            else:
+                mask_status = "no_mask" 
+                confidence = without_mask_prob
+            
+            # Update stats
+            mask_time = (time.time() - start_time) * 1000
+            self.debug_stats['mask_detection_times'].append(mask_time)
+            
+            return mask_status, confidence
+            
+        except Exception as e:
+            self.logger.error(f"Mask detection error: {e}")
+            return "unknown", 0.0
+                
+    def _load_models(self):
+        """Load YOLO face detection model from local path with GPU support"""
+        try:
+            model_path = Path(self.config['detection_model_path'])
+            if not model_path.exists():
+                raise FileNotFoundError(f"YOLO model not found at {model_path}")
+                
+            # Load model with GPU support
+            self.detection_model = YOLO(str(model_path))
+            
+            # Move model to GPU if available
+            if self.config.get('use_gpu', False):
+                device = self.config.get('gpu_device', 0)  # Default to GPU 0
+                # Convert to torch device
+                torch_device = f'cuda:{device}'
+                self.detection_model.to(torch_device)
+                self.logger.info(f"YOLO model loaded on {torch_device}")
+                
+                # Verify the model is actually on GPU
+                model_device = next(self.detection_model.model.parameters()).device
+                self.logger.info(f"YOLO model verified on device: {model_device}")
+            else:
+                self.logger.info(f"YOLO model loaded on CPU")
+                
+        except Exception as e:
+            self.logger.error(f"Failed to load YOLO model: {e}")
+            raise
+               
+    def _load_embeddings_database(self):
+        """Load pre-computed face embeddings from JSON with your structure"""
+        try:
+            db_path = Path(self.config['embeddings_db_path'])
+            if not db_path.exists():
+                self.logger.warning("Embeddings database not found, starting fresh")
+                self.embeddings_db = {"persons": {}, "metadata": {}}
+                return
+                
+            with open(db_path, 'r') as f:
+                self.embeddings_db = json.load(f)
+                
+            if "persons" in self.embeddings_db:
+                for person_id, person_data in self.embeddings_db["persons"].items():
+                    display_name = person_data["display_name"]
+                    centroid = person_data["centroid_embedding"]
+                    self.identity_centroids[display_name] = np.array(centroid)
+                    
+                self.logger.info(f"Loaded {len(self.identity_centroids)} identities from database")
+                self.logger.info(f"Available persons: {list(self.identity_centroids.keys())}")
+                
+            else:
+                self.logger.warning("No 'persons' key found in JSON database")
+                
+        except Exception as e:
+            self.logger.error(f"Failed to load embeddings database: {e}")
+            raise
+
+    def detect_faces(self, frame: np.ndarray) -> List[Dict]:
+            """Detect faces using YOLO with GPU optimization"""
+            start_time = time.time()
+            try:
+                # Use GPU if configured - FIXED: Use proper device string
+                if self.config.get('use_gpu', False):
+                    device = self.config.get('gpu_device', 0)
+                    device_str = f'cuda:{device}'
+                else:
+                    device_str = 'cpu'
+                
+                results = self.detection_model(
+                    frame, 
+                    conf=self.config['detection_confidence'],
+                    iou=self.config['detection_iou'],
+                    verbose=False,
+                    device=device_str  # Specify device for inference
+                )
+                
+                detections = []
+                for result in results:
+                    boxes = result.boxes
+                    if boxes is not None:
+                        for box in boxes:
+                            x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()  # Ensure tensor is moved to CPU for numpy
+                            confidence = box.conf[0].cpu().numpy()
+                            
+                            detections.append({
+                                'bbox': [int(x1), int(y1), int(x2), int(y2)],
+                                'confidence': float(confidence)
+                            })
+                
+                detection_time = (time.time() - start_time) * 1000
+                self.debug_stats['detection_times'].append(detection_time)
+                
+                if self.config.get('debug', {}).get('verbose', False):
+                    self.logger.debug(f"Detected {len(detections)} faces in {detection_time:.2f}ms")
+                            
+                return detections
+                
+            except Exception as e:
+                self.logger.error(f"Detection error: {e}")
+                return []
+                    
+    def extract_embedding(self, face_roi: np.ndarray) -> Optional[np.ndarray]:
+        """Optimized embedding extraction with GPU support"""
+        start_time = time.time()
+        
+        # Validate ROI dimensions more thoroughly
+        if (face_roi.size == 0 or face_roi.shape[0] < 50 or face_roi.shape[1] < 50 or 
+            np.max(face_roi) - np.min(face_roi) < 10):  # Check for low contrast
+            if self.config.get('debug', {}).get('verbose', False):
+                self.logger.warning("Invalid face ROI for embedding extraction")
+            return None
+            
+        try:
+            # Convert to RGB and ensure proper data type
+            if len(face_roi.shape) == 3:
+                face_rgb = cv2.cvtColor(face_roi, cv2.COLOR_BGR2RGB)
+            else:
+                face_rgb = cv2.cvtColor(face_roi, cv2.COLOR_GRAY2RGB)
+            
+            # Normalize pixel values
+            face_rgb = face_rgb.astype(np.float32) / 255.0
+            
+            # Set device for DeepFace - FIXED: Use proper device format
+            if self.config.get('use_gpu', False):
+                device = self.config.get('gpu_device', 0)
+                # DeepFace uses different device format
+                device_name = f'cuda:{device}'
+            else:
+                device_name = 'cpu'
+                
+            if self.config.get('debug', {}).get('verbose', False):
+                self.logger.debug(f"Extracting embedding on device: {device_name}")
+                
+            embedding_obj = DeepFace.represent(
+                face_rgb,
+                model_name=self.config['embedding_model'],
+                enforce_detection=False,
+                detector_backend='skip',
+                align=True
+            )
+            
+            if embedding_obj and len(embedding_obj) > 0:
+                embedding_time = (time.time() - start_time) * 1000
+                self.debug_stats['embedding_times'].append(embedding_time)
+                
+                if self.config.get('debug', {}).get('verbose', False):
+                    self.logger.debug(f"Embedding extracted in {embedding_time:.2f}ms")
+               
+                return np.array(embedding_obj[0]['embedding'])
+            else:
+                if self.config.get('debug', {}).get('verbose', False):
+                    self.logger.warning("No embedding extracted")
+                
+        except Exception as e:
+            if self.config.get('verbose', False):
+                self.logger.error(f"Embedding extraction error: {e}")
+                
+        return None
+    
+    def recognize_face(self, embedding: np.ndarray) -> Tuple[Optional[str], float]:
+        """Enhanced matching with multiple similarity strategies"""
+        start_time = time.time()
+        
+        if not self.identity_centroids:
+            return None, 0.0
+            
+        best_similarity = -1.0
+        best_identity = None
+        
+        embedding = embedding.flatten()
+        
+        for identity, centroid in self.identity_centroids.items():
+            centroid = centroid.flatten()
+            
+            # Cosine similarity (primary)
+            cosine_sim = cosine_similarity([embedding], [centroid])[0][0]
+            
+            # Optional: Euclidean distance (normalized to 0-1)
+            euclidean_dist = np.linalg.norm(embedding - centroid)
+            euclidean_sim = 1 / (1 + euclidean_dist)  # Convert distance to similarity
+            
+            # Combine strategies (weighted)
+            final_similarity = 0.8 * cosine_sim + 0.2 * euclidean_sim
+            
+            if final_similarity > best_similarity and final_similarity >= self.config['recognition_threshold']:
+                best_similarity = final_similarity
+                best_identity = identity
+        
+        recognition_time = (time.time() - start_time) * 1000
+        self.debug_stats['recognition_times'].append(recognition_time)
+        
+        return best_identity, best_similarity
+
+    def process_frame(self, frame: np.ndarray) -> List[Dict]:
+        """Enhanced pipeline: detect → mask detection → extract → recognize"""
+        start_time = time.time()
+        results = []
+        
+        # Detect faces
+        detections = self.detect_faces(frame)
+        
+        for detection in detections:
+            x1, y1, x2, y2 = detection['bbox']
+            
+            padding = self.config.get('roi_padding', 20)  # Increased padding for better mask detection
+            h, w = frame.shape[:2]
+            x1_pad = max(0, x1 - padding)
+            y1_pad = max(0, y1 - padding)
+            x2_pad = min(w, x2 + padding)
+            y2_pad = min(h, y2 + padding)
+            
+            face_roi = frame[y1_pad:y2_pad, x1_pad:x2_pad]
+            
+            # Better ROI validation
+            if (face_roi.size == 0 or face_roi.shape[0] < 40 or face_roi.shape[1] < 40 or
+                np.std(face_roi) < 10):  # Check for low contrast
+                continue
+                
+            # NEW: Enhanced Mask detection
+            mask_status, mask_confidence = self.detect_mask(face_roi)
+            
+            # Continue with embedding extraction only if we have a good face ROI
+            embedding = self.extract_embedding(face_roi)
+            if embedding is None:
+                continue
+                
+            identity, recognition_confidence = self.recognize_face(embedding)
+            
+            # Update mask statistics
+            if mask_status == "mask":
+                self.debug_stats['total_masks_detected'] += 1
+            
+            results.append({
+                'bbox': detection['bbox'],
+                'detection_confidence': detection['confidence'],
+                'mask_status': mask_status,  
+                'mask_confidence': mask_confidence,  
+                'identity': identity,
+                'recognition_confidence': recognition_confidence,
+                'embedding': embedding.tolist()
+            })
+        
+        # Update overall stats
+        self.debug_stats['total_frames_processed'] += 1
+        self.debug_stats['total_faces_detected'] += len(detections)
+        self.debug_stats['total_faces_recognized'] += len([r for r in results if r['identity']])
+        self.debug_stats['last_processing_time'] = (time.time() - start_time) * 1000
+            
+        return results
+        
+    def get_debug_stats(self) -> Dict:
+        """Enhanced performance statistics"""
+        stats = self.debug_stats.copy()
+        
+        # Calculate averages and percentiles
+        stats['avg_detection_time'] = np.mean(stats['detection_times']) if stats['detection_times'] else 0
+        stats['p95_detection_time'] = np.percentile(stats['detection_times'], 95) if stats['detection_times'] else 0
+        stats['max_detection_time'] = np.max(stats['detection_times']) if stats['detection_times'] else 0
+        
+        stats['avg_embedding_time'] = np.mean(stats['embedding_times']) if stats['embedding_times'] else 0
+        stats['p95_embedding_time'] = np.percentile(stats['embedding_times'], 95) if stats['embedding_times'] else 0
+        
+        stats['avg_recognition_time'] = np.mean(stats['recognition_times']) if stats['recognition_times'] else 0
+        
+        # Calculate mask detection time
+        stats['avg_detection_time'] = np.mean(stats['detection_times']) if stats['detection_times'] else 0
+        stats['avg_mask_detection_time'] = np.mean(stats['mask_detection_times']) if stats['mask_detection_times'] else 0
+        
+        # Add mask input size to stats if available
+        if self.mask_input_size:
+            stats['mask_input_size'] = f"{self.mask_input_size[1]}x{self.mask_input_size[0]}"
+            stats['mask_channel_format'] = self.channel_format
+                     
+        # Calculate rates and efficiencies
+        if stats['total_faces_detected'] > 0:
+            stats['mask_detection_rate'] = (stats['total_masks_detected'] / stats['total_faces_detected']) * 100
+            stats['recognition_rate'] = (stats['total_faces_recognized'] / stats['total_faces_detected']) * 100
+        else:
+            stats['mask_detection_rate'] = 0
+            stats['recognition_rate'] = 0
+            
+        if stats['total_frames_processed'] > 0:
+            stats['faces_per_frame'] = stats['total_faces_detected'] / stats['total_frames_processed']
+        else:
+            stats['faces_per_frame'] = 0
+                
+        # Memory usage (approximate)
+        try:
+            import psutil
+            process = psutil.Process()
+            stats['memory_mb'] = process.memory_info().rss / 1024 / 1024
+        except ImportError:
+            stats['memory_mb'] = 0
+        
+        return stats
+
+    def get_known_identities(self) -> List[str]:
+        """Get list of all known identities"""
+        return list(self.identity_centroids.keys())
+
+    def get_model_info(self) -> Dict:
+        """Get information about loaded models"""
+        info = {
+            'mask_detector_loaded': self.mask_detector is not None,
+            'face_detector_loaded': self.detection_model is not None,
+            'known_identities_count': len(self.identity_centroids)
+        }
+        
+        if self.mask_detector:
+            info['mask_input_size'] = self.mask_input_size
+            info['mask_channel_format'] = self.channel_format
+            info['mask_input_name'] = self.mask_detector.get_inputs()[0].name
+            info['mask_output_name'] = self.mask_detector.get_outputs()[0].name
+            
+        return info
+
+
+# recognition/__init__.py
+"""
+Face recognition systems and engines.
+"""
+
+from .base_system import FaceRecognitionSystem
+from .voyager_system import VoyagerFaceRecognitionSystem, VoyagerPerformanceMonitor
+from .robust_system import RobustFaceRecognitionSystem
+#from .chroma_system import ChromaFaceRecognitionSystem
+#from .faiss_system import FaissFaceRecognitionSystem
+
+__all__ = [
+    "FaceRecognitionSystem", #'ChromaFaceRecognitionSystem',
+    "VoyagerFaceRecognitionSystem", #'FaissFaceRecognitionSystem',
+    "VoyagerPerformanceMonitor",
+    "RobustFaceRecognitionSystem",
+]
 
