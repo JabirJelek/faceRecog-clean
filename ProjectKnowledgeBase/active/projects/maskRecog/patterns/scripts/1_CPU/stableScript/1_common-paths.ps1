@@ -12,23 +12,23 @@ Handles portable path discovery and date-based folder creation
 # ====================================================================
 $Script:CommonConfig = @{
     ProjectName = "maskRecog"
-    LogBasePath = "logs-running\towerCPU"
+    LogBasePath = "logs-running\cpu"
     DateFormat = "yyyy-MM-dd"
     DateTimeFormat = "yyyy-MM-dd_HH-mm-ss"
     LogDateTimeFormat = "yyyy-MM-dd HH:mm:ss"
     
     # File paths for monitor script
     MonitorFilePaths = @{
-        WorkerScript = "patterns\scripts\1_towerCPU\stableScript\1_worker_portable.ps1"
-        PythonScriptPath = "patterns\algorithm\entry_multi-USED-TowerCPU.py"
-        PIDFileName = "monitor_pid_TowerCPU.json"
-        LogFileName = "monitor_TowerCPU.log"
-        EmailSendScript = "patterns\scripts\1_towerCPU\stableScript\1_email-sender-stable.ps1"
+        WorkerScript = "patterns\scripts\1_cpu\stableScript\1_worker_portable.ps1"
+        PythonScriptPath = "patterns\algorithm\entry_multi-USED-CPU.py"
+        PIDFileName = "monitor_pid_CPU.json"
+        LogFileName = "monitor_CPU.log"
+        EmailSendScript = "patterns\scripts\1_cpu\stableScript\1_email-sender-stable.ps1"
     }
     
     # File paths for worker script
     WorkerFilePaths = @{
-        PythonScript = "patterns\algorithm\entry_multi-USED-TowerCPU.py"
+        PythonScript = "patterns\algorithm\entry_multi-USED-CPU.py"
     }
     
     # Common file paths
@@ -50,10 +50,10 @@ $Script:ApplicationConfig = @{
     MonitorProcessCheckInterval = 5
     MonitorMaxPIDFileAgeMinutes = 120
     MonitorPIDTrackingFile = "pid_tracking.json"
-    MonitorLogPattern      = "monitor_TowerCPU_{0}.log"
+    MonitorLogPattern      = "monitor_CPU_{0}.log"
     
     # ---------------------- Worker Settings ----------------------
-    WorkerRunFolderPrefix  = "TowerCPU_Process_MaskDetect_"
+    WorkerRunFolderPrefix  = "CPU_Process_MaskDetect_"
     WorkerLogSubfolder     = "logs"
     WorkerOutputSubfolder  = "script_output"
     WorkerMetadataFile     = "metadata.json"
@@ -63,7 +63,7 @@ $Script:ApplicationConfig = @{
     
     # ---------------------- Email Sender Settings ----------------
     EmailCredentialPath    = "$env:USERPROFILE\.face-recog\email-credential.xml"
-    EmailRunFolderFilter   = "TowerCPU_Process_MaskDetect_*"
+    EmailRunFolderFilter   = "CPU_Process_MaskDetect_*"
     EmailCompletionSummaryFile = "completion_summary.txt"
     EmailMetadataFile      = "metadata.json"
     EmailLogsFolder        = "logs"
@@ -83,7 +83,7 @@ $Script:ApplicationConfig = @{
     # CaptureEndTime         = "11:04"
     CaptureRunsDirectory   = "runs"
     CaptureLogsDirectory   = "logs"
-    CaptureOutputFolderPattern = "TowerCPU_Process_MaskDetect_*"
+    CaptureOutputFolderPattern = "CPU_Process_MaskDetect_*"
     CaptureLogFilePattern  = "capture_collected_runs_{0}.log"
     CaptureDateFormat      = "yyyy-MM-dd"
     CaptureDateTimeFormat  = "yyyy-MM-dd HH:mm"
@@ -187,13 +187,13 @@ function Initialize-DateBasedStructure {
     param([hashtable]$Paths)
     
     # Create base folder
-    $towerCPUBasePath = Join-Path $Paths.ActiveRoot $Script:CommonConfig.LogBasePath
-    if (-not (Test-Path $towerCPUBasePath)) {
-        New-Item -ItemType Directory -Path $towerCPUBasePath -Force | Out-Null
+    $cpuBasePath = Join-Path $Paths.ActiveRoot $Script:CommonConfig.LogBasePath
+    if (-not (Test-Path $cpuBasePath)) {
+        New-Item -ItemType Directory -Path $cpuBasePath -Force | Out-Null
     }
     
     # Create date-specific folder
-    $dateBasedPath = Join-Path $towerCPUBasePath $Paths.CurrentDate
+    $dateBasedPath = Join-Path $cpuBasePath $Paths.CurrentDate
     if (-not (Test-Path $dateBasedPath)) {
         New-Item -ItemType Directory -Path $dateBasedPath -Force | Out-Null
     }
