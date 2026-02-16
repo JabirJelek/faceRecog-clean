@@ -45,8 +45,8 @@ $Script:CommonConfig = @{
 # ====================================================================
 $Script:ApplicationConfig = @{
     # ---------------------- Monitor Settings ----------------------
-    EveryStartTime       = "12:50"
-    EveryEndTime         = "17:10"
+    EveryStartTime       = "08:40"
+    EveryEndTime         = "11:12"
     MonitorProcessCheckInterval = 5
     MonitorMaxPIDFileAgeMinutes = 120
     MonitorPIDTrackingFile = "pid_tracking.json"
@@ -229,9 +229,6 @@ function Add-ScriptSpecificPaths {
     return $Paths
 }
 
-# ====================================================================
-# MISSING FUNCTION IMPLEMENTATIONS
-# ====================================================================
 
 function Check-Heartbeat {
     [CmdletBinding()]
@@ -339,7 +336,9 @@ function Write-CommonLog {
     }
     if (-not $NoConsole) {
         $color = @{ ERROR='Red'; WARN='Yellow'; SUCCESS='Green'; DEBUG='Gray'; SHUTDOWN='Blue' }[$Level]
-        Write-Host $entry -ForegroundColor ($color ?? 'White')
+        # Replace null-coalescing operator for PowerShell 5 compatibility
+        $foregroundColor = if ($null -ne $color) { $color } else { 'White' }
+        Write-Host $entry -ForegroundColor $foregroundColor
     }
 }
 

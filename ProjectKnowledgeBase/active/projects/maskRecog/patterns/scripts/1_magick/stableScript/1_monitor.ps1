@@ -224,7 +224,6 @@ function Start-WorkerProcess {
     try {
         Write-Log "Worker script path: $($Script:Config.WorkerScript)" -Level "INFO"
         
-        # Verify worker script exists - FIX: Better error handling
         if ([string]::IsNullOrEmpty($Script:Config.WorkerScript)) {
             Write-Log "ERROR: Worker script path is null or empty" -Level "ERROR"
             return $false
@@ -235,20 +234,12 @@ function Start-WorkerProcess {
             return $false
         }
         
-        # Start worker process with explicit output capture
         Write-Log "Starting worker process..." -Level "INFO"
         
         $processInfo = New-Object System.Diagnostics.ProcessStartInfo
         $processInfo.FileName = "powershell.exe"
-        
-        # FIXED: Properly formatted arguments array
-        $arguments = @(
-            "-NoProfile",
-            "-ExecutionPolicy", "Bypass",
-            "-File", "`"$($Script:Config.WorkerScript)`""
-        )
+        $arguments = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "`"$($Script:Config.WorkerScript)`"")
         $processInfo.Arguments = $arguments
-        
         $processInfo.UseShellExecute = $false
         $processInfo.RedirectStandardOutput = $true
         $processInfo.RedirectStandardError = $true
@@ -257,36 +248,22 @@ function Start-WorkerProcess {
         $WorkerProcess = New-Object System.Diagnostics.Process
         $WorkerProcess.StartInfo = $processInfo
         
-        # Create output collectors
         $stdOutBuilder = New-Object System.Text.StringBuilder
         $stdErrBuilder = New-Object System.Text.StringBuilder
         
-        # better PID parsing:
-
+        # Event actions – NO PowerShell cmdlets, only append data
         $outAction = {
             if (-not [String]::IsNullOrEmpty($EventArgs.Data)) {
                 $Event.MessageData.AppendLine($EventArgs.Data)
-                
-                # Parse for Python PID from worker output
-                if ($EventArgs.Data -match "Python process started \(PID: (\d+)\)") {
-                    $global:PythonPID = $matches[1]
-                    Write-Log "Captured Python PID from worker output: $global:PythonPID" -Level "SUCCESS"
-                }
-                
-                # Also log to monitor log
-                Write-Log "Worker Output: $($EventArgs.Data)" -Level "DEBUG"
             }
         }
         
         $errAction = {
             if (-not [String]::IsNullOrEmpty($EventArgs.Data)) {
                 $Event.MessageData.AppendLine($EventArgs.Data)
-                # Also log to monitor log
-                Write-Log "Worker Error: $($EventArgs.Data)" -Level "ERROR"
             }
         }
         
-        # Register events
         $stdOutEvent = Register-ObjectEvent -InputObject $WorkerProcess `
             -EventName 'OutputDataReceived' `
             -Action $outAction `
@@ -297,7 +274,6 @@ function Start-WorkerProcess {
             -Action $errAction `
             -MessageData $stdErrBuilder
         
-        # Start the process
         if ($WorkerProcess.Start()) {
             $global:WorkerPID = $WorkerProcess.Id
             $global:WorkerStartTime = Get-Date
@@ -305,81 +281,45 @@ function Start-WorkerProcess {
             
             Write-Log "Worker process started (PID: $global:WorkerPID)" -Level "SUCCESS"
             
-            # Begin async output reading
             $WorkerProcess.BeginOutputReadLine()
             $WorkerProcess.BeginErrorReadLine()
-            
-            # Wait a moment for initial output
             Start-Sleep -Seconds 2
             
-            # Check if process is still running
             if ($WorkerProcess.HasExited) {
                 $exitCode = $WorkerProcess.ExitCode
                 $output = $stdOutBuilder.ToString()
                 $errorOutput = $stdErrBuilder.ToString()
                 
                 Write-Log "Worker process exited immediately with code: $exitCode" -Level "ERROR"
-                
                 if ($output) {
                     Write-Log "Worker output:" -Level "DEBUG"
-                    foreach ($line in $output -split "`n") {
-                        if ($line.Trim()) {
-                            Write-Log "  $line" -Level "DEBUG"
-                        }
-                    }
+                    foreach ($line in $output -split "`n") { if ($line.Trim()) { Write-Log "  $line" -Level "DEBUG" } }
                 }
-                
                 if ($errorOutput) {
                     Write-Log "Worker error output:" -Level "ERROR"
-                    foreach ($line in $errorOutput -split "`n") {
-                        if ($line.Trim()) {
-                            Write-Log "  $line" -Level "ERROR"
-                        }
-                    }
+                    foreach ($line in $errorOutput -split "`n") { if ($line.Trim()) { Write-Log "  $line" -Level "ERROR" } }
                 }
-                
-                # Clean up events
-                if ($stdOutEvent) {
-                    Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
-                }
-                if ($stdErrEvent) {
-                    Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
-                }
-                
+                Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
+                Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
                 return $false
             }
             
             Write-Log "Worker process is running, waiting for Python..." -Level "INFO"
             
-            # Look for Python process
-            $maxWait = 60
-            $waited = 0
-            
+            $maxWait = 60; $waited = 0
             while ($waited -lt $maxWait) {
                 $foundPID = Find-PythonProcess
                 if ($foundPID) {
                     $global:PythonPID = $foundPID
                     $global:PythonIsRunning = $true
                     $global:PythonStartTime = Get-Date
-                    
                     Write-Log "Python process found (PID: $global:PythonPID)" -Level "SUCCESS"
                     Save-PIDTracking
-                    
-                    # Clean up events
-                    if ($stdOutEvent) {
-                        Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
-                    }
-                    if ($stdErrEvent) {
-                        Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
-                    }
-                    
+                    Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
+                    Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
                     return $true
                 }
-                
-                Start-Sleep -Seconds 5
-                $waited += 5
-                
-                # Check if worker is still running
+                Start-Sleep -Seconds 5; $waited += 5
                 if ($WorkerProcess.HasExited) {
                     Write-Log "Worker process exited while waiting for Python" -Level "ERROR"
                     break
@@ -387,15 +327,8 @@ function Start-WorkerProcess {
             }
             
             Write-Log "Python process not found within $maxWait seconds" -Level "WARN"
-            
-            # Clean up events
-            if ($stdOutEvent) {
-                Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
-            }
-            if ($stdErrEvent) {
-                Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
-            }
-            
+            Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
+            Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
             Save-PIDTracking
             return $true
         } else {
@@ -408,6 +341,7 @@ function Start-WorkerProcess {
         return $false
     }
 }
+
 
 
 function Stop-WorkerProcess {
@@ -734,8 +668,17 @@ function Validate-Output {
         [DateTime]$CollectionEnd = $null
     )
     if ($CollectAll) {
-        $start = $CollectionStart ?? [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.StartTime, "yyyy-MM-dd HH:mm", $null)
-        $end   = $CollectionEnd   ?? [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.EndTime,   "yyyy-MM-dd HH:mm", $null)
+        # Replace null-coalescing operator with conditional
+        $start = if ($null -ne $CollectionStart) {
+            $CollectionStart
+        } else {
+            [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.StartTime, "yyyy-MM-dd HH:mm", $null)
+        }
+        $end = if ($null -ne $CollectionEnd) {
+            $CollectionEnd
+        } else {
+            [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.EndTime, "yyyy-MM-dd HH:mm", $null)
+        }
         $collected = Collect-RunsFromTimeWindow -BasePath $Script:Config.RunsBasePath -WindowStart $start -WindowEnd $end -ValidateEach
         $global:CollectedRunFolders = $collected
         $valid = ($collected | Where-Object { $_.Status -eq "VALID" }).Count
@@ -770,85 +713,7 @@ function Validate-Output {
 }
 
 
-function Collect-RunsFromTimeWindow {
-    param(
-        [DateTime]$StartTime,
-        [DateTime]$EndTime,
-        [switch]$ForceValidation = $false
-    )
-    
-    Write-Log "Collecting runs from $($StartTime.ToString('HH:mm')) to $($EndTime.ToString('HH:mm'))..." -Level "INFO"
-    
-    $collectionResults = @{
-        TotalRuns = 0
-        ValidRuns = 0
-        InvalidRuns = 0
-        Runs = @()
-        Summary = $null
-    }
-    
-    try {
-        # FIX: Use just the time portion (HH:mm) instead of full datetime
-        $startTimeStr = $StartTime.ToString("HH:mm")
-        $endTimeStr = $EndTime.ToString("HH:mm")
-        
-        Write-Log "Time window for collection: $startTimeStr to $endTimeStr" -Level "INFO"
-        
-        # Check if integrated functions are available
-        if (Get-Command -Name "Start-RunCollection-Integrated" -ErrorAction SilentlyContinue) {
-            $collectedRuns = Start-RunCollection-Integrated -StartTime $startTimeStr -EndTime $endTimeStr
-        } else {
-            # Fallback to simple manual collection using TimeOfDay
-            Write-Log "Integrated functions not available, using manual collection" -Level "WARN"
-            $collectedRuns = @()
-            
-            if ($Script:Config.RunsBasePath -and (Test-Path $Script:Config.RunsBasePath)) {
-                $folders = Get-ChildItem -Path $Script:Config.RunsBasePath -Directory -Filter $Script:Config.OutputFolderPattern -ErrorAction SilentlyContinue
-                
-                Write-Log "Found $($folders.Count) total folders to check" -Level "INFO"
-                
-                foreach ($folder in $folders) {
-                    # Check if folder creation time is within window using TimeOfDay
-                    $folderTime = $folder.CreationTime.TimeOfDay
-                    $startTimeOfDay = $StartTime.TimeOfDay
-                    $endTimeOfDay = $EndTime.TimeOfDay
-                    
-                    if ($folderTime -ge $startTimeOfDay -and $folderTime -le $endTimeOfDay) {
-                        $collectedRuns += @{
-                            Folder = $folder.FullName
-                            Name = $folder.Name
-                            CreationTime = $folder.CreationTime
-                            Validation = @{ Success = $true; MissingItems = @() }
-                            Status = "VALID"
-                        }
-                        Write-Log "✓ Manual collection added: $($folder.Name)" -Level "INFO"
-                    }
-                }
-            }
-        }
-        
-        if ($collectedRuns) {
-            $collectionResults.TotalRuns = $collectedRuns.Count
-            $collectionResults.ValidRuns = ($collectedRuns | Where-Object { $_.Status -eq "VALID" }).Count
-            $collectionResults.InvalidRuns = ($collectedRuns | Where-Object { $_.Status -eq "INVALID" }).Count
-            $collectionResults.Runs = $collectedRuns
-            
-            Write-Log "Collection completed: $($collectionResults.ValidRuns)/$($collectionResults.TotalRuns) valid runs" -Level "INFO"
-            
-            # Store in global variable
-            $global:CollectedRunFolders = $collectedRuns
-        } else {
-            Write-Log "No runs collected in the specified time window" -Level "WARN"
-        }
-        
-    } catch {
-        Write-Log "Error during run collection: $_" -Level "ERROR"
-        Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
-    }
-    
-    return $collectionResults
-}
-
+ 
 
 
 function Test-TimeWindow {
@@ -883,41 +748,32 @@ function Register-ConsoleControlHandler {
 "@
 
     $handler = [ConsoleCtrlHandler+ConsoleEventDelegate]{
-        param([int]$eventHostType)
-        
-        $currentTime = Get-Date
-        $timeSinceLast = if ($global:LastForceStopTime) { 
-            ($currentTime - $global:LastForceStopTime).TotalSeconds 
-        } else { 
-            [double]::MaxValue 
-        }
-        
-        switch ($eventHostType) {
-            { $_ -in 0, 1 } {
-                Write-Host "`n[Console Control Handler] Control event detected" -ForegroundColor Yellow
-                
-                if ($timeSinceLast -lt $global:ForceStopWindowSeconds) {
+        param($eventType)
+        $current = Get-Date
+        $sinceLast = if ($global:LastForceStopTime) { ($current - $global:LastForceStopTime).TotalSeconds } else { [double]::MaxValue }
+        switch ($eventType) {
+            { $_ -in 0,1 } {
+                Write-Host "`n[Console] Control event detected" -ForegroundColor Yellow
+                Write-Log "Ctrl+C detected (attempt $($global:ForceStopAttempts+1)/$global:ForceStopThreshold)" -Level "DEBUG"
+                if ($sinceLast -lt $global:ForceStopWindowSeconds) {
                     $global:ForceStopAttempts++
-                    Write-Host "  Rapid attempt detected ($global:ForceStopAttempts/$global:ForceStopThreshold)" -ForegroundColor Yellow
+                    Write-Host "  Rapid attempt ($global:ForceStopAttempts/$global:ForceStopThreshold)" -ForegroundColor Yellow
+                    Write-Log "Rapid Ctrl+C attempt $global:ForceStopAttempts/$global:ForceStopThreshold" -Level "DEBUG"
                 } else {
                     $global:ForceStopAttempts = 1
                 }
-                
-                $global:LastForceStopTime = $currentTime
-                
+                $global:LastForceStopTime = $current
                 if ($global:ForceStopAttempts -ge $global:ForceStopThreshold) {
-                    Write-Host "  Force shutdown requested by user" -ForegroundColor Red
+                    Write-Host "  Force shutdown requested" -ForegroundColor Red
+                    Write-Log "Force shutdown initiated by user" -Level "SHUTDOWN"
                     $global:IsShuttingDown = $true
                     return $true
-                } else {
-                    Write-Host "  Monitor will continue until end time. Press Ctrl+C again within $($global:ForceStopWindowSeconds)s to force stop." -ForegroundColor Yellow
-                    Write-Log "Ctrl+C intercepted - monitor will continue until end time. Attempts: $global:ForceStopAttempts/$global:ForceStopThreshold" -Level "WARN"
-                    return $true
                 }
+                Write-Host "  Press Ctrl+C again within $($global:ForceStopWindowSeconds)s to force stop." -ForegroundColor Yellow
+                Write-Log "Ctrl+C ignored, waiting for second press to force stop" -Level "DEBUG"
+                return $true
             }
-            default {
-                return $false
-            }
+            default { return $false }
         }
     }
 
@@ -1096,6 +952,10 @@ try {
     }
 
     while ($monitoringActive) {
+    if ($global:IsShuttingDown) {
+        Write-Log "Force shutdown flag detected, exiting monitoring loop." -Level "SHUTDOWN"
+        break
+    }        
         try {
             $processStatus = Check-ProcessStatus
             $startPassed = Test-TimeWindow -TargetTime $Script:Config.StartTime
