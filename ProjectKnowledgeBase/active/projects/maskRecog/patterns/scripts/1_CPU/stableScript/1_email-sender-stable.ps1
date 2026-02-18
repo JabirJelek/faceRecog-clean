@@ -636,8 +636,8 @@ function Send-RunReport {
     # To disable attachments for an address, use:
     # "user@example.com" = @{ Language = "en"; Attach = $false }
     $Recipients = @{ 
-        "faridraihan17@gmail.com"          = @{ Language = "en" ; Attach = $false}  # attachments off
-        "ikeepmypromiz@gmail.com"          = @{ Language = "id" ; Attach = $false } # attachments off
+        # "faridraihan17@gmail.com"          = @{ Language = "en" ; Attach = $false}  # attachments off
+        # "ikeepmypromiz@gmail.com"          = @{ Language = "id" ; Attach = $false } # attachments off
         "humanj241@gmail.com"               = @{ Language = "id"; Attach = $true }  # attachments on
         # "itdiv@sinarcemaramasabadi.co.id"   = @{ Language = "id"; Attach = $false}  # attachments off
     }
