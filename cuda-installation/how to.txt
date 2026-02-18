@@ -1,0 +1,8 @@
+To run the process with cuda environment enabled, we need several steps to utilize such method.
+
+
+1. Make sure that we have the expected CUDA and CuDNN installed in our device component. 
+2. Create the venv from the uv or other package manager of python
+3. Install the necessary pytorch, currently, our devices supported pytorch capable to run with CUDA 2.16.
+run this scrip : uv pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+4. add from the requirement file called with-gpu.txt.

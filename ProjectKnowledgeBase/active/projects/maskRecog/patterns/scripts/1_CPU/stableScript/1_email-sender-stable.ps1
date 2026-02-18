@@ -67,8 +67,8 @@ $script:Translations = @{
         WithSummary = "Dengan Ringkasan Lengkap:"
         MetadataOnly = "Hanya Metadata:"
         NoData = "Tidak Ada Data:"
-        Successful = "Berhasil:"
-        Failed = "Gagal:"
+        Successful = "Berhasil-Sempurna:"
+        Failed = "Berhasil-Prematur:"
         UnknownStatus = "Status Tidak Diketahui:"
         ScheduleWindow = "Jadwal:"
         ReportTime = "Waktu Laporan:"
@@ -81,7 +81,7 @@ $script:Translations = @{
         Footer = "Laporan ini dibuat secara otomatis oleh Sistem Pemantauan Pengenalan Wajah."
         System = "Sistem: maskRecog | Versi:"
         StatusSuccess = "BERHASIL"
-        StatusFailed = "GAGAL"
+        StatusFailed = "Berhasil-Prematur"
         StatusUnknown = "TIDAK DIKETAHUI"
         CollectionFull = "Data Lengkap"
         CollectionMetadata = "Hanya Metadata"
@@ -638,7 +638,7 @@ function Send-RunReport {
     $Recipients = @{ 
         # "faridraihan17@gmail.com"          = @{ Language = "en" ; Attach = $false}  # attachments off
         # "ikeepmypromiz@gmail.com"          = @{ Language = "id" ; Attach = $false } # attachments off
-        "humanj241@gmail.com"               = @{ Language = "id"; Attach = $true }  # attachments on
+        # "humanj241@gmail.com"               = @{ Language = "id"; Attach = $false }  # attachments on
         # "itdiv@sinarcemaramasabadi.co.id"   = @{ Language = "id"; Attach = $false}  # attachments off
     }
     
