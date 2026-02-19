@@ -221,13 +221,18 @@ def get_default_config():
                                                 # VALUE BEFORE TRYING TO CHANGE THE TYPE OF mask MODEL USED.        
         
         # ========== CORE DETECTION PARAMETERS ==========
+<<<<<<< HEAD
         'detection_confidence': 0.75,
+=======
+        'detection_confidence': 0.5,
+>>>>>>> stash
         'recognition_threshold': 0.8,
         'mask_detection_threshold': 0.6,  # INCREASED from 0.5 - makes mask detection more conservative
         'detection_iou': 0.3,
         'min_face_size': 10, # Min face height in pixels
         'max_faces_per_frame': 15,
         'enable_person_detection': True,
+<<<<<<< HEAD
         'person_detection_confidence_threshold': 0.5,    
 
     # ========== CONFIGURATION OF CHROMADB ==========
@@ -241,6 +246,9 @@ def get_default_config():
 
     
     },       
+=======
+        'person_detection_confidence_threshold': 0.4,        
+>>>>>>> stash
         
     # ========== FRAME PROCESSING CONFIGURATION ==========
     'frame_processing': {
@@ -526,8 +534,13 @@ def get_default_config():
         
         # ========== SERVER PUSH CONFIGURATION ==========        
         'server_push_enabled': True,
+<<<<<<< HEAD
         'server_endpoint': 'https://vps.scasda.my.id/accounting/public/api/submit_ai_detection',
         'server_push_cooldown': 210,
+=======
+        'server_endpoint': 'https://vps.casda.my.id/accounting/public/api/submit_ai_detection',
+        'server_push_cooldown': 5,
+>>>>>>> stash
         'server_timeout': 10,
         'server_retry_attempts': 10,
         'server_retry_delay': 2,
@@ -541,7 +554,11 @@ def get_default_config():
         # ========== ALERT CONFIGURATION ==========
         'enable_voice_alerts': True,
         'alert_server_url': "https://vps.casda.my.id/actions/a_notifikasi_suara_speaker.php",
+<<<<<<< HEAD
         'alert_cooldown_seconds': 210,            # DECREASED from 20 - more responsive alerts
+=======
+        'alert_cooldown_seconds': 15,            # DECREASED from 20 - more responsive alerts
+>>>>>>> stash
         'min_violation_frames': 1,              # DECREASED from 20 - more sensitive
         'min_violation_seconds': 1,              # DECREASED from 12 - faster alerts
         'max_gap_frames': 10,                    # INCREASED from 8 - more tolerant to gaps
@@ -557,7 +574,11 @@ def get_default_config():
         
         # ========== STREAM MANAGEMENT CONFIGURATION ==========
         'stream_manager': {
+<<<<<<< HEAD
             'max_reconnect_attempts': 3000,
+=======
+            'max_reconnect_attempts': 10,
+>>>>>>> stash
             'reconnect_delay': 3,
             'health_check_interval': 10,
             'max_frame_gap': 5,
@@ -664,7 +685,11 @@ def get_advanced_sources_config():
             'processing_scale':1,            
             'buffer_size': 100,
             'cctv_name':None,
+<<<<<<< HEAD
         },                
+=======
+        },       
+>>>>>>> stash
     }
         
 def load_custom_config(config_path: str = None) -> Dict:
@@ -767,6 +792,10 @@ def print_verification_summary(processor):
             print(f"   Currently Verified: {aggregate.get('currently_verified', 0)}")
             
             # Calculate rates
+<<<<<<< HEAD
+=======
+            # Calculate rates - SIMPLIFIED CLEAR VERSION
+>>>>>>> stash
             total_detected = max(1, aggregate.get('total_detected', 1))
             total_verified = aggregate.get('total_verified', 0)
             total_rejected = aggregate.get('total_rejected', 0)
@@ -953,7 +982,11 @@ def main():
     # Create robust face recognition system using factory
     print("\n🔄 Creating face recognition system...")
     try:
+<<<<<<< HEAD
         face_system = create_system(config, system_type="voyager")
+=======
+        face_system = create_system(config, system_type="robust")
+>>>>>>> stash
         
         # Verify GPU usage
         verify_gpu_usage(face_system)
@@ -962,7 +995,11 @@ def main():
         print(f"❌ Failed to create face recognition system: {e}")
         print("🔄 Falling back to CPU mode...")
         config['use_gpu'] = False
+<<<<<<< HEAD
         face_system = create_system(config, system_type="voyager")
+=======
+        face_system = create_system(config, system_type="robust")
+>>>>>>> stash
     
     # Apply multi-source specific configurations
     multi_source_config = {
