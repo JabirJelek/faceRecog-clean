@@ -221,34 +221,14 @@ def get_default_config():
                                                 # VALUE BEFORE TRYING TO CHANGE THE TYPE OF mask MODEL USED.        
         
         # ========== CORE DETECTION PARAMETERS ==========
-   
-        'detection_confidence': 0.75,
-
         'detection_confidence': 0.5,
- 
         'recognition_threshold': 0.8,
         'mask_detection_threshold': 0.6,  # INCREASED from 0.5 - makes mask detection more conservative
         'detection_iou': 0.3,
         'min_face_size': 10, # Min face height in pixels
         'max_faces_per_frame': 15,
         'enable_person_detection': True,
-   
-        'person_detection_confidence_threshold': 0.5,    
-
-    # ========== CONFIGURATION OF CHROMADB ==========
-    'chromadb':{
-        'enabled': True,
-        'persistent': True,
-        #'persist_directory': r'C:\raihan\dokumen\project\global-env\faceRecog\run_py\modular\0_dataset\chroma_db',
-        'migrate_existing': True, # Migrate old JSON embeddings
-        'store_all_faces':True, # Store every face detected
-        'store_unknown_faces':True, # Store unrecognized faces for review
-
-    
-    },       
-
         'person_detection_confidence_threshold': 0.4,        
- 
         
     # ========== FRAME PROCESSING CONFIGURATION ==========
     'frame_processing': {
@@ -487,8 +467,8 @@ def get_default_config():
                 'extreme_no_mask_boost': 0.9,
                 
                 # Initial weight parameters
-                'initial_mask_weight': 0.2,
-                'initial_no_mask_weight': 0.2,
+                'initial_mask_weight': 0.5,
+                'initial_no_mask_weight': 0.5,
                 
                 # Weight adjustment parameters (NEW - optional to expose)
                 'weight_increase_high_conf': 0.4,
@@ -534,12 +514,8 @@ def get_default_config():
         
         # ========== SERVER PUSH CONFIGURATION ==========        
         'server_push_enabled': True,
-   
-        'server_endpoint': 'https://vps.scasda.my.id/accounting/public/api/submit_ai_detection',
-        'server_push_cooldown': 210,
-        'server_endpoint': 'https://vps.casda.my.id/accounting/public/api/submit_ai_detection',
+        'server_endpoint': '',
         'server_push_cooldown': 5,
- 
         'server_timeout': 10,
         'server_retry_attempts': 10,
         'server_retry_delay': 2,
@@ -552,11 +528,8 @@ def get_default_config():
         
         # ========== ALERT CONFIGURATION ==========
         'enable_voice_alerts': True,
-        'alert_server_url': "https://vps.casda.my.id/actions/a_notifikasi_suara_speaker.php",
-   
-        'alert_cooldown_seconds': 210,            # DECREASED from 20 - more responsive alerts
+        'alert_server_url': " ",
         'alert_cooldown_seconds': 15,            # DECREASED from 20 - more responsive alerts
- 
         'min_violation_frames': 1,              # DECREASED from 20 - more sensitive
         'min_violation_seconds': 1,              # DECREASED from 12 - faster alerts
         'max_gap_frames': 10,                    # INCREASED from 8 - more tolerant to gaps
@@ -570,13 +543,20 @@ def get_default_config():
         'min_alert_confidence': 0.85,            # DECREASED from 0.9 - more sensitive alerts
         'alert_buffer_size': 100,                 # DECREASED from 25 - faster alert decisions
         
+        # ========== FAISS SYSTEM CONFIGURATION ========== 
+        'use_faiss_gpu': True,  # Enable GPU acceleration for FAISS
+        'faiss_index_type': 'FlatL2',  # Options: 'FlatL2', 'FlatIP', 'IVFFlat', 'IVFPQ'
+        'faiss_nlist': 100,  # For IVF indices
+        'faiss_pq_m': 8,  # For IVFPQ: number of sub-vectors
+        'faiss_pq_bits': 8,  # For IVFPQ: bits per sub-vector
+        'faiss_max_l2_distance': 100.0,  # For L2 distance normalization
+        
+        # Model paths
+        'embedding_model': 'Facenet512',
+        
         # ========== STREAM MANAGEMENT CONFIGURATION ==========
         'stream_manager': {
-   
-            'max_reconnect_attempts': 3000,
-
             'max_reconnect_attempts': 10,
- 
             'reconnect_delay': 3,
             'health_check_interval': 10,
             'max_frame_gap': 5,
@@ -617,7 +597,7 @@ def get_default_config():
         'enable_multi_scale': True,
         'enable_temporal_fusion': True,
         'enable_quality_aware': True,
-        'embedding_model': 'Facenet512',
+ 
         
         # ========== BASE64 CONFIGURATION ==========
         'enable_base64_logging': True,
@@ -684,11 +664,8 @@ def get_advanced_sources_config():
             'buffer_size': 100,
             'cctv_name':None,
    
-        },                
-
-        },       
- 
-    
+        },                               
+    }
         
 def load_custom_config(config_path: str = None) -> Dict:
     """Load custom configuration from file if provided"""
@@ -790,8 +767,6 @@ def print_verification_summary(processor):
             print(f"   Currently Verified: {aggregate.get('currently_verified', 0)}")
             
             # Calculate rates
-   
-            # Calculate rates - SIMPLIFIED CLEAR VERSION
             total_detected = max(1, aggregate.get('total_detected', 1))
             total_verified = aggregate.get('total_verified', 0)
             total_rejected = aggregate.get('total_rejected', 0)
@@ -801,27 +776,26 @@ def print_verification_summary(processor):
             
             # 1. What percentage of detections were verified?
             verification_success_rate = (total_verified / total_detected) * 100
-            print(f"   Verified Detections: {verification_success_rate:.1f}%")
+            print(f"   Verified Detections: {verification_success_rate:.1f}% ({total_verified}/{total_detected})")
             
             # 2. What percentage of detections were rejected?
             rejection_rate = (total_rejected / total_detected) * 100
-            print(f"   Rejected Detections: {rejection_rate:.1f}%")
+            print(f"   Rejected Detections: {rejection_rate:.1f}% ({total_rejected}/{total_detected})")
             
             # 3. Of the rejected detections, how many were false positives?
             if total_rejected > 0:
                 false_positive_catch_rate = (false_positives_prevented / total_rejected) * 100
-                print(f"   False Positives Caught: {false_positive_catch_rate:.1f}%")
+                print(f"   False Positives Caught: {false_positive_catch_rate:.1f}% ({false_positives_prevented}/{total_rejected})")
+            else:
+                print(f"   False Positives Caught: N/A (no rejected detections)")
             
             # 4. Overall system accuracy (if we assume verified = correct)
             total_decisions = total_verified + total_rejected
             if total_decisions > 0:
                 accuracy = ((total_verified + false_positives_prevented) / total_decisions) * 100
                 print(f"   System Accuracy: {accuracy:.1f}%")
-            
-            print(f"\n📈 VERIFICATION RATES:")
-            print(f"   Verification Rate: {verification_success_rate:.1f}%")
-            print(f"   Rejection Rate: {rejection_rate:.1f}%")
-            print(f"   False Positive Prevention Rate: {false_positives_prevented:.1f}%")
+            else:
+                print(f"   System Accuracy: N/A (no decisions made)")
             
             # Per-source stats
             per_source = stats.get('per_source', {})
@@ -849,7 +823,7 @@ def print_verification_summary(processor):
             
     except Exception as e:
         print(f"⚠️ Error printing verification summary: {e}")
-
+        
 def monitor_verification_performance(processor, interval_seconds=30):
     """Monitor verification performance periodically"""
     def monitor_worker():
@@ -978,10 +952,7 @@ def main():
     # Create robust face recognition system using factory
     print("\n🔄 Creating face recognition system...")
     try:
-   
-        face_system = create_system(config, system_type="voyager")
-        face_system = create_system(config, system_type="robust")
- 
+        face_system = create_system(config, system_type="robust_face_recognition")
         
         # Verify GPU usage
         verify_gpu_usage(face_system)
@@ -990,10 +961,7 @@ def main():
         print(f"❌ Failed to create face recognition system: {e}")
         print("🔄 Falling back to CPU mode...")
         config['use_gpu'] = False
-   
-        face_system = create_system(config, system_type="voyager")
-        face_system = create_system(config, system_type="robust")
- 
+        face_system = create_system(config, system_type="robust_face_recognition")
     
     # Apply multi-source specific configurations
     multi_source_config = {
@@ -1191,8 +1159,6 @@ def main():
         print("\n📊 Starting verification performance monitoring...")
         monitor_verification_performance(processor, interval_seconds=60)
         
-        # Run the multi-source processing
-        processor.run_multi_source_stable(sources_config)
         
     except KeyboardInterrupt:
         print("\n🛑 Shutting down by user request...")

@@ -3,3 +3,22 @@ To connect to gedangan pc, required this number is set for the target id:
 1984959394
 
 and we are required to utilize the password that has been set from pa romi.
+
+
+Traceback (most recent call last):
+  File "D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-CPU.py", line 1212, in <module>
+    main()
+  File "D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-CPU.py", line 929, in main
+    print_multi_source_info(sources_config)
+  File "D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-CPU.py", line 763, in print_multi_source_info
+    for source_id, source_config in sources_config.items():
+                                    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'items'
+
+
+
+
+
+
+
+           
