@@ -33,7 +33,7 @@ $Script:CommonConfig = @{
     
     # Common file paths
     CommonFilePaths = @{
-        PythonExe = ".venv\Scripts\python.exe"
+        PythonExe = "with-cuda\Scripts\python.exe"
         CommunicationDirName = "communication"
         WorkerPIDFileName = "worker_pid.txt"
         WorkerStatusFileName = "worker_status.json"
@@ -45,8 +45,8 @@ $Script:CommonConfig = @{
 # ====================================================================
 $Script:ApplicationConfig = @{
     # ---------------------- Monitor Settings ----------------------
-    EveryStartTime       = "15:50"
-    EveryEndTime         = "16:40"
+    EveryStartTime       = "13:40"
+    EveryEndTime         = "16:10"
     MonitorProcessCheckInterval = 5
     MonitorMaxPIDFileAgeMinutes = 120
     MonitorPIDTrackingFile = "pid_tracking.json"

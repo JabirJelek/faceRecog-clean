@@ -1,0 +1,83 @@
+PS D:\raihan\document\projects\faceRecog> pwsh -ExecutionPolicy ByPass -File 'D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_cpu\stableScript\1_monitor.ps1'
+Initialising enhanced monitor...
+Initializing portable paths for maskRecog project...
+Found project root: D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog
+[2026-02-19 13:42:23] [DEBUG] Monitor metadata initial written
+[2026-02-19 13:42:23] [INFO] === Enhanced Face Recognition Monitor Started ===
+[2026-02-19 13:42:23] [INFO] Version: 2.2 (refactored, shared validation)
+[2026-02-19 13:42:23] [INFO] Start Time: 13:40
+[2026-02-19 13:42:23] [INFO] End Time: 16:10
+[2026-02-19 13:42:23] [INFO] Initializing email reporting...
+[2026-02-19 13:42:23] [SUCCESS] Stable Email sender initialized successfully
+[2026-02-19 13:42:23] [INFO] Monitoring window: 13:40:00 to 16:10:00
+[2026-02-19 13:42:23] [INFO] Starting face recognition worker...
+[2026-02-19 13:42:23] [INFO] Worker script path: D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_cpu\stableScript\1_worker_portable.ps1
+[2026-02-19 13:42:23] [INFO] Starting worker process...
+[2026-02-19 13:42:23] [SUCCESS] Worker process started (PID: 17828)
+[2026-02-19 13:42:25] [DEBUG] Worker Output: === WORKER SCRIPT STARTING ===
+[2026-02-19 13:42:25] [DEBUG] Worker Output: Worker PID: 17828
+[2026-02-19 13:42:25] [DEBUG] Worker Output: Common paths script loaded
+[2026-02-19 13:42:25] [DEBUG] Worker Output: Python executable: D:\raihan\document\projects\faceRecog\with-cuda\Scripts\python.exe
+[2026-02-19 13:42:25] [DEBUG] Worker Output: Python script: D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-CPU.py
+[2026-02-19 13:42:25] [DEBUG] Worker Output: Creating run folder: D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\logs-running\cpu\2026-02-19\CPU_Process_MaskDetect_2026-02-19_13-42-25
+[2026-02-19 13:42:25] [DEBUG] Worker Output: Starting Python script...
+[2026-02-19 13:42:25] [SUCCESS] Captured Python PID from worker output: 3444
+[2026-02-19 13:42:25] [DEBUG] Worker Output: Python process started (PID: 3444)
+[2026-02-19 13:42:25] [DEBUG] Worker Output: Waiting for Python to complete...
+[2026-02-19 13:42:25] [INFO] Worker process is running, waiting for Python...
+[2026-02-19 13:42:25] [DEBUG] Looking for Python PID from available data...
+[2026-02-19 13:42:25] [DEBUG] Using Python PID from worker output: 3444
+[2026-02-19 13:42:25] [SUCCESS] Python process found (PID: 3444)
+[2026-02-19 13:42:25] [DEBUG] PID tracking saved
+[2026-02-19 13:42:25] [SUCCESS] Worker started.
+[2026-02-19 13:43:26] [INFO] Starting face recognition worker...
+[2026-02-19 13:43:26] [INFO] Worker script path: D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_cpu\stableScript\1_worker_portable.ps1
+[2026-02-19 13:43:26] [INFO] Starting worker process...
+[2026-02-19 13:43:26] [SUCCESS] Worker process started (PID: 15852)
+[2026-02-19 13:43:28] [DEBUG] Worker Output: === WORKER SCRIPT STARTING ===
+[2026-02-19 13:43:28] [DEBUG] Worker Output: Worker PID: 15852
+[2026-02-19 13:43:28] [DEBUG] Worker Output: Common paths script loaded
+[2026-02-19 13:43:28] [DEBUG] Worker Output: Python executable: D:\raihan\document\projects\faceRecog\with-cuda\Scripts\python.exe
+[2026-02-19 13:43:28] [DEBUG] Worker Output: Python script: D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-CPU.py
+[2026-02-19 13:43:28] [DEBUG] Worker Output: Creating run folder: D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\logs-running\cpu\2026-02-19\CPU_Process_MaskDetect_2026-02-19_13-43-26
+[2026-02-19 13:43:28] [DEBUG] Worker Output: Starting Python script...
+[2026-02-19 13:43:28] [SUCCESS] Captured Python PID from worker output: 9736
+[2026-02-19 13:43:28] [DEBUG] Worker Output: Python process started (PID: 9736)
+[2026-02-19 13:43:28] [DEBUG] Worker Output: Waiting for Python to complete...
+[2026-02-19 13:43:28] [DEBUG] Worker Output: Python completed with exit code: 1
+[2026-02-19 13:43:28] [DEBUG] Worker Output: === WORKER SCRIPT COMPLETED ===
+[2026-02-19 13:43:28] [ERROR] Worker process exited immediately with code: 1
+[2026-02-19 13:44:28] [INFO] Starting face recognition worker...
+[2026-02-19 13:44:28] [INFO] Worker script path: D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\scripts\1_cpu\stableScript\1_worker_portable.ps1
+[2026-02-19 13:44:28] [INFO] Starting worker process...
+[2026-02-19 13:44:28] [SUCCESS] Worker process started (PID: 12956)
+[2026-02-19 13:44:30] [DEBUG] Worker Output: === WORKER SCRIPT STARTING ===
+[2026-02-19 13:44:30] [DEBUG] Worker Output: Worker PID: 12956
+[2026-02-19 13:44:30] [DEBUG] Worker Output: Common paths script loaded
+[2026-02-19 13:44:30] [DEBUG] Worker Output: Python executable: D:\raihan\document\projects\faceRecog\with-cuda\Scripts\python.exe
+[2026-02-19 13:44:30] [DEBUG] Worker Output: Python script: D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\patterns\algorithm\entry_multi-USED-CPU.py
+[2026-02-19 13:44:30] [DEBUG] Worker Output: Creating run folder: D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\active\logs-running\cpu\2026-02-19\CPU_Process_MaskDetect_2026-02-19_13-44-28
+[2026-02-19 13:44:30] [DEBUG] Worker Output: Starting Python script...
+[2026-02-19 13:44:30] [SUCCESS] Captured Python PID from worker output: 10672
+[2026-02-19 13:44:30] [DEBUG] Worker Output: Python process started (PID: 10672)
+[2026-02-19 13:44:30] [DEBUG] Worker Output: Waiting for Python to complete...
+[2026-02-19 13:44:30] [DEBUG] Worker Output: Python completed with exit code: 1
+[2026-02-19 13:44:30] [DEBUG] Worker Output: === WORKER SCRIPT COMPLETED ===
+[2026-02-19 13:44:30] [ERROR] Worker process exited immediately with code: 1
+================================================
+    FACE RECOGNITION MONITOR
+================================================
+Time: 2026-02-19 13:44:40 | Schedule: 13:40-16:10
+Status: ACTIVE
+Python: STOPPED
+Worker: STOPPED
+================================================
+
+An error has occurred that was not properly handled. Additional information is shown below. The PowerShell process will exit.
+Unhandled exception. System.Management.Automation.PSInvalidOperationException: There is no Runspace available to run scripts in this thread. You can provide one in the DefaultRunspace property of the System.Management.Automation.Runspaces.Runspace type. The script block you attempted to invoke was:
+    param($eventT.n $false }
+    }
+
+   at System.Management.Automation.ScriptBlock.GetContextFromTLS()
+   at System.Management.Automation.ScriptBlock.InvokeAsDelegateHelper(Object dollarUnder, Object dollarThis, Object[] args)
+   at lambda_method110(Closure, Int32)
