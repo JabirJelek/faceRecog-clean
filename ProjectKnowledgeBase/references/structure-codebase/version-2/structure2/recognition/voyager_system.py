@@ -421,39 +421,35 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
             return len(self.voyager_id_to_identity)
     
     def _validate_embedding(self, embedding: np.ndarray) -> bool:
-        """Validate embedding shape and values, with automatic reshaping if possible."""
+        """Validate embedding shape and values"""
         if embedding is None or embedding.size == 0:
             return False
-
+        
         # Check for NaN or Inf values
         if np.any(np.isnan(embedding)) or np.any(np.isinf(embedding)):
             self.logger.warning("Embedding contains NaN or Inf values")
             return False
-
+        
+        # Check expected dimension (based on model)
         expected_dim = self._get_embedding_dimension_from_model()
-
-        # If shape doesn't match, try to reshape
         if embedding.shape[-1] != expected_dim:
+            self.logger.warning(
+                f"Embedding dimension mismatch: expected {expected_dim}, "
+                f"got {embedding.shape[-1]}"
+            )
+            # Try to reshape if possible
             if embedding.size == expected_dim:
-                # Total elements match, reshape to 1D
                 embedding = embedding.reshape(-1)
-                self.logger.debug(f"Reshaped embedding from {embedding.shape} to ({expected_dim},)")
             else:
-                self.logger.warning(
-                    f"Embedding dimension mismatch: expected {expected_dim}, "
-                    f"got {embedding.shape[-1]} (total elements: {embedding.size})"
-                )
                 return False
-
+        
         return True
-
 
     def recognize_face(self, embedding: np.ndarray) -> Tuple[Optional[str], float]:
         """Enhanced recognition with robust error recovery"""
         start_time = time.time()
         
         # Validate input embedding
-        embedding = embedding.flatten()
         if not self._validate_embedding(embedding):
             self.logger.warning(f"Invalid embedding provided: shape={embedding.shape}")
             return None, 0.0
@@ -545,72 +541,51 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
         return self._recognize_face_gpu_optimized(embedding, start_time)
 
     def add_identity_to_voyager(self, identity: str, embedding: np.ndarray):
-        """Add new identity to Voyager index with GPU optimization and atomic updates"""
+        """Add new identity to Voyager index with GPU optimization"""
         if self.voyager_index is None:
+            # Initialize with the dimension of the new embedding
             dimension = len(embedding.flatten())
             self._initialize_voyager_index(dimension)
-
-        embedding_flat = embedding.flatten().astype(np.float32)
         
-        # Case 1: Updating existing identity
+        # Check if identity already exists
         if identity in self.identity_to_voyager_id:
             voyager_id = self.identity_to_voyager_id[identity]
             self.logger.info(f"Updating existing identity '{identity}' in Voyager index")
-
-            # Save current GPU tensor state for potential rollback
-            old_tensor = self.identity_centroids_tensor.clone() if self.identity_centroids_tensor is not None else None
-            old_names = self.identity_names_list.copy()
-
-            try:
-                # Update GPU tensor
+            
+            # Update GPU tensor
+            if self.identity_centroids_tensor is not None:
                 index = self.identity_names_list.index(identity)
                 new_centroid_tensor = torch.from_numpy(embedding).to(self.device).float()
                 self.identity_centroids_tensor[index] = new_centroid_tensor
-
-                # Update Voyager index
-                self.voyager_index.add_items(np.array([embedding_flat]), [voyager_id])
-
-                self.logger.info(f"Successfully updated identity '{identity}'")
-            except Exception as e:
-                # Rollback GPU tensor
-                if old_tensor is not None:
-                    self.identity_centroids_tensor = old_tensor
-                    self.identity_names_list = old_names
-                self.logger.error(f"Failed to update identity '{identity}': {e}")
-                raise  # Re-raise to let caller know the operation failed
-
-        # Case 2: Adding new identity
         else:
             voyager_id = self.next_voyager_id
             self.next_voyager_id += 1
-
-            # First, add to Voyager index (less critical if it fails)
-            try:
-                self.voyager_index.add_items(np.array([embedding_flat]), [voyager_id])
-            except Exception as e:
-                self.logger.error(f"Failed to add identity '{identity}' to Voyager index: {e}")
-                raise
-
-            # Update GPU tensor and mappings only after Voyager succeeds
+            
+            # Add to GPU tensor
             new_centroid_tensor = torch.from_numpy(embedding).to(self.device).float()
             if self.identity_centroids_tensor is None:
                 self.identity_centroids_tensor = new_centroid_tensor.unsqueeze(0)
                 self.identity_names_list = [identity]
             else:
                 self.identity_centroids_tensor = torch.cat([
-                    self.identity_centroids_tensor,
+                    self.identity_centroids_tensor, 
                     new_centroid_tensor.unsqueeze(0)
                 ])
                 self.identity_names_list.append(identity)
-
-            # Update mappings
-            self.voyager_id_to_identity[voyager_id] = identity
-            self.identity_to_voyager_id[identity] = voyager_id
-            self.identity_centroids[identity] = embedding
-
-            self.logger.info(f"Added new identity '{identity}' to Voyager index (ID: {voyager_id})")
-
-    
+        
+        # Update mappings
+        self.voyager_id_to_identity[voyager_id] = identity
+        self.identity_to_voyager_id[identity] = voyager_id
+        self.identity_centroids[identity] = embedding  # Maintain compatibility
+        
+        # Add to Voyager index
+        embedding_flat = embedding.flatten().astype(np.float32)
+        self.voyager_index.add_items(np.array([embedding_flat]), [voyager_id])
+        
+        item_count = self._get_voyager_item_count()
+        self.logger.info(f"Added/updated identity '{identity}' in Voyager index (ID: {voyager_id})")
+        self.logger.info(f"Voyager index now contains {item_count} items")
+        self.logger.info(f"GPU tensor now contains {len(self.identity_names_list)} centroids")
         
     def get_voyager_stats(self) -> Dict:
         """Get Voyager performance statistics"""

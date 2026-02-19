@@ -8,7 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import onnxruntime as ort
 import numpy as np
 from collections import deque
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Any
 import time
 import torch
 import logging
@@ -21,7 +21,8 @@ class FaceRecognitionSystem:
         self.config = config
         self.detection_model = None
         self.mask_detector = None
-        self.mask_input_size = None  # Will be dynamically set from model
+        self.channel_format = None
+        self.mask_input_size = None   
         self.embeddings_db = {}
         self.identity_centroids = {}
         
@@ -151,6 +152,8 @@ class FaceRecognitionSystem:
             
         except Exception as e:
             self.logger.error(f"Failed to load mask detection model: {e}")
+            self.mask_detector = None
+            self.mask_input_size = None
             # Don't raise exception, continue without mask detection
             
     def _maybe_clean_gpu_cache(self):
@@ -162,7 +165,62 @@ class FaceRecognitionSystem:
         if self._frame_counter >= self.gpu_cache_cleanup_interval:
             torch.cuda.empty_cache()
             self.logger.debug(f"GPU cache cleared after {self._frame_counter} frames")
-            self._frame_counter = 0            
+            self._frame_counter = 0     
+                
+    def health_check(self) -> Dict[str, Any]:
+        """
+        Returns the current health status of the recognition system.
+        Can be called periodically by external monitoring.
+        """
+        status = "healthy"
+        issues = []
+        
+        # Check detection model
+        if self.detection_model is None:
+            issues.append("detection_model_not_loaded")
+            status = "unhealthy"
+        
+        # Check mask detector (optional, but warn if missing)
+        mask_ok = self.mask_detector is not None
+        if not mask_ok:
+            issues.append("mask_detector_not_loaded")
+            # Only degrade status, not make it unhealthy (mask detection is optional)
+            if status == "healthy":
+                status = "degraded"
+        
+        # Check embeddings database loaded
+        if not self.identity_centroids:
+            issues.append("no_identities_loaded")
+            # Can still function (cold start), but degrade status
+            if status == "healthy":
+                status = "degraded"
+        
+        # GPU availability (if configured)
+        gpu_available = torch.cuda.is_available()
+        if self.config.get('use_gpu', False) and not gpu_available:
+            issues.append("gpu_requested_but_unavailable")
+            # System may fallback to CPU, so status degraded, not unhealthy
+            if status == "healthy":
+                status = "degraded"
+        
+        # Check for recent errors (optional, requires storing last error)
+        if hasattr(self, '_last_error') and self._last_error:
+            issues.append(f"last_error: {self._last_error}")
+            status = "degraded"  # or unhealthy based on severity
+        
+        return {
+            "status": status,
+            "timestamp": time.time(),
+            "issues": issues,
+            "details": {
+                "detection_model_loaded": self.detection_model is not None,
+                "mask_detector_loaded": mask_ok,
+                "identities_count": len(self.identity_centroids),
+                "gpu_available": gpu_available,
+                "gpu_configured": self.config.get('use_gpu', False),
+                "voyager_available": hasattr(self, 'voyager_index') and self.voyager_index is not None,
+            }
+        }                   
             
     def _validate_config(self):
         """Validate required configuration keys and set defaults for optional ones."""
@@ -228,7 +286,7 @@ class FaceRecognitionSystem:
                
                       
     def detect_mask(self, face_roi: np.ndarray) -> Tuple[str, float]:
-        if self.mask_detector is None:
+        if self.mask_detector is None or self.channel_format is None:
             return "no_mask", 0.0
             
         start_time = time.time()
@@ -595,7 +653,7 @@ class FaceRecognitionSystem:
             'known_identities_count': len(self.identity_centroids)
         }
         
-        if self.mask_detector:
+        if self.mask_detector is not None:
             info['mask_input_size'] = self.mask_input_size
             info['mask_channel_format'] = self.channel_format
             info['mask_input_name'] = self.mask_detector.get_inputs()[0].name
