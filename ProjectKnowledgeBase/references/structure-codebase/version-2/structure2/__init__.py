@@ -9,7 +9,7 @@ __author__ = "Face Recognition System"
 
 # Main classes and functions for easy access
 from .config import ConfigManager, ValidationRules
-from .recognition import FaceRecognitionSystem, RobustFaceRecognitionSystem, VoyagerFaceRecognitionSystem, ChromaFaceRecognitionSystem #FaissFaceRecognitionSystem
+from .recognition import FaceRecognitionSystem, RobustFaceRecognitionSystem, VoyagerFaceRecognitionSystem #, ChromaFaceRecognitionSystem FaissFaceRecognitionSystem
 from .streaming import RealTimeProcessor, StreamManager, RealTimeProcessorHeadless, MultiSourceRealTimeProcessor
 from .alerting import  DurationAwareAlertManager, VoiceInterface
 from .logging import DataLogger, ImageLogger
@@ -27,15 +27,15 @@ def create_system(config: dict, system_type: str = "robust"):
         return RobustFaceRecognitionSystem(system_config)
     elif system_type == "voyager":
         return VoyagerFaceRecognitionSystem(system_config)
-    elif system_type == "chroma":
-        return ChromaFaceRecognitionSystem(system_config)
+    # elif system_type == "chroma":
+    #     return ChromaFaceRecognitionSystem(system_config)
     # elif system_type == 'faiss':
     #     return FaissFaceRecognitionSystem(system_config)
     else:
         return VoyagerFaceRecognitionSystem(system_config)
 
 __all__ = [
-    "ConfigManager", "ChromaFaceRecognitionSystem", #'FaissFaceRecognitionSystem',
+    "ConfigManager", # "ChromaFaceRecognitionSystem", 'FaissFaceRecognitionSystem',
     "FaceRecognitionSystem",
     "RobustFaceRecognitionSystem",
     "RealTimeProcessor",

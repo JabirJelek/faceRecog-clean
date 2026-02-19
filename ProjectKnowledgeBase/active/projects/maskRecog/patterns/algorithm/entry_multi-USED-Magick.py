@@ -674,23 +674,23 @@ def get_advanced_sources_config():
         #     'cctv_name':None,
         # },     
                          
-        # '6': {
-        #     'url': '0',
-        #     'description': 'Main Camera',
-        #     'priority': 'medium',
-        #     'processing_scale':1,            
-        #     'buffer_size': 100,
-        #     'cctv_name':None,
-        # },
-        
-        '7': {
-            'url': 'rtsp://admin:admin888@192.168.110.40:554/Streaming/Channels/601',
-            'description': 'Pojok dekat MIS',
+        '6': {
+            'url': '0',
+            'description': 'Main Camera',
             'priority': 'medium',
             'processing_scale':1,            
             'buffer_size': 100,
             'cctv_name':None,
-        },                                  
+        },
+        
+        # '7': {
+        #     'url': 'rtsp://admin:admin888@192.168.110.40:554/Streaming/Channels/601',
+        #     'description': 'Pojok dekat MIS',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },                                  
     }
         
 def load_custom_config(config_path: str = None) -> Dict:
