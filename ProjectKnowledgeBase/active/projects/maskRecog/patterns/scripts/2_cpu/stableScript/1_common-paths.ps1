@@ -19,11 +19,11 @@ $Script:CommonConfig = @{
     
     # File paths for monitor script
     MonitorFilePaths = @{
-        WorkerScript = "patterns\scripts\1_cpu\stableScript\1_worker_portable.ps1"
+        WorkerScript = "patterns\scripts\2_cpu\stableScript\1_worker_portable.ps1"
         PythonScriptPath = "patterns\algorithm\entry_multi-USED-CPU.py"
         PIDFileName = "monitor_pid_CPU.json"
         LogFileName = "monitor_CPU.log"
-        EmailSendScript = "patterns\scripts\1_cpu\stableScript\1_email-sender-stable.ps1"
+        EmailSendScript = "patterns\scripts\2_cpu\stableScript\1_email-sender-stable.ps1"
     }
     
     # File paths for worker script
@@ -45,8 +45,8 @@ $Script:CommonConfig = @{
 # ====================================================================
 $Script:ApplicationConfig = @{
     # ---------------------- Monitor Settings ----------------------
-    EveryStartTime       = "10:40"
-    EveryEndTime         = "16:37"
+    EveryStartTime       = "13:40"
+    EveryEndTime         = "15:10"
     MonitorProcessCheckInterval = 5
     MonitorMaxPIDFileAgeMinutes = 120
     MonitorPIDTrackingFile = "pid_tracking.json"
@@ -79,8 +79,8 @@ $Script:ApplicationConfig = @{
     EmailSenderScript      = "1_email-sender-stable.ps1"
     
     # ---------------------- Capture Script Settings --------------
-    # CaptureStartTime       = "10:00"
-    # CaptureEndTime         = "11:04"
+    # CaptureStartTime       = "14:00"
+    # CaptureEndTime         = "15:04"
     CaptureRunsDirectory   = "runs"
     CaptureLogsDirectory   = "logs"
     CaptureOutputFolderPattern = "CPU_Process_MaskDetect_*"
