@@ -9,24 +9,17 @@
 
 #### Instructions
 
-This module is part of a big system.
 
-Propose stability from the codebase.
-
-
-#### Debug of the codebase
- 
-
-Ignore this section, focus on other section.
-
+Any possibilities that these codebase being ported? Meaning the hardcoded ps1 and .py script can be run wherever the script is being cloned
 
 #### Tips
 
-follow instructions, no need to add non-related solution.
+follow Instructions, no need to add non-related solution.
 
 
+#### debug of the codebase
 
-
+skip this section
 
 #### References
 
@@ -43,7 +36,7 @@ https://github-com.translate.goog/karanpratapsingh/system-design?_x_tr_sl=en&_x_
 #### Summary from previous update
 
 
-
+focus on important
 
 
 
@@ -70,1688 +63,2446 @@ https://github-com.translate.goog/karanpratapsingh/system-design?_x_tr_sl=en&_x_
 
 
 
+# 1_common-paths.ps1 
 
+<#
+.SYNOPSIS
+Common path initialization module shared by monitor and worker scripts
+.DESCRIPTION
+Handles portable path discovery and date-based folder creation
+#>
 
-
-
-
-# recognition/voyager_system.py
-import json
-from pathlib import Path
-from ultralytics import YOLO
-import numpy as np
-from collections import deque
-from typing import Dict, Tuple, Optional
-import time
-import torch
-import torch.nn.functional as F
-from voyager import Index, Space
-from .base_system import FaceRecognitionSystem
-import logging
-
-class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
-    def __init__(self, config: Dict):
-        # Initialize logger
-        self.logger = logging.getLogger(__name__)
-        
-        # Initialize GPU device FIRST
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.logger.info(f"Using device: {self.device}")
-        
-        # Initialize Voyager-specific attributes
-        self.voyager_index = None
-        self.voyager_id_to_identity = {}
-        self.identity_to_voyager_id = {}
-        self.next_voyager_id = 0
-        self.voyager_performance_monitor = VoyagerPerformanceMonitor()
-        
-        # GPU-optimized tensor storage for centroids
-        self.identity_centroids_tensor = None
-        self.identity_names_list = []
-        
-        # Add validation tracking
-        self.index_validation_errors = 0
-        self.last_validation_time = 0
-        self.max_validation_interval = 300  # 5 minutes
-        
-        # Add index consistency check
-        self._validate_index_consistency()        
-        
-        # Now call parent constructor
-        super().__init__(config)
-        
-    def _validate_index_consistency(self):
-        """Validate Voyager index matches internal mappings"""
-        if self.voyager_index is None:
-            return True
-            
-        try:
-            item_count = self._get_voyager_item_count()
-            mapping_count = len(self.voyager_id_to_identity)
-            
-            if item_count != mapping_count:
-                self.logger.warning(
-                    f"Index inconsistency detected: "
-                    f"Voyager items={item_count}, mappings={mapping_count}"
-                )
-                self.index_validation_errors += 1
-                
-                # Attempt to rebuild if too many errors
-                if self.index_validation_errors > 3:
-                    self._rebuild_index_from_backup()
-                    return False
-            return True
-        except Exception as e:
-            self.logger.error(f"Index validation failed: {e}")
-            return False
+# ====================================================================
+# Module Configuration - MODIFIABLE SECTION
+# ====================================================================
+$Script:CommonConfig = @{
+    ProjectName = "maskRecog"
+    LogBasePath = "logs-running\magick"
+    DateFormat = "yyyy-MM-dd"
+    DateTimeFormat = "yyyy-MM-dd_HH-mm-ss"
+    LogDateTimeFormat = "yyyy-MM-dd HH:mm:ss"
     
-    def _rebuild_index_from_backup(self):
-        """Rebuild Voyager index from database backup"""
-        self.logger.warning("Rebuilding Voyager index from database...")
-        
-        # Save current state
-        current_db = self.embeddings_db.copy()
-        
-        # Reinitialize
-        self.voyager_index = None
-        self.voyager_id_to_identity = {}
-        self.identity_to_voyager_id = {}
-        self.next_voyager_id = 0
-        
-        # Reload
-        self.embeddings_db = current_db
-        self._load_embeddings_database()
-        
-        self.index_validation_errors = 0
-        self.logger.info("Index rebuild complete")        
-        
-               
-    def _load_embeddings_database(self):
-        """Load embeddings into Voyager index with GPU optimization"""
-        try:
-            db_path = Path(self.config['embeddings_db_path'])
-            if not db_path.exists():
-                self.logger.warning("Embeddings database not found, starting fresh")
-                self.embeddings_db = {"persons": {}, "metadata": {}}
-                # Initialize empty Voyager index for future additions
-                self._initialize_voyager_index(512)  # Default dimension
-                return
-                
-            with open(db_path, 'r') as f:
-                self.embeddings_db = json.load(f)
-                
-            if "persons" in self.embeddings_db:
-                # First, determine embedding dimension from the data
-                embedding_dim = self._get_embedding_dimension_from_data()
-                self.logger.info(f"Detected embedding dimension: {embedding_dim}")
-                
-                # Initialize Voyager index with correct dimension
-                self._initialize_voyager_index(embedding_dim)
-                
-                vectors = []
-                voyager_ids = []
-                identities = []
-                centroid_tensors = []
-                
-                for person_id, person_data in self.embeddings_db["persons"].items():
-                    display_name = person_data["display_name"]
-                    
-                    # Extract centroid embedding from your database structure
-                    if "centroid_embedding" in person_data and person_data["centroid_embedding"]:
-                        centroid = np.array(person_data["centroid_embedding"])
-                    else:
-                        # Fallback: use first embedding if no centroid
-                        if (person_data.get("embeddings") and 
-                            len(person_data["embeddings"]) > 0 and
-                            "vector" in person_data["embeddings"][0]):
-                            centroid = np.array(person_data["embeddings"][0]["vector"])
-                            self.logger.warning(f"Using first embedding as centroid for {display_name}")
-                        else:
-                            self.logger.warning(f"No embeddings found for {display_name}, skipping")
-                            continue
-                    
-                    # Store mapping and prepare for batch addition
-                    voyager_id = self.next_voyager_id
-                    self.voyager_id_to_identity[voyager_id] = display_name
-                    self.identity_to_voyager_id[display_name] = voyager_id
-                    self.identity_centroids[display_name] = centroid  # Keep for compatibility
-                    
-                    vectors.append(centroid)
-                    voyager_ids.append(voyager_id)
-                    identities.append(display_name)
-                    
-                    # Create GPU tensor for this centroid
-                    centroid_tensor = torch.from_numpy(centroid).to(self.device).float()
-                    centroid_tensors.append(centroid_tensor)
-                    
-                    self.next_voyager_id += 1
-                
-                # Batch add to Voyager for better performance
-                if vectors:
-                    vectors_array = np.array(vectors)
-                    self.voyager_index.add_items(vectors_array, voyager_ids)
-                    
-                    # Create GPU tensor for all centroids
-                    if centroid_tensors:
-                        self.identity_centroids_tensor = torch.stack(centroid_tensors)
-                        self.identity_names_list = identities
-                    
-                    self.logger.info(f"Loaded {len(vectors)} identities into Voyager index")
-                    self.logger.info(f"Pre-loaded {len(centroid_tensors)} centroids to GPU memory")
-                    
-                    # Get the correct item count attribute
-                    item_count = self._get_voyager_item_count()
-                    self.logger.info(f"Voyager index size: {item_count} items")
-                    
-                    # Test query to verify index is working
-                    if len(vectors) > 0:
-                        try:
-                            test_neighbors, test_distances = self.voyager_index.query(vectors[0], k=1)
-                            if test_neighbors and len(test_neighbors) > 0:
-                                self.logger.info(f"Voyager test query successful: {len(test_neighbors)} results")
-                        except Exception as e:
-                            self.logger.warning(f"Voyager test query failed: {e}")
-                
-                self.logger.info(f"Loaded {len(self.voyager_id_to_identity)} identities from database")
-                self.logger.info(f"Available persons: {list(self.voyager_id_to_identity.values())}")
-                
-            else:
-                self.logger.warning("No 'persons' key found in JSON database")
-                self._initialize_voyager_index(512)  # Default dimension
-                
-        except Exception as e:
-            self.logger.error(f"Failed to load embeddings database: {e}")
-            import traceback
-            traceback.print_exc()
-            # Initialize empty index anyway
-            self._initialize_voyager_index(512)
-            
-    def _recognize_face_gpu_optimized(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
-        """GPU-optimized recognition with fallback to CPU"""
-        if not self.identity_centroids:
-            return None, 0.0
-        
-        # Try GPU first, fallback to CPU if GPU fails
-        try:
-            if torch.cuda.is_available() and self.identity_centroids_tensor is not None:
-                return self._recognize_on_gpu(embedding)
-            else:
-                return self._recognize_on_cpu(embedding, start_time)
-        except (RuntimeError, torch.cuda.OutOfMemoryError) as e:
-            self.logger.warning(f"GPU recognition failed, falling back to CPU: {e}")
-            # Clear GPU cache and retry on CPU
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-            return self._recognize_on_cpu(embedding, start_time)
-
-    def _recognize_on_gpu(self, embedding: np.ndarray) -> Tuple[Optional[str], float]:
-        """GPU-based recognition implementation"""
-        embedding_tensor = torch.from_numpy(embedding).to(self.device).float().flatten()
-        centroids_tensor = self.identity_centroids_tensor
-        
-        with torch.no_grad():
-            embedding_norm = F.normalize(embedding_tensor, p=2, dim=0)
-            centroids_norm = F.normalize(centroids_tensor, p=2, dim=1)
-            cosine_similarities = torch.mm(centroids_norm, embedding_norm.unsqueeze(1)).squeeze()
-            best_similarity, best_index = torch.max(cosine_similarities, dim=0)
-            best_similarity = best_similarity.item()
-        
-        best_identity = None
-        if best_similarity >= self.config['recognition_threshold']:
-            best_identity = self.identity_names_list[best_index]
-        
-        return best_identity, best_similarity
-
-    def _recognize_on_cpu(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
-        """CPU-based fallback recognition"""
-        best_identity = None
-        best_similarity = 0.0
-        
-        # Normalize query embedding
-        embedding_norm = embedding / np.linalg.norm(embedding)
-        
-        for identity, centroid in self.identity_centroids.items():
-            if centroid is None:
-                continue
-                
-            # Normalize centroid
-            centroid_norm = centroid / np.linalg.norm(centroid)
-            
-            # Calculate cosine similarity
-            similarity = np.dot(embedding_norm, centroid_norm)
-            
-            if similarity > best_similarity and similarity >= self.config['recognition_threshold']:
-                best_similarity = similarity
-                best_identity = identity
-        
-        recognition_time = (time.time() - start_time) * 1000
-        self.debug_stats['recognition_times'].append(recognition_time)
-        
-        return best_identity, best_similarity   
+    # File paths for monitor script
+    MonitorFilePaths = @{
+        WorkerScript = "patterns\scripts\1_magick-1\stableScript\1_worker_portable.ps1"
+        PythonScriptPath = "patterns\algorithm\entry_multi-USED-Magick.py"
+        PIDFileName = "monitor_pid_Magick.json"
+        LogFileName = "monitor_Magick.log"
+        EmailSendScript = "patterns\scripts\1_magick-1\stableScript\1_email-sender-stable.ps1"
+    }
     
-    def save_voyager_index(self, filepath: Optional[str] = None):
-        """Save Voyager index to disk with corruption check"""
-        if self.voyager_index is None:
-            self.logger.warning("No Voyager index to save")
-            return False
-        
-        try:
-            if filepath is None:
-                db_path = Path(self.config['embeddings_db_path'])
-                index_path = db_path.parent / f"voyager_index_{int(time.time())}.bin"
-            else:
-                index_path = Path(filepath)
-            
-            # Save with temporary file first
-            temp_path = index_path.with_suffix('.tmp')
-            self.voyager_index.save(str(temp_path))
-            
-            # Verify the saved file
-            if temp_path.exists() and temp_path.stat().st_size > 0:
-                # Move to final location (atomic operation on Unix-like systems)
-                temp_path.replace(index_path)
-                self.logger.info(f"Voyager index saved to {index_path}")
-                
-                # Create checksum for validation
-                self._create_index_checksum(index_path)
-                return True
-            else:
-                self.logger.error("Failed to save Voyager index - file empty or missing")
-                return False
-                
-        except Exception as e:
-            self.logger.error(f"Failed to save Voyager index: {e}")
-            return False
-
-    def load_voyager_index(self, filepath: str) -> bool:
-        """Load Voyager index with validation"""
-        try:
-            index_path = Path(filepath)
-            
-            if not index_path.exists():
-                self.logger.warning(f"Index file not found: {filepath}")
-                return False
-            
-            # Verify checksum if available
-            if not self._verify_index_checksum(index_path):
-                self.logger.warning("Index checksum verification failed")
-                return False
-            
-            # Load the index
-            dimension = self._get_embedding_dimension_from_model()
-            self.voyager_index = Index(Space.Cosine, num_dimensions=dimension)
-            self.voyager_index.load(str(index_path))
-            
-            # Validate loaded index
-            if self._validate_loaded_index():
-                self.logger.info(f"Successfully loaded Voyager index from {filepath}")
-                return True
-            else:
-                self.voyager_index = None
-                return False
-                
-        except Exception as e:
-            self.logger.error(f"Failed to load Voyager index: {e}")
-            return False
-
-    def _create_index_checksum(self, filepath: Path):
-        """Create checksum for index file"""
-        import hashlib
-        checksum_path = filepath.with_suffix('.checksum')
-        
-        with open(filepath, 'rb') as f:
-            file_hash = hashlib.sha256(f.read()).hexdigest()
-        
-        with open(checksum_path, 'w') as f:
-            f.write(f"{file_hash}\n{filepath.name}\n{time.time()}")
-
-    def _verify_index_checksum(self, filepath: Path) -> bool:
-        """Verify index file checksum"""
-        checksum_path = filepath.with_suffix('.checksum')
-        
-        if not checksum_path.exists():
-            self.logger.warning("No checksum file found, skipping verification")
-            return True
-        
-        try:
-            import hashlib
-            with open(filepath, 'rb') as f:
-                file_hash = hashlib.sha256(f.read()).hexdigest()
-            
-            with open(checksum_path, 'r') as f:
-                stored_hash = f.readline().strip()
-            
-            return file_hash == stored_hash
-        except Exception as e:
-            self.logger.warning(f"Checksum verification failed: {e}")
-            return False    
-                 
-            
-    def _get_embedding_dimension_from_data(self) -> int:
-        """Determine embedding dimension from the actual data"""
-        try:
-            # Look at the first person's centroid to determine dimension
-            first_person = next(iter(self.embeddings_db["persons"].values()))
-            
-            if "centroid_embedding" in first_person and first_person["centroid_embedding"]:
-                return len(first_person["centroid_embedding"])
-            elif (first_person.get("embeddings") and 
-                  len(first_person["embeddings"]) > 0 and
-                  "vector" in first_person["embeddings"][0]):
-                return len(first_person["embeddings"][0]["vector"])
-            else:
-                # Check embedding_length field
-                if first_person.get("embeddings") and len(first_person["embeddings"]) > 0:
-                    return first_person["embeddings"][0].get("embedding_length", 512)
-        except Exception as e:
-            self.logger.warning(f"Could not determine embedding dimension from data: {e}")
-        
-        # Fallback to model-based dimension
-        return self._get_embedding_dimension_from_model()
+    # File paths for worker script
+    WorkerFilePaths = @{
+        PythonScript = "patterns\algorithm\entry_multi-USED-Magick.py"
+    }
     
-    def _get_embedding_dimension_from_model(self) -> int:
-        """Determine embedding dimension based on model (fallback)"""
-        model_dimensions = {
-            'Facenet': 128,      # Based on your data, Facenet uses 128
-            'VGGFace': 4096,     # VGGFace uses 4096
-            'OpenFace': 128,     # OpenFace uses 128
-            'Facenet512': 512,   # Facenet512 uses 512
-            'DeepFace': 4096,    # DeepFace default (VGGFace)
-            'ArcFace':512,
-        }
-        model = self.config.get('embedding_model', 'ArcFace')
-        dimension = model_dimensions.get(model, 512)  # Default based on your data
-        self.logger.info(f"Using model-based dimension {dimension} for {model}")
-        return dimension
+    # Common file paths
+    CommonFilePaths = @{
+        PythonExe = ".venv\Scripts\python.exe"
+        CommunicationDirName = "communication"
+        WorkerPIDFileName = "worker_pid.txt"
+        WorkerStatusFileName = "worker_status.json"
+    }
+}
 
-
-    def _initialize_voyager_index(self, dimension: int):
-        """Initialize Voyager index with specific dimension"""
-        self.logger.info(f"Initializing Voyager index with dimension {dimension}")
-        
-        try:
-            # Use cosine similarity as it matches your current approach
-            self.voyager_index = Index(Space.Cosine, num_dimensions=dimension)
-            self.logger.info("Voyager index initialized with auto-tuning")
-        except Exception as e:
-            self.logger.error(f"Failed to initialize Voyager index: {e}")
-            self.voyager_index = None
-            
-    def _get_voyager_item_count(self) -> int:
-        """Safely get the number of items in Voyager index"""
-        if self.voyager_index is None:
-            return 0
-        
-        # Try different possible attribute names for item count
-        try:
-            if hasattr(self.voyager_index, 'get_n_items'):
-                return self.voyager_index.get_n_items()
-            elif hasattr(self.voyager_index, 'num_items'):
-                return self.voyager_index.num_items
-            elif hasattr(self.voyager_index, 'n_items'):
-                return self.voyager_index.n_items
-            else:
-                # If we can't determine, return the count from our mapping
-                return len(self.voyager_id_to_identity)
-        except Exception as e:
-            self.logger.warning(f"Could not get Voyager item count: {e}")
-            return len(self.voyager_id_to_identity)
+# ====================================================================
+# NEW: Centralised Application Configuration
+# ====================================================================
+$Script:ApplicationConfig = @{
+    # ---------------------- Monitor Settings ----------------------
+    EveryStartTime       = "10:57"
+    EveryEndTime         = "13:11"
+    MonitorProcessCheckInterval = 5
+    MonitorMaxPIDFileAgeMinutes = 120
+    MonitorPIDTrackingFile = "pid_tracking.json"
+    MonitorLogPattern      = "monitor_Magick_{0}.log"
     
-    def _validate_embedding(self, embedding: np.ndarray) -> bool:
-        """Validate embedding shape and values"""
-        if embedding is None or embedding.size == 0:
-            return False
-        
-        # Check for NaN or Inf values
-        if np.any(np.isnan(embedding)) or np.any(np.isinf(embedding)):
-            self.logger.warning("Embedding contains NaN or Inf values")
-            return False
-        
-        # Check expected dimension (based on model)
-        expected_dim = self._get_embedding_dimension_from_model()
-        if embedding.shape[-1] != expected_dim:
-            self.logger.warning(
-                f"Embedding dimension mismatch: expected {expected_dim}, "
-                f"got {embedding.shape[-1]}"
-            )
-            # Try to reshape if possible
-            if embedding.size == expected_dim:
-                embedding = embedding.reshape(-1)
-            else:
-                return False
-        
-        return True
+    # ---------------------- Worker Settings ----------------------
+    WorkerRunFolderPrefix  = "Magick_Process_MaskDetect_"
+    WorkerLogSubfolder     = "logs"
+    WorkerOutputSubfolder  = "script_output"
+    WorkerMetadataFile     = "metadata.json"
+    WorkerPythonOutputPrefix = "python_output_"
+    WorkerCompletionSummary = "completion_summary.txt"
+    WorkerPythonArgument   = "--multi-source"
+    
+    # ---------------------- Email Sender Settings ----------------
+    EmailCredentialPath    = "$env:USERPROFILE\.face-recog\email-credential.xml"
+    EmailRunFolderFilter   = "Magick_Process_MaskDetect_*"
+    EmailCompletionSummaryFile = "completion_summary.txt"
+    EmailMetadataFile      = "metadata.json"
+    EmailLogsFolder        = "logs"
+    EmailLogFileFilter     = "*.txt"
+    EmailCommonPathsScript = "1_common-paths.ps1"
+    EmailMaxRunsToCollect  = 10
+    EmailDefaultHoursBack  = 24
+    EmailMaxAttachmentSizeMB = 3
+    EmailSmtpServer        = "smtp.gmail.com"
+    EmailSmtpPort          = 587
+    EmailUseSsl            = $true
+    EmailSubjectPrefix     = "[FaceRecog]"
+    EmailSenderScript      = "1_email-sender-stable.ps1"
+    
+    # ---------------------- Capture Script Settings --------------
+    # CaptureStartTime       = "10:00"
+    # CaptureEndTime         = "11:04"
+    CaptureRunsDirectory   = "runs"
+    CaptureLogsDirectory   = "logs"
+    CaptureOutputFolderPattern = "Magick_Process_MaskDetect_*"
+    CaptureLogFilePattern  = "capture_collected_runs_{0}.log"
+    CaptureDateFormat      = "yyyy-MM-dd"
+    CaptureDateTimeFormat  = "yyyy-MM-dd HH:mm"
+    CaptureFileTimestampFormat = "yyyyMMdd_HHmmss"
+    
+    # ---------------------- Shared Validation Settings -----------
+    ExpectedSubfolders     = @("logs", "script_output")
+    ExpectedFiles          = @("metadata.json")
+    MaxValidationRetries   = 5
+    RetryDelaySeconds      = 10
+}
 
-    def recognize_face(self, embedding: np.ndarray) -> Tuple[Optional[str], float]:
-        """Enhanced recognition with robust error recovery"""
-        start_time = time.time()
-        
-        # Validate input embedding
-        if not self._validate_embedding(embedding):
-            self.logger.warning(f"Invalid embedding provided: shape={embedding.shape}")
-            return None, 0.0
-        
-        try:
-            # Try Voyager first
-            if (self.voyager_index is not None and 
-                self._get_voyager_item_count() > 0 and
-                self.config.get('use_voyager', True)):
-                
-                # Periodic index validation
-                current_time = time.time()
-                if current_time - self.last_validation_time > self.max_validation_interval:
-                    if not self._validate_index_consistency():
-                        self.logger.warning("Index validation failed, using fallback")
-                        result = self._recognize_face_gpu_optimized(embedding, start_time)
-                        self.voyager_performance_monitor.record_voyager_performance(
-                            start_time, success=False, used_fallback=True
-                        )
-                        return result
-                    self.last_validation_time = current_time
-                
-                result = self._recognize_with_voyager(embedding, start_time)
-                if result[0] is not None:
-                    return result
-            
-            # Fallback
-            result = self._recognize_face_gpu_optimized(embedding, start_time)
-            self.voyager_performance_monitor.record_voyager_performance(
-                start_time, success=False, used_fallback=True
-            )
-            return result
-            
-        except Exception as e:
-            self.logger.error(f"Recognition failed: {e}")
-            # Return safe default
-            return None, 0.0
-        
-    def _recognize_with_voyager(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
-        """Recognition using Voyager index"""
-        try:
-            # Ensure embedding is the right shape and type
-            embedding = embedding.flatten().astype(np.float32)
-            
-            # Query Voyager for nearest neighbors - use adaptive k based on index size
-            item_count = self._get_voyager_item_count()
-            k = min(5, item_count)
-            
-            neighbors, distances = self.voyager_index.query(embedding, k=k)
-            
-            if len(neighbors) == 0 or len(distances) == 0:
-                return None, 0.0
-            
-            # Convert Voyager distance to similarity score 
-            # Voyager Cosine space: distance = 1 - cosine_similarity
-            best_similarity = 1.0 - distances[0]
-            best_voyager_id = neighbors[0]
-            
-            threshold = self.config['recognition_threshold']
-            
-            if best_similarity >= threshold:
-                identity = self.voyager_id_to_identity.get(best_voyager_id)
-                
-                # Record successful Voyager query
-                self.voyager_performance_monitor.record_voyager_performance(
-                    start_time, success=True, used_fallback=False
-                )
-                
-                if self.config.get('verbose_voyager', False):
-                    self.logger.debug(f"Voyager matched: {identity} (similarity: {best_similarity:.3f})")
-                
-                return identity, best_similarity
-            
-            # No match above threshold
-            self.voyager_performance_monitor.record_voyager_performance(
-                start_time, success=False, used_fallback=False
-            )
-            return None, best_similarity
-            
-        except Exception as e:
-            self.logger.error(f"Voyager recognition error: {e}")
-            self.voyager_performance_monitor.record_voyager_performance(
-                start_time, success=False, used_fallback=True
-            )
-            return None, 0.0
-        
-    def _recognize_face_original(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
-        """Original recognition method kept for compatibility - now uses GPU optimization"""
-        return self._recognize_face_gpu_optimized(embedding, start_time)
+function Get-ApplicationConfig {
+    return $Script:ApplicationConfig
+}
 
-    def add_identity_to_voyager(self, identity: str, embedding: np.ndarray):
-        """Add new identity to Voyager index with GPU optimization"""
-        if self.voyager_index is None:
-            # Initialize with the dimension of the new embedding
-            dimension = len(embedding.flatten())
-            self._initialize_voyager_index(dimension)
-        
-        # Check if identity already exists
-        if identity in self.identity_to_voyager_id:
-            voyager_id = self.identity_to_voyager_id[identity]
-            self.logger.info(f"Updating existing identity '{identity}' in Voyager index")
-            
-            # Update GPU tensor
-            if self.identity_centroids_tensor is not None:
-                index = self.identity_names_list.index(identity)
-                new_centroid_tensor = torch.from_numpy(embedding).to(self.device).float()
-                self.identity_centroids_tensor[index] = new_centroid_tensor
-        else:
-            voyager_id = self.next_voyager_id
-            self.next_voyager_id += 1
-            
-            # Add to GPU tensor
-            new_centroid_tensor = torch.from_numpy(embedding).to(self.device).float()
-            if self.identity_centroids_tensor is None:
-                self.identity_centroids_tensor = new_centroid_tensor.unsqueeze(0)
-                self.identity_names_list = [identity]
-            else:
-                self.identity_centroids_tensor = torch.cat([
-                    self.identity_centroids_tensor, 
-                    new_centroid_tensor.unsqueeze(0)
-                ])
-                self.identity_names_list.append(identity)
-        
-        # Update mappings
-        self.voyager_id_to_identity[voyager_id] = identity
-        self.identity_to_voyager_id[identity] = voyager_id
-        self.identity_centroids[identity] = embedding  # Maintain compatibility
-        
-        # Add to Voyager index
-        embedding_flat = embedding.flatten().astype(np.float32)
-        self.voyager_index.add_items(np.array([embedding_flat]), [voyager_id])
-        
-        item_count = self._get_voyager_item_count()
-        self.logger.info(f"Added/updated identity '{identity}' in Voyager index (ID: {voyager_id})")
-        self.logger.info(f"Voyager index now contains {item_count} items")
-        self.logger.info(f"GPU tensor now contains {len(self.identity_names_list)} centroids")
-        
-    def get_voyager_stats(self) -> Dict:
-        """Get Voyager performance statistics"""
-        stats = self.voyager_performance_monitor.get_voyager_stats()
-        item_count = self._get_voyager_item_count()
-        
-        # Add GPU memory info if available
-        gpu_info = {}
-        if torch.cuda.is_available():
-            gpu_info = {
-                'gpu_memory_allocated': torch.cuda.memory_allocated() / 1024**2,  # MB
-                'gpu_memory_cached': torch.cuda.memory_cached() / 1024**2,  # MB
-                'gpu_centroids_loaded': len(self.identity_names_list) if self.identity_names_list else 0
+# ====================================================================
+# Initialize Project Paths
+# ====================================================================
+function Initialize-ProjectPortablePaths {
+    [CmdletBinding()]
+    param(
+        [switch]$IsMonitor,
+        [switch]$IsWorker,
+        [switch]$Silent = $false
+    )
+    
+    if (-not $Silent) {
+        Write-Host "Initializing portable paths for $($Script:CommonConfig.ProjectName) project..." -ForegroundColor Cyan
+    }
+    
+    # Find the project root
+    $projectRoot = Find-ProjectRoot -Silent:$Silent
+    if (-not $projectRoot) {
+        throw "Project root directory '$($Script:CommonConfig.ProjectName)' not found"
+    }
+    
+    # Build paths relative to project root
+    $paths = Build-ProjectPaths -ProjectRoot $projectRoot
+    
+    # Create date-based folder structure
+    $dateBasedPath = Initialize-DateBasedStructure -Paths $paths
+    
+    # Add script-specific paths
+    $paths = Add-ScriptSpecificPaths -Paths $paths -DateBasedPath $dateBasedPath -IsMonitor:$IsMonitor -IsWorker:$IsWorker
+    
+    return $paths
+}
+
+# ====================================================================
+# Helper Functions
+# ====================================================================
+
+function Find-ProjectRoot {
+    [CmdletBinding()]
+    param([switch]$Silent)
+    
+    $scriptPath = $PSScriptRoot
+    $currentPath = $scriptPath
+    
+    # Look for maskRecog directory by going up
+    while ($currentPath -and (Split-Path $currentPath -Parent)) {
+        $currentDirName = Split-Path $currentPath -Leaf
+        if ($currentDirName -eq $Script:CommonConfig.ProjectName) {
+            if (-not $Silent) {
+                Write-Host "Found project root: $currentPath" -ForegroundColor Green
             }
-        
-        stats.update({
-            'voyager_index_size': item_count,
-            'total_identities': len(self.voyager_id_to_identity),
-            'index_initialized': self.voyager_index is not None,
-            **gpu_info
-        })
-        return stats
-
-    def print_voyager_status(self):
-        """Print Voyager system status with GPU info"""
-        stats = self.get_voyager_stats()
-        self.logger.info("\n" + "="*50)
-        self.logger.info("VOYAGER VECTOR SEARCH STATUS")
-        self.logger.info("="*50)
-        self.logger.info(f"Index Initialized: {stats['index_initialized']}")
-        self.logger.info(f"Index Size: {stats['voyager_index_size']} items")
-        self.logger.info(f"Total Identities: {stats['total_identities']}")
-        self.logger.info(f"GPU Centroids Loaded: {stats.get('gpu_centroids_loaded', 0)}")
-        
-        if torch.cuda.is_available():
-            self.logger.info(f"GPU Memory Used: {stats.get('gpu_memory_allocated', 0):.1f} MB")
-            self.logger.info(f"GPU Memory Cached: {stats.get('gpu_memory_cached', 0):.1f} MB")
-        
-        self.logger.info(f"Total Queries: {stats['total_queries']}")
-        if stats['total_queries'] > 0:
-            self.logger.info(f"Average Query Time: {stats['avg_query_time']:.2f}ms")
-            self.logger.info(f"Fallback Rate: {(stats['fallback_count']/stats['total_queries'])*100:.1f}%")
-            self.logger.info(f"Success Rate: {stats['recall_rate']*100:.1f}%")
-        else:
-            self.logger.info("Average Query Time: N/A")
-            self.logger.info("Fallback Rate: N/A")
-            self.logger.info("Success Rate: N/A")
-        self.logger.info("="*50)
-                               
-class VoyagerPerformanceMonitor:
-    def __init__(self):
-        self.recognition_times = deque(maxlen=100)
-        self.voyager_stats = {
-            'total_queries': 0,
-            'successful_queries': 0,
-            'avg_query_time': 0.0,
-            'recall_rate': 0.0,
-            'fallback_count': 0
+            return $currentPath
         }
-        self.logger = logging.getLogger(__name__)
-        
+        $currentPath = Split-Path $currentPath -Parent
+    }
     
-    def record_voyager_performance(self, start_time: float, success: bool, used_fallback: bool = False):
-        query_time = (time.time() - start_time) * 1000
-        self.recognition_times.append(query_time)
-        
-        self.voyager_stats['total_queries'] += 1
-        
-        if success:
-            self.voyager_stats['successful_queries'] += 1
-        
-        if used_fallback:
-            self.voyager_stats['fallback_count'] += 1
-        
-        # Update averages
-        if self.recognition_times:
-            self.voyager_stats['avg_query_time'] = np.mean(self.recognition_times)
-        
-        # Update recall rate
-        if self.voyager_stats['total_queries'] > 0:
-            self.voyager_stats['recall_rate'] = (
-                self.voyager_stats['successful_queries'] / 
-                self.voyager_stats['total_queries']
-            )            
-    def get_voyager_stats(self) -> Dict:
-        return self.voyager_stats.copy()
-
-
-# recognition/robust_system.py
-import numpy as np
-from collections import deque
-from typing import Dict, List
-import time
-from ..processing.temporal_processing import MultiScaleFaceProcessor, TemporalFusion
-from ..processing.quality_assessment import FaceQualityAssessor, AdaptiveThresholdManager
-from ..recognition.voyager_system import VoyagerFaceRecognitionSystem
-import logging
-
-class RobustFaceRecognitionSystem(VoyagerFaceRecognitionSystem):
-    def __init__(self, config: Dict):
-        super().__init__(config)
-        
-        # Enhanced components
-        self.multi_scale_processor = MultiScaleFaceProcessor(config)
-        self.temporal_fusion = TemporalFusion(config)
-        self.quality_assessor = FaceQualityAssessor(config)
-        self.threshold_manager = AdaptiveThresholdManager(config)
-        
-        # Enhanced configuration with optimization parameters
-        self.robust_config = {
-            'enable_multi_scale': config.get('enable_multi_scale', True),
-            'enable_temporal_fusion': config.get('enable_temporal_fusion', True),
-            'enable_quality_aware': config.get('enable_quality_aware', True),
-            'min_face_quality': config.get('min_face_quality', 0.3),
-            'temporal_buffer_size': config.get('temporal_buffer_size', 10),
-            # Optimization thresholds
-            'quality_marginal_lower': config.get('quality_marginal_lower', 0.3),
-            'quality_marginal_upper': config.get('quality_marginal_upper', 0.6),
-            'quality_high_threshold': config.get('quality_high_threshold', 0.7),
-            'min_face_size': config.get('min_face_size', 20),
-            'near_min_size_multiplier': config.get('near_min_size_multiplier', 1.5),
-        }
-        
-        # Initialize for statistics
-        self.last_results = []
-        self.multi_scale_usage_stats = {'enabled': 0, 'disabled': 0, 'skipped_low': 0, 'skipped_high': 0}
-        
-        self.logger.info("Robust Face Recognition with VOYAGER similarity engine")
-                    
-    def process_frame_robust(self, frame: np.ndarray) -> List[Dict]:
-        """Enhanced robust processing with quality-adaptive similarity and optimized multi-scale usage"""
-        start_time = time.time()
-        results = []
-        
-        # Detect faces
-        detections = self.detect_faces(frame)
-        
-        for detection in detections:
-            x1, y1, x2, y2 = detection['bbox']
-            
-            # Extract face ROI with padding
-            padding = self.config.get('roi_padding', 15)
-            h, w = frame.shape[:2]
-            x1_pad = max(0, x1 - padding)
-            y1_pad = max(0, y1 - padding)
-            x2_pad = min(w, x2 + padding)
-            y2_pad = min(h, y2 + padding)
-            
-            face_roi = frame[y1_pad:y2_pad, x1_pad:x2_pad]
-            
-            # Skip if ROI is invalid
-            if face_roi.size == 0:
-                continue
-                
-            # Calculate face size for optimization
-            face_height = y2 - y1
-            face_width = x2 - x1
-            min_face_side = min(face_height, face_width)
-            
-            # Quality assessment
-            quality_scores = self.quality_assessor.assess_face_quality(face_roi, detection['bbox'])
-            overall_quality = quality_scores.get('overall', 0)
-            
-            # Skip very low quality faces entirely
-            if not self.threshold_manager.should_process_face(quality_scores):
-                self.multi_scale_usage_stats['skipped_low'] += 1
-                if self.config.get('verbose', False):
-                    self.logger.debug(f"Skipping low quality face (score: {overall_quality:.2f})")
-                continue
-                
-            # Mask detection
-            mask_status, mask_confidence = self.detect_mask(face_roi)
-            
-            # OPTIMIZED MULTI-SCALE DECISION LOGIC
-            use_multi_scale = False
-            multi_scale_reason = "standard"
-            
-            if self.robust_config['enable_multi_scale']:
-                # Condition 1: Face quality is marginal (0.3 < quality < 0.6)
-                condition_marginal_quality = (
-                    overall_quality > self.robust_config['quality_marginal_lower'] and
-                    overall_quality < self.robust_config['quality_marginal_upper']
-                )
-                
-                # Condition 2: Face size is near the minimum threshold
-                min_face_size = self.robust_config['min_face_size']
-                near_min_threshold = min_face_size * self.robust_config['near_min_size_multiplier']
-                condition_near_min_size = min_face_side < near_min_threshold
-                
-                # Decision logic based on optimization strategy
-                if condition_marginal_quality:
-                    # Quality is marginal - use multi-scale for boost
-                    use_multi_scale = True
-                    multi_scale_reason = "marginal_quality"
-                elif condition_near_min_size and overall_quality > 0.3:
-                    # Face is small and not extremely low quality - use multi-scale
-                    use_multi_scale = True
-                    multi_scale_reason = "near_min_size"
-                elif overall_quality >= self.robust_config['quality_high_threshold']:
-                    # High quality - skip multi-scale (fast path)
-                    use_multi_scale = False
-                    multi_scale_reason = "high_quality"
-                    self.multi_scale_usage_stats['skipped_high'] += 1
-                elif overall_quality <= self.robust_config['quality_marginal_lower']:
-                    # Very low quality - skip multi-scale
-                    use_multi_scale = False
-                    multi_scale_reason = "low_quality"
-                else:
-                    # Default: use standard embedding
-                    use_multi_scale = False
-                    multi_scale_reason = "default"
-                
-                # Update statistics
-                if use_multi_scale:
-                    self.multi_scale_usage_stats['enabled'] += 1
-                    if self.config.get('verbose', False):
-                        self.logger.debug(f"Multi-scale enabled ({multi_scale_reason}): Q={overall_quality:.2f}, Size={min_face_side}")
-                else:
-                    self.multi_scale_usage_stats['disabled'] += 1
-
-            
-            # Enhanced embedding extraction with optimized multi-scale usage
-            if use_multi_scale:
-                embeddings = self.multi_scale_processor.extract_multi_scale_embeddings(face_roi)
-                if embeddings:
-                    embedding = self.multi_scale_processor.fuse_embeddings(embeddings)
-                else:
-                    embedding = self.extract_embedding(face_roi)
-            else:
-                # Fast path: single embedding extraction
-                embedding = self.extract_embedding(face_roi)
-            
-            if embedding is None:
-                continue
-            
-            # VOYAGER-BASED RECOGNITION
-            identity, recognition_confidence = self.recognize_face(embedding)
-            
-            # Adaptive threshold for display
-            adaptive_threshold = self.threshold_manager.compute_adaptive_threshold(quality_scores)            
-            
-            results.append({
-                'bbox': detection['bbox'],
-                'detection_confidence': detection['confidence'],
-                'mask_status': mask_status,
-                'mask_confidence': mask_confidence,
-                'identity': identity,
-                'recognition_confidence': recognition_confidence,
-                'embedding': embedding.tolist(),
-                'quality_scores': quality_scores,
-                'adaptive_threshold': adaptive_threshold,
-                'similarity_engine': 'voyager',
-                'quality_adaptive': True,
-                'multi_scale_used': use_multi_scale,
-                'multi_scale_reason': multi_scale_reason,
-                'face_size': min_face_side
-            })
-        
-        # Update stats and store last results
-        self._update_robust_stats(results, start_time)
-        self.last_results = results
-        return results
-                  
-    def _update_robust_stats(self, results: List[Dict], start_time: float):
-        """Update enhanced statistics"""
-        self.debug_stats['total_frames_processed'] += 1
-        self.debug_stats['total_faces_detected'] += len(results)
-        self.debug_stats['total_faces_recognized'] += len([r for r in results if r['identity']])
-        self.debug_stats['last_processing_time'] = (time.time() - start_time) * 1000
-        
-        # Quality statistics
-        if results:
-            avg_quality = np.mean([r.get('quality_scores', {}).get('overall', 0) for r in results])
-            self.debug_stats.setdefault('avg_face_quality', deque(maxlen=50)).append(avg_quality)
-
-         
-    def get_robust_stats(self) -> Dict:
-        """Get robust engine statistics"""
-        stats = self.get_voyager_stats()
-        
-        # Add recognition statistics
-        if hasattr(self, 'last_results'):
-            total_faces = len(self.last_results)
-            recognized_faces = len([r for r in self.last_results if r['identity']])
-            stats['recognition_rate'] = recognized_faces / total_faces if total_faces > 0 else 0
-        
-        # Add multi-scale optimization statistics
-        total_multi_scale_decisions = (self.multi_scale_usage_stats['enabled'] + 
-                                      self.multi_scale_usage_stats['disabled'])
-        if total_multi_scale_decisions > 0:
-            stats['multi_scale_usage'] = {
-                'enabled_percentage': (self.multi_scale_usage_stats['enabled'] / 
-                                      total_multi_scale_decisions * 100),
-                'disabled_percentage': (self.multi_scale_usage_stats['disabled'] / 
-                                       total_multi_scale_decisions * 100),
-                'skipped_low_quality': self.multi_scale_usage_stats['skipped_low'],
-                'skipped_high_quality': self.multi_scale_usage_stats['skipped_high'],
-                'total_decisions': total_multi_scale_decisions
-            }
-        
-        return stats
-    # recognition/robust_system.py
-import numpy as np
-from collections import deque
-from typing import Dict, List
-import time
-from ..processing.temporal_processing import MultiScaleFaceProcessor, TemporalFusion
-from ..processing.quality_assessment import FaceQualityAssessor, AdaptiveThresholdManager
-from ..recognition.voyager_system import VoyagerFaceRecognitionSystem
-import logging
-
-class RobustFaceRecognitionSystem(VoyagerFaceRecognitionSystem):
-    def __init__(self, config: Dict):
-        super().__init__(config)
-        
-        # Enhanced components
-        self.multi_scale_processor = MultiScaleFaceProcessor(config)
-        self.temporal_fusion = TemporalFusion(config)
-        self.quality_assessor = FaceQualityAssessor(config)
-        self.threshold_manager = AdaptiveThresholdManager(config)
-        
-        # Enhanced configuration with optimization parameters
-        self.robust_config = {
-            'enable_multi_scale': config.get('enable_multi_scale', True),
-            'enable_temporal_fusion': config.get('enable_temporal_fusion', True),
-            'enable_quality_aware': config.get('enable_quality_aware', True),
-            'min_face_quality': config.get('min_face_quality', 0.3),
-            'temporal_buffer_size': config.get('temporal_buffer_size', 10),
-            # Optimization thresholds
-            'quality_marginal_lower': config.get('quality_marginal_lower', 0.3),
-            'quality_marginal_upper': config.get('quality_marginal_upper', 0.6),
-            'quality_high_threshold': config.get('quality_high_threshold', 0.7),
-            'min_face_size': config.get('min_face_size', 20),
-            'near_min_size_multiplier': config.get('near_min_size_multiplier', 1.5),
-        }
-        
-        # Initialize for statistics
-        self.last_results = []
-        self.multi_scale_usage_stats = {'enabled': 0, 'disabled': 0, 'skipped_low': 0, 'skipped_high': 0}
-        
-        self.logger.info("Robust Face Recognition with VOYAGER similarity engine")
-                    
-    def process_frame_robust(self, frame: np.ndarray) -> List[Dict]:
-        """Enhanced robust processing with quality-adaptive similarity and optimized multi-scale usage"""
-        start_time = time.time()
-        results = []
-        
-        # Detect faces
-        detections = self.detect_faces(frame)
-        
-        for detection in detections:
-            x1, y1, x2, y2 = detection['bbox']
-            
-            # Extract face ROI with padding
-            padding = self.config.get('roi_padding', 15)
-            h, w = frame.shape[:2]
-            x1_pad = max(0, x1 - padding)
-            y1_pad = max(0, y1 - padding)
-            x2_pad = min(w, x2 + padding)
-            y2_pad = min(h, y2 + padding)
-            
-            face_roi = frame[y1_pad:y2_pad, x1_pad:x2_pad]
-            
-            # Skip if ROI is invalid
-            if face_roi.size == 0:
-                continue
-                
-            # Calculate face size for optimization
-            face_height = y2 - y1
-            face_width = x2 - x1
-            min_face_side = min(face_height, face_width)
-            
-            # Quality assessment
-            quality_scores = self.quality_assessor.assess_face_quality(face_roi, detection['bbox'])
-            overall_quality = quality_scores.get('overall', 0)
-            
-            # Skip very low quality faces entirely
-            if not self.threshold_manager.should_process_face(quality_scores):
-                self.multi_scale_usage_stats['skipped_low'] += 1
-                if self.config.get('verbose', False):
-                    self.logger.debug(f"Skipping low quality face (score: {overall_quality:.2f})")
-                continue
-                
-            # Mask detection
-            mask_status, mask_confidence = self.detect_mask(face_roi)
-            
-            # OPTIMIZED MULTI-SCALE DECISION LOGIC
-            use_multi_scale = False
-            multi_scale_reason = "standard"
-            
-            if self.robust_config['enable_multi_scale']:
-                # Condition 1: Face quality is marginal (0.3 < quality < 0.6)
-                condition_marginal_quality = (
-                    overall_quality > self.robust_config['quality_marginal_lower'] and
-                    overall_quality < self.robust_config['quality_marginal_upper']
-                )
-                
-                # Condition 2: Face size is near the minimum threshold
-                min_face_size = self.robust_config['min_face_size']
-                near_min_threshold = min_face_size * self.robust_config['near_min_size_multiplier']
-                condition_near_min_size = min_face_side < near_min_threshold
-                
-                # Decision logic based on optimization strategy
-                if condition_marginal_quality:
-                    # Quality is marginal - use multi-scale for boost
-                    use_multi_scale = True
-                    multi_scale_reason = "marginal_quality"
-                elif condition_near_min_size and overall_quality > 0.3:
-                    # Face is small and not extremely low quality - use multi-scale
-                    use_multi_scale = True
-                    multi_scale_reason = "near_min_size"
-                elif overall_quality >= self.robust_config['quality_high_threshold']:
-                    # High quality - skip multi-scale (fast path)
-                    use_multi_scale = False
-                    multi_scale_reason = "high_quality"
-                    self.multi_scale_usage_stats['skipped_high'] += 1
-                elif overall_quality <= self.robust_config['quality_marginal_lower']:
-                    # Very low quality - skip multi-scale
-                    use_multi_scale = False
-                    multi_scale_reason = "low_quality"
-                else:
-                    # Default: use standard embedding
-                    use_multi_scale = False
-                    multi_scale_reason = "default"
-                
-                # Update statistics
-                if use_multi_scale:
-                    self.multi_scale_usage_stats['enabled'] += 1
-                    if self.config.get('verbose', False):
-                        self.logger.debug(f"Multi-scale enabled ({multi_scale_reason}): Q={overall_quality:.2f}, Size={min_face_side}")
-                else:
-                    self.multi_scale_usage_stats['disabled'] += 1
-
-            
-            # Enhanced embedding extraction with optimized multi-scale usage
-            if use_multi_scale:
-                embeddings = self.multi_scale_processor.extract_multi_scale_embeddings(face_roi)
-                if embeddings:
-                    embedding = self.multi_scale_processor.fuse_embeddings(embeddings)
-                else:
-                    embedding = self.extract_embedding(face_roi)
-            else:
-                # Fast path: single embedding extraction
-                embedding = self.extract_embedding(face_roi)
-            
-            if embedding is None:
-                continue
-            
-            # VOYAGER-BASED RECOGNITION
-            identity, recognition_confidence = self.recognize_face(embedding)
-            
-            # Adaptive threshold for display
-            adaptive_threshold = self.threshold_manager.compute_adaptive_threshold(quality_scores)            
-            
-            results.append({
-                'bbox': detection['bbox'],
-                'detection_confidence': detection['confidence'],
-                'mask_status': mask_status,
-                'mask_confidence': mask_confidence,
-                'identity': identity,
-                'recognition_confidence': recognition_confidence,
-                'embedding': embedding.tolist(),
-                'quality_scores': quality_scores,
-                'adaptive_threshold': adaptive_threshold,
-                'similarity_engine': 'voyager',
-                'quality_adaptive': True,
-                'multi_scale_used': use_multi_scale,
-                'multi_scale_reason': multi_scale_reason,
-                'face_size': min_face_side
-            })
-        
-        # Update stats and store last results
-        self._update_robust_stats(results, start_time)
-        self.last_results = results
-        return results
-                  
-    def _update_robust_stats(self, results: List[Dict], start_time: float):
-        """Update enhanced statistics"""
-        self.debug_stats['total_frames_processed'] += 1
-        self.debug_stats['total_faces_detected'] += len(results)
-        self.debug_stats['total_faces_recognized'] += len([r for r in results if r['identity']])
-        self.debug_stats['last_processing_time'] = (time.time() - start_time) * 1000
-        
-        # Quality statistics
-        if results:
-            avg_quality = np.mean([r.get('quality_scores', {}).get('overall', 0) for r in results])
-            self.debug_stats.setdefault('avg_face_quality', deque(maxlen=50)).append(avg_quality)
-
-         
-    def get_robust_stats(self) -> Dict:
-        """Get robust engine statistics"""
-        stats = self.get_voyager_stats()
-        
-        # Add recognition statistics
-        if hasattr(self, 'last_results'):
-            total_faces = len(self.last_results)
-            recognized_faces = len([r for r in self.last_results if r['identity']])
-            stats['recognition_rate'] = recognized_faces / total_faces if total_faces > 0 else 0
-        
-        # Add multi-scale optimization statistics
-        total_multi_scale_decisions = (self.multi_scale_usage_stats['enabled'] + 
-                                      self.multi_scale_usage_stats['disabled'])
-        if total_multi_scale_decisions > 0:
-            stats['multi_scale_usage'] = {
-                'enabled_percentage': (self.multi_scale_usage_stats['enabled'] / 
-                                      total_multi_scale_decisions * 100),
-                'disabled_percentage': (self.multi_scale_usage_stats['disabled'] / 
-                                       total_multi_scale_decisions * 100),
-                'skipped_low_quality': self.multi_scale_usage_stats['skipped_low'],
-                'skipped_high_quality': self.multi_scale_usage_stats['skipped_high'],
-                'total_decisions': total_multi_scale_decisions
-            }
-        
-        return stats
-
-# recognition/base_system.py
-import cv2
-import json
-from pathlib import Path
-from ultralytics import YOLO
-from deepface import DeepFace
-from sklearn.metrics.pairwise import cosine_similarity
-import onnxruntime as ort
-import numpy as np
-from collections import deque
-from typing import Dict, List, Tuple, Optional
-import time
-import torch
-import logging
-
-class FaceRecognitionSystem:
-    def __init__(self, config: Dict):
-        # Initialize logger
-        self.logger = logging.getLogger(__name__)
-        
-        self.config = config
-        self.detection_model = None
-        self.mask_detector = None
-        self.mask_input_size = None  # Will be dynamically set from model
-        self.embeddings_db = {}
-        self.identity_centroids = {}
-        
-        # ENHANCED: Use circular buffers to prevent memory leaks
-        self.debug_stats = {
-            'total_frames_processed': 0,
-            'total_faces_detected': 0,
-            'total_faces_recognized': 0,
-            'total_masks_detected': 0,
-            'detection_times': deque(maxlen=50),
-            'mask_detection_times': deque(maxlen=50),
-            'embedding_times': deque(maxlen=50),
-            'recognition_times': deque(maxlen=50),
-            'last_processing_time': 0
-        }
-        
-        # Check GPU availability and update config
-        self._verify_gpu_config()
-        
-        self._load_models()
-        self._load_mask_detector()  
-        self._load_embeddings_database()
-
-    def _verify_gpu_config(self):
-        """Verify and update GPU configuration based on actual availability"""
-        if self.config.get('use_gpu', False):
-            try:
-                if torch.cuda.is_available():
-                    device_count = torch.cuda.device_count()
-                    current_device = self.config.get('gpu_device', 0)
-                    
-                    if current_device < device_count:
-                        gpu_name = torch.cuda.get_device_name(current_device)
-                        self.logger.info(f"GPU {current_device}: {gpu_name} confirmed available")
-                        self.config['use_gpu'] = True
-                    else:
-                        self.logger.warning(f"GPU device {current_device} not available, falling back to CPU")
-                        self.config['use_gpu'] = False
-                else:
-                    self.logger.warning("CUDA not available, falling back to CPU")
-                    self.config['use_gpu'] = False
-            except Exception as e:
-                self.logger.warning(f"GPU verification failed: {e}, falling back to CPU")
-                self.config['use_gpu'] = False
-        
-    def _load_mask_detector(self):
-        """Load ONNX mask detection model with GPU support and dynamic input size detection"""
-        try:
-            mask_model_path = Path(self.config.get('mask_model_path', ''))
-            if not mask_model_path.exists():
-                self.logger.warning("Mask model not found, continuing without mask detection")
-                return
-                
-            # Set providers for GPU acceleration
-            providers = []
-            if self.config.get('use_gpu', False):
-                # Try CUDA first, then fall back to CPU
-                try:
-                    providers = [
-                        ('CUDAExecutionProvider', {
-                            'device_id': self.config.get('gpu_device', 0),
-                            'arena_extend_strategy': 'kNextPowerOfTwo',
-                            'gpu_mem_limit': 2 * 1024 * 1024 * 1024,  # 2GB limit
-                            'cudnn_conv_algo_search': 'EXHAUSTIVE',
-                            'do_copy_in_default_stream': True,
-                        }),
-                        'CPUExecutionProvider'
-                    ]
-                    self.logger.info("Using CUDA for mask detection")
-                except Exception as e:
-                    self.logger.warning(f"CUDA not available for mask detection: {e}")
-                    providers = ['CPUExecutionProvider']
-            else:
-                providers = ['CPUExecutionProvider']
-                
-            # Initialize ONNX Runtime session with providers
-            self.mask_detector = ort.InferenceSession(
-                str(mask_model_path), 
-                providers=providers
-            )
-            
-            # DYNAMIC INPUT SIZE DETECTION
-            # Get input shape from model
-            input_details = self.mask_detector.get_inputs()[0]
-            input_shape = input_details.shape
-            
-            # Determine input size based on shape format
-            # Common formats: (batch, channels, height, width) or (batch, height, width, channels)
-            if len(input_shape) == 4:
-                if input_shape[1] == 3:  # NCHW format (batch, channels, height, width)
-                    # Your model structure shows (None, 40, 50, 3) which is NHWC
-                    # But ONNX often uses NCHW, so we need to check
-                    height, width = input_shape[2], input_shape[3]
-                    self.channel_format = 'NCHW'
-                elif input_shape[3] == 3:  # NHWC format (batch, height, width, channels)
-                    height, width = input_shape[1], input_shape[2]
-                    self.channel_format = 'NHWC'
-                else:
-                    # Try to infer from the shape
-                    # Find dimensions that look like spatial dimensions (larger than 3)
-                    spatial_dims = [dim for dim in input_shape[1:] if dim > 3]
-                    if len(spatial_dims) >= 2:
-                        height, width = spatial_dims[0], spatial_dims[1]
-                        self.channel_format = 'UNKNOWN'
-                    else:
-                        # Default fallback
-                        height, width = 40, 50  # Based on your model structure
-                        self.channel_format = 'DEFAULT'
-                        self.logger.warning(f"Could not determine input shape, using default: {height}x{width}")
-            else:
-                # Unexpected shape format, use default from your model
-                height, width = 40, 50
-                self.channel_format = 'UNKNOWN'
-                self.logger.warning(f"Unexpected input shape {input_shape}, using default: {height}x{width}")
-            
-            # Store the dynamic input size
-            self.mask_input_size = (height, width)
-            
-            # Validate model input/output
-            input_name = input_details.name
-            output_name = self.mask_detector.get_outputs()[0].name
-            
-            self.logger.info(f"Mask detection model loaded with input size: {width}x{height}")
-            self.logger.info(f"Channel format: {self.channel_format}")
-            self.logger.info(f"Input: {input_name}, Output: {output_name}")
-            self.logger.info(f"Input shape: {input_shape}")
-            self.logger.info(f"Using providers: {[p if isinstance(p, str) else p[0] for p in providers]}")
-            
-        except Exception as e:
-            self.logger.error(f"Failed to load mask detection model: {e}")
-            # Don't raise exception, continue without mask detection
-                      
-    def detect_mask(self, face_roi: np.ndarray) -> Tuple[str, float]:
-        """Enhanced mask detection with dynamic input size and better ROI handling"""
-        if self.mask_detector is None or self.mask_input_size is None:
-            return "no_mask", 0.0
-            
-        start_time = time.time()
-        
-        try:
-            # More thorough ROI validation
-            if (face_roi.size == 0 or face_roi.shape[0] < 40 or face_roi.shape[1] < 40 or
-                np.std(face_roi) < 15):  # Check for low variance (blurry/featureless)
-                return "unknown", 0.0
-            
-            # Use dynamic input size from model
-            input_height, input_width = self.mask_input_size
-            
-            # DYNAMIC: Use the detected input size
-            input_size = (input_height, input_width)
-            h, w = face_roi.shape[:2]
-            
-            # Calculate scaling factor that preserves aspect ratio
-            scale = min(input_size[0] / h, input_size[1] / w)
-            new_h, new_w = int(h * scale), int(w * scale)
-            
-            # Resize with aspect ratio preservation
-            resized_face = cv2.resize(face_roi, (new_w, new_h), interpolation=cv2.INTER_AREA)
-            
-            # Create padded image
-            padded_face = np.zeros((input_size[0], input_size[1], 3), dtype=np.float32)
-            y_offset = (input_size[0] - new_h) // 2
-            x_offset = (input_size[1] - new_w) // 2
-            padded_face[y_offset:y_offset+new_h, x_offset:x_offset+new_w] = resized_face
-            
-            # Convert to RGB and normalize
-            rgb_face = cv2.cvtColor(padded_face.astype(np.uint8), cv2.COLOR_BGR2RGB)
-            normalized_face = rgb_face.astype(np.float32) / 255.0
-            
-            # Prepare input based on channel format
-            if self.channel_format == 'NCHW':
-                # Convert from NHWC to NCHW (batch, channels, height, width)
-                input_data = np.transpose(normalized_face, (2, 0, 1))  # HWC to CHW
-                input_data = np.expand_dims(input_data, axis=0)  # Add batch dimension
-            elif self.channel_format == 'NHWC':
-                # Keep as NHWC (batch, height, width, channels)
-                input_data = np.expand_dims(normalized_face, axis=0)
-            else:
-                # Try both formats
-                try:
-                    # First try NCHW
-                    input_data = np.transpose(normalized_face, (2, 0, 1))
-                    input_data = np.expand_dims(input_data, axis=0)
-                except:
-                    # Fall back to NHWC
-                    input_data = np.expand_dims(normalized_face, axis=0)
-            
-            # Run inference
-            input_name = self.mask_detector.get_inputs()[0].name
-            output_name = self.mask_detector.get_outputs()[0].name
-            
-            outputs = self.mask_detector.run([output_name], {input_name: input_data})
-            predictions = outputs[0][0]  # First batch, first prediction
-            
-            # 🎯 ENHANCED FRAMEWORK LOGIC WITH CONFIDENCE THRESHOLDING
-            mask_prob = float(predictions[0])
-            without_mask_prob = float(predictions[1])
-            
-            # Get the configuration threshold (default to 0.8 if not set)
-            mask_threshold = self.config.get('mask_detection_threshold', 0.8)
-            
-            # Use threshold to reduce false positives
-            if mask_prob > without_mask_prob and mask_prob >= mask_threshold:
-                mask_status = "mask"
-                confidence = mask_prob
-            else:
-                mask_status = "no_mask" 
-                confidence = without_mask_prob
-            
-            # Update stats
-            mask_time = (time.time() - start_time) * 1000
-            self.debug_stats['mask_detection_times'].append(mask_time)
-            
-            return mask_status, confidence
-            
-        except Exception as e:
-            self.logger.error(f"Mask detection error: {e}")
-            return "unknown", 0.0
-                
-    def _load_models(self):
-        """Load YOLO face detection model from local path with GPU support"""
-        try:
-            model_path = Path(self.config['detection_model_path'])
-            if not model_path.exists():
-                raise FileNotFoundError(f"YOLO model not found at {model_path}")
-                
-            # Load model with GPU support
-            self.detection_model = YOLO(str(model_path))
-            
-            # Move model to GPU if available
-            if self.config.get('use_gpu', False):
-                device = self.config.get('gpu_device', 0)  # Default to GPU 0
-                # Convert to torch device
-                torch_device = f'cuda:{device}'
-                self.detection_model.to(torch_device)
-                self.logger.info(f"YOLO model loaded on {torch_device}")
-                
-                # Verify the model is actually on GPU
-                model_device = next(self.detection_model.model.parameters()).device
-                self.logger.info(f"YOLO model verified on device: {model_device}")
-            else:
-                self.logger.info(f"YOLO model loaded on CPU")
-                
-        except Exception as e:
-            self.logger.error(f"Failed to load YOLO model: {e}")
-            raise
-               
-    def _load_embeddings_database(self):
-        """Load pre-computed face embeddings from JSON with your structure"""
-        try:
-            db_path = Path(self.config['embeddings_db_path'])
-            if not db_path.exists():
-                self.logger.warning("Embeddings database not found, starting fresh")
-                self.embeddings_db = {"persons": {}, "metadata": {}}
-                return
-                
-            with open(db_path, 'r') as f:
-                self.embeddings_db = json.load(f)
-                
-            if "persons" in self.embeddings_db:
-                for person_id, person_data in self.embeddings_db["persons"].items():
-                    display_name = person_data["display_name"]
-                    centroid = person_data["centroid_embedding"]
-                    self.identity_centroids[display_name] = np.array(centroid)
-                    
-                self.logger.info(f"Loaded {len(self.identity_centroids)} identities from database")
-                self.logger.info(f"Available persons: {list(self.identity_centroids.keys())}")
-                
-            else:
-                self.logger.warning("No 'persons' key found in JSON database")
-                
-        except Exception as e:
-            self.logger.error(f"Failed to load embeddings database: {e}")
-            raise
-
-    def detect_faces(self, frame: np.ndarray) -> List[Dict]:
-            """Detect faces using YOLO with GPU optimization"""
-            start_time = time.time()
-            try:
-                # Use GPU if configured - FIXED: Use proper device string
-                if self.config.get('use_gpu', False):
-                    device = self.config.get('gpu_device', 0)
-                    device_str = f'cuda:{device}'
-                else:
-                    device_str = 'cpu'
-                
-                results = self.detection_model(
-                    frame, 
-                    conf=self.config['detection_confidence'],
-                    iou=self.config['detection_iou'],
-                    verbose=False,
-                    device=device_str  # Specify device for inference
-                )
-                
-                detections = []
-                for result in results:
-                    boxes = result.boxes
-                    if boxes is not None:
-                        for box in boxes:
-                            x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()  # Ensure tensor is moved to CPU for numpy
-                            confidence = box.conf[0].cpu().numpy()
-                            
-                            detections.append({
-                                'bbox': [int(x1), int(y1), int(x2), int(y2)],
-                                'confidence': float(confidence)
-                            })
-                
-                detection_time = (time.time() - start_time) * 1000
-                self.debug_stats['detection_times'].append(detection_time)
-                
-                if self.config.get('debug', {}).get('verbose', False):
-                    self.logger.debug(f"Detected {len(detections)} faces in {detection_time:.2f}ms")
-                            
-                return detections
-                
-            except Exception as e:
-                self.logger.error(f"Detection error: {e}")
-                return []
-                    
-    def extract_embedding(self, face_roi: np.ndarray) -> Optional[np.ndarray]:
-        """Optimized embedding extraction with GPU support"""
-        start_time = time.time()
-        
-        # Validate ROI dimensions more thoroughly
-        if (face_roi.size == 0 or face_roi.shape[0] < 50 or face_roi.shape[1] < 50 or 
-            np.max(face_roi) - np.min(face_roi) < 10):  # Check for low contrast
-            if self.config.get('debug', {}).get('verbose', False):
-                self.logger.warning("Invalid face ROI for embedding extraction")
-            return None
-            
-        try:
-            # Convert to RGB and ensure proper data type
-            if len(face_roi.shape) == 3:
-                face_rgb = cv2.cvtColor(face_roi, cv2.COLOR_BGR2RGB)
-            else:
-                face_rgb = cv2.cvtColor(face_roi, cv2.COLOR_GRAY2RGB)
-            
-            # Normalize pixel values
-            face_rgb = face_rgb.astype(np.float32) / 255.0
-            
-            # Set device for DeepFace - FIXED: Use proper device format
-            if self.config.get('use_gpu', False):
-                device = self.config.get('gpu_device', 0)
-                # DeepFace uses different device format
-                device_name = f'cuda:{device}'
-            else:
-                device_name = 'cpu'
-                
-            if self.config.get('debug', {}).get('verbose', False):
-                self.logger.debug(f"Extracting embedding on device: {device_name}")
-                
-            embedding_obj = DeepFace.represent(
-                face_rgb,
-                model_name=self.config['embedding_model'],
-                enforce_detection=False,
-                detector_backend='skip',
-                align=True
-            )
-            
-            if embedding_obj and len(embedding_obj) > 0:
-                embedding_time = (time.time() - start_time) * 1000
-                self.debug_stats['embedding_times'].append(embedding_time)
-                
-                if self.config.get('debug', {}).get('verbose', False):
-                    self.logger.debug(f"Embedding extracted in {embedding_time:.2f}ms")
-               
-                return np.array(embedding_obj[0]['embedding'])
-            else:
-                if self.config.get('debug', {}).get('verbose', False):
-                    self.logger.warning("No embedding extracted")
-                
-        except Exception as e:
-            if self.config.get('verbose', False):
-                self.logger.error(f"Embedding extraction error: {e}")
-                
-        return None
+    # Check current directory
+    $currentDir = Get-Location
+    if ((Split-Path $currentDir -Leaf) -eq $Script:CommonConfig.ProjectName) {
+        return $currentDir
+    }
     
-    def recognize_face(self, embedding: np.ndarray) -> Tuple[Optional[str], float]:
-        """Enhanced matching with multiple similarity strategies"""
-        start_time = time.time()
-        
-        if not self.identity_centroids:
-            return None, 0.0
-            
-        best_similarity = -1.0
-        best_identity = None
-        
-        embedding = embedding.flatten()
-        
-        for identity, centroid in self.identity_centroids.items():
-            centroid = centroid.flatten()
-            
-            # Cosine similarity (primary)
-            cosine_sim = cosine_similarity([embedding], [centroid])[0][0]
-            
-            # Optional: Euclidean distance (normalized to 0-1)
-            euclidean_dist = np.linalg.norm(embedding - centroid)
-            euclidean_sim = 1 / (1 + euclidean_dist)  # Convert distance to similarity
-            
-            # Combine strategies (weighted)
-            final_similarity = 0.8 * cosine_sim + 0.2 * euclidean_sim
-            
-            if final_similarity > best_similarity and final_similarity >= self.config['recognition_threshold']:
-                best_similarity = final_similarity
-                best_identity = identity
-        
-        recognition_time = (time.time() - start_time) * 1000
-        self.debug_stats['recognition_times'].append(recognition_time)
-        
-        return best_identity, best_similarity
+    return $null
+}
 
-    def process_frame(self, frame: np.ndarray) -> List[Dict]:
-        """Enhanced pipeline: detect → mask detection → extract → recognize"""
-        start_time = time.time()
-        results = []
-        
-        # Detect faces
-        detections = self.detect_faces(frame)
-        
-        for detection in detections:
-            x1, y1, x2, y2 = detection['bbox']
-            
-            padding = self.config.get('roi_padding', 20)  # Increased padding for better mask detection
-            h, w = frame.shape[:2]
-            x1_pad = max(0, x1 - padding)
-            y1_pad = max(0, y1 - padding)
-            x2_pad = min(w, x2 + padding)
-            y2_pad = min(h, y2 + padding)
-            
-            face_roi = frame[y1_pad:y2_pad, x1_pad:x2_pad]
-            
-            # Better ROI validation
-            if (face_roi.size == 0 or face_roi.shape[0] < 40 or face_roi.shape[1] < 40 or
-                np.std(face_roi) < 10):  # Check for low contrast
-                continue
-                
-            # NEW: Enhanced Mask detection
-            mask_status, mask_confidence = self.detect_mask(face_roi)
-            
-            # Continue with embedding extraction only if we have a good face ROI
-            embedding = self.extract_embedding(face_roi)
-            if embedding is None:
-                continue
-                
-            identity, recognition_confidence = self.recognize_face(embedding)
-            
-            # Update mask statistics
-            if mask_status == "mask":
-                self.debug_stats['total_masks_detected'] += 1
-            
-            results.append({
-                'bbox': detection['bbox'],
-                'detection_confidence': detection['confidence'],
-                'mask_status': mask_status,  
-                'mask_confidence': mask_confidence,  
-                'identity': identity,
-                'recognition_confidence': recognition_confidence,
-                'embedding': embedding.tolist()
-            })
-        
-        # Update overall stats
-        self.debug_stats['total_frames_processed'] += 1
-        self.debug_stats['total_faces_detected'] += len(detections)
-        self.debug_stats['total_faces_recognized'] += len([r for r in results if r['identity']])
-        self.debug_stats['last_processing_time'] = (time.time() - start_time) * 1000
-            
-        return results
-        
-    def get_debug_stats(self) -> Dict:
-        """Enhanced performance statistics"""
-        stats = self.debug_stats.copy()
-        
-        # Calculate averages and percentiles
-        stats['avg_detection_time'] = np.mean(stats['detection_times']) if stats['detection_times'] else 0
-        stats['p95_detection_time'] = np.percentile(stats['detection_times'], 95) if stats['detection_times'] else 0
-        stats['max_detection_time'] = np.max(stats['detection_times']) if stats['detection_times'] else 0
-        
-        stats['avg_embedding_time'] = np.mean(stats['embedding_times']) if stats['embedding_times'] else 0
-        stats['p95_embedding_time'] = np.percentile(stats['embedding_times'], 95) if stats['embedding_times'] else 0
-        
-        stats['avg_recognition_time'] = np.mean(stats['recognition_times']) if stats['recognition_times'] else 0
-        
-        # Calculate mask detection time
-        stats['avg_detection_time'] = np.mean(stats['detection_times']) if stats['detection_times'] else 0
-        stats['avg_mask_detection_time'] = np.mean(stats['mask_detection_times']) if stats['mask_detection_times'] else 0
-        
-        # Add mask input size to stats if available
-        if self.mask_input_size:
-            stats['mask_input_size'] = f"{self.mask_input_size[1]}x{self.mask_input_size[0]}"
-            stats['mask_channel_format'] = self.channel_format
-                     
-        # Calculate rates and efficiencies
-        if stats['total_faces_detected'] > 0:
-            stats['mask_detection_rate'] = (stats['total_masks_detected'] / stats['total_faces_detected']) * 100
-            stats['recognition_rate'] = (stats['total_faces_recognized'] / stats['total_faces_detected']) * 100
-        else:
-            stats['mask_detection_rate'] = 0
-            stats['recognition_rate'] = 0
-            
-        if stats['total_frames_processed'] > 0:
-            stats['faces_per_frame'] = stats['total_faces_detected'] / stats['total_frames_processed']
-        else:
-            stats['faces_per_frame'] = 0
-                
-        # Memory usage (approximate)
-        try:
-            import psutil
-            process = psutil.Process()
-            stats['memory_mb'] = process.memory_info().rss / 1024 / 1024
-        except ImportError:
-            stats['memory_mb'] = 0
-        
-        return stats
+function Build-ProjectPaths {
+    [CmdletBinding()]
+    param([string]$ProjectRoot)
+    
+    # Calculate paths
+    $ActiveRoot = Split-Path $ProjectRoot -Parent | Split-Path -Parent
+    $VenvRoot = Split-Path $ProjectRoot -Parent | Split-Path -Parent | Split-Path -Parent | Split-Path -Parent
+    $currentDate = Get-Date -Format $Script:CommonConfig.DateFormat
+    
+    return @{
+        ProjectRoot = $ProjectRoot
+        ActiveRoot = $ActiveRoot
+        VenvRoot = $VenvRoot
+        CurrentDate = $currentDate
+    }
+}
 
-    def get_known_identities(self) -> List[str]:
-        """Get list of all known identities"""
-        return list(self.identity_centroids.keys())
+function Initialize-DateBasedStructure {
+    [CmdletBinding()]
+    param([hashtable]$Paths)
+    
+    # Create base folder
+    $magickBasePath = Join-Path $Paths.ActiveRoot $Script:CommonConfig.LogBasePath
+    if (-not (Test-Path $magickBasePath)) {
+        New-Item -ItemType Directory -Path $magickBasePath -Force | Out-Null
+    }
+    
+    # Create date-specific folder
+    $dateBasedPath = Join-Path $magickBasePath $Paths.CurrentDate
+    if (-not (Test-Path $dateBasedPath)) {
+        New-Item -ItemType Directory -Path $dateBasedPath -Force | Out-Null
+    }
+    
+    return $dateBasedPath
+}
 
-    def get_model_info(self) -> Dict:
-        """Get information about loaded models"""
-        info = {
-            'mask_detector_loaded': self.mask_detector is not None,
-            'face_detector_loaded': self.detection_model is not None,
-            'known_identities_count': len(self.identity_centroids)
+function Add-ScriptSpecificPaths {
+    [CmdletBinding()]
+    param(
+        [hashtable]$Paths,
+        [string]$DateBasedPath,
+        [switch]$IsMonitor,
+        [switch]$IsWorker
+    )
+    
+    $Paths.DateBasedPath = $DateBasedPath
+    
+    if ($IsMonitor) {
+        $Paths.WorkerScript = Join-Path $Paths.ProjectRoot $Script:CommonConfig.MonitorFilePaths.WorkerScript
+        $Paths.PythonScriptPath = Join-Path $Paths.ProjectRoot $Script:CommonConfig.MonitorFilePaths.PythonScriptPath
+        $Paths.PIDFilePath = Join-Path $DateBasedPath $Script:CommonConfig.MonitorFilePaths.PIDFileName
+        $Paths.LogFile = Join-Path $DateBasedPath $Script:CommonConfig.MonitorFilePaths.LogFileName
+        $Paths.PythonExe = Join-Path $Paths.VenvRoot $Script:CommonConfig.CommonFilePaths.PythonExe
+        $paths.EmailSendScript = Join-Path $Paths.ProjectRoot $Script:CommonConfig.MonitorFilePaths.EmailSendScript
+    }
+    
+    if ($IsWorker) {
+        $Paths.PythonScript = Join-Path $Paths.ProjectRoot $Script:CommonConfig.WorkerFilePaths.PythonScript
+        $Paths.PythonExe = Join-Path $Paths.VenvRoot $Script:CommonConfig.CommonFilePaths.PythonExe
+    }
+    
+    return $Paths
+}
+
+function Write-CommonLog {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Message,
+        [string]$Level = "INFO",
+        [string]$LogFile,
+        [switch]$NoConsole
+    )
+    $timestamp = Get-Date -Format $Script:CommonConfig.LogDateTimeFormat
+    $entry = "[$timestamp] [$Level] $Message"
+    if ($LogFile) {
+        $dir = Split-Path $LogFile -Parent
+        if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+        Add-Content -Path $LogFile -Value $entry -ErrorAction SilentlyContinue
+    }
+    if (-not $NoConsole) {
+        $color = @{ ERROR='Red'; WARN='Yellow'; SUCCESS='Green'; DEBUG='Gray'; SHUTDOWN='Blue' }[$Level]
+        # Replace null-coalescing operator for PowerShell 5 compatibility
+        $foregroundColor = if ($null -ne $color) { $color } else { 'White' }
+        Write-Host $entry -ForegroundColor $foregroundColor
+    }
+}
+
+# ====================================================================
+# SHARED VALIDATION & COLLECTION – NEW / MOVED HERE
+# ====================================================================
+function Test-RunFolder {
+    [CmdletBinding()]
+    param(
+        [string]$FolderPath
+    )
+    $cfg = Get-ApplicationConfig
+    $result = @{
+        Success = $false
+        FolderPath = $FolderPath
+        FolderName = Split-Path $FolderPath -Leaf
+        CreationTime = $null
+        MissingItems = @()
+        Errors = @()
+        Warnings = @()
+        Details = @{}
+    }
+    try {
+        $folder = Get-Item -Path $FolderPath -ErrorAction Stop
+        $result.CreationTime = $folder.CreationTime
+        foreach ($sub in $cfg.ExpectedSubfolders) {
+            if (-not (Test-Path (Join-Path $FolderPath $sub))) {
+                $result.MissingItems += $sub
+                $result.Warnings += "Missing subfolder: $sub"
+            }
+        }
+        foreach ($file in $cfg.ExpectedFiles) {
+            if (-not (Test-Path (Join-Path $FolderPath $file))) {
+                $result.MissingItems += $file
+                $result.Warnings += "Missing file: $file"
+            }
+        }
+        $result.Success = ($result.MissingItems.Count -eq 0) -and ($result.Errors.Count -eq 0)
+    } catch {
+        $result.Errors += "Error validating folder: $_"
+    }
+    return $result
+}
+
+function Get-RunFoldersInWindow {
+    [CmdletBinding()]
+    param(
+        [string]$BasePath,
+        [DateTime]$WindowStart,
+        [DateTime]$WindowEnd,
+        [string]$FolderFilter = (Get-ApplicationConfig).WorkerRunFolderPrefix
+    )
+    if (-not (Test-Path $BasePath)) { return @() }
+    $folders = Get-ChildItem -Path $BasePath -Directory -Filter "$FolderFilter*" -ErrorAction SilentlyContinue |
+               Where-Object { $_.CreationTime -ge $WindowStart -and $_.CreationTime -le $WindowEnd }
+    return $folders
+}
+
+function Get-LatestRunFolder {
+    [CmdletBinding()]
+    param(
+        [string]$BasePath,
+        [string]$FolderFilter = (Get-ApplicationConfig).WorkerRunFolderPrefix
+    )
+    if (-not (Test-Path $BasePath)) { return $null }
+    return Get-ChildItem -Path $BasePath -Directory -Filter "$FolderFilter*" -ErrorAction SilentlyContinue |
+           Sort-Object CreationTime -Descending | Select-Object -First 1
+}
+
+function Collect-RunsFromTimeWindow {
+    [CmdletBinding()]
+    param(
+        [string]$BasePath,
+        [DateTime]$WindowStart,
+        [DateTime]$WindowEnd,
+        [switch]$ValidateEach
+    )
+    $runs = Get-RunFoldersInWindow -BasePath $BasePath -WindowStart $WindowStart -WindowEnd $WindowEnd
+    $collected = @()
+    foreach ($run in $runs) {
+        $validation = if ($ValidateEach) { Test-RunFolder -FolderPath $run.FullName } else { $null }
+        $collected += @{
+            Folder       = $run.FullName
+            Name         = $run.Name
+            CreationTime = $run.CreationTime
+            Validation   = $validation
+            Status       = if ($validation -and $validation.Success) { "VALID" } elseif ($validation) { "INVALID" } else { "COLLECTED" }
+        }
+    }
+    return $collected
+}
+
+
+# ====================================================================
+# Communication Functions (Basic)
+# ====================================================================
+
+function Initialize-CommunicationPaths {
+    [CmdletBinding()]
+    param(
+        [hashtable]$Paths,
+        [switch]$IsMonitor,
+        [switch]$IsWorker
+    )
+    
+    if (-not $Paths -or -not $Paths.DateBasedPath) {
+        return $null
+    }
+    
+    $communicationPaths = @{}
+    
+    try {
+        $commDir = Join-Path $Paths.DateBasedPath $Script:CommonConfig.CommonFilePaths.CommunicationDirName
+        if (-not (Test-Path $commDir)) {
+            New-Item -ItemType Directory -Path $commDir -Force -ErrorAction Stop | Out-Null
         }
         
-        if self.mask_detector:
-            info['mask_input_size'] = self.mask_input_size
-            info['mask_channel_format'] = self.channel_format
-            info['mask_input_name'] = self.mask_detector.get_inputs()[0].name
-            info['mask_output_name'] = self.mask_detector.get_outputs()[0].name
+        $communicationPaths.CommunicationDir = $commDir
+        $communicationPaths.StatusFile = Join-Path $commDir $Script:CommonConfig.CommonFilePaths.WorkerStatusFileName
+        
+        if ($IsWorker) {
+            $communicationPaths.PIDFile = Join-Path $commDir $Script:CommonConfig.CommonFilePaths.WorkerPIDFileName
+        }
+        
+        return $communicationPaths
+    } catch {
+        return $null
+    }
+}
+
+function Write-WorkerStatus {
+    [CmdletBinding()]
+    param(
+        [string]$StatusFile,
+        [string]$Status,
+        [int]$WorkerPID,
+        [int]$PythonPID = 0,
+        [string]$Message = ""
+    )
+    
+    $statusData = @{
+        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        Status = $Status
+        WorkerPID = $WorkerPID
+        PythonPID = $PythonPID
+        Message = $Message
+    }
+    
+    try {
+        $statusData | ConvertTo-Json | Out-File $StatusFile -Force
+        return $true
+    } catch {
+        return $false
+    }
+}
+
+function Read-WorkerStatus {
+    [CmdletBinding()]
+    param([string]$StatusFile)
+    
+    if (-not (Test-Path $StatusFile)) {
+        return @{ Status = "NOT_FOUND"; WorkerPID = 0; PythonPID = 0 }
+    }
+    
+    try {
+        $content = Get-Content $StatusFile -Raw
+        return $content | ConvertFrom-Json -AsHashtable
+    } catch {
+        return @{ Status = "ERROR"; Error = $_; WorkerPID = 0; PythonPID = 0 }
+    }
+}
+
+ # 1_capture-collected-runs.ps1  
+
+<#
+.SYNOPSIS
+Captures and validates all run folders created between start and end times.
+Now uses shared functions from 1_common-paths.ps1.
+#>
+
+# ====================================================================
+# Configuration – loaded from 1_common-paths.ps1
+# ====================================================================
+$commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
+if (-not (Test-Path $commonPathsScript)) { throw "Common paths script not found" }
+. $commonPathsScript
+
+$appConfig = Get-ApplicationConfig
+
+# ====================================================================
+# SCRIPT‑SCOPED CONFIG
+# ====================================================================
+$Script:Config = @{
+    StartTime    = $appConfig.EveryStartTime
+    EndTime      = $appConfig.EveryEndTime
+    RunsBasePath = $null
+    LogFile      = $null
+}
+
+
+# ====================================================================
+# PATH INITIALISATION
+# ====================================================================
+function Initialize-Paths {
+    $dateStr = Get-Date -Format $appConfig.CaptureDateFormat
+    $projectRoot = if ($PSScriptRoot) { Join-Path $PSScriptRoot ".." } else { $PWD.Path }
+    $Script:Config.RunsBasePath = Join-Path $projectRoot $appConfig.CaptureRunsDirectory $dateStr
+    $logDir = Join-Path $projectRoot $appConfig.CaptureLogsDirectory
+    if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force | Out-Null }
+    $logFileName = $appConfig.CaptureLogFilePattern -f (Get-Date -Format $appConfig.CaptureFileTimestampFormat)
+    $Script:Config.LogFile = Join-Path $logDir $logFileName
+    return $true
+}
+
+
+
+# ====================================================================
+# LOCAL LOGGING WRAPPER
+# ====================================================================
+function Write-CaptureLog {
+    param([string]$Message, [string]$Level = "INFO")
+    Write-CommonLog -Message $Message -Level $Level -LogFile $Script:Config.LogFile
+}
+
+
+# ====================================================================
+# TIME CONVERSION
+# ====================================================================
+function Convert-ToDateTime {
+    param([string]$TimeString)
+    try {
+        $today = Get-Date -Format "yyyy-MM-dd"
+        return [DateTime]::ParseExact("$today $TimeString", "yyyy-MM-dd HH:mm", $null)
+    } catch {
+        Write-CaptureLog "Invalid time format: $TimeString" -Level "ERROR"
+        return $null
+    }
+}
+
+function Is-WithinTimeWindow {
+    param(
+        [DateTime]$CheckTime,
+        [DateTime]$WindowStart,
+        [DateTime]$WindowEnd
+    )
+    
+    return ($CheckTime -ge $WindowStart) -and ($CheckTime -le $WindowEnd)
+}
+
+# ====================================================================
+# UPDATED: Enhanced Validate-Output Function
+# ====================================================================
+function Validate-RunFolder {
+    param(
+        [string]$FolderPath,
+        [switch]$Detailed = $false
+    )
+    
+    $result = @{
+        Success = $false
+        FolderPath = $FolderPath
+        FolderName = Split-Path $FolderPath -Leaf
+        CreationTime = $null
+        MissingItems = @()
+        Errors = @()
+        Warnings = @()
+        Details = @{
+            FileSizes = @{}
+            FileCount = 0
+            HasMetadata = $false
+            Metadata = $null
+        }
+    }
+    
+    try {
+        # Get folder info
+        $folder = Get-Item -Path $FolderPath -ErrorAction Stop
+        $result.CreationTime = $folder.CreationTime
+        
+        Write-CaptureLog "Validating folder: $($result.FolderName)" -Level "INFO"
+        
+        # Check subfolders
+        foreach ($subfolder in $Script:Config.ExpectedSubfolders) {
+            $subfolderPath = Join-Path $FolderPath $subfolder
+            if (-not (Test-Path $subfolderPath)) {
+                $result.MissingItems += $subfolder
+                $result.Warnings += "Missing subfolder: $subfolder"
+            } else {
+                # Count files in subfolder if detailed validation
+                if ($Detailed) {
+                    $files = Get-ChildItem -Path $subfolderPath -File -Recurse -ErrorAction SilentlyContinue
+                    $result.Details.FileCount += $files.Count
+                }
+            }
+        }
+        
+        # Check expected files
+        foreach ($file in $Script:Config.ExpectedFiles) {
+            $filePath = Join-Path $FolderPath $file
+            if (-not (Test-Path $filePath)) {
+                $result.MissingItems += $file
+                $result.Warnings += "Missing file: $file"
+            } else {
+                # Get file info
+                $fileInfo = Get-Item -Path $filePath -ErrorAction SilentlyContinue
+                if ($fileInfo) {
+                    $result.Details.FileSizes[$file] = $fileInfo.Length
+                    
+                    # Parse metadata.json if it exists
+                    if ($file -eq "metadata.json") {
+                        try {
+                            $metadata = Get-Content $filePath -Raw | ConvertFrom-Json -ErrorAction Stop
+                            $result.Details.Metadata = $metadata
+                            $result.Details.HasMetadata = $true
+                        } catch {
+                            $result.Errors += "Invalid JSON in metadata.json: $_"
+                        }
+                    }
+                }
+            }
+        }
+        
+        # Additional checks for data files
+        $dataFiles = Get-ChildItem -Path $FolderPath -File -Filter "*.json" -ErrorAction SilentlyContinue | 
+            Where-Object { $_.Name -ne "metadata.json" }
+        
+        if ($dataFiles.Count -eq 0) {
+            $result.Warnings += "No data JSON files found"
+        } else {
+            $result.Details.FileCount += $dataFiles.Count
+        }
+        
+        # Determine success
+        $result.Success = ($result.MissingItems.Count -eq 0) -and ($result.Errors.Count -eq 0)
+        
+        if ($result.Success) {
+            Write-CaptureLog "✓ Folder validation passed: $($result.FolderName)" -Level "SUCCESS"
+        } else {
+            Write-CaptureLog "✗ Folder validation failed: $($result.FolderName)" -Level "WARN"
+            if ($result.MissingItems.Count -gt 0) {
+                Write-CaptureLog "  Missing: $($result.MissingItems -join ', ')" -Level "WARN"
+            }
+            if ($result.Errors.Count -gt 0) {
+                Write-CaptureLog "  Errors: $($result.Errors -join ', ')" -Level "ERROR"
+            }
+        }
+        
+    } catch {
+        $result.Errors += "Error validating folder: $_"
+        $result.Success = $false
+        Write-CaptureLog "Error validating folder: $_" -Level "ERROR"
+    }
+    
+    return $result
+}
+
+# ====================================================================
+# MAIN COLLECTION – now uses shared functions
+# ====================================================================
+function Capture-CollectedRuns {
+    param([DateTime]$WindowStart, [DateTime]$WindowEnd)
+    Write-CaptureLog "Starting run collection..." -Level "INFO"
+    if (-not (Test-Path $Script:Config.RunsBasePath)) {
+        Write-CaptureLog "Runs base path does not exist: $($Script:Config.RunsBasePath)" -Level "WARN"
+        return @()
+    }
+    $collected = Collect-RunsFromTimeWindow -BasePath $Script:Config.RunsBasePath `
+                                            -WindowStart $WindowStart `
+                                            -WindowEnd $WindowEnd `
+                                            -ValidateEach
+    foreach ($run in $collected) {
+        if ($run.Status -eq "VALID") {
+            Write-CaptureLog "✓ Collected: $($run.Name)" -Level "SUCCESS"
+        } else {
+            Write-CaptureLog "✗ Issues found: $($run.Name)" -Level "WARN"
+        }
+    }
+    return $collected
+}
+
+
+# ====================================================================
+# Summary Reporting
+# ====================================================================
+function Show-CollectionSummary {
+    param([array]$CollectedRuns)
+    $valid   = ($CollectedRuns | Where-Object { $_.Status -eq "VALID" }).Count
+    $invalid = ($CollectedRuns | Where-Object { $_.Status -eq "INVALID" }).Count
+    Write-CaptureLog "`n=== COLLECTION SUMMARY ===" -Level "INFO"
+    Write-CaptureLog "Total runs collected: $($CollectedRuns.Count)" -Level "INFO"
+    Write-CaptureLog "Valid runs: $valid" -Level "SUCCESS"
+    Write-CaptureLog "Invalid runs: $invalid" -Level $(if ($invalid -gt 0) { "WARN" } else { "INFO" })
+    
+    # Show invalid runs details
+    if ($invalidRuns.Count -gt 0) {
+        Write-CaptureLog "`nInvalid runs details:" -Level "WARN"
+        foreach ($run in $invalidRuns) {
+            $folderName = $run.Name
+            $missing = $run.Validation.MissingItems -join ', '
+            Write-CaptureLog "  - : Missing $missing" -Level "WARN"
+        }
+    }
+    
+    # Show folder sizes
+    $totalSize = 0
+    foreach ($run in $CollectedRuns) {
+        $folder = Get-Item -Path $run.Folder -ErrorAction SilentlyContinue
+        if ($folder) {
+            $size = (Get-ChildItem -Path $run.Folder -Recurse -File -ErrorAction SilentlyContinue | 
+                    Measure-Object -Property Length -Sum).Sum
+            $totalSize += $size
+        }
+    }
+    
+    $sizeMB = [math]::Round($totalSize / 1MB, 2)
+    Write-CaptureLog "Total data collected: $sizeMB MB" -Level "INFO"
+    
+    return @{ TotalRuns = $CollectedRuns.Count; ValidRuns = $valid; InvalidRuns = $invalid }
+}
+
+# ====================================================================
+# Export Function for Monitor Integration
+# ====================================================================
+function Export-CollectedRuns {
+    param(
+        [array]$CollectedRuns,
+        [string]$ExportPath
+    )
+    
+    try {
+        $exportData = @{
+            CollectionTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            TimeWindow = @{
+                Start = $Script:Config.StartTime
+                End = $Script:Config.EndTime
+            }
+            Runs = $CollectedRuns
+            Summary = Show-CollectionSummary -CollectedRuns $CollectedRuns
+        }
+        
+        $exportData | ConvertTo-Json -Depth 5 | Out-File -FilePath $ExportPath -Force
+        Write-CaptureLog "Exported collection data to: $ExportPath" -Level "SUCCESS"
+        return $true
+    } catch {
+        Write-CaptureLog "Failed to export collection data: $_" -Level "ERROR"
+        return $false
+    }
+}
+
+# ====================================================================
+# Main Execution
+# ====================================================================
+function Start-RunCollection {
+    param(
+        [string]$StartTime = $null,
+        [string]$EndTime = $null,
+        [string]$ExportTo = $null
+    )
+    Write-CaptureLog "=== Run Collection Script Started ===" -Level "INFO"
+    if (-not (Initialize-Paths)) { return }
+    $start = if ($StartTime) { Convert-ToDateTime $StartTime } else { Convert-ToDateTime $Script:Config.StartTime }
+    $end   = if ($EndTime)   { Convert-ToDateTime $EndTime }   else { Convert-ToDateTime $Script:Config.EndTime }
+    if (-not $start -or -not $end) { return }
+    $collected = Capture-CollectedRuns -WindowStart $start -WindowEnd $end
+    $summary = Show-CollectionSummary -CollectedRuns $collected
+    if ($ExportTo) { Export-CollectedRuns -CollectedRuns $collected -ExportPath $ExportTo }
+    Write-CaptureLog "=== Run Collection Completed ===" -Level "INFO"
+    return $collected
+}
+
+
+# ====================================================================
+# Export functions for use in monitor
+# ====================================================================
+if ($MyInvocation.InvocationName -ne '.') {
+    Start-RunCollection
+} else {
+    Export-ModuleMember -Function Start-RunCollection, Test-RunFolder, Show-CollectionSummary
+}
+
+# 1_email-sender-stable.ps1
+<#
+.SYNOPSIS
+Stable email sender for face recognition run reports
+#>
+
+# ====================================================================
+# CONFIGURATION – LOADED FROM 1_common-paths.ps1
+# ====================================================================
+$commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
+if (-not (Test-Path $commonPathsScript)) { throw "Common paths script not found" }
+. $commonPathsScript
+
+$appConfig = Get-ApplicationConfig
+
+# ====================================================================
+# Email Configuration (sensitive parts remain local)
+# ====================================================================
+$EmailConfig = @{
+    SmtpServer   = $appConfig.EmailSmtpServer
+    SmtpPort     = $appConfig.EmailSmtpPort
+    UseSsl       = $appConfig.EmailUseSsl
+    Username     = ""   # loaded from credential file
+    Password     = ""   # loaded from credential file
+    FromAddress  = ""   # loaded from credential file
+    ToAddress    = ""   # loaded from credential file (default single recipient)
+    SubjectPrefix = $appConfig.EmailSubjectPrefix
+}
+
+# ====================================================================
+# Translation table for English and Bahasa Indonesia
+# ====================================================================
+$script:Translations = @{
+    en = @{
+        ReportTitle = "=== Face Recognition Run Report ==="
+        SummaryTitle = "=== Summary ==="
+        DetailsTitle = "=== Run Details ==="
+        TotalRuns = "Total Runs:"
+        WithSummary = "With Completion Summary:"
+        MetadataOnly = "Metadata Only:"
+        NoData = "Incomplete Data:"
+        Successful = "Successful:"
+        Failed = "Failed:"
+        UnknownStatus = "Unknown Status:"
+        ScheduleWindow = "Schedule Window:"
+        ReportTime = "Report Time:"
+        Created = "Created:"
+        ExitCode = "Exit Code:"
+        WorkerPID = "Worker PID:"
+        PythonPID = "Python PID:"
+        StartTime = "Start Time:"
+        EndTime = "End Time:"
+        Footer = "This report was automatically generated by the Face Recognition Monitoring System."
+        System = "System: maskRecog | Version:"
+        StatusSuccess = "SUCCESS"
+        StatusFailed = "FAILED"
+        StatusUnknown = "UNKNOWN"
+        CollectionFull = "Full Data"
+        CollectionMetadata = "Metadata Only"
+    }
+    id = @{
+        ReportTitle = "=== Laporan Pengenalan Wajah ==="
+        SummaryTitle = "=== Ringkasan ==="
+        DetailsTitle = "=== Detail Proses ==="
+        TotalRuns = "Total Proses:"
+        WithSummary = "Dengan Ringkasan Lengkap:"
+        MetadataOnly = "Hanya Metadata:"
+        NoData = "Data Tidak Lengkap:"
+        Successful = "Berhasil:"
+        Failed = "Berhasil-Prematur:"
+        UnknownStatus = "Status Tidak Diketahui:"
+        ScheduleWindow = "Jadwal:"
+        ReportTime = "Waktu Laporan:"
+        Created = "Folder berhasil dibuat pada:"
+        ExitCode = "Kode Keluar:"
+        WorkerPID = "PID Worker:"
+        PythonPID = "PID Python:"
+        StartTime = "Waktu Proses dimulai:"
+        EndTime = "Waktu Selesai:"
+        Footer = "Laporan ini dibuat secara otomatis oleh Sistem Pemantauan Pengenalan Wajah."
+        System = "Sistem: maskRecog | Versi:"
+        StatusSuccess = "BERHASIL"
+        StatusFailed = "Berhasil-Prematur"
+        StatusUnknown = "TIDAK DIKETAHUI"
+        CollectionFull = "Data Lengkap"
+        CollectionMetadata = "Hanya Metadata"
+    }
+}
+
+# ====================================================================
+# Initialize Email Configuration
+# ====================================================================
+function Initialize-EmailConfig {
+    [CmdletBinding()]
+    param(
+        [string]$CredentialPath = $appConfig.EmailCredentialPath,
+        [hashtable]$OverrideConfig = @{}
+    )
+    Write-Host "Initializing email configuration..." -ForegroundColor Cyan
+    
+    if (Test-Path $CredentialPath) {
+        try {
+            $credential = Import-Clixml -Path $CredentialPath -ErrorAction Stop
+            $EmailConfig.Username = $credential.GetNetworkCredential().UserName
+            $EmailConfig.Password = $credential.GetNetworkCredential().Password
+            $EmailConfig.FromAddress = $credential.GetNetworkCredential().UserName
+            $EmailConfig.ToAddress = $credential.GetNetworkCredential().UserName
             
-        return info
+            Write-Host "✓ Email credentials loaded from: $CredentialPath" -ForegroundColor Green
+        } catch {
+            Write-Host "✗ Failed to load credentials: $_" -ForegroundColor Red
+            return $false
+        }
+    } else {
+        Write-Host "✗ Credential file not found: $CredentialPath" -ForegroundColor Red
+        
+        Write-Host "`nPlease enter email configuration:" -ForegroundColor Yellow
+        $EmailConfig.Username = Read-Host "Email address"
+        $EmailConfig.Password = Read-Host "App password" -AsSecureString
+        
+        $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($EmailConfig.Password)
+        $EmailConfig.Password = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
+        
+        $EmailConfig.FromAddress = $EmailConfig.Username
+        $EmailConfig.ToAddress = $EmailConfig.Username
+        
+        $credentialDir = Split-Path $CredentialPath -Parent
+        if (-not (Test-Path $credentialDir)) {
+            New-Item -ItemType Directory -Path $credentialDir -Force | Out-Null
+        }
+        
+        $securePassword = ConvertTo-SecureString $EmailConfig.Password -AsPlainText -Force
+        $credential = New-Object System.Management.Automation.PSCredential($EmailConfig.Username, $securePassword)
+        $credential | Export-Clixml -Path $CredentialPath
+        
+        Write-Host "✓ Credentials saved to: $CredentialPath" -ForegroundColor Green
+    }
+    
+    foreach ($key in $OverrideConfig.Keys) {
+        $EmailConfig[$key] = $OverrideConfig[$key]
+    }
+    
+    return $true
+}
+
+# ====================================================================
+# Collect Run Summaries
+# ====================================================================
+function Get-RunSummaries {
+    param(
+        [string]$BasePath,
+        [datetime]$Since,
+        [int]$MaxRuns = $appConfig.EmailMaxRunsToCollect,
+        [DateTime]$ScheduleStart = $null,
+        [DateTime]$ScheduleEnd = $null,
+        [switch]$TimeWindowMode = $false
+    )
+    
+    $summaries = @()
+    
+    try {
+        $runFolders = Get-ChildItem -Path $BasePath -Directory -Filter $appConfig.EmailRunFolderFilter -ErrorAction SilentlyContinue | 
+            Sort-Object CreationTime -Descending |
+            Select-Object -First $MaxRuns
+        
+        Write-Host "Found $($runFolders.Count) run folders" -ForegroundColor Cyan
+        
+        $collectedWithSummary = 0
+        $collectedMetadataOnly = 0
+        $outsideTimeWindow = 0
+        
+        foreach ($folder in $runFolders) {
+            $inTimeWindow = $true
+            if ($TimeWindowMode -and $ScheduleStart -and $ScheduleEnd) {
+                $inTimeWindow = ($folder.CreationTime -ge $ScheduleStart -and $folder.CreationTime -le $ScheduleEnd)
+                if (-not $inTimeWindow) {
+                    $outsideTimeWindow++
+                    continue
+                }
+            }
+            
+            if ($folder.CreationTime -ge $Since) {
+                $summaryPath = Join-Path $folder.FullName "$($appConfig.EmailLogsFolder)\$($appConfig.EmailCompletionSummaryFile)"
+                $hasSummary = Test-Path $summaryPath
+                
+                $metadata = $null
+                $metadataPath = Join-Path $folder.FullName $appConfig.EmailMetadataFile
+                $hasMetadata = Test-Path $metadataPath
+                
+                if ($hasMetadata) {
+                    try {
+                        $metadata = Get-Content $metadataPath -Raw | ConvertFrom-Json
+                    } catch { 
+                        $hasMetadata = $false
+                    }
+                }
+                
+                $summary = @{
+                    FolderPath = $folder.FullName
+                    FolderName = $folder.Name
+                    CreationTime = $folder.CreationTime
+                    ExitCode = "UNKNOWN"
+                    SummaryText = $null
+                    Metadata = $metadata
+                    LogFiles = @()
+                    HasSummary = $hasSummary
+                    HasMetadata = $hasMetadata
+                    CollectionType = "UNKNOWN"
+                    Status = "UNKNOWN"
+                }
+                
+                if ($hasSummary) {
+                    $summaryContent = Get-Content $summaryPath -Raw
+                    $summary.SummaryText = $summaryContent
+                    
+                    if ($summaryContent -match "Exit code: (\d+)") {
+                        $summary.ExitCode = $matches[1]
+                        $summary.Status = if ($matches[1] -eq "1") { "FAILED" } else { "SUCCESS" }
+                    }
+                    $summary.CollectionType = "SUMMARY_METADATA"
+                    $collectedWithSummary++
+                    Write-Host "  ✓ Collected with summary: $($folder.Name) (Exit: $($summary.ExitCode))" -ForegroundColor Green
+                } elseif ($hasMetadata) {
+                    if ($metadata -and $metadata.worker_exit_code) {
+                        $summary.ExitCode = $metadata.worker_exit_code
+                        $summary.Status = if ($metadata.worker_exit_code -eq "1") { "FAILED" } else { "SUCCESS" }
+                    }
+                    $summary.CollectionType = "METADATA_ONLY"
+                    $collectedMetadataOnly++
+                    Write-Host "  ⚠ Collected metadata only: $($folder.Name) (Exit: $($summary.ExitCode))" -ForegroundColor Yellow
+                } else {
+                    $summary.CollectionType = "NO_DATA"
+                    Write-Host "  ✗ No data found: $($folder.Name)" -ForegroundColor Red
+                }
+                
+                $logDir = Join-Path $folder.FullName $appConfig.EmailLogsFolder
+                if (Test-Path $logDir) {
+                    $logFiles = Get-ChildItem -Path $logDir -File -Filter $appConfig.EmailLogFileFilter -ErrorAction SilentlyContinue
+                    foreach ($logFile in $logFiles) {
+                        $sizeInKB = [math]::Round($logFile.Length / 1KB, 2)
+                        $summary.LogFiles += @{
+                            Path = $logFile.FullName
+                            Name = $logFile.Name
+                            Size = "$sizeInKB KB"
+                            SizeBytes = $logFile.Length
+                            SizeKB = $sizeInKB
+                        }
+                    }
+                }
+                
+                $tempDir = [System.IO.Path]::GetTempPath()
+                $compressedFolder = Compress-RunFolder -FolderPath $folder.FullName -DestinationPath $tempDir
+                if ($compressedFolder) {
+                    $summary.CompressedFolder = $compressedFolder
+                }
+                
+                $summaries += $summary
+            }
+        }
+        
+        $totalInWindow = $runFolders.Count - $outsideTimeWindow
+        $noDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
+        
+        Write-Host "`nCollection Summary:" -ForegroundColor Cyan
+        Write-Host "  Total folders checked: $($runFolders.Count)" -ForegroundColor White
+        Write-Host "  Runs in time window: $totalInWindow" -ForegroundColor White
+        Write-Host "  With completion summary: $collectedWithSummary" -ForegroundColor Green
+        Write-Host "  Metadata only: $collectedMetadataOnly" -ForegroundColor Yellow
+        Write-Host "  No data available: $noDataCount" -ForegroundColor Red
+        if ($TimeWindowMode) {
+            Write-Host "  Outside time window: $outsideTimeWindow" -ForegroundColor Gray
+        }
+        
+    } catch {
+        Write-Host "Error collecting run summaries: $_" -ForegroundColor Red
+    }
+    
+    return $summaries
+}
+
+# ====================================================================
+# Folder Compression
+# ====================================================================
+function Compress-RunFolder {
+    [CmdletBinding()]
+    param(
+        [string]$FolderPath,
+        [string]$DestinationPath
+    )
+    
+    try {
+        $folderName = Split-Path $FolderPath -Leaf
+        $zipPath = Join-Path $DestinationPath "$folderName.zip"
+        Compress-Archive -Path "$FolderPath\*" -DestinationPath $zipPath -CompressionLevel Optimal -Force
+        $zipFile = Get-Item $zipPath
+        return @{
+            Path = $zipFile.FullName
+            Name = $zipFile.Name
+            Size = "$([math]::Round($zipFile.Length / 1KB, 2)) KB"
+            SizeBytes = $zipFile.Length
+            SizeKB = [math]::Round($zipFile.Length / 1KB, 2)
+            SourceFolder = $FolderPath
+        }
+    } catch {
+        Write-Host "  ✗ Failed to compress folder $($FolderPath): $_" -ForegroundColor Red
+        return $null
+    }
+}
+
+# ====================================================================
+# Send Email with MailKit Library
+# ====================================================================
+function Send-EmailWithAttachments {
+    [CmdletBinding()]
+    param(
+        [string]$Subject,
+        [string]$Body,
+        [array]$Attachments = @(),
+        [hashtable]$Config
+    )
+    
+    try {
+        Write-Host "Preparing email with $($Attachments.Count) attachments..." -ForegroundColor Cyan
+        
+        $currentLocation = $PSScriptRoot
+        $mailKitPath = Join-Path $currentLocation "MailKit.dll"
+        $mimeKitPath = Join-Path $currentLocation "MimeKit.dll"
+        
+        if (-not (Test-Path $mailKitPath)) {
+            throw "MailKit.dll not found in current location: $currentLocation"
+        }
+        if (-not (Test-Path $mimeKitPath)) {
+            throw "MimeKit.dll not found in current location: $currentLocation"
+        }
+        
+        Add-Type -Path $mailKitPath
+        Add-Type -Path $mimeKitPath
+        
+        $message = New-Object MimeKit.MimeMessage
+        $message.From.Add([MimeKit.MailboxAddress]::Parse($Config.FromAddress))
+        $message.To.Add([MimeKit.MailboxAddress]::Parse($Config.ToAddress))
+        $message.Subject = $Subject
+        
+        $bodyBuilder = New-Object MimeKit.BodyBuilder
+        $bodyBuilder.HtmlBody = $Body
+        $bodyBuilder.TextBody = [System.Text.RegularExpressions.Regex]::Replace($Body, "<[^>]*>", "")
+        
+        $attachmentStreams = @()
+        
+        try {
+            if ($Attachments.Count -gt 0) {
+                foreach ($attachmentPath in $Attachments) {
+                    if (Test-Path $attachmentPath) {
+                        $fileName = Split-Path $attachmentPath -Leaf
+                        try {
+                            $attachmentStream = [System.IO.File]::OpenRead($attachmentPath)
+                            $attachmentStreams += $attachmentStream
+                            $bodyBuilder.Attachments.Add($fileName, $attachmentStream, [MimeKit.ContentType]::Parse("application/zip"))
+                            Write-Host "  ✓ Attached: $fileName" -ForegroundColor Green
+                        } catch {
+                            Write-Host "  ⚠ Warning: Could not attach: $_" -ForegroundColor Yellow
+                        }
+                    }
+                }
+            }
+            
+            $message.Body = $bodyBuilder.ToMessageBody()
+            
+            Write-Host "Sending email via $($Config.SmtpServer):$($Config.SmtpPort)..." -ForegroundColor Cyan
+            
+            $smtpClient = New-Object MailKit.Net.Smtp.SmtpClient
+            try {
+                $socketOptions = [MailKit.Security.SecureSocketOptions]::Auto
+                if ($Config.SmtpPort -eq 465) {
+                    $socketOptions = [MailKit.Security.SecureSocketOptions]::SslOnConnect
+                } elseif ($Config.SmtpPort -eq 587) {
+                    $socketOptions = [MailKit.Security.SecureSocketOptions]::StartTls
+                } else {
+                    $socketOptions = if ($Config.UseSsl) { 
+                        [MailKit.Security.SecureSocketOptions]::SslOnConnect 
+                    } else { 
+                        [MailKit.Security.SecureSocketOptions]::None 
+                    }
+                }
+                
+                $smtpClient.Connect($Config.SmtpServer, $Config.SmtpPort, $socketOptions)
+                $smtpClient.Authenticate($Config.Username, $Config.Password)
+                $smtpClient.Send($message)
+                $smtpClient.Disconnect($true)
+                
+                Write-Host "✓ Email sent successfully using MailKit!" -ForegroundColor Green
+            } finally {
+                if ($smtpClient -and $smtpClient.IsConnected) {
+                    $smtpClient.Disconnect($true)
+                }
+                if ($smtpClient) {
+                    $smtpClient.Dispose()
+                }
+            }
+            
+            foreach ($attachment in $Attachments) {
+                if ($attachment -like "*.zip") {
+                    try {
+                        Remove-Item $attachment -Force -ErrorAction SilentlyContinue
+                        Write-Host "  ✓ Cleaned up temporary zip: $(Split-Path $attachment -Leaf)" -ForegroundColor Gray
+                    } catch { }
+                }
+            }
+            
+            return $true
+            
+        } finally {
+            foreach ($stream in $attachmentStreams) {
+                try { $stream.Dispose() } catch { }
+            }
+        }
+        
+    } catch {
+        Write-Host "✗ Failed to send email: $_" -ForegroundColor Red
+        return $false
+    }
+}
+
+# ====================================================================
+# Create Email Body with Language Selection
+# ====================================================================
+function Create-EmailBody {
+    [CmdletBinding()]
+    param(
+        [array]$RunSummaries,
+        [hashtable]$Config,
+        [string]$ScheduleStart = $null,
+        [string]$ScheduleEnd = $null,
+        [string]$Language = 'en'
+    )
+    
+    $t = $script:Translations[$Language]
+    if (-not $t) { $t = $script:Translations['en'] }
+    
+    $runCount = $RunSummaries.Count
+    $summaryCount = ($RunSummaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
+    $metadataOnlyCount = ($RunSummaries | Where-Object { $_.CollectionType -eq "METADATA_ONLY" }).Count
+    $noDataCount = $runCount - $summaryCount - $metadataOnlyCount
+    
+    $successCount = ($RunSummaries | Where-Object { $_.Status -eq "SUCCESS" }).Count
+    $failedCount = ($RunSummaries | Where-Object { $_.Status -eq "FAILED" }).Count
+    $unknownCount = $runCount - $successCount - $failedCount
+    
+    $htmlBody = @"
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 25px; }
+        .summary-box { background: #ecf0f1; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .run-card { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-left: 4px solid #0078d4;
+            border-radius: 3px;
+        }
+        .run-success { border-left-color: #27ae60; }
+        .run-failed { border-left-color: #e74c3c; }
+        .run-unknown { border-left-color: #95a5a6; }
+        .run-metadata-only { border-left-color: #f39c12; }
+        .status-badge { 
+            display: inline-block; 
+            padding: 3px 8px; 
+            border-radius: 12px; 
+            font-size: 12px; 
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-failed { background: #f8d7da; color: #721c24; }
+        .status-unknown { background: #d1ecf1; color: #0c5460; }
+        .collection-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 8px;
+        }
+        .collection-summary { background: #28a745; color: white; }
+        .collection-metadata { background: #ffc107; color: black; }
+        .metadata { font-size: 12px; color: #7f8c8d; margin-top: 5px; }
+        .timestamp { color: #95a5a6; font-size: 11px; }
+        .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; font-size: 12px; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1> $($t.ReportTitle) </h1>
+        
+        <div class="summary-box">
+            <h2> $($t.SummaryTitle) </h2>
+            <p><strong>$($t.TotalRuns)</strong> $runCount</p>
+            <p><strong>$($t.WithSummary)</strong> <span style="color: #28a745;">$summaryCount</span></p>
+            <p><strong>$($t.MetadataOnly)</strong> <span style="color: #ffc107;">$metadataOnlyCount</span></p>
+            <p><strong>$($t.NoData)</strong> <span style="color: #dc3545;">$noDataCount</span></p>
+            <p><strong>$($t.Successful)</strong> <span style="color: #28a745;">$successCount</span></p>
+            <p><strong>$($t.Failed)</strong> <span style="color: #dc3545;">$failedCount</span></p>
+            <p><strong>$($t.UnknownStatus)</strong> <span style="color: #6c757d;">$unknownCount</span></p>
+"@
+
+    if ($ScheduleStart -and $ScheduleEnd) {
+        $htmlBody += @"
+            <p><strong>$($t.ScheduleWindow)</strong> $ScheduleStart to $ScheduleEnd</p>
+"@
+    }
+    
+    $htmlBody += @"
+            <p><strong>$($t.ReportTime)</strong> $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')</p>
+        </div>
+        
+        <h2> $($t.DetailsTitle) </h2>
+"@
+
+    foreach ($summary in $RunSummaries) {
+        $statusClass = "run-unknown"
+        $statusBadgeClass = "status-unknown"
+        $statusText = $t.StatusUnknown
+        
+        if ($summary.Status -eq "SUCCESS") { 
+            $statusClass = "run-success"
+            $statusBadgeClass = "status-success"
+            $statusText = $t.StatusSuccess
+        } elseif ($summary.Status -eq "FAILED") { 
+            $statusClass = "run-failed"
+            $statusBadgeClass = "status-failed"
+            $statusText = $t.StatusFailed
+        }
+        
+        if ($summary.CollectionType -eq "METADATA_ONLY") {
+            $statusClass = "run-metadata-only"
+        }
+        
+        $collectionBadge = ""
+        $collectionText = ""
+        if ($summary.CollectionType -eq "SUMMARY_METADATA") {
+            $collectionBadge = "collection-summary"
+            $collectionText = $t.CollectionFull
+        } elseif ($summary.CollectionType -eq "METADATA_ONLY") {
+            $collectionBadge = "collection-metadata"
+            $collectionText = $t.CollectionMetadata
+        }
+        
+        $htmlBody += @"
+        <div class="run-card $statusClass">
+            <div>
+                <span class="status-badge $statusBadgeClass">$statusText</span>
+                <strong>$($summary.FolderName)</strong>
+                $(if ($collectionBadge) { "<span class='collection-badge $collectionBadge'>$collectionText</span>" })
+            </div>
+            <div class="timestamp">$($t.Created) $($summary.CreationTime.ToString('yyyy-MM-dd HH:mm:ss'))</div>
+            <div class="metadata">
+                $($t.ExitCode) $($summary.ExitCode)<br>
+"@
+        
+        if ($summary.Metadata) {
+            if ($summary.Metadata.worker_pid) {
+                $htmlBody += "$($t.WorkerPID) $($summary.Metadata.worker_pid)<br>"
+            }
+            if ($summary.Metadata.python_pid) {
+                $htmlBody += "$($t.PythonPID) $($summary.Metadata.python_pid)<br>"
+            }
+            if ($summary.Metadata.start_time) {
+                $htmlBody += "$($t.StartTime) $($summary.Metadata.start_time)<br>"
+            }
+            if ($summary.Metadata.end_time) {
+                $htmlBody += "$($t.EndTime) $($summary.Metadata.end_time)<br>"
+            }
+        }
+        
+        $htmlBody += @"
+            </div>
+        </div>
+"@
+    }
+
+    $htmlBody += @"
+        
+        <div class="footer">
+            <p><em>$($t.Footer)</em></p>
+            <p>$($t.System) $(Get-Date -Format 'yyyy.MM.dd')</p>
+        </div>
+    </div>
+</body>
+</html>
+"@
+    
+    return $htmlBody
+}
+# ====================================================================
+# Helper: Normalize recipient info
+# ====================================================================
+function Get-RecipientInfo {
+    param($RecipientValue)
+    if ($RecipientValue -is [hashtable]) {
+        return @{
+            Language = $RecipientValue.Language
+            Attach   = if ($RecipientValue.ContainsKey('Attach')) { $RecipientValue.Attach } else { $true }
+        }
+    } else {
+        return @{
+            Language = $RecipientValue
+            Attach   = $true   # default to attach
+        }
+    }
+}
 
 
-# recognition/__init__.py
-"""
-Face recognition systems and engines.
-"""
+# ====================================================================
+# Main Email Sending Function (modified)
+# ====================================================================
+function Send-RunReport {
+    [CmdletBinding()]
+    param(
+        [string]$BasePath,
+        [hashtable]$ConfigOverride = @{},
+        [switch]$TestMode = $false,
+        [string]$ScheduleStartTime = $null,
+        [string]$ScheduleEndTime = $null,
+        [switch]$UseTimeWindow = $false,
+        [hashtable]$Recipients = $null,  
+        [array]$CollectedRuns = $null
+    )
+    
 
-from .base_system import FaceRecognitionSystem
-from .voyager_system import VoyagerFaceRecognitionSystem, VoyagerPerformanceMonitor
-from .robust_system import RobustFaceRecognitionSystem
-#from .chroma_system import ChromaFaceRecognitionSystem
-#from .faiss_system import FaissFaceRecognitionSystem
+    # Default recipients – modify this block to set attach per email
+    # To disable attachments for an address, use:
+    # "user@example.com" = @{ Language = "en"; Attach = $false }
+    $Recipients = @{ 
+        # "faridraihan17@gmail.com"          = @{ Language = "en" ; Attach = $false}  # attachments off
+        # "ikeepmypromiz@gmail.com"          = @{ Language = "id" ; Attach = $false } # attachments off
+        "humanj241@gmail.com"               = @{ Language = "id"; Attach = $true }  # attachments on
+        # "itdiv@sinarcemaramasabadi.co.id"   = @{ Language = "id"; Attach = $false}  # attachments off
+    }
+    
+    Write-Host "==============================" -ForegroundColor Cyan
+    Write-Host "FACE RECOGNITION EMAIL REPORT" -ForegroundColor Cyan
+    Write-Host "==============================" -ForegroundColor Cyan
+    Write-Host ""
+    
+    if (-not (Initialize-EmailConfig -OverrideConfig $ConfigOverride)) {
+        return $false
+    }
+    
+    # If no recipients provided, use the default single recipient with English
+    if (-not $Recipients) {
+        $Recipients = @{ $EmailConfig.ToAddress = 'en' }
+    }
 
-__all__ = [
-    "FaceRecognitionSystem", #'ChromaFaceRecognitionSystem',
-    "VoyagerFaceRecognitionSystem", #'FaissFaceRecognitionSystem',
-    "VoyagerPerformanceMonitor",
-    "RobustFaceRecognitionSystem",
-]
+    # Determine if any recipient needs attachments
+    $needAttachments = $false
+    foreach ($recipient in $Recipients.Keys) {
+        $info = Get-RecipientInfo -RecipientValue $Recipients[$recipient]
+        if ($info.Attach) {
+            $needAttachments = $true
+            break
+        }
+    }
+    
+    $since = (Get-Date).AddHours(-$appConfig.EmailDefaultHoursBack)
+    
+    $windowStart = $null
+    $windowEnd = $null
+    if ($UseTimeWindow -and $ScheduleStartTime -and $ScheduleEndTime) {
+        try {
+            $today = Get-Date -Format "yyyy-MM-dd"
+            $windowStart = [DateTime]::ParseExact("$today $ScheduleStartTime", "yyyy-MM-dd HH:mm", $null)
+            $windowEnd = [DateTime]::ParseExact("$today $ScheduleEndTime", "yyyy-MM-dd HH:mm", $null)
+            
+            Write-Host "Using schedule time window:" -ForegroundColor Cyan
+            Write-Host "  Start: $ScheduleStartTime" -ForegroundColor White
+            Write-Host "  End: $ScheduleEndTime" -ForegroundColor White
+            Write-Host "  Window: $($windowStart.ToString('HH:mm')) to $($windowEnd.ToString('HH:mm'))" -ForegroundColor White
+        } catch {
+            Write-Host "Warning: Failed to parse schedule times. Using default $($appConfig.EmailDefaultHoursBack)-hour window." -ForegroundColor Yellow
+            Write-Host "  Error: $_" -ForegroundColor Red
+            $UseTimeWindow = $false
+        }
+    }
+    
+    Write-Host "Collecting run summaries from: $BasePath" -ForegroundColor Cyan
+    
+    # If CollectedRuns is provided, use it directly (skip re-collecting)
+    if ($CollectedRuns -ne $null) {
+        Write-Host "Using pre-collected runs from monitor validation." -ForegroundColor Green
+        $summaries = $CollectedRuns
+    } else {
+        # Fall back to original collection logic
+        $getParams = @{
+            BasePath = $BasePath
+            Since = $since
+            MaxRuns = $appConfig.EmailMaxRunsToCollect
+            TimeWindowMode = $UseTimeWindow
+        }
+        if ($UseTimeWindow -and $windowStart -and $windowEnd) {
+            $getParams.ScheduleStart = $windowStart
+            $getParams.ScheduleEnd = $windowEnd
+        }
+        $summaries = Get-RunSummaries @getParams
+    }
+    
+    if ($summaries.Count -eq 0) {
+        Write-Host "No runs found to report." -ForegroundColor Yellow
+        
+        if (-not $TestMode) {
+            foreach ($recipient in $Recipients.Keys) {
+                $info = Get-RecipientInfo -RecipientValue $Recipients[$recipient]
+                $subject = "$($EmailConfig.SubjectPrefix) No Runs Found - $(Get-Date -Format 'yyyy-MM-dd')"
+                if ($UseTimeWindow) {
+                    $subject = "$($EmailConfig.SubjectPrefix) No Runs in Window $ScheduleStartTime-$ScheduleEndTime - $(Get-Date -Format 'yyyy-MM-dd')"
+                }
+                $originalTo = $EmailConfig.ToAddress
+                $EmailConfig.ToAddress = $recipient
+                $body = Create-EmailBody -RunSummaries @() -Config $EmailConfig -ScheduleStart $ScheduleStartTime -ScheduleEnd $ScheduleEndTime -Language $info.Language
+                # No attachments for empty report anyway
+                $result = Send-EmailWithAttachments -Subject $subject -Body $body -Attachments @() -Config $EmailConfig
+                $EmailConfig.ToAddress = $originalTo
+                if (-not $result) {
+                    Write-Host "Failed to send to $recipient" -ForegroundColor Red
+                }
+            }
+        }
+        return $true
+    }
+
+    # Compute counts by collection type
+    $calcSummaryCount = ($summaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
+    $calcMetadataOnlyCount = ($summaries | Where-Object { $_.CollectionType -eq "METADATA_ONLY" }).Count
+    $calcNoDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
+    $unknownCount = $summaries.Count - ($calcSummaryCount + $calcMetadataOnlyCount + $calcNoDataCount)
+
+    # If there are runs with unknown CollectionType, treat them as No Data
+    if ($unknownCount -gt 0) {
+        Write-Host "Warning: $unknownCount runs have unknown collection type. Counting them as 'Incomplete Data'." -ForegroundColor Yellow
+        $calcNoDataCount += $unknownCount
+    }
+
+    # Set the final counts to be used in the email body
+    $summaryCount = $calcSummaryCount
+    $metadataOnlyCount = $calcMetadataOnlyCount
+    $noDataCount = $calcNoDataCount
+
+    # Prepare attachments
+    $attachments = @()
+    $totalSize = 0
+    $maxSize = $appConfig.EmailMaxAttachmentSizeMB * 1024 * 1024
+    
+    if ($needAttachments){
+        # Use the already computed counts (no need to recompute)
+        foreach ($summary in $summaries) {
+            if ($summary.CompressedFolder) {
+                $zipFile = $summary.CompressedFolder
+                $sizeInBytes = $zipFile.SizeBytes
+                if (($totalSize + $sizeInBytes) -lt $maxSize) {
+                    $attachments += $zipFile.Path
+                    $totalSize += $sizeInBytes
+                    Write-Host "  ✓ Will attach compressed folder: $($zipFile.Name) ($($zipFile.Size))" -ForegroundColor Green
+                }
+            } else {
+                foreach ($logFile in $summary.LogFiles) {
+                    $sizeInBytes = if ($logFile.SizeBytes) {
+                        $logFile.SizeBytes
+                    } elseif ($logFile.SizeKB) {
+                        $logFile.SizeKB * 1024
+                    } else { 0 }
+                    
+                    if (($totalSize + $sizeInBytes) -lt $maxSize) {
+                        $attachments += $logFile.Path
+                        $totalSize += $sizeInBytes
+                    }
+                }
+            }
+        }
+        
+    } else {
+        Write-Host "No recipients require attachments; skipping attachment generation." -ForegroundColor Yellow
+    }
+    
+    # Send to each recipient with appropriate language and attachment flag
+    $anySuccess = $false
+    $first = $true
+    foreach ($recipient in $Recipients.Keys) {
+        $info = Get-RecipientInfo -RecipientValue $Recipients[$recipient]
+        $lang = $info.Language
+        $attachForThis = if ($info.Attach) { $attachments } else { @() }
+        
+        $runCount = $summaries.Count
+        $subject = "$($EmailConfig.SubjectPrefix) $runCount Runs - $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
+        if ($UseTimeWindow) {
+            $subject = "$($EmailConfig.SubjectPrefix) $runCount Runs ($ScheduleStartTime-$ScheduleEndTime) - $(Get-Date -Format 'yyyy-MM-dd')"
+        }
+        
+        $body = Create-EmailBody -RunSummaries $summaries -Config $EmailConfig -ScheduleStart $ScheduleStartTime -ScheduleEnd $ScheduleEndTime -Language $lang
+        
+        if ($first) {
+            Write-Host "`nEmail Details (sample):" -ForegroundColor Cyan
+            Write-Host "  Subject: $subject" -ForegroundColor White
+            Write-Host "  To: $recipient ($lang) [Attachments: $($attachForThis.Count)]" -ForegroundColor White
+            Write-Host "  Total runs in collection: $($runCount)" -ForegroundColor White
+            Write-Host "  With summary: $summaryCount" -ForegroundColor Green
+            Write-Host "  Metadata only: $metadataOnlyCount" -ForegroundColor Yellow
+            Write-Host "  Incomplete data: $noDataCount" -ForegroundColor Gray
+            Write-Host "  Attachments: $($attachments.Count) files (~$([math]::Round($totalSize/1MB, 2)) MB)" -ForegroundColor White
+            $compressedCount = ($summaries | Where-Object { $_.CompressedFolder }).Count
+            Write-Host "  Compressed folders: $compressedCount" -ForegroundColor Cyan
+            if ($UseTimeWindow) {
+                Write-Host "  Time window: $ScheduleStartTime to $ScheduleEndTime" -ForegroundColor Cyan
+            }
+            $first = $false
+        }
+        
+        if ($TestMode) {
+            Write-Host "`nTest Mode: Email would be sent to $recipient ($lang) with $($attachForThis.Count) attachments." -ForegroundColor Yellow
+            $anySuccess = $true
+            continue
+        }
+        
+        $originalTo = $EmailConfig.ToAddress
+        $EmailConfig.ToAddress = $recipient
+        $success = Send-EmailWithAttachments -Subject $subject -Body $body -Attachments $attachForThis -Config $EmailConfig
+        $EmailConfig.ToAddress = $originalTo
+        
+        if ($success) {
+            Write-Host "Email sent successfully to $recipient ($lang)" -ForegroundColor Green
+            $anySuccess = $true
+        } else {
+            Write-Host "Failed to send email to $recipient ($lang)" -ForegroundColor Red
+        }
+    }
+    
+    return $anySuccess
+}
+
+# ====================================================================
+# Monitor Integration Functions (unchanged)
+# ====================================================================
+function Register-StableEmailSender {
+    param(
+        [hashtable]$MonitorConfig,
+        [hashtable]$CustomEmailConfig = @{}
+    )
+    $global:StableEmailSender = @{
+        Config         = $CustomEmailConfig
+        LastSent       = $null
+        MonitorConfig  = $MonitorConfig
+        Enabled        = $true
+        CredentialPath = $appConfig.EmailCredentialPath
+    }
+    return $true
+}
+
+function Invoke-StableEmailReport {
+    [CmdletBinding()]
+    param(
+        [switch]$Force = $false,
+        [array]$CollectedRuns = $null      # NEW: optional pre-collected runs
+    )
+    
+    if (-not $global:StableEmailSender -or -not $global:StableEmailSender.Enabled) {
+        Write-Host "Stable email sender not registered or disabled" -ForegroundColor Yellow
+        return $false
+    }
+    
+    $shouldSend = $Force -or (
+        $global:StableEmailSender.LastSent -eq $null -or 
+        ((Get-Date) - $global:StableEmailSender.LastSent).TotalHours -ge 1
+    )
+    
+    if ($shouldSend) {
+        Write-Host "Sending email report..." -ForegroundColor Cyan
+        Write-Host "Time: $(Get-Date -Format 'HH:mm:ss')" -ForegroundColor Gray
+        
+        if (-not $global:StableEmailSender.Config -or $global:StableEmailSender.Config.Count -eq 0) {
+            $global:StableEmailSender.Config = @{
+                SubjectPrefix = "[FaceRecog]"
+            }
+        }
+        
+        $scheduleStart = $global:StableEmailSender.Config.ScheduleStartTime
+        $scheduleEnd = $global:StableEmailSender.Config.ScheduleEndTime
+        $useTimeWindow = ($scheduleStart -and $scheduleEnd)
+        
+        if ($useTimeWindow) {
+            Write-Host "Using schedule window: $scheduleStart to $scheduleEnd" -ForegroundColor White
+        }
+        
+        # Pass CollectedRuns to Send-RunReport
+        $success = Send-RunReport -BasePath $global:StableEmailSender.MonitorConfig.RunsBasePath `
+            -ConfigOverride $global:StableEmailSender.Config `
+            -ScheduleStartTime $scheduleStart `
+            -ScheduleEndTime $scheduleEnd `
+            -UseTimeWindow:$useTimeWindow `
+            -CollectedRuns $CollectedRuns   # NEW
+        
+        if ($success) {
+            $global:StableEmailSender.LastSent = Get-Date
+            Write-Host "Email sent successfully at $(Get-Date -Format 'HH:mm:ss')" -ForegroundColor Green
+        } else {
+            Write-Host "Failed to send email" -ForegroundColor Red
+        }
+        
+        return $success
+    } else {
+        Write-Host "Email report not sent (recently sent at $($global:StableEmailSender.LastSent.ToString('HH:mm:ss')))" -ForegroundColor Gray
+        return $true
+    }
+}
+
+
+# ====================================================================
+# Direct Execution
+# ====================================================================
+if ($MyInvocation.InvocationName -ne '.') {
+    Write-Host "==============================" -ForegroundColor Cyan
+    Write-Host "DIRECT EMAIL REPORT TEST" -ForegroundColor Cyan
+    Write-Host "==============================" -ForegroundColor Cyan
+    Write-Host ""
+    
+    $commonPathsScript = Join-Path $PSScriptRoot $appConfig.EmailCommonPathsScript
+    if (Test-Path $commonPathsScript) {
+        try {
+            . $commonPathsScript
+            $paths = Initialize-ProjectPortablePaths -IsMonitor -Silent
+            if ($paths -and $paths.DateBasedPath) {
+                Write-Host "Found base path: $($paths.DateBasedPath)" -ForegroundColor Green
+                
+                $testConfig = @{
+                    SubjectPrefix = "[Test] FaceRecog"
+                }
+                
+                # Example: send to two recipients with different languages
+                $recipients = @{
+                    "english@example.com" = "en"
+                    "bahasa@example.com"  = "id"
+                }
+                
+                $result = Send-RunReport -BasePath $paths.DateBasedPath -ConfigOverride $testConfig -TestMode -Recipients $recipients
+                
+                if ($result) {
+                    Write-Host "`n✓ Email test completed successfully!" -ForegroundColor Green
+                    Write-Host "   Run with -TestMode:`$false to send actual email." -ForegroundColor Yellow
+                } else {
+                    Write-Host "`n✗ Email test failed" -ForegroundColor Red
+                }
+            } else {
+                Write-Host "Could not initialize paths" -ForegroundColor Red
+            }
+        } catch {
+            Write-Host "Error: $_" -ForegroundColor Red
+        }
+    } else {
+        Write-Host "Common paths script not found at: $commonPathsScript" -ForegroundColor Red
+    }
+}
+
+# 1_monitor.ps1
+<#
+.SYNOPSIS
+Enhanced time-based process monitor for Face Recognition pipeline with PID tracking.
+Now uses blocking wait for low CPU usage.
+#>
+
+# ====================================================================
+# LOAD COMMON MODULE – always first
+# ====================================================================
+$commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
+if (-not (Test-Path $commonPathsScript)) { throw "Common paths script not found" }
+. $commonPathsScript
+
+$centralConfig = Get-ApplicationConfig
+
+# ====================================================================
+# INITIALISE PATHS – single attempt, no fallback clutter
+# ====================================================================
+Write-Host "Initialising enhanced monitor..." -ForegroundColor Cyan
+try {
+    $paths = Initialize-ProjectPortablePaths -IsMonitor
+} catch {
+    Write-Host "FATAL: Paths initialisation failed: $_" -ForegroundColor Red
+    exit 1
+}
+$global:MonitorPaths = $paths
+
+# ====================================================================
+# MONITOR‑SPECIFIC CONFIG – built from central config + paths
+# ====================================================================
+# Default maximum runtime for a single worker (in minutes)
+$maxRuntimeMinutes = if ($centralConfig.ContainsKey('MonitorMaxWorkerRuntimeMinutes')) {
+    $centralConfig.MonitorMaxWorkerRuntimeMinutes
+} else {
+    60
+}
+
+$Script:Config = @{
+    StartTime        = $centralConfig.EveryStartTime
+    EndTime          = $centralConfig.EveryEndTime
+    WorkerScript     = $paths.WorkerScript
+    PythonScript     = $paths.PythonScriptPath
+    RunsBasePath     = $paths.DateBasedPath
+    PIDFilePath      = $paths.PIDFilePath
+    LogFile          = $paths.LogFile
+    EmailSenders     = $paths.EmailSendScript
+    ProcessCheckInterval = $centralConfig.MonitorProcessCheckInterval   # kept for compatibility, not used in main loop
+    MaxPIDFileAgeMinutes = $centralConfig.MonitorMaxPIDFileAgeMinutes
+    ExpectedSubfolders   = $centralConfig.ExpectedSubfolders
+    ExpectedFiles        = $centralConfig.ExpectedFiles
+    MaxValidationRetries = $centralConfig.MaxValidationRetries
+    RetryDelaySeconds    = $centralConfig.RetryDelaySeconds
+    MaxWorkerRuntimeMinutes = $maxRuntimeMinutes
+}
+
+# ====================================================================
+# SINGLETON INSTANCE LOCK – improved lock file path
+# ====================================================================
+$global:MonitorLockFile = Join-Path $env:TEMP "maskRecog_monitor_$PID.lock"
+if (Test-Path $global:MonitorLockFile) {
+    $existingPID = Get-Content $global:MonitorLockFile -ErrorAction SilentlyContinue
+    if ($existingPID) {
+        try {
+            $null = Get-Process -Id $existingPID -ErrorAction Stop
+            Write-Host "Another monitor instance is running (PID: $existingPID). Exiting." -ForegroundColor Yellow
+            exit 0
+        } catch { Remove-Item $global:MonitorLockFile -Force -ErrorAction SilentlyContinue }
+    }
+}
+$PID | Out-File $global:MonitorLockFile -Force
+
+# ====================================================================
+# LOCAL LOGGING WRAPPER – uses shared Write-CommonLog
+# ====================================================================
+function Write-Log {
+    param([string]$Message, [string]$Level = "INFO")
+    Write-CommonLog -Message $Message -Level $Level -LogFile $Script:Config.LogFile
+}
+
+# ====================================================================
+# GLOBAL STATE – with missing console‑handler defaults added
+# ====================================================================
+$global:WorkerProcess = $null
+$global:WorkerPID = $null
+$global:PythonPID = $null
+$global:WorkerStartTime = $null
+$global:PythonStartTime = $null
+$global:WorkerIsRunning = $false
+$global:PythonIsRunning = $false
+$global:LastWorkerAttempt = $null
+$global:CollectedRunFolders = @()
+$global:IsShuttingDown = $false
+$global:ForceStopWindowSeconds = 3
+$global:ForceStopThreshold = 2
+$global:ForceStopAttempts = 0
+$global:LastForceStopTime = $null
+
+# ====================================================================
+# CONSOLE CONTROL HANDLER – uses the newly defined globals
+# ====================================================================
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+public class ConsoleCtrlHandler {
+    public delegate bool ConsoleEventDelegate(int eventType);
+    [DllImport("kernel32.dll")] public static extern bool SetConsoleCtrlHandler(ConsoleEventDelegate handler, bool add);
+}
+"@
+$handler = [ConsoleCtrlHandler+ConsoleEventDelegate]{
+    param($eventType)
+    $current = Get-Date
+    $sinceLast = if ($global:LastForceStopTime) { ($current - $global:LastForceStopTime).TotalSeconds } else { [double]::MaxValue }
+    switch ($eventType) {
+        { $_ -in 0,1 } {
+            Write-Host "`n[Console] Control event detected" -ForegroundColor Yellow
+            if ($sinceLast -lt $global:ForceStopWindowSeconds) {
+                $global:ForceStopAttempts++
+                Write-Host "  Rapid attempt ($global:ForceStopAttempts/$global:ForceStopThreshold)" -ForegroundColor Yellow
+            } else { $global:ForceStopAttempts = 1 }
+            $global:LastForceStopTime = $current
+            if ($global:ForceStopAttempts -ge $global:ForceStopThreshold) {
+                Write-Host "  Force shutdown requested" -ForegroundColor Red
+                $global:IsShuttingDown = $true
+                return $true
+            }
+            Write-Host "  Press Ctrl+C again within $($global:ForceStopWindowSeconds)s to force stop." -ForegroundColor Yellow
+            return $true
+        }
+        default { return $false }
+    }
+}
+[void][ConsoleCtrlHandler]::SetConsoleCtrlHandler($handler, $true)
+
+# ====================================================================
+# Process Management Functions
+# ====================================================================
+function Is-ProcessRunning {
+    param(
+        [int]$ProcessId, 
+        [string]$ProcessName
+    )
+    if (-not $ProcessId -or $ProcessId -eq 0) { return $false }
+    try {
+        $process = Get-Process -Id $ProcessId -ErrorAction Stop
+        if ($ProcessName) {
+            return ($process.ProcessName -like "*$ProcessName*" -and (-not $process.HasExited))
+        }
+        return (-not $process.HasExited)
+    } catch { return $false }
+}
+
+function Find-PythonProcess {
+    Write-Log "Looking for Python PID from available data..." -Level "DEBUG"
+    if ($global:PythonPID -and $global:PythonPID -ne 0) {
+        Write-Log "Using Python PID from worker output: $global:PythonPID" -Level "DEBUG"
+        return $global:PythonPID
+    }
+    $runFolder = Find-LatestRunFolder
+    if ($runFolder) {
+        $metadataPath = Join-Path $runFolder.FullName "metadata.json"
+        if (Test-Path $metadataPath) {
+            try {
+                $metadata = Get-Content $metadataPath -Raw | ConvertFrom-Json
+                if ($metadata.PSObject.Properties.Name -contains "python_pid") {
+                    $foundPID = $metadata.python_pid
+                    Write-Log "Found Python PID in metadata: $foundPID" -Level "INFO"
+                    return $foundPID
+                }
+            } catch { }
+        }
+    }
+    Write-Log "No Python process data available yet" -Level "DEBUG"
+    return $null
+}
+
+# ====================================================================
+# Modified Start-WorkerProcess – returns process object
+# ====================================================================
+function Start-WorkerProcess {
+    Write-Log "Starting face recognition worker..." -Level "INFO"
+    try {
+        if (-not (Test-Path $Script:Config.WorkerScript)) {
+            Write-Log "ERROR: Worker script not found at: $($Script:Config.WorkerScript)" -Level "ERROR"
+            return $null
+        }
+        Write-Log "Starting worker process..." -Level "INFO"
+        $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+        $processInfo.FileName = "powershell.exe"
+        $arguments = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "`"$($Script:Config.WorkerScript)`"")
+        $processInfo.Arguments = $arguments
+        $processInfo.UseShellExecute = $false
+        $processInfo.RedirectStandardOutput = $true
+        $processInfo.RedirectStandardError = $true
+        $processInfo.CreateNoWindow = $true
+        $workerProcess = New-Object System.Diagnostics.Process
+        $workerProcess.StartInfo = $processInfo
+
+        $stdOutBuilder = New-Object System.Text.StringBuilder
+        $stdErrBuilder = New-Object System.Text.StringBuilder
+
+        $outAction = { if (-not [String]::IsNullOrEmpty($EventArgs.Data)) { $Event.MessageData.AppendLine($EventArgs.Data) } }
+        $errAction = { if (-not [String]::IsNullOrEmpty($EventArgs.Data)) { $Event.MessageData.AppendLine($EventArgs.Data) } }
+
+        $stdOutEvent = Register-ObjectEvent -InputObject $workerProcess -EventName 'OutputDataReceived' -Action $outAction -MessageData $stdOutBuilder
+        $stdErrEvent = Register-ObjectEvent -InputObject $workerProcess -EventName 'ErrorDataReceived' -Action $errAction -MessageData $stdErrBuilder
+
+        if ($workerProcess.Start()) {
+            $global:WorkerPID = $workerProcess.Id
+            $global:WorkerStartTime = Get-Date
+            $global:WorkerIsRunning = $true
+            $global:WorkerProcess = $workerProcess
+            Write-Log "Worker process started (PID: $global:WorkerPID)" -Level "SUCCESS"
+            $workerProcess.BeginOutputReadLine()
+            $workerProcess.BeginErrorReadLine()
+            Start-Sleep -Seconds 2
+
+            if ($workerProcess.HasExited) {
+                $exitCode = $workerProcess.ExitCode
+                $output = $stdOutBuilder.ToString()
+                $errorOutput = $stdErrBuilder.ToString()
+                Write-Log "Worker process exited immediately with code: $exitCode" -Level "ERROR"
+                if ($output) { foreach ($line in $output -split "`n") { if ($line.Trim()) { Write-Log "  $line" -Level "DEBUG" } } }
+                if ($errorOutput) { foreach ($line in $errorOutput -split "`n") { if ($line.Trim()) { Write-Log "  $line" -Level "ERROR" } } }
+                Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
+                Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
+                return $null
+            }
+
+            Write-Log "Worker process is running, waiting for Python..." -Level "INFO"
+            $maxWait = 60; $waited = 0
+            while ($waited -lt $maxWait) {
+                $foundPID = Find-PythonProcess
+                if ($foundPID) {
+                    $global:PythonPID = $foundPID
+                    $global:PythonIsRunning = $true
+                    $global:PythonStartTime = Get-Date
+                    Write-Log "Python process found (PID: $global:PythonPID)" -Level "SUCCESS"
+                    Save-PIDTracking
+                    Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
+                    Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
+                    return $workerProcess
+                }
+                Start-Sleep -Seconds 5; $waited += 5
+                if ($workerProcess.HasExited) {
+                    Write-Log "Worker process exited while waiting for Python" -Level "ERROR"
+                    break
+                }
+            }
+            Write-Log "Python process not found within $maxWait seconds" -Level "WARN"
+            Unregister-Event -SourceIdentifier $stdOutEvent.Name -ErrorAction SilentlyContinue
+            Unregister-Event -SourceIdentifier $stdErrEvent.Name -ErrorAction SilentlyContinue
+            Save-PIDTracking
+            return $workerProcess
+        } else {
+            Write-Log "Failed to start worker process" -Level "ERROR"
+            return $null
+        }
+    } catch {
+        Write-Log "ERROR starting worker: $_" -Level "ERROR"
+        Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
+        return $null
+    }
+}
+
+function Stop-WorkerProcess {
+    Write-Log "Stopping worker process..." -Level "INFO"
+    $stoppedProcesses = @()
+    $processesToStop = @()
+    if ($global:PythonPID -and $global:PythonPID -ne 0) {
+        try {
+            $pythonProcess = Get-Process -Id $global:PythonPID -ErrorAction SilentlyContinue
+            if ($pythonProcess -and (-not $pythonProcess.HasExited)) {
+                $processesToStop += @{ Type = "Python"; PID = $global:PythonPID; Process = $pythonProcess }
+            }
+        } catch { Write-Log "Python process not found (PID: $global:PythonPID) - $_" -Level "DEBUG" }
+    }
+    if ($global:WorkerPID -and $global:WorkerPID -ne 0) {
+        try {
+            $workerProcess = Get-Process -Id $global:WorkerPID -ErrorAction SilentlyContinue
+            if ($workerProcess -and (-not $workerProcess.HasExited)) {
+                $processesToStop += @{ Type = "Worker"; PID = $global:WorkerPID; Process = $workerProcess }
+            }
+        } catch { Write-Log "Worker process not found (PID: $global:WorkerPID) - $_" -Level "DEBUG" }
+    }
+    foreach ($procInfo in $processesToStop | Where-Object { $_.Type -eq "Python" }) {
+        Write-Log "Stopping $($procInfo.Type) process (PID: $($procInfo.PID))..." -Level "INFO"
+        try {
+            $procInfo.Process.Kill()
+            Write-Log "Waiting 10 seconds for Python process to stop completely..." -Level "WARN"
+            Start-Sleep -Seconds 10
+            $timeout = 10
+            $startTime = Get-Date
+            while ((-not $procInfo.Process.HasExited) -and ((Get-Date) - $startTime).TotalSeconds -lt $timeout) { Start-Sleep -Milliseconds 100 }
+            if ($procInfo.Process.HasExited) { $stoppedProcesses += $procInfo.Type; Write-Log "$($procInfo.Type) process stopped successfully" -Level "SUCCESS" }
+            else { Write-Log "$($procInfo.Type) process did not stop within timeout" -Level "WARN" }
+        } catch { Write-Log "Error stopping $($procInfo.Type) process: $_" -Level "ERROR" }
+    }
+    foreach ($procInfo in $processesToStop | Where-Object { $_.Type -eq "Worker" }) {
+        Write-Log "Stopping $($procInfo.Type) process (PID: $($procInfo.PID))..." -Level "INFO"
+        try {
+            if ($procInfo.Process.CloseMainWindow()) {
+                $timeout = 5
+                $startTime = Get-Date
+                while ((-not $procInfo.Process.HasExited) -and ((Get-Date) - $startTime).TotalSeconds -lt $timeout) { Start-Sleep -Milliseconds 100 }
+            }
+            if (-not $procInfo.Process.HasExited) { $procInfo.Process.Kill(); Start-Sleep -Seconds 2 }
+            if ($procInfo.Process.HasExited) { $stoppedProcesses += $procInfo.Type; Write-Log "$($procInfo.Type) process stopped successfully" -Level "SUCCESS" }
+        } catch { Write-Log "Error stopping $($procInfo.Type) process: $_" -Level "ERROR" }
+    }
+    Write-Log "Checking for known orphaned processes..." -Level "INFO"
+    $orphanedProcesses = @()
+    if ($global:PythonPID -and $global:PythonPID -ne 0) {
+        try {
+            $proc = Get-Process -Id $global:PythonPID -ErrorAction SilentlyContinue
+            if ($proc -and (-not $proc.HasExited)) { Write-Log "Found orphaned Python process (PID: $global:PythonPID) - terminating" -Level "WARN"; $proc.Kill(); $orphanedProcesses += "Python:$global:PythonPID"; Start-Sleep -Seconds 1 }
+        } catch { }
+    }
+    $global:WorkerProcess = $null
+    $global:WorkerPID = $null
+    $global:PythonPID = $null
+    $global:WorkerIsRunning = $false
+    $global:PythonIsRunning = $false
+    $global:WorkerStartTime = $null
+    $global:PythonStartTime = $null
+    $commPaths = Initialize-CommunicationPaths -Paths $global:MonitorPaths -IsMonitor
+    if (Test-Path $commPaths.CommunicationDir) { Remove-Item -Path $commPaths.CommunicationDir -Recurse -Force -ErrorAction SilentlyContinue; Write-Log "Cleaned up communication directory" -Level "DEBUG" }
+    if ($stoppedProcesses.Count -gt 0) { Write-Log "Successfully stopped processes: $($stoppedProcesses -join ', ')" -Level "INFO" }
+    if ($orphanedProcesses.Count -gt 0) { Write-Log "Cleaned up orphaned processes: $($orphanedProcesses.Count)" -Level "INFO" }
+    Write-Log "Worker process cleanup completed" -Level "INFO"
+}
+
+# ====================================================================
+# Email Reporting Integration (unchanged)
+# ====================================================================
+function Initialize-EmailReporting {
+    Write-Log "Initializing email reporting..." -Level "INFO"
+    $emailSenderScript = $Script:Config.EmailSenders
+    if (Test-Path $emailSenderScript) {
+        try {
+            Remove-Item "function:Invoke-StableEmailReport" -ErrorAction SilentlyContinue
+            Remove-Item "function:Register-StableEmailSender" -ErrorAction SilentlyContinue
+            Remove-Item "function:Send-RunReport" -ErrorAction SilentlyContinue
+            . $emailSenderScript
+            if (-not (Get-Command -Name "Invoke-StableEmailReport" -ErrorAction SilentlyContinue)) {
+                Write-Log "ERROR: Invoke-StableEmailReport function not found after loading script" -Level "ERROR"
+                return $false
+            }
+            $emailConfig = @{
+                ScheduleStartTime = $Script:Config.StartTime
+                ScheduleEndTime = $Script:Config.EndTime
+                EmailSubject = "[FaceRecog] Runs - $(Get-Date -Format 'yyyy-MM-dd') - Schedule: $($Script:Config.StartTime)-$($Script:Config.EndTime)"
+            }
+            $registrationResult = Register-StableEmailSender -MonitorConfig $Script:Config -CustomEmailConfig $emailConfig
+            if ($registrationResult -and $global:StableEmailSender) {
+                Write-Log "Stable Email sender initialized successfully" -Level "SUCCESS"
+                return $true
+            } else { Write-Log "Failed to register stable email sender" -Level "ERROR"; return $false }
+        } catch {
+            Write-Log "Failed to initialize email reporting: $_" -Level "ERROR"
+            Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
+            return $false
+        }
+    } else { Write-Log "Email sender script not found: $emailSenderScript" -Level "WARN"; return $false }
+}
+
+function Invoke-EmailReport {
+    [CmdletBinding()] param(
+        [switch]$Force = $false,
+        [array]$CollectedRuns = $null           
+        )
+
+    Write-Log "Scheduled email report triggered..." -Level "INFO"
+    Write-Log "Email configuration:" -Level "DEBUG"
+    Write-Log "  Start time: $($Script:Config.StartTime)" -Level "DEBUG"
+    Write-Log "  End time: $($Script:Config.EndTime)" -Level "DEBUG"
+    Write-Log "  Runs base path: $($Script:Config.RunsBasePath)" -Level "DEBUG"
+
+    try {
+        if (-not (Get-Command -Name "Invoke-StableEmailReport" -ErrorAction SilentlyContinue)) {
+            Write-Log "Invoke-StableEmailReport function not available, attempting to load email sender..." -Level "WARN"
+            $emailTestScript = $Script:Config.EmailSenders
+            if (Test-Path $emailTestScript) { . $emailTestScript; Write-Log "Email sender script reloaded" -Level "INFO" }
+            else { Write-Log "ERROR: Email sender script not found at: $emailTestScript" -Level "ERROR"; return $false }
+        }
+        if (-not $global:StableEmailSender -or -not $global:StableEmailSender.Enabled) {
+            Write-Log "Stable email sender not registered or disabled, attempting to initialize..." -Level "WARN"
+            $reinitialized = Initialize-EmailReporting
+            if (-not $reinitialized) { Write-Log "Failed to re-initialize email reporting" -Level "ERROR"; return $false }
+        }
+        Write-Log "Sending email report for schedule starting at: $($Script:Config.StartTime)" -Level "INFO"
+
+        # Pass CollectedRuns to the stable sender
+        $success = Invoke-StableEmailReport -Force:$Force -CollectedRuns $CollectedRuns
+        if ($success) { Write-Log "Email report sent successfully!" -Level "SUCCESS" }
+        else { Write-Log "Failed to send email report" -Level "ERROR" }
+        return $success
+    } catch {
+        Write-Log "Error in email report: $_" -Level "ERROR"
+        Write-Log "Stack trace: $($_.ScriptStackTrace)" -Level "DEBUG"
+        return $false
+    }
+}
+
+
+# ====================================================================
+# PID Tracking (kept for compatibility)
+# ====================================================================
+function Save-PIDTracking {
+    $PIDTracking = @{
+        WorkerPID = $global:WorkerPID
+        PythonPID = $global:PythonPID
+        WorkerStartTime = if ($global:WorkerStartTime) { $global:WorkerStartTime.ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
+        PythonStartTime = if ($global:PythonStartTime) { $global:PythonStartTime.ToString("yyyy-MM-dd HH:mm:ss") } else { $null }
+        RunFolder = $global:CurrentRunFolder
+        LastUpdate = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    }
+    try {
+        if ($Script:Config.PIDFilePath) {
+            $PIDTracking | ConvertTo-Json -Depth 5 | Out-File -FilePath $Script:Config.PIDFilePath -Force
+            Write-Log "PID tracking saved" -Level "DEBUG" -LogFile $Script:Config.LogFile
+        }
+    } catch { Write-Log "Failed to save PID tracking: $_" -Level "ERROR" -LogFile $Script:Config.LogFile }
+}
+
+# ====================================================================
+# Folder and Validation Functions
+# ====================================================================
+function Find-LatestRunFolder {
+    try {
+        if (-not $Script:Config.RunsBasePath -or -not (Test-Path $Script:Config.RunsBasePath)) { return $null }
+        $folders = Get-ChildItem -Path $Script:Config.RunsBasePath -Directory -Filter $Script:Config.OutputFolderPattern -ErrorAction SilentlyContinue
+        if (-not $folders) { return $null }
+        return $folders | Sort-Object CreationTime -Descending | Select-Object -First 1
+    } catch { Write-Log "Error finding run folders: $_" -Level "ERROR"; return $null }
+}
+
+function Validate-Output {
+    param(
+        [int]$RetryCount = 0,
+        [switch]$CollectAll = $false,
+        [DateTime]$CollectionStart = $null,
+        [DateTime]$CollectionEnd = $null
+    )
+    if ($CollectAll) {
+        $start = if ($null -ne $CollectionStart) { $CollectionStart } else {
+            [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.StartTime, "yyyy-MM-dd HH:mm", $null)
+        }
+        $end = if ($null -ne $CollectionEnd) { $CollectionEnd } else {
+            [DateTime]::ParseExact((Get-Date -Format "yyyy-MM-dd") + " " + $Script:Config.EndTime, "yyyy-MM-dd HH:mm", $null)
+        }
+        $collected = Collect-RunsFromTimeWindow -BasePath $Script:Config.RunsBasePath -WindowStart $start -WindowEnd $end -ValidateEach
+        $global:CollectedRunFolders = $collected
+        $valid = ($collected | Where-Object { $_.Status -eq "VALID" }).Count
+        $invalid = ($collected | Where-Object { $_.Status -eq "INVALID" }).Count
+        return @{
+            Success = ($invalid -eq 0)
+            Mode = "COLLECT_ALL"
+            CollectionResults = @{ TotalRuns = $collected.Count; ValidRuns = $valid; InvalidRuns = $invalid }
+            TotalRuns = $collected.Count
+            ValidRuns = $valid
+            InvalidRuns = $invalid
+        }
+    } else {
+        $folder = Get-LatestRunFolder -BasePath $Script:Config.RunsBasePath
+        if (-not $folder) {
+            if ($RetryCount -lt $Script:Config.MaxValidationRetries) {
+                Start-Sleep -Seconds $Script:Config.RetryDelaySeconds
+                return Validate-Output -RetryCount ($RetryCount+1)
+            }
+            return @{ Success = $false; Mode = "SINGLE"; Error = "No output folder created" }
+        }
+        $validation = Test-RunFolder -FolderPath $folder.FullName
+        $global:CurrentRunFolder = $folder.FullName
+        return @{
+            Success = $validation.Success
+            Mode = "SINGLE"
+            RunFolder = $folder.FullName
+            FolderName = $folder.Name
+            ValidationDetails = $validation
+        }
+    }
+}
+
+function Test-TimeWindow {
+    param([string]$TargetTime)
+    $now = Get-Date
+    try {
+        $target = [DateTime]::ParseExact($TargetTime, "HH:mm", $null)
+        return ($now.TimeOfDay -ge $target.TimeOfDay)
+    } catch {
+        Write-Log "Invalid time format: $TargetTime" -Level "ERROR"
+        return $false
+    }
+}
+
+# ====================================================================
+# MAIN EXECUTION – redesigned with blocking waits
+# ====================================================================
+try {
+    if ($Script:Config.LogFile) {
+        $null = New-Item -ItemType Directory -Path (Split-Path $Script:Config.LogFile -Parent) -Force
+    }
+
+    Write-Log "=== Enhanced Face Recognition Monitor Started ===" -Level "INFO"
+    Write-Log "Version: 2.2 (Blocking wait, low CPU)" -Level "INFO"
+    Write-Log "Start Time: $($Script:Config.StartTime)" -Level "INFO"
+    Write-Log "End Time: $($Script:Config.EndTime)" -Level "INFO"
+    Write-Log "Max Worker Runtime: $($Script:Config.MaxWorkerRuntimeMinutes) minutes" -Level "INFO"
+
+    if (-not (Test-Path $Script:Config.RunsBasePath)) {
+        New-Item -ItemType Directory -Path $Script:Config.RunsBasePath -Force | Out-Null
+    }
+
+    $emailReportingInitialized = Initialize-EmailReporting
+
+    # Determine absolute start and end DateTimes for today
+    $today = Get-Date -Format "yyyy-MM-dd"
+    $startDateTime = [DateTime]::ParseExact("$today $($Script:Config.StartTime)", "yyyy-MM-dd HH:mm", $null)
+    $endDateTime   = [DateTime]::ParseExact("$today $($Script:Config.EndTime)",   "yyyy-MM-dd HH:mm", $null)
+
+    # If current time is already past end time, collect and exit immediately
+    if ((Get-Date) -gt $endDateTime) {
+        Write-Log "Current time is past end time. Starting immediate collection and exit." -Level "WARN"
+        $global:LastValidation = Validate-Output -CollectAll -CollectionStart $startDateTime -CollectionEnd $endDateTime
+        if ($emailReportingInitialized) {
+            Invoke-EmailReport -Force -CollectedRuns $global:CollectedRunFolders   # <-- added CollectedRuns
+        }
+        exit 0
+    }
+
+    
+
+    # Wait until start time if we are too early
+    $now = Get-Date
+    if ($now -lt $startDateTime) {
+        $waitSeconds = ($startDateTime - $now).TotalSeconds
+        Write-Log "Waiting $([math]::Round($waitSeconds,0)) seconds until start time $($Script:Config.StartTime) ..." -Level "INFO"
+        Start-Sleep -Seconds $waitSeconds   # blocking wait – zero CPU
+    }
+
+    # We are now within the active window
+    Write-Log "Entering active window. Will run workers until $($Script:Config.EndTime)" -Level "INFO"
+
+    # Main loop: run workers sequentially until end time
+    while ((Get-Date) -lt $endDateTime) {
+        # Start a worker only if none is currently running
+        if (-not $global:WorkerIsRunning) {
+            $worker = Start-WorkerProcess
+            if (-not $worker) {
+                Write-Log "Failed to start worker. Retrying in 60 seconds." -Level "ERROR"
+                Start-Sleep -Seconds 60
+                continue
+            }
+            # Worker process is now running; it has set $global:WorkerPID, $global:PythonPID, etc.
+        }
+
+        # Calculate timeout: either the maximum allowed runtime or the time remaining until end of window
+        $remainingToEnd = ($endDateTime - (Get-Date)).TotalMilliseconds
+        $timeoutMs = [math]::Min($Script:Config.MaxWorkerRuntimeMinutes * 60 * 1000, $remainingToEnd)
+        if ($timeoutMs -le 0) { break }   # window already closed
+
+        Write-Log "Waiting for worker (PID: $global:WorkerPID) to finish (timeout = $([math]::Round($timeoutMs/1000/60,1)) minutes)..." -Level "INFO"
+
+        # BLOCKING WAIT – process suspended, zero CPU
+        $exited = $global:WorkerProcess.WaitForExit($timeoutMs)
+
+        if ($exited) {
+            # Worker exited naturally
+            $exitCode = $global:WorkerProcess.ExitCode
+            Write-Log "Worker exited naturally with code $exitCode" -Level "INFO"
+            $global:WorkerIsRunning = $false
+            $global:WorkerProcess.Dispose()
+            # Optionally, collect this single run immediately? Not required; final collection will catch it.
+            # Continue loop to possibly start another worker if still within window.
+        } else {
+            # Timeout reached – worker took too long or end time arrived
+            Write-Log "Worker exceeded allowed runtime or end time reached. Terminating..." -Level "WARN"
+            Stop-WorkerProcess
+            # After termination, break out of loop because we are likely at or past end time.
+            break
+        }
+    }
+
+    # End of window: collect all runs in the window and send email report
+    Write-Log "End time reached or window closed. Collecting runs and sending report." -Level "INFO"
+    $global:LastValidation = Validate-Output -CollectAll -CollectionStart $startDateTime -CollectionEnd $endDateTime
+    if ($emailReportingInitialized) {
+        Invoke-EmailReport -Force -CollectedRuns $global:CollectedRunFolders   # <-- added CollectedRuns
+    }
+
+} catch {
+    Write-Log "FATAL ERROR: $_" -Level "ERROR"
+} finally {
+    Write-Log "Cleaning up..." -Level "INFO"
+    Stop-WorkerProcess
+    if (Test-Path $global:MonitorLockFile) { Remove-Item $global:MonitorLockFile -Force }
+    Write-Log "=== Monitor Stopped ===" -Level "INFO"
+    Write-Host "`n================================================" -ForegroundColor Cyan
+    Write-Host "MONITOR STOPPED" -ForegroundColor Yellow
+    Write-Host "Log file: $($Script:Config.LogFile)" -ForegroundColor White
+    Write-Host "Collected folders with full data: $($global:CollectedRunFolders.Count)" -ForegroundColor White
+    Write-Host "================================================" -ForegroundColor Cyan
+}
+
+# 1_worker_portable.ps1 
+
+<#
+.SYNOPSIS
+Worker script for face recognition pipeline
+.DESCRIPTION
+Basic worker script that just runs Python
+#>
+
+try {
+    Write-Host "=== WORKER SCRIPT STARTING ===" -ForegroundColor Cyan
+    Write-Host "Worker PID: $PID" -ForegroundColor Yellow
+    
+    # Load common paths and central config
+    $commonPathsScript = Join-Path $PSScriptRoot "1_common-paths.ps1"
+    if (-not (Test-Path $commonPathsScript)) {
+        throw "Common paths script not found: $commonPathsScript"
+    }
+    
+    . $commonPathsScript
+    Write-Host "Common paths script loaded" -ForegroundColor Green
+    
+    $appConfig = Get-ApplicationConfig   # load central configuration
+    
+    # Initialize paths
+    $paths = Initialize-ProjectPortablePaths -IsWorker -Silent
+    if (-not $paths) {
+        throw "Failed to initialize paths"
+    }
+    
+    $PYTHON_EXE = $paths.PythonExe
+    $PYTHON_SCRIPT = $paths.PythonScript
+    $RUNS_BASE_PATH = $paths.DateBasedPath
+    
+    # Centralised constants
+    $RUN_FOLDER_PREFIX          = $appConfig.WorkerRunFolderPrefix
+    $LOG_SUBFOLDER_NAME        = $appConfig.WorkerLogSubfolder
+    $OUTPUT_SUBFOLDER_NAME     = $appConfig.WorkerOutputSubfolder
+    $METADATA_FILENAME         = $appConfig.WorkerMetadataFile
+    $PYTHON_OUTPUT_FILENAME_PREFIX = $appConfig.WorkerPythonOutputPrefix
+    $COMPLETION_SUMMARY_FILENAME = $appConfig.WorkerCompletionSummary
+    $PYTHON_ARGUMENT           = $appConfig.WorkerPythonArgument
+    
+    Write-Host "Python executable: $PYTHON_EXE" -ForegroundColor Green
+    Write-Host "Python script: $PYTHON_SCRIPT" -ForegroundColor Green
+    
+    # Validate paths
+    if (-not (Test-Path $PYTHON_EXE)) {
+        throw "Python executable not found: $PYTHON_EXE"
+    }
+    
+    if (-not (Test-Path $PYTHON_SCRIPT)) {
+        throw "Python script not found: $PYTHON_SCRIPT"
+    }
+    
+    # Create run folder
+    $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+    $runFolder = Join-Path $RUNS_BASE_PATH "$RUN_FOLDER_PREFIX$timestamp"
+    Write-Host "Creating run folder: $runFolder" -ForegroundColor Yellow
+    
+    New-Item -ItemType Directory -Path $runFolder -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $runFolder $LOG_SUBFOLDER_NAME) -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $runFolder $OUTPUT_SUBFOLDER_NAME) -Force | Out-Null
+    
+    # Create metadata
+    $metadata = @{
+        run_id = $timestamp
+        start_time = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        worker_pid = $PID
+        python_script = $PYTHON_SCRIPT
+        python_exe = $PYTHON_EXE
+        run_folder = $runFolder
+    }
+    
+    $metadata | ConvertTo-Json | Out-File (Join-Path $runFolder $METADATA_FILENAME)
+    
+    # Run Python
+    Write-Host "Starting Python script..." -ForegroundColor Cyan
+    
+    $pythonOutputFile = Join-Path $runFolder "$LOG_SUBFOLDER_NAME\${PYTHON_OUTPUT_FILENAME_PREFIX}${timestamp}.txt"
+    $workingDir = Join-Path $runFolder $OUTPUT_SUBFOLDER_NAME
+    
+    # Start Python process
+    $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $processInfo.FileName = $PYTHON_EXE
+    $processInfo.Arguments = "`"$PYTHON_SCRIPT`" $PYTHON_ARGUMENT"
+    $processInfo.UseShellExecute = $false
+    $processInfo.RedirectStandardOutput = $true
+    $processInfo.RedirectStandardError = $true
+    $processInfo.CreateNoWindow = $true
+    $processInfo.WorkingDirectory = $workingDir
+    
+    $pythonProcess = New-Object System.Diagnostics.Process
+    $pythonProcess.StartInfo = $processInfo
+    
+    if ($pythonProcess.Start()) {
+        $pythonPID = $pythonProcess.Id
+        Write-Host "Python process started (PID: $pythonPID)" -ForegroundColor Green
+        
+        # Update metadata
+        $metadata.python_pid = $pythonPID
+        $metadata | ConvertTo-Json | Out-File (Join-Path $runFolder $METADATA_FILENAME) -Force
+        
+        # Wait for completion
+        Write-Host "Waiting for Python to complete..." -ForegroundColor Yellow
+        
+        $output = $pythonProcess.StandardOutput.ReadToEnd()
+        $errorOutput = $pythonProcess.StandardError.ReadToEnd()
+        $pythonProcess.WaitForExit()
+        
+        $exitCode = $pythonProcess.ExitCode
+        
+        # Write output
+        $output | Out-File $pythonOutputFile -Force
+        if ($errorOutput) {
+            $errorOutput | Out-File $pythonOutputFile -Append
+        }
+        
+        Write-Host "Python completed with exit code: $exitCode" -ForegroundColor $(if ($exitCode -eq 0) { "Green" } else { "Red" })
+        
+        # Create summary
+        $summary = @"
+Run completed: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
+Exit code: $exitCode
+Run folder: $runFolder
+Worker PID: $PID
+Python PID: $pythonPID
+"@
+        
+        $summary | Out-File (Join-Path $runFolder "$LOG_SUBFOLDER_NAME\$COMPLETION_SUMMARY_FILENAME")
+        
+        Write-Host "=== WORKER SCRIPT COMPLETED ===" -ForegroundColor Green
+        exit $exitCode
+    } else {
+        throw "Failed to start Python process"
+    }
+    
+} catch {
+    Write-Host "ERROR: $_" -ForegroundColor Red
+    exit 1
+}
 

@@ -1,5 +1,4 @@
-# 1_email-sender-stable.ps1 (updated with multi‑language support)
-
+# 1_email-sender-stable.ps1
 <#
 .SYNOPSIS
 Stable email sender for face recognition run reports
@@ -39,7 +38,7 @@ $script:Translations = @{
         TotalRuns = "Total Runs:"
         WithSummary = "With Completion Summary:"
         MetadataOnly = "Metadata Only:"
-        NoData = "No Data:"
+        NoData = "Incomplete Data:"
         Successful = "Successful:"
         Failed = "Failed:"
         UnknownStatus = "Unknown Status:"
@@ -66,7 +65,7 @@ $script:Translations = @{
         TotalRuns = "Total Proses:"
         WithSummary = "Dengan Ringkasan Lengkap:"
         MetadataOnly = "Hanya Metadata:"
-        NoData = "Tidak Ada Data:"
+        NoData = "Data Tidak Lengkap:"
         Successful = "Berhasil:"
         Failed = "Berhasil-Prematur:"
         UnknownStatus = "Status Tidak Diketahui:"
@@ -628,7 +627,8 @@ function Send-RunReport {
         [string]$ScheduleStartTime = $null,
         [string]$ScheduleEndTime = $null,
         [switch]$UseTimeWindow = $false,
-        [hashtable]$Recipients = $null   # email -> language (string) or hashtable {Language, Attach}
+        [hashtable]$Recipients = $null,  
+        [array]$CollectedRuns = $null
     )
     
 
@@ -636,8 +636,8 @@ function Send-RunReport {
     # To disable attachments for an address, use:
     # "user@example.com" = @{ Language = "en"; Attach = $false }
     $Recipients = @{ 
-        "faridraihan17@gmail.com"          = @{ Language = "en" ; Attach = $false}  # attachments off
-        "ikeepmypromiz@gmail.com"          = @{ Language = "id" ; Attach = $false } # attachments off
+        # "faridraihan17@gmail.com"          = @{ Language = "en" ; Attach = $false}  # attachments off
+        # "ikeepmypromiz@gmail.com"          = @{ Language = "id" ; Attach = $false } # attachments off
         "humanj241@gmail.com"               = @{ Language = "id"; Attach = $true }  # attachments on
         # "itdiv@sinarcemaramasabadi.co.id"   = @{ Language = "id"; Attach = $false}  # attachments off
     }
@@ -688,17 +688,25 @@ function Send-RunReport {
     }
     
     Write-Host "Collecting run summaries from: $BasePath" -ForegroundColor Cyan
-    $getParams = @{
-        BasePath = $BasePath
-        Since = $since
-        MaxRuns = $appConfig.EmailMaxRunsToCollect
-        TimeWindowMode = $UseTimeWindow
+    
+    # If CollectedRuns is provided, use it directly (skip re-collecting)
+    if ($CollectedRuns -ne $null) {
+        Write-Host "Using pre-collected runs from monitor validation." -ForegroundColor Green
+        $summaries = $CollectedRuns
+    } else {
+        # Fall back to original collection logic
+        $getParams = @{
+            BasePath = $BasePath
+            Since = $since
+            MaxRuns = $appConfig.EmailMaxRunsToCollect
+            TimeWindowMode = $UseTimeWindow
+        }
+        if ($UseTimeWindow -and $windowStart -and $windowEnd) {
+            $getParams.ScheduleStart = $windowStart
+            $getParams.ScheduleEnd = $windowEnd
+        }
+        $summaries = Get-RunSummaries @getParams
     }
-    if ($UseTimeWindow -and $windowStart -and $windowEnd) {
-        $getParams.ScheduleStart = $windowStart
-        $getParams.ScheduleEnd = $windowEnd
-    }
-    $summaries = Get-RunSummaries @getParams
     
     if ($summaries.Count -eq 0) {
         Write-Host "No runs found to report." -ForegroundColor Yellow
@@ -724,28 +732,30 @@ function Send-RunReport {
         return $true
     }
 
-    # Validate counts (existing logic)
-    $totalCollected = $summaries.Count
+    # Compute counts by collection type
     $calcSummaryCount = ($summaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
     $calcMetadataOnlyCount = ($summaries | Where-Object { $_.CollectionType -eq "METADATA_ONLY" }).Count
     $calcNoDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
-    
-    $calculatedTotal = $calcSummaryCount + $calcMetadataOnlyCount + $calcNoDataCount
-    if ($calculatedTotal -ne $totalCollected) {
-        Write-Host "Warning: Count mismatch! Calculated: $calculatedTotal, Actual: $totalCollected" -ForegroundColor Red
-        Write-Host "  Adjusting counts to match actual total..." -ForegroundColor Yellow
+    $unknownCount = $summaries.Count - ($calcSummaryCount + $calcMetadataOnlyCount + $calcNoDataCount)
+
+    # If there are runs with unknown CollectionType, treat them as No Data
+    if ($unknownCount -gt 0) {
+        Write-Host "Warning: $unknownCount runs have unknown collection type. Counting them as 'Incomplete Data'." -ForegroundColor Yellow
+        $calcNoDataCount += $unknownCount
     }
-    
+
+    # Set the final counts to be used in the email body
+    $summaryCount = $calcSummaryCount
+    $metadataOnlyCount = $calcMetadataOnlyCount
+    $noDataCount = $calcNoDataCount
+
     # Prepare attachments
     $attachments = @()
     $totalSize = 0
     $maxSize = $appConfig.EmailMaxAttachmentSizeMB * 1024 * 1024
     
     if ($needAttachments){
-        $summaryCount = ($summaries | Where-Object { $_.CollectionType -eq "SUMMARY_METADATA" }).Count
-        $metadataOnlyCount = ($summaries | Where-Object { $_.CollectionType -eq "METADATA_ONLY" }).Count
-        $noDataCount = ($summaries | Where-Object { $_.CollectionType -eq "NO_DATA" }).Count
-        
+        # Use the already computed counts (no need to recompute)
         foreach ($summary in $summaries) {
             if ($summary.CompressedFolder) {
                 $zipFile = $summary.CompressedFolder
@@ -795,10 +805,10 @@ function Send-RunReport {
             Write-Host "`nEmail Details (sample):" -ForegroundColor Cyan
             Write-Host "  Subject: $subject" -ForegroundColor White
             Write-Host "  To: $recipient ($lang) [Attachments: $($attachForThis.Count)]" -ForegroundColor White
-            Write-Host "  Total runs in collection: $($summaries.Count)" -ForegroundColor White
+            Write-Host "  Total runs in collection: $($runCount)" -ForegroundColor White
             Write-Host "  With summary: $summaryCount" -ForegroundColor Green
             Write-Host "  Metadata only: $metadataOnlyCount" -ForegroundColor Yellow
-            Write-Host "  No data: $noDataCount" -ForegroundColor Gray
+            Write-Host "  Incomplete data: $noDataCount" -ForegroundColor Gray
             Write-Host "  Attachments: $($attachments.Count) files (~$([math]::Round($totalSize/1MB, 2)) MB)" -ForegroundColor White
             $compressedCount = ($summaries | Where-Object { $_.CompressedFolder }).Count
             Write-Host "  Compressed folders: $compressedCount" -ForegroundColor Cyan
@@ -851,7 +861,8 @@ function Register-StableEmailSender {
 function Invoke-StableEmailReport {
     [CmdletBinding()]
     param(
-        [switch]$Force = $false
+        [switch]$Force = $false,
+        [array]$CollectedRuns = $null      # NEW: optional pre-collected runs
     )
     
     if (-not $global:StableEmailSender -or -not $global:StableEmailSender.Enabled) {
@@ -882,12 +893,13 @@ function Invoke-StableEmailReport {
             Write-Host "Using schedule window: $scheduleStart to $scheduleEnd" -ForegroundColor White
         }
         
-        # For monitor integration, we still use the single default recipient
+        # Pass CollectedRuns to Send-RunReport
         $success = Send-RunReport -BasePath $global:StableEmailSender.MonitorConfig.RunsBasePath `
             -ConfigOverride $global:StableEmailSender.Config `
             -ScheduleStartTime $scheduleStart `
             -ScheduleEndTime $scheduleEnd `
-            -UseTimeWindow:$useTimeWindow
+            -UseTimeWindow:$useTimeWindow `
+            -CollectedRuns $CollectedRuns   # NEW
         
         if ($success) {
             $global:StableEmailSender.LastSent = Get-Date
@@ -902,6 +914,7 @@ function Invoke-StableEmailReport {
         return $true
     }
 }
+
 
 # ====================================================================
 # Direct Execution
