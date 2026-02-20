@@ -211,7 +211,78 @@ def verify_gpu_usage(face_system):
             
     except Exception as e:
         print(f"⚠️  GPU verification failed: {e}")
+        
+def validate_email_config(config: dict, test_connection: bool = False) -> None:
+    """Validate email configuration and resolve password; exit with helpful message on failure."""
+    email_cfg = config.get('email', {})
+    if not email_cfg.get('enabled', False):
+        return  # email disabled – nothing to validate
 
+    password_setting = email_cfg.get('smtp_password', '')
+    if not password_setting:
+        print("❌ Email is enabled but 'smtp_password' is missing from config.")
+        sys.exit(1)
+
+    # Use the same resolution logic as MultiSourceRealTimeProcessor._load_password
+    resolved = None
+    source_desc = "unknown"
+
+    if password_setting.startswith("env:"):
+        env_var = password_setting[4:]
+        resolved = os.environ.get(env_var, "")
+        source_desc = f"environment variable '{env_var}'"
+        if not resolved:
+            print(f"❌ Email enabled but {source_desc} is not set or empty.")
+            print("\n💡 To fix:")
+            print(f"   - Windows (Command Prompt): set {env_var}=your_password")
+            print(f"   - Windows (PowerShell):     $env:{env_var} = 'your_password'")
+            print(f"   - Linux/macOS:               export {env_var}=your_password")
+            print("\n   Or change the config to use a plain password or a file:")
+            print("   'smtp_password': 'your_plain_password'")
+            print("   'smtp_password': '/path/to/password.txt'")
+            sys.exit(1)
+    elif '/' in password_setting or '\\' in password_setting or password_setting.endswith(('.txt', '.pwd')):
+        # File path
+        source_desc = f"file '{password_setting}'"
+        if not os.path.exists(password_setting):
+            print(f"❌ Email enabled but password file '{password_setting}' does not exist.")
+            sys.exit(1)
+        try:
+            with open(password_setting, 'r') as f:
+                resolved = f.readline().strip()
+            if not resolved:
+                print(f"❌ Password file '{password_setting}' is empty.")
+                sys.exit(1)
+        except Exception as e:
+            print(f"❌ Could not read password file '{password_setting}': {e}")
+            sys.exit(1)
+    else:
+        # Plain text
+        resolved = password_setting
+        source_desc = "plain text in config"
+
+    if not resolved:
+        print(f"❌ Resolved password from {source_desc} is empty.")
+        sys.exit(1)
+
+    print(f"✅ Email password resolved from {source_desc} (length {len(resolved)}).")
+
+    # Optional: test SMTP connection
+    if test_connection:
+        try:
+            import smtplib
+            server = smtplib.SMTP(email_cfg.get('smtp_server', 'smtp.gmail.com'),
+                                  email_cfg.get('smtp_port', 587))
+            if email_cfg.get('use_tls', True):
+                server.starttls()
+            server.login(email_cfg.get('smtp_user', ''), resolved)
+            server.quit()
+            print("✅ SMTP login successful – credentials are valid.")
+        except Exception as e:
+            print(f"❌ SMTP login failed: {e}")
+            print("   Check your username, password, and SMTP server settings.")
+            sys.exit(1)
+            
 def get_default_config():
     """Return the complete default configuration"""
     return {
@@ -638,7 +709,7 @@ def get_default_config():
             'smtp_server': 'smtp.gmail.com',
             'smtp_port': 587,
             'smtp_user': 'faridraihan17@gmail.com',
-            'smtp_password': 'env:EMAIL_PASSWORD',        # Use environment variable for security
+            'smtp_password': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\pass.txt',        # Use environment variable for security
             'use_tls': True,
             'send_on_exit': True,                    # Send email after run finishes
             'max_attachment_size_mb': 25,            # Common email limit
@@ -900,10 +971,12 @@ def main():
     parser.add_argument('--cctv-name', type=str, help='Override CCTV name')
     parser.add_argument('--no-server-push', action='store_true', help='Disable server push')
     parser.add_argument('--test-server', action='store_true', help='Test server connection before starting')
+    parser.add_argument('--test-email', action='store_true', help='Test email connection before starting')
     args = parser.parse_args()
     
     # Load configuration
     config = load_custom_config(args.config)
+    validate_email_config(config, test_connection=args.test_email)  
     
     # Resolve output.root_dir relative to LOG_ROOT if it's a relative path
     if 'output' in config and 'root_dir' in config['output']:

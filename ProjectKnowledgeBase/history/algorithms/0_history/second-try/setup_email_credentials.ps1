@@ -89,8 +89,8 @@ try {
     Write-Host "Testing SMTP connection to Gmail..." -ForegroundColor White
     
     $testConfig = @{
-        SmtpServer = "smtp.gmail.com"
-        SmtpPort = 587
+        SmtpServer = " " # Change this value into our expected server
+        SmtpPort =  # change this value to check the smtp port
         UseSsl = $true
         Username = $email
         Password = $plainPassword

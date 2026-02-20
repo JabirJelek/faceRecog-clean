@@ -9,8 +9,8 @@
 
 #### Instructions
 
-modify the output from the image and data logger to utilize the main orchestration path. Even better, propose a relative location of the directory path, so that each process will access that location
-and store each output file into that location
+utiulize the exit_status.json for run_summaries.
+
 
 
 #### Tips
@@ -18,9 +18,6 @@ and store each output file into that location
 follow Instructions, no need to add non-related solution.
 
 
-#### debug of the codebase
-
-skip this section
 
 #### References
 
@@ -30,22 +27,31 @@ https://github-com.translate.goog/karanpratapsingh/system-design?_x_tr_sl=en&_x_
 
 
 
+#### debug Error
 
-#### Debug of the codebase
+❌ Email sending failed: MultiSourceRealTimeProcessor._generate_email_body() missing 2 required positional arguments: 'run_summaries' and 'config'
 
 
-🔄 Set dynamic CCTV name for 6: Local-Camera-0
-🔍 Creating ImageLogger for 6 with CCTV name: Local-Camera-0
-📹 ImageLogger initialized with CCTV name: Local-Camera-0
-❌ Error setting up logging for source 6: expected str, bytes or os.PathLike object, not NoneType
-Traceback (most recent call last):
-  File "D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\structure\streaming\multi_realtime.py", line 2472, in _setup_source_logging
-    source_base_filename = os.path.join(self.image_log_dir, f"{self.current_log_session}_{safe_cctv_name}")
-                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen ntpath>", line 109, in join
-TypeError: expected str, bytes or os.PathLike object, not NoneType
-❌ Failed to setup logging for source: 6
-🖼️  Multi-source image logging ENABLED for 0 sources
+#### Expected email structure and conditional 
+
+# exit_status.json
+{
+  "exit_code": 130,
+  "exit_message": "Interrupted by user",
+  "timestamp": "2026-02-20T16:11:07.657876",
+  "run_directory": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\runs-magick\\Process-Python_2026-02-20_16-11-01",
+  "statistics": {
+    "total_frames": 4,
+    "average_fps": 1.4888610630173165,
+    "active_sources": 1,
+    "violations_detected": 0,
+    "violations_verified": 0,
+    "images_saved": 0,
+    "server_pushes": 0
+  }
+}
+
+
 
 
 #### Several utilized file
@@ -62,11 +68,6 @@ TypeError: expected str, bytes or os.PathLike object, not NoneType
 
 
 
-
-
-
-
-# streaming/multi_realtime.py
 
 # streaming/multi_realtime.py
 
@@ -108,8 +109,9 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         super().__init__(face_system, config)
         
         # ==========   OUTPUT DIRECTORY CONFIGURATION ==========
+        self.data_logger = None          # will be created if logging enabled
         output_cfg = config.get('output', {})
-        self.output_root = output_cfg.get('root_dir', 'runs')
+        self.output_root = output_cfg.get('root_dir', )
         self.create_timestamped_subdir = output_cfg.get('create_timestamped_subdir', True)
         self.enable_exit_status = output_cfg.get('enable_exit_status', True)
         self.run_dir = None          # will be set by _create_run_directory()
@@ -245,7 +247,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
     
     def _create_run_directory(self):
         """Create a timestamped directory for this run."""
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.datetime.now().strftime("Process-Python_%Y-%m-%d_%H-%M-%S")
         if self.create_timestamped_subdir:
             self.run_dir = os.path.join(self.output_root, timestamp)
         else:
@@ -375,6 +377,236 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         # Assume plain text password
         return password_setting
 
+    def _generate_email_body(self, run_summaries: List[Dict], config: Dict,
+                            schedule_start: str = None, schedule_end: str = None,
+                            language: str = 'en') -> str:
+        """
+        Generate an HTML email body from a list of run summaries.
+        
+        Args:
+            run_summaries: List of dicts, each containing:
+                - CollectionType: 'SUMMARY_METADATA', 'METADATA_ONLY', or other
+                - Status: 'SUCCESS', 'FAILED', or other
+                - FolderName: name of the run folder
+                - CreationTime: datetime object
+                - ExitCode: int
+                - Metadata: dict with optional keys worker_pid, python_pid, start_time, end_time
+            config: Configuration dict (not used directly, kept for consistency)
+            schedule_start: Optional start of schedule window
+            schedule_end: Optional end of schedule window
+            language: 'en' or 'id' (default 'en')
+        
+        Returns:
+            HTML string ready for email body.
+        """
+        # Translations (embedded for clarity; could be a class constant)
+        translations = {
+            'en': {
+                'ReportTitle': "=== Face Recognition Run Report ===",
+                'SummaryTitle': "=== Summary ===",
+                'DetailsTitle': "=== Run Details ===",
+                'TotalRuns': "Total Runs:",
+                'WithSummary': "With Completion Summary:",
+                'MetadataOnly': "Metadata Only:",
+                'NoData': "Incomplete Data:",
+                'Successful': "Successful:",
+                'Failed': "Failed:",
+                'UnknownStatus': "Unknown Status:",
+                'ScheduleWindow': "Schedule Window:",
+                'ReportTime': "Report Time:",
+                'Created': "Created:",
+                'ExitCode': "Exit Code:",
+                'WorkerPID': "Worker PID:",
+                'PythonPID': "Python PID:",
+                'StartTime': "Start Time:",
+                'EndTime': "End Time:",
+                'Footer': "This report was automatically generated by the Face Recognition Monitoring System.",
+                'System': "System: maskRecog | Version:",
+                'StatusSuccess': "SUCCESS",
+                'StatusFailed': "FAILED",
+                'StatusUnknown': "UNKNOWN",
+                'CollectionFull': "Full Data",
+                'CollectionMetadata': "Metadata Only"
+            },
+            'id': {
+                'ReportTitle': "=== Laporan Pengenalan Wajah ===",
+                'SummaryTitle': "=== Ringkasan ===",
+                'DetailsTitle': "=== Detail Proses ===",
+                'TotalRuns': "Total Proses:",
+                'WithSummary': "Dengan Ringkasan Lengkap:",
+                'MetadataOnly': "Hanya Metadata:",
+                'NoData': "Data Tidak Lengkap:",
+                'Successful': "Berhasil:",
+                'Failed': "Berhasil-Prematur:",
+                'UnknownStatus': "Status Tidak Diketahui:",
+                'ScheduleWindow': "Jadwal:",
+                'ReportTime': "Waktu Laporan:",
+                'Created': "Folder berhasil dibuat pada:",
+                'ExitCode': "Kode Keluar:",
+                'WorkerPID': "PID Worker:",
+                'PythonPID': "PID Python:",
+                'StartTime': "Waktu Proses dimulai:",
+                'EndTime': "Waktu Selesai:",
+                'Footer': "Laporan ini dibuat secara otomatis oleh Sistem Pemantauan Pengenalan Wajah.",
+                'System': "Sistem: maskRecog | Versi:",
+                'StatusSuccess': "BERHASIL",
+                'StatusFailed': "Berhasil-Prematur",
+                'StatusUnknown': "TIDAK DIKETAHUI",
+                'CollectionFull': "Data Lengkap",
+                'CollectionMetadata': "Hanya Metadata"
+            }
+        }
+        t = translations.get(language, translations['en'])
+        
+        run_count = len(run_summaries)
+        summary_count = sum(1 for r in run_summaries if r.get('CollectionType') == 'SUMMARY_METADATA')
+        metadata_only_count = sum(1 for r in run_summaries if r.get('CollectionType') == 'METADATA_ONLY')
+        no_data_count = run_count - summary_count - metadata_only_count
+        
+        success_count = sum(1 for r in run_summaries if r.get('Status') == 'SUCCESS')
+        failed_count = sum(1 for r in run_summaries if r.get('Status') == 'FAILED')
+        unknown_count = run_count - success_count - failed_count
+        
+        # Start building HTML
+        html = f"""<!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }}
+            .container {{ max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+            h1 {{ color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }}
+            h2 {{ color: #34495e; margin-top: 25px; }}
+            .summary-box {{ background: #ecf0f1; padding: 15px; border-radius: 5px; margin: 15px 0; }}
+            .run-card {{ 
+                background: #f8f9fa; 
+                padding: 15px; 
+                margin: 10px 0; 
+                border-left: 4px solid #0078d4;
+                border-radius: 3px;
+            }}
+            .run-success {{ border-left-color: #27ae60; }}
+            .run-failed {{ border-left-color: #e74c3c; }}
+            .run-unknown {{ border-left-color: #95a5a6; }}
+            .run-metadata-only {{ border-left-color: #f39c12; }}
+            .status-badge {{ 
+                display: inline-block; 
+                padding: 3px 8px; 
+                border-radius: 12px; 
+                font-size: 12px; 
+                font-weight: bold;
+                margin-right: 10px;
+            }}
+            .status-success {{ background: #d4edda; color: #155724; }}
+            .status-failed {{ background: #f8d7da; color: #721c24; }}
+            .status-unknown {{ background: #d1ecf1; color: #0c5460; }}
+            .collection-badge {{
+                display: inline-block;
+                padding: 2px 6px;
+                border-radius: 10px;
+                font-size: 10px;
+                margin-left: 8px;
+            }}
+            .collection-summary {{ background: #28a745; color: white; }}
+            .collection-metadata {{ background: #ffc107; color: black; }}
+            .metadata {{ font-size: 12px; color: #7f8c8d; margin-top: 5px; }}
+            .timestamp {{ color: #95a5a6; font-size: 11px; }}
+            .footer {{ margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; font-size: 12px; color: #7f8c8d; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1> {t['ReportTitle']} </h1>
+            
+            <div class="summary-box">
+                <h2> {t['SummaryTitle']} </h2>
+                <p><strong>{t['TotalRuns']}</strong> {run_count}</p>
+                <p><strong>{t['WithSummary']}</strong> <span style="color: #28a745;">{summary_count}</span></p>
+                <p><strong>{t['MetadataOnly']}</strong> <span style="color: #ffc107;">{metadata_only_count}</span></p>
+                <p><strong>{t['NoData']}</strong> <span style="color: #dc3545;">{no_data_count}</span></p>
+                <p><strong>{t['Successful']}</strong> <span style="color: #28a745;">{success_count}</span></p>
+                <p><strong>{t['Failed']}</strong> <span style="color: #dc3545;">{failed_count}</span></p>
+                <p><strong>{t['UnknownStatus']}</strong> <span style="color: #6c757d;">{unknown_count}</span></p>
+    """
+        if schedule_start and schedule_end:
+            html += f"""
+                <p><strong>{t['ScheduleWindow']}</strong> {schedule_start} to {schedule_end}</p>
+    """
+        html += f"""
+                <p><strong>{t['ReportTime']}</strong> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+            </div>
+            
+            <h2> {t['DetailsTitle']} </h2>
+    """
+
+        for summary in run_summaries:
+            status_class = "run-unknown"
+            status_badge_class = "status-unknown"
+            status_text = t['StatusUnknown']
+            
+            if summary.get('Status') == "SUCCESS":
+                status_class = "run-success"
+                status_badge_class = "status-success"
+                status_text = t['StatusSuccess']
+            elif summary.get('Status') == "FAILED":
+                status_class = "run-failed"
+                status_badge_class = "status-failed"
+                status_text = t['StatusFailed']
+            
+            if summary.get('CollectionType') == "METADATA_ONLY":
+                status_class = "run-metadata-only"
+            
+            collection_badge = ""
+            collection_text = ""
+            if summary.get('CollectionType') == "SUMMARY_METADATA":
+                collection_badge = "collection-summary"
+                collection_text = t['CollectionFull']
+            elif summary.get('CollectionType') == "METADATA_ONLY":
+                collection_badge = "collection-metadata"
+                collection_text = t['CollectionMetadata']
+            
+            folder_name = summary.get('FolderName', 'Unknown')
+            creation_time = summary.get('CreationTime')
+            creation_str = creation_time.strftime('%Y-%m-%d %H:%M:%S') if creation_time else 'Unknown'
+            exit_code = summary.get('ExitCode', 'N/A')
+            
+            html += f"""
+            <div class="run-card {status_class}">
+                <div>
+                    <span class="status-badge {status_badge_class}">{status_text}</span>
+                    <strong>{folder_name}</strong>
+                    {f"<span class='collection-badge {collection_badge}'>{collection_text}</span>" if collection_badge else ""}
+                </div>
+                <div class="timestamp">{t['Created']} {creation_str}</div>
+                <div class="metadata">
+                    {t['ExitCode']} {exit_code}<br>
+    """
+            metadata = summary.get('Metadata', {})
+            if metadata.get('worker_pid'):
+                html += f"{t['WorkerPID']} {metadata['worker_pid']}<br>"
+            if metadata.get('python_pid'):
+                html += f"{t['PythonPID']} {metadata['python_pid']}<br>"
+            if metadata.get('start_time'):
+                html += f"{t['StartTime']} {metadata['start_time']}<br>"
+            if metadata.get('end_time'):
+                html += f"{t['EndTime']} {metadata['end_time']}<br>"
+            
+            html += f"""
+                </div>
+            </div>
+    """
+        
+        html += f"""
+            
+            <div class="footer">
+                <p><em>{t['Footer']}</em></p>
+                <p>{t['System']} {datetime.datetime.now().strftime('%Y.%m.%d')}</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+        return html
+
     def _send_email(self, attachment_path: str):
         """Send email with the ZIP archive attached."""
         if not self.email_enabled:
@@ -398,6 +630,8 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 encoders.encode_base64(part)
                 part.add_header('Content-Disposition', f'attachment; filename="{os.path.basename(attachment_path)}"')
                 msg.attach(part)
+                
+            self._generate_email_body()
             
             server = smtplib.SMTP(self.smtp_server, self.smtp_port)
             if self.email_use_tls:
@@ -475,8 +709,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                     print(f"⚠️ {thread_name} did not stop gracefully")
                     # Remove the incorrect _stop.set() call
                     # Threads should exit when self.running = False
-
-    
+   
     def _close_all_streams(self):
         """Close all stream managers safely"""
         source_ids = list(self.stream_managers.keys())
@@ -767,25 +1000,33 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
     # ========== ENHANCED: Multi-source ImageLogger Management ==========
         
     def setup_multi_source_logging(self, base_filename: str = None):
-        """Setup logging for all active sources using source_configs - SINGLE INITIALIZATION POINT"""
+        """Setup logging for all active sources using source_configs"""
         try:
-            #   CHECK: If logging is already enabled, just return
+            # If logging already active, just return
             if self.image_logging_enabled and self.current_log_session:
                 print(f"📁 Multi-source logging already active: {self.current_log_session}")
                 self.print_multi_source_logging_status()
                 return True
-                
+            
+            # ===== ENSURE RUN DIRECTORY EXISTS =====
+            if self.run_dir is None:
+                self._create_run_directory()
+            
             if base_filename is None:
                 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 base_filename = f"multi_source_{timestamp}"
             
+            # After setting up image loggers, also setup data logger if needed
+            if self.logging_enabled:
+                self._setup_data_logging(base_filename)
+                
             self.current_log_session = base_filename
             print(f"📁 Setting up multi-source logging session: {base_filename}")
             
-            #   DEBUG: Check CCTV names before setup
+            # DEBUG: Check CCTV names before setup
             self.debug_cctv_names()
             
-            #     Ensure ALL sources have proper CCTV names BEFORE creating loggers
+            # Ensure ALL sources have proper CCTV names BEFORE creating loggers
             for source_id in self.active_sources:
                 if source_id in self.source_configs:
                     #   ENSURE: Dynamic CCTV name is set in source_configs
@@ -824,6 +1065,23 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             traceback.print_exc()
             self.image_logging_enabled = False
             return False
+        
+    # ========== NEW: Setup data logging ==========
+    def _setup_data_logging(self, base_filename: str):
+        """Initialize the data logger with the centralized CSV directory."""
+        try:
+            from ..logging.data_logger import DataLogger
+            self.data_logger = DataLogger()
+            # Use the same base filename, but inside csv_log_dir
+            csv_path = os.path.join(self.csv_log_dir, base_filename)
+            success = self.data_logger.setup_logging(csv_path)
+            if success:
+                print(f"📊 Data logger initialized at: {csv_path}.csv")
+            else:
+                print("❌ Failed to initialize data logger")
+        except Exception as e:
+            print(f"❌ Error setting up data logger: {e}")
+            self.data_logger = None        
                                   
     def print_cctv_mapping(self):
         """Print mapping of source IDs to CCTV names using source_configs - OPTIMIZED"""
@@ -1331,21 +1589,6 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             print(f"[{timestamp}] 📹 {source_id}: {message}")            
             
     def stop_all_sources_stable(self):
-        # """Stable shutdown procedure with proper thread cleanup"""
-        # print("🛑 Starting stable shutdown...")
-        # self.running = False
-        
-        # # Wait for threads to finish with timeout
-        # if hasattr(self, 'health_monitor_thread') and self.health_monitor_thread and self.health_monitor_thread.is_alive():
-        #     print("⏳ Waiting for health monitor to stop...")
-        #     self.health_monitor_thread.join(timeout=3.0)
-        
-        # if hasattr(self, 'maintenance_thread') and self.maintenance_thread and self.maintenance_thread.is_alive():
-        #     print("⏳ Waiting for maintenance thread to stop...")
-        #     self.maintenance_thread.join(timeout=3.0)
-        
-        # # Comprehensive cleanup
-        # self.cleanup_all_resources()
         
         """Stable shutdown procedure - enhanced"""
         print("🛑 Starting stable shutdown...")
@@ -1429,8 +1672,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             print("🎯 Face tracking system configured for all sources")
         except Exception as e:
             print(f"❌ Error applying tracking configuration: {e}")
-            
-    
+               
     def apply_verification_config(self, config: Dict):
         """Apply violation verification configuration to all tracking managers"""
         try:
@@ -2511,43 +2753,34 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
     # ========== MODIFIED: Setup source logging to use run subdirs ==========
     
     def _setup_source_logging(self, source_id: str) -> bool:
-        """Setup logging for a specific source using source_configs - OPTIMIZED"""
+        """Setup logging for a specific source using source_configs."""
         try:
-            # 🆕 CHECK: If ImageLogger already exists for this source, skip creation
             if source_id in self.image_loggers:
                 existing_logger = self.image_loggers[source_id]
                 status = existing_logger.get_logging_status()
                 print(f"📁 ImageLogger already exists for {source_id}: {status['image_log_folder']}")
                 return True
-            
+
             source_config = self.source_configs[source_id]
-            
-            # 🆕 FIX: Use cached CCTV name instead of recalculating
             cctv_name = self._get_cached_cctv_name(source_id)
-            
             print(f"🔍 Creating ImageLogger for {source_id} with CCTV name: {cctv_name}")
-            
-            # 🆕 CREATE: ImageLogger with the properly configured source_config
+
             source_logger = ImageLogger(source_config)
-            
-            # 🆕 VERIFY: Check that the CCTV name was set correctly in ImageLogger
             if source_logger.cctv_name != cctv_name:
-                print(f"⚠️  CCTV name mismatch! Expected: {cctv_name}, Got: {source_logger.cctv_name}")
+                print(f"⚠️ CCTV name mismatch! Expected: {cctv_name}, Got: {source_logger.cctv_name}")
                 source_logger.update_cctv_name(cctv_name)
-            
+
             safe_cctv_name = self._create_source_safe_name(cctv_name)
-            # Use the centralized image log directory
-            source_base_filename = os.path.join(self.image_log_dir, f"{self.current_log_session}_{safe_cctv_name}")
-            
-            print(f"🔍 Setting up ImageLogger with base filename: {source_base_filename}")
-            
-            # Pass the full path to setup_image_logging (modify ImageLogger if needed)
-            success = source_logger.setup_image_logging(source_base_filename)
+            # Construct the base directory for this source's images
+            source_image_dir = os.path.join(self.image_log_dir, f"{self.current_log_session}_{safe_cctv_name}")
+
+            print(f"🔍 Setting up ImageLogger with base directory: {source_image_dir}")
+
+            # Pass as base_dir, not base_filename
+            success = source_logger.setup_image_logging(base_dir=source_image_dir)
             if success:
                 self.image_loggers[source_id] = source_logger
                 print(f"✅ ImageLogger setup for source: {source_id} → {cctv_name}")
-                
-                # 🆕 VERIFY: Double-check the CCTV name after setup
                 status = source_logger.get_logging_status()
                 print(f"🔍 Verification - ImageLogger CCTV name: {status['cctv_name']}")
                 print(f"🔍 Verification - ImageLogger folder: {status['image_log_folder']}")
@@ -2555,7 +2788,6 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             else:
                 print(f"❌ Failed to setup ImageLogger for source: {source_id}")
                 return False
-                
         except Exception as e:
             print(f"❌ Error setting up logging for source {source_id}: {e}")
             import traceback
@@ -2674,15 +2906,15 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 success_count += 1
         return success_count    
    
-    # ========== MODIFIED: run_multi_source_stable with new features ==========
-    
+    # ========== MODIFIED: run_multi_source_stable ==========
     def run_multi_source_stable(self, sources_config: Dict[str, Dict]):
         """Stabilized main processing loop with output directory and email."""
         exit_code = 0
         exit_message = "Normal shutdown"
         try:
-            # Create run directory
-            self._create_run_directory()
+            # Create run directory if not already created (e.g., by setup_multi_source_logging)
+            if self.run_dir is None:
+                self._create_run_directory()
             
             # Redirect console output to file
             self._setup_file_logging()
@@ -2796,6 +3028,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             
             # Close all resources
             self.close()                  
+                     
     # ========== ENHANCED: Logging Pipeline Integration ==========
                                    
     def create_multi_source_display(self, source_frames: Dict[str, np.ndarray], 
@@ -3055,7 +3288,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         """
         Enhanced logging that uses ONLY TrackingManager's verified violations
         """
-        #     Extract only verified violations from TrackingManager
+        # Extract only verified violations from TrackingManager
         verified_violations = []
         unverified_violations = []
         
@@ -3085,29 +3318,34 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                     # Unverified violation - track but don't log
                     unverified_violations.append(result)
                     self.violation_stats['false_positives_prevented'] += 1
-        
-        #   ONLY log verified violations
+            
+        # Log verified violations (images)
         if verified_violations:
             success, _ = self.log_source_violation(source_id, frame, verified_violations, frame)
             if success:
                 self.violation_stats['total_logged'] += len(verified_violations)
+                # Also log to data logger (CSV)
+                if self.data_logger and self.logging_enabled:
+                    log_entries = self.data_logger.collect_log_data(verified_violations)
+                    if log_entries:
+                        self.data_logger.write_log_entries(log_entries)
                 
-                # Log verification details
-                for violation in verified_violations:
-                    identity = violation.get('identity', 'Unknown')
-                    duration = violation.get('violation_duration', 0)
-                    frames = violation.get('violation_frames', 0)
-                    level = violation.get('verification_level', 'unknown')
-                    
-                    verification_log = (
-                        f"✅ VERIFIED VIOLATION | "
-                        f"Source: {source_id} | "
-                        f"Identity: {identity} | "
-                        f"Level: {level} | "
-                        f"Duration: {duration:.1f}s | "
-                        f"Frames: {frames}"
-                    )
-                    print(verification_log)
+                    # Log verification details
+                    for violation in verified_violations:
+                        identity = violation.get('identity', 'Unknown')
+                        duration = violation.get('violation_duration', 0)
+                        frames = violation.get('violation_frames', 0)
+                        level = violation.get('verification_level', 'unknown')
+                        
+                        verification_log = (
+                            f"✅ VERIFIED VIOLATION | "
+                            f"Source: {source_id} | "
+                            f"Identity: {identity} | "
+                            f"Level: {level} | "
+                            f"Duration: {duration:.1f}s | "
+                            f"Frames: {frames}"
+                        )
+                        print(verification_log)
         
         # Log unverified violations for debugging only
         if unverified_violations and self.debug_mode:
@@ -3122,1273 +3360,1314 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                                                 
         
                     
-#### Current image and data logger 
 
-# logging/data_logger.py
-"""
-CSV data logging functionality.
-"""
 
-import csv
-import datetime
+# main/entry_multi.py
+
+
+import sys
+import os
 from pathlib import Path
-from typing import List, Dict, Optional
 
-class DataLogger:
-    """Handles CSV logging of recognition results."""
-    
-    def __init__(self):
-        self.log_file = None
-        self.logging_enabled = False
-        self.log_start_time = None
-        self.log_counter = 0
-        self.log_interval = 5
-        self.log_columns = ['timestamp', 'identity', 'mask_status']
-    
-    def setup_logging(self, filename: Optional[str] = None) -> bool:
-        """Setup CSV logging with face names and mask status."""
-        try:
-            if filename is None:
-                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                filename = f"face_recognition_detailed_{timestamp}.csv"
-            
-            self.log_file = filename
-            self.log_start_time = datetime.datetime.now()
-            
-            # Write header
-            with open(self.log_file, 'w', newline='', encoding='utf-8') as f:
-                writer = csv.writer(f)
-                writer.writerow(self.log_columns)
-            
-            self.logging_enabled = True
-            print(f"📊 Detailed face logging ENABLED: {filename}")
-            return True
-            
-        except Exception as e:
-            print(f"❌ Failed to setup logging: {e}")
-            self.logging_enabled = False
-            self.log_file = None
-            return False
-    
-    def collect_log_data(self, results: List[Dict]) -> List[Dict]:
-        """Collect individual face recognition and mask status data."""
-        log_entries = []
-        
-        if not isinstance(results, list):
-            return log_entries
-        
-        for result in results:
-            if isinstance(result, dict):
-                identity = result.get('identity')
-                mask_status = result.get('mask_status', 'unknown')
-                
-                # Only log recognized faces with valid identities
-                if identity is not None and identity != "Unknown":
-                    log_entries.append({
-                        'timestamp': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
-                        'identity': str(identity),
-                        'mask_status': str(mask_status)
-                    })
-        
-        return log_entries
-    
-    def write_log_entries(self, log_entries: List[Dict]):
-        """Write multiple log entries to CSV."""
-        if not self.logging_enabled or not self.log_file or not log_entries:
-            return
-        
-        try:
-            with open(self.log_file, 'a', newline='', encoding='utf-8') as f:
-                writer = csv.writer(f)
-                
-                for log_data in log_entries:
-                    row = [
-                        log_data['timestamp'],
-                        log_data['identity'],
-                        log_data['mask_status']
-                    ]
-                    writer.writerow(row)
-                    
-            self.log_counter += len(log_entries)
-            
-            # Periodic status update
-            if self.log_counter % 10 == 0:
-                print(f"📊 Logged {self.log_counter} face entries")
-                
-        except Exception as e:
-            print(f"❌ Log write error: {e}")
-    
-    def toggle_logging(self, filename: Optional[str] = None):
-        """Toggle logging on/off."""
-        if not self.logging_enabled:
-            self.setup_logging(filename)
-            print("🟢 Enhanced logging STARTED")
-        else:
-            if self.log_file:
-                duration = datetime.datetime.now() - self.log_start_time
-                print(f"🔴 Logging STOPPED: {self.log_file}")
-                print(f"   - Duration: {duration}")
-                print(f"   - CSV entries: {self.log_counter}")
-            
-            self.logging_enabled = False
-            self.log_file = None
-            self.log_start_time = None
-    
-    def get_log_status(self) -> Dict:
-        """Get current logging status."""
-        return {
-            'enabled': self.logging_enabled,
-            'file': self.log_file,
-            'entries': self.log_counter,
-            'interval': self.log_interval,
-            'start_time': self.log_start_time
-        }
+# Get the project root (go up 2 levels from current file)
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.append(str(PROJECT_ROOT))
+
+LOG_ROOT = Path(__file__).parent.parent.parent.parent.parent
 
 
-
-# logging/image_logger.py
-
-"""
-Image logging system for saving annotated frames with violations.
-"""
-
-import cv2
+from structure import create_system, ConfigManager
+from structure import MultiSourceRealTimeProcessor
+import time
+import os
+from typing import Dict
 import datetime
-from pathlib import Path
-from typing import Optional, List, Dict, Any, Tuple
-import numpy as np
-import logging
-from collections import deque
-import base64
-import json
-import requests
-import time  # 🆕 FIX: Changed from 'from datetime import time'
+import threading
 
-class ImageLogger:
-    """Handles image logging for mask violations and system events."""
+def test_multi_stream_connections(sources_config: Dict[str, Dict]) -> bool:
+    """Test if we can connect to all streams before starting main processing"""
+    print(f"\n🔍 Testing multi-stream connections for {len(sources_config)} sources...")
     
-    def __init__(self, config: Dict[str, Any]):
-        self.config = config
-        self.logging_enabled = False
-        self.image_log_folder: Optional[Path] = None
-        self.saved_image_count = 0
-        self.last_image_save_time = 0
-        
-        # Annotation configuration
-        self.base_box_thickness = config.get('annotation_box_thickness', 1)
-        self.base_text_thickness = config.get('annotation_text_thickness', 1)
-        self.min_text_scale = config.get('annotation_min_text_scale', 0.3)
-        self.max_text_scale = config.get('annotation_max_text_scale', 0.8)
-        
-        # Configuration parameters
-        self.image_log_interval = config.get('image_log_interval', 0)
-        self.max_images_per_session = config.get('max_images_per_session', 0)
-        self.min_save_interval = config.get('min_save_interval', 0.0)
-        self.image_quality = config.get('image_quality', 95)
-        self.annotate_images = config.get('annotate_images', True)
-        self.enable_base64_logging = config.get('enable_base64_logging', True)
-        self.base64_quality = config.get('base64_quality', 85)
-        
-        # Image resize configuration
-        self.enable_resize = config.get('enable_image_resize', False)
-        self.resize_width = config.get('image_resize_width', 640)
-        self.resize_height = config.get('image_resize_height', 480)
-        self.resize_method = config.get('image_resize_method', 'default')
-        
-        # 🆕 FIX: Enhanced CCTV name configuration with better fallback
-        self.cctv_name = config.get('cctv_name')
-        if not self.cctv_name or self.cctv_name == 'Unknown-Camera':
-            # Try to extract from URL or other config parameters
-            self.cctv_name = self._extract_cctv_name_from_config(config)
-        print(f"📹 ImageLogger initialized with CCTV name: {self.cctv_name}")
-        
-        # Server push configuration
-        self.server_push_enabled = config.get('server_push_enabled', False)
-        self.server_endpoint = config.get('server_endpoint', '')
-        self.server_push_cooldown = config.get('server_push_cooldown', 0)  # seconds
-        self.last_server_push_time = 0
-        self.server_timeout = config.get('server_timeout', 10)  # seconds
-        self.server_retry_attempts = config.get('server_retry_attempts', 3)
-        self.server_retry_delay = config.get('server_retry_delay', 2)  # seconds
-        
-        # Statistics
-        self.stats = {
-            'total_saved': 0,
-            'violations_logged': 0,
-            'base64_saved': 0,
-            'errors': 0,
-            'last_save_time': None,
-            'resized_images': 0,
-            'server_pushes': 0,
-            'server_errors': 0,
-            'last_server_push': None
-            # REMOVE violation verification stats
-        }
-        
-        self.logger = logging.getLogger(__name__)
-        self.recent_violations = deque(maxlen=10)
-        self.pending_server_violations = deque(maxlen=50)
-
-    def _extract_cctv_name_from_config(self, config: Dict[str, Any]) -> str:
-        """
-        Extract CCTV name from configuration with enhanced fallback logic.
-        
-        Args:
-            config: Configuration dictionary
-            
-        Returns:
-            str: Extracted CCTV name
-        """
-        try:
-            # First, try to get from config directly
-            cctv_name = config.get('cctv_name')
-            if cctv_name and cctv_name != 'Unknown-Camera':
-                return cctv_name
-            
-            # Try to extract from URL
-            url = config.get('url', '')
-            if url:
-                extracted_name = self._extract_name_from_url(url)
-                if extracted_name and extracted_name != 'Unknown-Camera':
-                    return extracted_name
-            
-            # Try from description
-            description = config.get('description', '')
-            if description and description != 'Unknown Source':
-                safe_name = self._create_safe_name(description)
-                if safe_name:
-                    return safe_name
-            
-            # Use source_id if available
-            source_id = config.get('source_id')
-            if source_id:
-                return f"Camera-{source_id}"
-            
-            # Final fallback with timestamp
-            timestamp = datetime.datetime.now().strftime("%H%M%S")
-            return f"Camera-{timestamp}"
-            
-        except Exception as e:
-            self.logger.warning(f"Could not extract CCTV name from config: {e}")
-            return "Unknown-Camera"
-
-    def _extract_name_from_url(self, url: str) -> str:
-        """
-        Extract camera name from URL.
-        
-        Args:
-            url: Camera URL
-            
-        Returns:
-            str: Extracted name
-        """
-        try:
-            import re
-            from urllib.parse import urlparse
-            
-            parsed = urlparse(url)
-            
-            # Enhanced pattern matching for various CCTV URL formats
-            patterns = [
-                r'/(?:Channels|channels|CHANNELS)/(\d+)',
-                r'/(?:channel|Channel|CHANNEL)[/_]?(\d+)',
-                r'/(?:cam|Cam|CAM)[/_]?(\d+)',
-                r'/(?:stream|Stream|STREAM)[/_]?(\d+)',
-                r'/(\d+)$',
-                r'/(\d+)/?$',
-                r'[Cc]hannel[_-]?(\d+)',
-                r'[Cc]am[_-]?(\d+)'
-            ]
-            
-            for pattern in patterns:
-                match = re.search(pattern, parsed.path)
-                if match:
-                    channel_num = match.group(1)
-                    return f"Camera-{channel_num}"
-            
-            # Try hostname-based naming
-            if parsed.hostname:
-                if re.match(r'\d+\.\d+\.\d+\.\d+', parsed.hostname):
-                    return f"IP-Camera-{parsed.hostname}"
-                else:
-                    # Use subdomain or domain name
-                    parts = parsed.hostname.split('.')
-                    if len(parts) > 1 and parts[0] not in ['www', 'api']:
-                        return f"Camera-{parts[0].title()}"
-            
-            # Use last part of path
-            path_parts = [part for part in parsed.path.split('/') if part]
-            if path_parts:
-                last_part = path_parts[-1]
-                clean_part = re.sub(r'\.\w+$', '', last_part)
-                if clean_part and clean_part not in ['live', 'stream', 'video', 'main']:
-                    return f"Camera-{clean_part.title()}"
-            
-            return "Unknown-Camera"
-            
-        except Exception as e:
-            self.logger.warning(f"Error extracting name from URL: {e}")
-            return "Unknown-Camera"
-
-    def _create_safe_name(self, name: str) -> str:
-        """
-        Create filesystem-safe name.
-        
-        Args:
-            name: Original name
-            
-        Returns:
-            str: Safe name
-        """
-        try:
-            import re
-            # Replace problematic characters
-            safe_name = re.sub(r'[^\w\-_.]', '_', name)
-            # Remove multiple underscores
-            safe_name = re.sub(r'_+', '_', safe_name)
-            # Remove leading/trailing underscores
-            safe_name = safe_name.strip('_')
-            return safe_name if safe_name else "Unknown-Camera"
-        except:
-            return "Unknown-Camera"
-
-    # 🆕 NEW: Method to update CCTV name dynamically
-    def update_cctv_name(self, cctv_name: str) -> None:
-        """
-        Update CCTV name dynamically.
-        
-        Args:
-            cctv_name: New CCTV name
-        """
-        if cctv_name and cctv_name != 'Unknown-Camera':
-            old_name = self.cctv_name
-            self.cctv_name = cctv_name
-            self.config['cctv_name'] = cctv_name
-            self.logger.info(f"🔄 Updated CCTV name: {old_name} → {cctv_name}")
-        else:
-            self.logger.warning(f"⚠️ Invalid CCTV name provided: {cctv_name}")
-                     
-    def debug_server_push(self, violation_data: Dict[str, Any]) -> None:
-        """Debug method to check why server push isn't working"""
-        print(f"🔍 DEBUG SERVER PUSH:")
-        print(f"  - Server push enabled: {self.server_push_enabled}")
-        print(f"  - Server endpoint: {self.server_endpoint}")
-        print(f"  - Base64 data available: {bool(violation_data.get('image_data'))}")
-        print(f"  - Base64 data length: {len(violation_data.get('image_data', ''))}")
-        print(f"  - Filename: {violation_data.get('filename')}")
-        print(f"  - Detected name: {violation_data.get('detected_name')}")
-        print(f"  - CCTV name: {self.cctv_name}")
-        
-        # Check cooldown
-        current_time = time.time()
-        time_since_last_push = current_time - self.last_server_push_time
-        print(f"  - Time since last push: {time_since_last_push:.1f}s")
-        print(f"  - Cooldown period: {self.server_push_cooldown}s")
-        print(f"  - Can push: {time_since_last_push >= self.server_push_cooldown}")      
+    # FIXED: Use the correct module name
+    from structure import StreamManager
     
-    def push_violation_to_server(self, violation_data: Dict[str, Any]) -> bool:
-        """
-        Push violation data to configured server endpoint with cooldown.
-        
-        Args:
-            violation_data: Dictionary containing violation data including base64 image
-            
-        Returns:
-            bool: True if push successful, False otherwise
-        """
-        # Check if server push is enabled
-        if not self.server_push_enabled:
-            self.logger.debug("Server push disabled")
-            return False
-        
-        # Check cooldown
-        current_time = time.time()  # 🆕 FIX: Use time.time() instead of datetime.time
-        if current_time - self.last_server_push_time < self.server_push_cooldown:
-            remaining = self.server_push_cooldown - (current_time - self.last_server_push_time)
-            self.logger.debug(f"Server push cooldown active. Skipping push. Next push in {remaining:.1f}s")
-            return False
-        
-        # Validate endpoint
-        if not self.server_endpoint:
-            self.logger.error("Server endpoint not configured")
-            return False
-        
+    successful_sources = []
+    failed_sources = []
+    
+    for source_id, source_config in sources_config.items():
+        print(f"\n📹 Testing source: {source_id}")
         try:
-            # 🆕 UPDATED: Prepare the payload with ONLY required fields
-            payload = {
-                'filename': violation_data.get('filename', ''),
-                'image_format': violation_data.get('image_format', 'jpg'),
-                'image_data': violation_data.get('image_data', ''),
-                'detected_name': violation_data.get('detected_name', 'Unknown'),
-                'cctv_name': self.cctv_name  # 🆕 FIX: Use the instance's CCTV name
-            }
-            
-            # Validate required fields
-            if not payload['image_data']:
-                self.logger.error("No image data available for server push")
-                return False
-                
-            if not payload['filename']:
-                # Generate a filename if not provided
-                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                payload['filename'] = f"violation_{timestamp}"
-            
-            headers = {
-                'Content-Type': 'application/json',
-                'User-Agent': f'FaceRecognition-Logger/1.0 ({self.cctv_name})'
-            }
-            
-            # Retry logic
-            for attempt in range(self.server_retry_attempts):
-                try:
-                    self.logger.info(f"Pushing violation to server (attempt {attempt + 1}/{self.server_retry_attempts})...")
-                    
-                    response = requests.post(
-                        self.server_endpoint,
-                        json=payload,
-                        headers=headers,
-                        timeout=self.server_timeout
-                    )
-                    
-                    if response.status_code == 200:
-                        self.last_server_push_time = current_time
-                        self.stats['server_pushes'] += 1
-                        self.stats['last_server_push'] = datetime.datetime.now()
-                        
-                        self.logger.info(f"✅ Successfully pushed violation to server. Response: {response.status_code}")
-                        self.logger.debug(f"📤 Payload sent: filename={payload['filename']}, detected_name={payload['detected_name']}, cctv_name={payload['cctv_name']}")
-                        return True
-                    else:
-                        self.logger.warning(f"Server returned error status: {response.status_code} - {response.text}")
-                        
-                        # If it's a client error (4xx), don't retry
-                        if 400 <= response.status_code < 500:
-                            self.logger.error(f"Client error {response.status_code}, stopping retries")
-                            break
-                        
-                except requests.exceptions.Timeout:
-                    self.logger.warning(f"Server request timeout (attempt {attempt + 1}/{self.server_retry_attempts})")
-                except requests.exceptions.ConnectionError:
-                    self.logger.warning(f"Server connection error (attempt {attempt + 1}/{self.server_retry_attempts})")
-                except requests.exceptions.RequestException as e:
-                    self.logger.warning(f"Server request error: {e} (attempt {attempt + 1}/{self.server_retry_attempts})")
-                
-                # Wait before retry (except on last attempt)
-                if attempt < self.server_retry_attempts - 1:
-                    time.sleep(self.server_retry_delay)
-            
-            # If we get here, all attempts failed
-            self.stats['server_errors'] += 1
-            self.logger.error(f"❌ Failed to push violation to server after {self.server_retry_attempts} attempts")
-            return False
-            
-        except Exception as e:
-            self.stats['server_errors'] += 1
-            self.logger.error(f"❌ Unexpected error during server push: {e}")
-            return False
-                
-    def save_annotated_frame(self, frame: np.ndarray, results: List[Dict], 
-                        original_frame: Optional[np.ndarray] = None) -> Tuple[bool, Optional[str]]:
-        """
-        Save annotated frame with bounding boxes, labels, and enhanced metadata overlay.
-        Now returns both success status and base64 data if enabled.
-        
-        Args:
-            frame: Frame to save (can be display frame)
-            results: Face recognition results
-            original_frame: Original high-quality frame (optional)
-            
-        Returns:
-            Tuple[bool, Optional[str]]: (success_status, base64_data)
-        """
-        if not self.logging_enabled or not self.image_log_folder:
-            return False, None
-        
-        # Check limits
-        if self.saved_image_count >= self.max_images_per_session:
-            self.logger.warning("Image log limit reached, disabling image logging")
-            self.logging_enabled = False
-            return False, None
-        
-        # Rate limiting
-        current_time = time.time()  # 🆕 FIX: Use time.time() for consistency
-        if current_time - self.last_image_save_time < self.min_save_interval:
-            return False, None
-        
-        base64_data = None
-        
-        try:
-            # Use original frame if available for better quality, otherwise use provided frame
-            if original_frame is not None:
-                save_frame = original_frame.copy()
-            else:
-                save_frame = frame.copy()
-            
-            # Apply annotations if enabled (BEFORE resize for better quality)
-            if self.annotate_images:
-                save_frame = self._annotate_frame(save_frame, results)
-            
-            # Apply resize AFTER annotation to maintain annotation quality
-            save_frame = self._resize_image(save_frame)
-            
-            # Generate filename
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
-            filename = f"violation_{timestamp}_{self.saved_image_count + 1:04d}.jpg"
-            filepath = self.image_log_folder / "violations" / filename
-            
-            # Save as high-quality JPEG
-            success = cv2.imwrite(
-                str(filepath), 
-                save_frame, 
-                [cv2.IMWRITE_JPEG_QUALITY, self.image_quality]
-            )
+            test_manager = StreamManager(source_config)
+            success = test_manager.initialize_stream(source_config['url'])
             
             if success:
-                # Save base64 version if enabled
-                if self.enable_base64_logging:
-                    # Prepare metadata using the new method
-                    metadata = self._prepare_violation_metadata(results)
-                    
-                    base64_filename = f"violation_{timestamp}_{self.saved_image_count + 1:04d}"
-                    base64_success = self._save_base64_image(
-                        save_frame, base64_filename, "violations", metadata
-                    )
-                    
-                    # Get base64 data for return
-                    if base64_success:
-                        base64_data = self._image_to_base64(save_frame)
-                        self.logger.info(f"✅ Base64 data generated: {len(base64_data)} characters")
-                
-                self.saved_image_count += 1
-                self.last_image_save_time = current_time
-                self.stats['total_saved'] += 1
-                self.stats['violations_logged'] += 1
-                self.stats['last_save_time'] = datetime.datetime.now()
-                
-                # Only save violations that are verified by TrackingManager
-                violations = [
-                    r for r in results 
-                    if r.get('mask_status') == 'no_mask' 
-                    and r.get('violation_verified', False)  # ← CRITICAL: Use TrackingManager's flag
-                ]
-                
-                # Skip if no verified violations
-                if not violations:
-                    return False, None   
-                             
-                violation_record = {
-                    'timestamp': timestamp,
-                    'violations': len(violations),
-                    'filepath': filepath,
-                    'base64_saved': base64_data is not None,
-                    'resized': self.enable_resize
-                }
-                self.recent_violations.append(violation_record)
-                                                
-                # 🆕 UPDATED: Push to server if enabled and we have base64 data
-                if self.server_push_enabled and base64_data:
-                    detected_names = []
-                    for result in violations:  # Only include verified violations
-                        identity = result.get('identity', 'Unknown')
-                        # Add additional verification metadata from TrackingManager
-                        violation_duration = result.get('violation_duration', 0)
-                        violation_frames = result.get('violation_frames', 0)
-                        verification_level = result.get('verification_level', 'unknown')
-                        
-                        # Append with verification metadata
-                        detected_names.append(f"{identity} ({verification_level}, {violation_duration:.1f}s)")
-                    
-                    # 🆕 IMPROVED: Create comma-separated string of ALL detected names
-                    if detected_names:
-                        # Join with comma separation, each identity is clearly separated
-                        detected_name_str = ', '.join(detected_names)
+                # Test reading a few frames
+                frame_success_count = 0
+                for i in range(3):
+                    frame_success, frame = test_manager.read_frame()
+                    if frame_success and frame is not None:
+                        frame_success_count += 1
+                        print(f"   ✅ Frame {i+1}: {frame.shape}")
                     else:
-                        detected_name_str = "Unknown"
-                    
-                    # 🆕 UPDATED: Prepare violation data with ONLY required fields
-                    violation_data = {
-                        'filename': filename.replace('.jpg', ''),  # Remove extension for server
-                        'image_format': 'jpg',
-                        'image_data': base64_data,
-                        'detected_name': detected_name_str  # 🆕 Now properly formatted
-                        # cctv_name is added automatically in push_violation_to_server
-                    }
-                    
-                    # Log the detected names for debugging
-                    self.logger.info(f"👤 Detected names for server push: {detected_name_str}")
-                    
-                    # Attempt to push to server (runs in background, doesn't block)
-                    server_success = self.push_violation_to_server(violation_data)
-                    violation_record['server_pushed'] = server_success
-                    if server_success:
-                        self.logger.info(f"📤 Server push successful for {detected_name_str}")
-                    else:
-                        self.logger.warning(f"❌ Server push failed for {detected_name_str}")
+                        print(f"   ❌ Failed to read frame {i+1}")
+                
+                if frame_success_count >= 2:  # Require at least 2 successful frames
+                    successful_sources.append(source_id)
+                    print(f"✅ Source {source_id} test successful")
                 else:
-                    if not self.server_push_enabled:
-                        self.logger.debug("Server push disabled, skipping")
-                    if not base64_data:
-                        self.logger.debug("No base64 data available for server push")
-                
-                self.logger.info(
-                    f"✅ Saved violation image #{self.saved_image_count}: {filename} "
-                    f"(Violations: {len(violations)}, Base64: {base64_data is not None}, "
-                    f"Resized: {self.enable_resize}, Server Push: {self.server_push_enabled and base64_data})"
-                )
-                
-                return True, base64_data
+                    failed_sources.append(source_id)
+                    print(f"❌ Source {source_id} test failed - insufficient frames")
             else:
-                self.stats['errors'] += 1
-                self.logger.error(f"❌ Failed to save image: {filepath}")
-                return False, None
+                failed_sources.append(source_id)
+                print(f"❌ Source {source_id} test failed - initialization failed")
                 
-        except Exception as e:
-            self.stats['errors'] += 1
-            self.logger.error(f"❌ Error saving annotated frame: {e}")
-            return False, None
-        
-    def update_server_config(self, server_config: Dict[str, Any]) -> None:
-        """
-        Update server push configuration dynamically.
-        
-        Args:
-            server_config: Dictionary with server configuration
-                - server_push_enabled: bool
-                - server_endpoint: str
-                - server_push_cooldown: float (seconds)
-                - server_timeout: int (seconds)
-                - server_retry_attempts: int
-                - server_retry_delay: float (seconds)
-        """
-        try:
-            self.server_push_enabled = server_config.get('server_push_enabled', self.server_push_enabled)
-            self.server_endpoint = server_config.get('server_endpoint', self.server_endpoint)
-            self.server_push_cooldown = server_config.get('server_push_cooldown', self.server_push_cooldown)
-            self.server_timeout = server_config.get('server_timeout', self.server_timeout)
-            self.server_retry_attempts = server_config.get('server_retry_attempts', self.server_retry_attempts)
-            self.server_retry_delay = server_config.get('server_retry_delay', self.server_retry_delay)
+            test_manager.release()
             
-            self.logger.info(f"🔄 Updated server config: enabled={self.server_push_enabled}, "
-                           f"endpoint={self.server_endpoint}, cooldown={self.server_push_cooldown}s")
-                           
         except Exception as e:
-            self.logger.error(f"❌ Error updating server config: {e}")
-                    
-    def get_logging_status(self) -> Dict[str, Any]:
-        """Get current logging status and statistics."""
-        status = {
-            'enabled': self.logging_enabled,
-            'image_log_folder': str(self.image_log_folder) if self.image_log_folder else None,
-            'saved_image_count': self.saved_image_count,
-            'max_images_per_session': self.max_images_per_session,
-            'stats': self.stats.copy(),
-            'recent_violations': list(self.recent_violations),
-            'cctv_name': self.cctv_name  # 🆕 FIX: Use the instance's CCTV name
-        }
-        
-        # Add resize configuration to status
-        status['resize_config'] = {
-            'enabled': self.enable_resize,
-            'width': self.resize_width,
-            'height': self.resize_height,
-            'method': self.resize_method
-        }
-        
-        # Add server push configuration to status
-        status['server_config'] = {
-            'enabled': self.server_push_enabled,
-            'endpoint': self.server_endpoint,
-            'cooldown': self.server_push_cooldown,
-            'timeout': self.server_timeout,
-            'retry_attempts': self.server_retry_attempts,
-            'retry_delay': self.server_retry_delay,
-            'last_push_time': self.last_server_push_time,
-            'time_since_last_push': time.time() - self.last_server_push_time if self.last_server_push_time > 0 else None
-        }
-        
-        return status
+            failed_sources.append(source_id)
+            print(f"❌ Source {source_id} test error: {e}")
+    
+    # Print summary
+    print(f"\n📊 STREAM TEST SUMMARY:")
+    print(f"   ✅ Successful: {len(successful_sources)} sources")
+    print(f"   ❌ Failed: {len(failed_sources)} sources")
+    
+    if failed_sources:
+        print(f"   Failed sources: {failed_sources}")
+    
+    # Return True if at least one source is successful
+    return len(successful_sources) > 0
 
-    def setup_image_logging(self, base_filename: Optional[str] = None) -> bool:
-        """
-        Setup image logging folder structure.
-        
-        Args:
-            base_filename: Base filename for the logging session
+def check_gpu_availability(config: dict) -> dict:
+    """Check and report GPU availability, updating config accordingly"""
+    try:
+        import torch
+        if torch.cuda.is_available():
+            device_count = torch.cuda.device_count()
+            current_device = config.get('gpu_device', 0)
             
-        Returns:
-            bool: True if setup successful
-        """
-        try:
-            if base_filename is None:
-                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                base_filename = f"face_recognition_{timestamp}"
-            
-            # Extract base name without extension
-            base_name = Path(base_filename).stem
-            self.image_log_folder = Path(f"{base_name}_images")
-            
-            # Create directory
-            self.image_log_folder.mkdir(exist_ok=True)
-            
-            # Create subdirectories
-            (self.image_log_folder / "violations").mkdir(exist_ok=True)
-            (self.image_log_folder / "debug").mkdir(exist_ok=True)
-            (self.image_log_folder / "snapshots").mkdir(exist_ok=True)
-            
-            # Create base64 subdirectories if enabled
-            if self.enable_base64_logging:
-                (self.image_log_folder / "base64").mkdir(exist_ok=True)
-                (self.image_log_folder / "base64" / "violations").mkdir(exist_ok=True)
-                (self.image_log_folder / "base64" / "debug").mkdir(exist_ok=True)
-                (self.image_log_folder / "base64" / "snapshots").mkdir(exist_ok=True)
-            
-            self.logging_enabled = True
-            self.saved_image_count = 0
-            
-            self.logger.info(f"Image logging ENABLED: {self.image_log_folder}")
-            self.logger.info(f"  - Max images: {self.max_images_per_session}")
-            self.logger.info(f"  - Quality: {self.image_quality}%")
-            self.logger.info(f"  - Annotations: {self.annotate_images}")
-            self.logger.info(f"  - Base64 logging: {self.enable_base64_logging}")
-            self.logger.info(f"  - Resize enabled: {self.enable_resize}")
-            self.logger.info(f"  - CCTV Name: {self.cctv_name}")  # 🆕 FIX: Use the instance's CCTV name
-            self.logger.info(f"  - Server push: {self.server_push_enabled}")
-            if self.server_push_enabled:
-                self.logger.info(f"  - Server endpoint: {self.server_endpoint}")
-                self.logger.info(f"  - Push cooldown: {self.server_push_cooldown}s")
-            if self.enable_resize:
-                self.logger.info(f"  - Resize dimensions: {self.resize_width}x{self.resize_height}")
-                self.logger.info(f"  - Resize method: {self.resize_method}")
-            
-            return True
-            
-        except Exception as e:
-            self.logger.error(f"Failed to setup image logging: {e}")
-            self.logging_enabled = False
-            self.image_log_folder = None
-            return False
-        
-    def _resize_image(self, image: np.ndarray) -> np.ndarray:
-        """
-        Resize image according to configured dimensions and method.
-        
-        Args:
-            image: Input image to resize
-            
-        Returns:
-            Resized image
-        """
-        if not self.enable_resize:
-            return image
-            
-        try:
-            original_height, original_width = image.shape[:2]
-            
-            # Skip resize if image is already smaller than target
-            if original_width <= self.resize_width and original_height <= self.resize_height:
-                return image
-            
-            # Choose interpolation method based on configuration
-            if self.resize_method == 'high_quality':
-                interpolation = cv2.INTER_LANCZOS4
-            elif self.resize_method == 'fast':
-                interpolation = cv2.INTER_LINEAR
-            else:  # default
-                interpolation = cv2.INTER_AREA
-            
-            # Resize image
-            resized_image = cv2.resize(
-                image, 
-                (self.resize_width, self.resize_height), 
-                interpolation=interpolation
-            )
-            
-            self.stats['resized_images'] += 1
-            self.logger.debug(f"Resized image from {original_width}x{original_height} to {self.resize_width}x{self.resize_height}")
-            
-            return resized_image
-            
-        except Exception as e:
-            self.logger.error(f"Error resizing image: {e}")
-            return image  # Return original image on error
-        
-    def _image_to_base64(self, image: np.ndarray, quality: int = None) -> str:
-        """
-        Convert OpenCV image to base64 encoded string.
-        
-        Args:
-            image: OpenCV image (numpy array)
-            quality: JPEG quality (1-100), uses self.base64_quality if None
-            
-        Returns:
-            str: Base64 encoded JPEG image
-        """
-        if quality is None:
-            quality = self.base64_quality
-            
-        try:
-            # Encode image to JPEG in memory
-            encode_params = [cv2.IMWRITE_JPEG_QUALITY, quality]
-            success, buffer = cv2.imencode('.jpg', image, encode_params)
-            
-            if not success:
-                raise ValueError("Failed to encode image to JPEG")
-            
-            # Convert to base64
-            image_base64 = base64.b64encode(buffer).decode('utf-8')
-            return image_base64
-            
-        except Exception as e:
-            self.logger.error(f"Error converting image to base64: {e}")
-            raise
-        
-    def _prepare_violation_metadata(self, results: List[Dict]) -> Dict[str, Any]:
-        """Prepare violation metadata that is JSON serializable"""
-        violations = [r for r in results if r.get('mask_status') == 'no_mask']
-        
-        # 🆕 UPDATED: Build serializable violations list with ALL identities
-        serializable_violations = []
-        for r in violations:
-            identity = r.get('identity', 'Unknown')
-            # 🆕 UPDATED: Keep "Unknown" as a valid identity
-            violation_data = {
-                "identity": str(identity),  # Keep as string, including "Unknown"
-                "mask_confidence": float(r.get('mask_confidence', 0)),
-                "recognition_confidence": float(r.get('recognition_confidence', 0)),
-                "detection_confidence": float(r.get('detection_confidence', 0)),
-                "bbox": [int(coord) for coord in r.get('bbox', [0, 0, 0, 0])]
-            }
-            serializable_violations.append(violation_data)
-        
-        return {
-            "violation_count": len(violations),
-            "total_faces": len(results),
-            "violations": serializable_violations
-        }
-        
-    def _make_json_serializable(self, obj):
-        """Recursively make object JSON serializable"""
-        if isinstance(obj, (str, int, float, bool, type(None))):
-            return obj
-        elif isinstance(obj, dict):
-            return {key: self._make_json_serializable(value) for key, value in obj.items()}
-        elif isinstance(obj, list):
-            return [self._make_json_serializable(item) for item in obj]
-        elif isinstance(obj, (np.integer, np.floating)):
-            return obj.item()
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
+            if current_device < device_count:
+                gpu_name = torch.cuda.get_device_name(current_device)
+                memory_info = torch.cuda.get_device_properties(current_device)
+                total_memory = memory_info.total_memory / (1024**3)  # Convert to GB
+                
+                print(f"🎮 GPU {current_device}: {gpu_name} available")
+                print(f"🎮 CUDA version: {torch.version.cuda}")
+                print(f"🎮 Total GPU Memory: {total_memory:.1f} GB")
+                
+                # Test GPU functionality
+                test_tensor = torch.randn(1000, 1000).cuda()
+                test_result = test_tensor * 2
+                del test_tensor, test_result
+                torch.cuda.empty_cache()
+                
+                print("✅ GPU functionality test passed")
+                config['use_gpu'] = True
+                return config
+            else:
+                print(f"⚠️  GPU device {current_device} not available, falling back to CPU")
+                config['use_gpu'] = False
         else:
-            return str(obj)
-        
-    def has_mask_violations(self, results: List[Dict]) -> bool:
-        """
-        Check if frame contains mask violations.
-        
-        Args:
-            results: List of face recognition results
+            print("⚠️  CUDA not available, falling back to CPU")
+            config['use_gpu'] = False
             
-        Returns:
-            bool: True if mask violations detected
-        """
-        if not results:
+    except Exception as e:
+        print(f"⚠️  GPU check failed: {e}, falling back to CPU")
+        config['use_gpu'] = False
+    
+    return config
+
+def check_onnx_gpu_availability():
+    """Check if ONNX Runtime can use GPU"""
+    try:
+        import onnxruntime as ort
+        available_providers = ort.get_available_providers()
+        print(f"🔧 Available ONNX Providers: {available_providers}")
+        
+        if 'CUDAExecutionProvider' in available_providers:
+            print("✅ ONNX CUDA Execution Provider available")
+            return True
+        else:
+            print("⚠️  ONNX CUDA Execution Provider not available")
             return False
-        
-        for result in results:
-            mask_status = result.get('mask_status')
-            mask_conf = result.get('mask_confidence', 0)
             
-            # Log ANY person without mask, regardless of recognition status
-            if mask_status == 'no_mask' and mask_conf > 0.3:
-                return True
-        
+    except Exception as e:
+        print(f"⚠️  ONNX GPU check failed: {e}")
         return False
-    
-    def _annotate_frame(self, frame: np.ndarray, results: List[Dict]) -> np.ndarray:
-        """Apply comprehensive annotations to the frame with dynamic scaling."""
-        annotated_frame = frame.copy()
-        h, w = annotated_frame.shape[:2]
-        
-        # Get dynamic text parameters based on current frame size
-        text_x, text_y, text_scale = self.get_dynamic_text_params(w, h)
-        
-        # Initialize variables for summary text
-        violations = [r for r in results if r.get('mask_status') == 'no_mask']
-        
-        # Draw bounding boxes and labels
-        for result in results:
-            x1, y1, x2, y2 = result['bbox']
-            identity = result.get('identity', 'Unknown')
-            rec_conf = result.get('recognition_confidence', 0)
-            det_conf = result.get('detection_confidence', 0)
-            mask_status = result.get('mask_status', 'unknown')  
-            mask_conf = result.get('mask_confidence', 0.0)
-            
-            # Color coding
-            if identity and identity != "Unknown":
-                if mask_status == "mask":
-                    color = (0, 255, 0)  # Green
-                    label_color = color
-                    text_color = (0, 0, 0)
-                else:
-                    color = (0, 255, 255)  # Yellow
-                    label_color = color
-                    text_color = (0, 0, 0)                    
-            else:
-                if mask_status == "mask":
-                    color = (255, 255, 0)  # Cyan
-                    label_color = color
-                    text_color = (0, 0, 0)                    
-                else:
-                    color = (0, 0, 255)    # Red
-                    label_color = (0, 0, 255)
-                    text_color = (255, 255, 255)  # White text on red background
-            
-            # NEW: Optimized box thickness for 640x288 resolution
-            # Scale thickness based on resolution - much thinner for smaller frames
-            base_thickness = 1  # Reduced from 3
-            box_thickness = max(1, int(base_thickness * (w / 640)))  # Much thinner scaling
-            
-            cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), color, box_thickness)
-            
-            # Prepare label
-            if identity and identity != "Unknown":
-                base_label = f"{identity} (Rec:{rec_conf:.2f})"
-            else:
-                base_label = f"Unknown (Det:{det_conf:.2f})"
-            
-            # Add mask status to label
-            mask_label = f" | Mask: {mask_status}({mask_conf:.2f})"
-            full_label = base_label + mask_label
-            
-            # NEW: Optimized text parameters for better readability
-            label_scale = text_scale * 0.7  # Smaller scale for labels
-            label_thickness = 1  # Reduced from 2 - much thinner text
-            
-            # Calculate text size for background
-            label_size = cv2.getTextSize(full_label, cv2.FONT_HERSHEY_SIMPLEX, label_scale, label_thickness)[0]
-            
-            # Draw label background
-            cv2.rectangle(annotated_frame, (x1, y1 - label_size[1] - 10),  # Reduced padding
-                        (x1 + label_size[0], y1), label_color, -1)
-            
-            # Draw label text with optimized thickness
-            cv2.putText(annotated_frame, full_label, (x1, y1 - 5),  # Reduced offset
-                    cv2.FONT_HERSHEY_SIMPLEX, label_scale, text_color, label_thickness)
-        
-        # Add violation summary with optimized parameters
-        violation_text = f"Violations: {len(violations)} | Total Faces: {len(results)}"
-        vio_color = (0, 0, 255)
-        
-        # NEW: Optimized summary text
-        summary_thickness = 1  # Reduced from 2
-        cv2.putText(annotated_frame, violation_text, (text_x, text_y),
-                cv2.FONT_HERSHEY_SIMPLEX, text_scale, vio_color, summary_thickness)  
-        
-        return annotated_frame
 
-    def get_dynamic_text_params(self, frame_width: int, frame_height: int, 
-                            preset: str = "violation_summary") -> Tuple[int, int, float]:
-        """
-        Calculate dynamic text parameters optimized for 640x288 resolution.
+def print_system_info(config: dict):
+    """Print comprehensive system information"""
+    print("\n" + "="*60)
+    print("🖥️  SYSTEM INFORMATION")
+    print("="*60)
+    
+    # CPU Information
+    try:
+        import psutil
+        cpu_count = psutil.cpu_count()
+        memory_total = psutil.virtual_memory().total / (1024**3)  # GB
+        print(f"💻 CPU Cores: {cpu_count}")
+        print(f"💾 Total RAM: {memory_total:.1f} GB")
+    except:
+        print("💻 CPU: Information not available")
+    
+    # GPU Information
+    try:
+        import torch
+        if torch.cuda.is_available():
+            for i in range(torch.cuda.device_count()):
+                gpu_name = torch.cuda.get_device_name(i)
+                memory_info = torch.cuda.get_device_properties(i)
+                total_memory = memory_info.total_memory / (1024**3)
+                print(f"🎮 GPU {i}: {gpu_name} ({total_memory:.1f} GB)")
+        else:
+            print("🎮 GPU: No CUDA devices available")
+    except:
+        print("🎮 GPU: Information not available")
+    
+    # Python Information
+    import sys
+    print(f"🐍 Python Version: {sys.version.split()[0]}")
+    
+    # Library Versions
+    try:
+        import torch
+        print(f"🔥 PyTorch Version: {torch.__version__}")
+    except:
+        pass
         
-        Args:
-            frame_width: Current frame width
-            frame_height: Current frame height  
-            preset: Text preset type
-                    
-        Returns:
-            Tuple of (x, y, scale) adjusted for current resolution
-        """
-        # Define presets optimized for 640x288 resolution
-        presets = {
-            "violation_summary": {"x": 10, "y": frame_height - 20, "scale": 0.4},  # Bottom-left
-            "header": {"x": 10, "y": 25, "scale": 0.5},
-            "info": {"x": 10, "y": 50, "scale": 0.35},
-            "counter": {"x": frame_width - 100, "y": 25, "scale": 0.4}  # Top-right
+    try:
+        import cv2
+        print(f"👁️  OpenCV Version: {cv2.__version__}")
+    except:
+        pass
+        
+    try:
+        import onnxruntime as ort
+        print(f"🔧 ONNX Runtime Version: {ort.__version__}")
+    except:
+        pass
+    
+    print("="*60)
+
+def verify_gpu_usage(face_system):
+    """Verify that GPU is actually being used by the models"""
+    print("\n🔍 Verifying GPU usage...")
+    
+    try:
+        # Check YOLO model device
+        if hasattr(face_system, 'detection_model') and face_system.detection_model:
+            yolo_device = next(face_system.detection_model.model.parameters()).device
+            print(f"🎯 YOLO Model Device: {yolo_device}")
+        
+        # Check ONNX mask detector
+        if hasattr(face_system, 'mask_detector') and face_system.mask_detector:
+            providers = face_system.mask_detector.get_providers()
+            print(f"🎯 ONNX Mask Detector Providers: {providers}")
+            
+        # Check DeepFace backend
+        try:
+            from deepface.commons import functions
+            backend = functions.get_backend()
+            print(f"🎯 DeepFace Backend: {backend}")
+        except:
+            print("🎯 DeepFace Backend: Could not determine")
+            
+    except Exception as e:
+        print(f"⚠️  GPU verification failed: {e}")
+        
+def validate_email_config(config: dict, test_connection: bool = False) -> None:
+    """Validate email configuration and resolve password; exit with helpful message on failure."""
+    email_cfg = config.get('email', {})
+    if not email_cfg.get('enabled', False):
+        return  # email disabled – nothing to validate
+
+    password_setting = email_cfg.get('smtp_password', '')
+    if not password_setting:
+        print("❌ Email is enabled but 'smtp_password' is missing from config.")
+        sys.exit(1)
+
+    # Use the same resolution logic as MultiSourceRealTimeProcessor._load_password
+    resolved = None
+    source_desc = "unknown"
+
+    if password_setting.startswith("env:"):
+        env_var = password_setting[4:]
+        resolved = os.environ.get(env_var, "")
+        source_desc = f"environment variable '{env_var}'"
+        if not resolved:
+            print(f"❌ Email enabled but {source_desc} is not set or empty.")
+            print("\n💡 To fix:")
+            print(f"   - Windows (Command Prompt): set {env_var}=your_password")
+            print(f"   - Windows (PowerShell):     $env:{env_var} = 'your_password'")
+            print(f"   - Linux/macOS:               export {env_var}=your_password")
+            print("\n   Or change the config to use a plain password or a file:")
+            print("   'smtp_password': 'your_plain_password'")
+            print("   'smtp_password': '/path/to/password.txt'")
+            sys.exit(1)
+    elif '/' in password_setting or '\\' in password_setting or password_setting.endswith(('.txt', '.pwd')):
+        # File path
+        source_desc = f"file '{password_setting}'"
+        if not os.path.exists(password_setting):
+            print(f"❌ Email enabled but password file '{password_setting}' does not exist.")
+            sys.exit(1)
+        try:
+            with open(password_setting, 'r') as f:
+                resolved = f.readline().strip()
+            if not resolved:
+                print(f"❌ Password file '{password_setting}' is empty.")
+                sys.exit(1)
+        except Exception as e:
+            print(f"❌ Could not read password file '{password_setting}': {e}")
+            sys.exit(1)
+    else:
+        # Plain text
+        resolved = password_setting
+        source_desc = "plain text in config"
+
+    if not resolved:
+        print(f"❌ Resolved password from {source_desc} is empty.")
+        sys.exit(1)
+
+    print(f"✅ Email password resolved from {source_desc} (length {len(resolved)}).")
+
+    # Optional: test SMTP connection
+    if test_connection:
+        try:
+            import smtplib
+            server = smtplib.SMTP(email_cfg.get('smtp_server', 'smtp.gmail.com'),
+                                  email_cfg.get('smtp_port', 587))
+            if email_cfg.get('use_tls', True):
+                server.starttls()
+            server.login(email_cfg.get('smtp_user', ''), resolved)
+            server.quit()
+            print("✅ SMTP login successful – credentials are valid.")
+        except Exception as e:
+            print(f"❌ SMTP login failed: {e}")
+            print("   Check your username, password, and SMTP server settings.")
+            sys.exit(1)
+            
+def get_default_config():
+    """Return the complete default configuration"""
+    return {
+        # ========== MODEL PATHS ==========        
+        'detection_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\yolov12m-face.pt',
+        'embeddings_db_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\dataset\person_512.json',
+        'mask_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\mask_detector_cus4.onnx',
+        
+                                                # PLEASE FIX THE STABILITY OF THE VERIFICATION 
+                                                # VALUE BEFORE TRYING TO CHANGE THE TYPE OF mask MODEL USED.        
+        
+        # ========== CORE DETECTION PARAMETERS ==========
+        'detection_confidence': 0.5,
+        'recognition_threshold': 0.8,
+        'mask_detection_threshold': 0.6,  # INCREASED from 0.5 - makes mask detection more conservative
+        'detection_iou': 0.3,
+        'min_face_size': 10, # Min face height in pixels
+        'max_faces_per_frame': 15,
+        'enable_person_detection': True,
+        'person_detection_confidence_threshold': 0.4,        
+        
+        # ========== FRAME PROCESSING CONFIGURATION ==========
+        'frame_processing': {
+            # Basic processing parameters
+            'processing_width': 640,
+            'processing_height': 480,
+            'min_processing_scale': 0.3,
+            'max_processing_scale': 4.5,
+            'default_processing_scale': 1.0,
+            
+            # Color and normalization settings
+            'convert_to_rgb': True,  # Convert BGR to RGB for models that expect RGB
+            'normalize_values': False,  # Normalize pixel values to [0, 1]
+            'apply_mean_std_normalization': False,  # Apply ImageNet mean/std normalization
+            
+            # Normalization values (ImageNet standard)
+            'normalization_mean': [0.485, 0.456, 0.406],
+            'normalization_std': [0.229, 0.224, 0.225],
+            
+            # Debug and validation
+            'debug_mode': False,
+            'validate_frames': True,  # Enable frame validation
+            'frame_validation_threshold': 0.1,  # Reject frames with brightness < 10% or > 90%
+            
+            # Frame statistics collection
+            'collect_frame_stats': True,
+            'stats_update_interval': 30.0,  # Update stats every 30 seconds
+            
+            # Contrast enhancement
+            'contrast_enhancement': {
+                'enabled': True,
+                'method': 'clahe',  # 'clahe', 'histogram', or 'none'
+                'clahe_clip_limit': 3.0,
+                'clahe_grid_size': 8,
+            },
+            
+            # Region of interest (ROI) extraction
+            'roi_extraction': {
+                'enabled': True,
+                'default_padding': 10,  # Pixels to add around bbox
+                'min_roi_size': 32,  # Minimum ROI size in pixels
+            },
+            
+            # Multi-source composite settings
+            'composite_creation': {
+                'grid_target_width': 480,
+                'grid_target_height': 360,
+                'horizontal_target_height': 360,
+                'vertical_target_width': 480,
+                'maintain_aspect_ratio': True,
+                'max_composite_width': 1920,
+                'max_composite_height': 1080,
+            },
+            
+            # Frame buffering and queuing
+            'frame_buffer': {
+                'buffer_size': 3,
+                'queue_timeout': 0.1,  # seconds
+                'max_queue_size': 100,
+                'drop_old_frames': True,  # Drop old frames when queue is full
+            },
+            
+            # Frame quality assessment
+            'quality_assessment': {
+                'enabled': True,
+                'min_brightness': 20.0,
+                'max_brightness': 235.0,
+                'min_contrast': 10.0,
+                'blur_threshold': 100.0,  # Laplacian variance threshold
+            },
+            
+            # Performance optimization
+            'performance': {
+                'use_half_precision': False,  # Use float16 for processing
+                'enable_caching': True,
+                'cache_size': 10,  # Number of frames to cache
+                'optimize_for_size': True,  # Optimize memory usage
+            },
+            
+            # Frame preprocessing pipeline
+            'preprocessing_pipeline': [
+                'validate_frame',
+                'resize_for_processing',
+                'convert_color_space',
+                'enhance_contrast',
+                'normalize_if_needed'
+            ],
+            
+            # Color space conversion options
+            'color_space_conversion': {
+                'input_format': 'bgr',  # OpenCV default
+                'output_format': 'rgb',  # Most models expect RGB
+                'conversion_method': 'opencv',  # 'opencv', 'numpy', or 'manual'
+            },
+            
+            # Dynamic scaling parameters
+            'dynamic_scaling': {
+                'enabled': True,
+                'min_face_size': 50,  # Minimum face size for scaling decisions
+                'max_face_size': 300,  # Maximum face size for scaling decisions
+                'scale_adjustment_step': 0.1,
+                'stability_threshold': 0.8,  # Confidence threshold for stable scaling
+            },
+        },
+        
+        # ========== CCTV CONFIGURATION ==========
+        'cctv_name': 'Default',  
+        
+        # ========== MULTI-SOURCE DISPLAY CONFIGURATION ==========
+        'display_layout': 'grid',  # 'grid', 'horizontal', 'vertical'
+        'max_display_sources': 4,
+        
+        # ========== MULTI-SOURCE PROCESSING CONFIGURATION ==========
+        'processing_width': 640,
+        'processing_height': 480,
+        'processing_scale': 1.0,
+        
+        # ========== STREAM HEALTH MONITORING ==========
+        'stream_health': {
+            'check_interval': 30.0,  # seconds
+            'success_rate_threshold': 0.3,  # 30%
+            'unhealthy_retry_delay': 2.0,  # seconds
+            'max_consecutive_errors': 10,
+        },
+        
+        # ========== MAINTENANCE CONFIGURATION ==========
+        'maintenance_interval': 300.0,  # 5 minutes in seconds
+        
+        # ========== VIOLATION VERIFICATION (PROCESSOR LEVEL) ==========
+        'violation_verification_enabled': True,
+        'min_violation_duration': 0.1,  # seconds
+        'min_violation_frames': 1,
+        'violation_confidence_threshold': 0.4,
+        
+        # ========== LOGGING INTERVALS ==========
+        'log_interval': 1,  # Process every Nth frame
+        'enable_logging': True,
+        'enable_image_logging': True,
+        
+        # ========== RESOURCE MANAGEMENT ==========
+        'resource_monitoring': {
+            'memory_threshold_mb': 1024,  # Warn at 1GB
+            'cleanup_interval': 60.0,  # seconds
+            'max_open_files': 100,
+            'max_threads': 50,
+        },
+        
+        # ========== TRACKING BUFFER SIZES ==========
+        'tracking_buffers': {
+            'max_track_age': 500,  # seconds
+            'max_violation_history': 100,
+            'cleanup_old_tracks_interval': 60.0,
+        },
+        
+        # ========== GRID LAYOUT CONFIGURATION ==========
+        'grid_layout': {
+            'target_height': 360,
+            'target_width': 480,
+            'max_grid_size': 4,  # 2x2 grid max
+        },
+        
+        # ========== HORIZONTAL LAYOUT CONFIGURATION ==========
+        'horizontal_layout': {
+            'target_height': 360,
+            'maintain_aspect_ratio': True,
+        },
+        
+        # ========== VERTICAL LAYOUT CONFIGURATION ==========
+        'vertical_layout': {
+            'target_width': 480,
+            'maintain_aspect_ratio': True,
+        },
+        
+        # ========== SOURCE OVERLAY CONFIGURATION ==========
+        'source_overlay': {
+            'show_source_id': True,
+            'show_cctv_name': True,
+            'show_violation_count': True,
+            'font_scale': 0.5,
+            'font_thickness': 2,
+            'text_color': (255, 255, 255),  # White
+            'background_color': (0, 0, 0),  # Black with transparency
+            'background_alpha': 0.7,
+        },        
+            
+        # ========== ENHANCED TRACKING CONFIGURATION ==========
+        'tracking': {
+            'enabled': True,
+            'fairness_enabled': True,
+            'confidence_frames': 3,
+            'cooldown_seconds': 5,
+            'min_iou': 0.3,
+            'max_recognitions_per_person': 10,
+            'recent_window_size': 300,
+            'enable_velocity_prediction': True,
+            'enable_appearance_matching': True,
+            'max_track_age': 500,
+            
+            # ByteTrack person tracking configuration
+            'enable_person_tracking': True,
+            'enabled':True,
+            'person_track_confidence': 0.55,
+            'person_track_max_age': 90,
+            'person_iou_threshold': 0.3,
+            'bytetrack_track_thresh': 0.5,
+            'bytetrack_track_buffer': 100,
+            'bytetrack_match_thresh': 0.8,
+            'bytetrack_min_box_area': 10,
+            
+            # 🎯 Progressive mask detection configuration
+            'progressive_mask': {          
+                
+                # Buffer and temporal parameters
+                'mask_buffer_size': 200,
+                'min_mask_frames': 2,
+                'occlusion_timeout': 3.0,
+                
+                # Confidence and stability thresholds  
+                'mask_confidence_threshold': 0.1,
+                'mask_consistency_threshold': 0.1,
+                
+                # Require higher stability before committing
+                'min_stability_to_commit': 0.15,
+                
+                # State holding parameters
+                'state_hold_duration': 15.0,
+                'verification_grace_ratio': 0.1,
+                
+                # Spatial consistency parameters
+                'spatial_consistency_weight': 0.3,
+                'max_bbox_variation': 0.45,
+                
+                # Extreme confidence handling
+                'extreme_confidence_threshold': 0.95,
+                'extreme_mask_penalty': 0.8,
+                'extreme_no_mask_boost': 0.9,
+                
+                # Initial weight parameters
+                'initial_mask_weight': 0.5,
+                'initial_no_mask_weight': 0.5,
+                
+                # Weight adjustment parameters (NEW - optional to expose)
+                'weight_increase_high_conf': 0.4,
+                'weight_decrease_low_conf': 0.3,
+                'weight_increase_opposite': 0.1,
+                
+                'confidence_smoothing_factor': 0.3,
+                'stability_smoothing_factor': 0.2,                
+            },
+            
+            # 🎯 **MODIFIED** Violation verification configuration
+            'violation_verification_enabled': True,
+            'min_violation_duration': 1,       # DECREASED from 20.0 - quicker to detect violations
+            'min_violation_frames': 1,           # DECREASED from 35 - quicker to detect violations
+            'violation_confidence_threshold': 0.15, # DECREASED from 0.9 - more sensitive to violations
+        },    
+        
+        # ========== VIOLATION VERIFICATION CONFIGURATION ==========
+        'violation_verification': {
+            'enabled': True,
+            'min_duration_seconds': 0.1,           # DECREASED from 30 - faster verification
+            'min_frames': 1 ,                     # DECREASED from 50 - faster verification
+            'confidence_threshold': 0.1,         # DECREASED from 0.85 - more sensitive
+            'progressive_verification': True,
+            'log_unverified_violations': True,
+            'unverified_log_cooldown': 10,        # DECREASED from 15 - more frequent logging
+            'false_negative_monitoring': True,
+            # 🆕 Modified multi-level verification
+            'verification_levels': {
+                'low': {'duration': 1.5, 'frames': 1},      # Quicker initial detection
+                'medium': {'duration': 2.0, 'frames': 2},  # Medium confidence
+                'high': {'duration': 3.0, 'frames': 3}    # High confidence (verified)
+            }
+        },  
+                
+        # ========== LOGGING CONFIGURATION ==========
+        'enable_logging': True,
+        'enable_image_logging': True,
+        'log_interval': 5,
+        'image_log_interval': 5,
+        'max_images_per_session': 5000,
+        'min_save_interval': 1.0,
+        
+        # ========== SERVER PUSH CONFIGURATION ==========        
+        'server_push_enabled': True,
+        'server_endpoint': '',
+        'server_push_cooldown': 5,
+        'server_timeout': 10,
+        'server_retry_attempts': 10,
+        'server_retry_delay': 2,
+        
+        # ========== IMAGE RESIZE CONFIGURATION ==========
+        'enable_image_resize': True,
+        'image_resize_width': 1024,
+        'image_resize_height': 576,
+        'image_resize_method': 'default',
+        
+        # ========== ALERT CONFIGURATION ==========
+        'enable_voice_alerts': True,
+        'alert_server_url': " ",
+        'alert_cooldown_seconds': 15,            # DECREASED from 20 - more responsive alerts
+        'min_violation_frames': 1,              # DECREASED from 20 - more sensitive
+        'min_violation_seconds': 1,              # DECREASED from 12 - faster alerts
+        'max_gap_frames': 10,                    # INCREASED from 8 - more tolerant to gaps
+        'alert_language': 'id',
+        'alert_style': 'formal',
+        'enable_individual_alerts': True,
+        'enable_group_alerts': True,
+        'alert_timeout_seconds': 2,              # DECREASED from 3 - faster alert processing
+        # 🆕 Modified alert verification requirements
+        'alert_verification_required': True,
+        'min_alert_confidence': 0.85,            # DECREASED from 0.9 - more sensitive alerts
+        'alert_buffer_size': 100,                 # DECREASED from 25 - faster alert decisions
+        
+        # ========== FAISS SYSTEM CONFIGURATION ========== 
+        'use_faiss_gpu': True,  # Enable GPU acceleration for FAISS
+        'faiss_index_type': 'FlatL2',  # Options: 'FlatL2', 'FlatIP', 'IVFFlat', 'IVFPQ'
+        'faiss_nlist': 100,  # For IVF indices
+        'faiss_pq_m': 8,  # For IVFPQ: number of sub-vectors
+        'faiss_pq_bits': 8,  # For IVFPQ: bits per sub-vector
+        'faiss_max_l2_distance': 100.0,  # For L2 distance normalization
+        
+        # Model paths
+        'embedding_model': 'Facenet512',
+        
+        # ========== STREAM MANAGEMENT CONFIGURATION ==========
+        'stream_manager': {
+            'max_reconnect_attempts': 10,
+            'reconnect_delay': 3,
+            'health_check_interval': 10,
+            'max_frame_gap': 5,
+            'buffer_size': 100,
+            'open_timeout': 10000,
+            'read_timeout': 5000,
+        },
+        
+        # ========== DISPLAY CONFIGURATION ==========
+        'display': {
+            'default_width': 1280,
+            'default_height': 720,
+            'max_display_width': 1920,
+            'max_display_height': 1080,
+            'resize_method': 'fit_to_screen',
+            'show_resize_info': False,
+            'show_performance_stats': False,
+        },
+        
+        # ========== DEBUG CONFIGURATION ==========
+        'debug': {
+            'enabled': False,
+            'show_detection_debug': False,
+            'save_debug_frames': False,
+            'max_debug_frames': 100,
+            'verbose': False,
+        },
+        
+        # ========== CONTEXT-AWARE SCALING ==========
+        'context_aware_scaling': {
+            'enabled': True,
+            'debug_mode': False,
+            'min_context_samples': 10,
+            'max_context_samples': 100,
+        },
+        
+        # ========== ADVANCED FEATURES ==========
+        'enable_multi_scale': True,
+        'enable_temporal_fusion': True,
+        'enable_quality_aware': True,
+ 
+        
+        # ========== BASE64 CONFIGURATION ==========
+        'enable_base64_logging': True,
+        'base64_quality': 50,
+        
+        # ========== SYSTEM MODE ==========
+        'headless_mode': False,
+        'use_gpu': False,
+        'gpu_device': 0,
+        
+        # ========== ANNOTATION CONFIGURATION ==========
+        'annotation_box_thickness': 1,
+        'annotation_text_thickness': 1, 
+        'annotation_min_text_scale': 0.3,
+        'annotation_max_text_scale': 0.8,
+        
+        # ========== PERFORMANCE TUNING ==========
+        'performance': {
+            'fps_update_interval': 5.0,
+            'dynamic_adjustment_enabled': True,
+            'quality_threshold_high': 0.8,
+            'quality_threshold_low': 0.3,
+            'face_size_threshold_small': 50,
+            'face_size_threshold_large': 200,
+        },
+        
+        'output': {
+            'root_dir': r'logs-running\magick\runs-magick',                    # Base directory for all runs
+            'create_timestamped_subdir': True,      # Create YYYYMMDD_HHMMSS subfolder
+            'enable_exit_status': True,              # Write exit_status.json on shutdown
+        },
+        'email': {
+            'enabled': True,
+            'recipient': 'faridraihan17@gmail.com',
+            'smtp_server': 'smtp.gmail.com',
+            'smtp_port': 587,
+            'smtp_user': 'faridraihan17@gmail.com',
+            'smtp_password': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\pass.txt',        # Use environment variable for security
+            'use_tls': True,
+            'send_on_exit': True,                    # Send email after run finishes
+            'max_attachment_size_mb': 25,            # Common email limit
+        }        
+    }
+    
+    
+def get_advanced_sources_config():
+    """Return advanced sources configuration with parameters"""
+    return {
+        # '1': {
+        #     'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/601',
+        #     'description': 'Dekat meja IT',
+        #     'priority': 'low',
+        #     'processing_scale': 1,
+        #     'buffer_size': 100,
+        #     'cctv_name':None,            
+        # },
+        
+        
+        # '2': {
+        #     'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/501',
+        #     'description': 'Dekat meja bu Dyah',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },
+        
+        # '3': {
+        #     'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/101',
+        #     'description': 'Atas Server Gedangan',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },
+        
+        # '4': {
+        #     'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/601',
+        #     'description': 'Ruang Produksi',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },   
+        
+        # '5': {
+        #     'url': 'rtsp://admin:admin@192.168.110.137:1935',
+        #     'description': 'HP Pribadi',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },     
+                         
+        '6': {
+            'url': '0',
+            'description': 'Main Camera',
+            'priority': 'medium',
+            'processing_scale':1,            
+            'buffer_size': 100,
+            'cctv_name':None,
+        },
+        
+        # '7': {
+        #     'url': 'rtsp://admin:admin888@192.168.110.40:554/Streaming/Channels/601',
+        #     'description': 'Pojok dekat MIS',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },                                  
+    }
+        
+def load_custom_config(config_path: str = None) -> Dict:
+    """Load custom configuration from file if provided"""
+    if config_path and os.path.exists(config_path):
+        try:
+            import json
+            with open(config_path, 'r') as f:
+                custom_config = json.load(f)
+            print(f"✅ Loaded custom configuration from: {config_path}")
+            return custom_config
+        except Exception as e:
+            print(f"❌ Failed to load custom configuration: {e}")
+            print("🔄 Using default configuration")
+    
+    return get_default_config()
+
+def test_server_connection(config: dict) -> bool:
+    """Test connection to the violation server"""
+    if not config.get('server_push_enabled', False):
+        print("📤 Server push disabled, skipping server connection test")
+        return True
+        
+    server_endpoint = config.get('server_endpoint', '')
+    if not server_endpoint:
+        print("❌ No server endpoint configured")
+        return False
+        
+    try:
+        import requests
+        print(f"🔍 Testing server connection: {server_endpoint}")
+        
+        # Test health endpoint
+        health_url = server_endpoint.replace('/api/violations', '/api/health')
+        response = requests.get(health_url, timeout=10)
+        
+        if response.status_code == 200:
+            print(f"✅ Server connection successful: {health_url}")
+            return True
+        else:
+            print(f"❌ Server health check failed: {response.status_code}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Server connection test failed: {e}")
+        print("💡 Make sure the test server is running: python test_upload_server.py")
+        return False
+
+def print_server_push_info(config: dict):
+    """Print server push configuration information"""
+    if config.get('server_push_enabled', False):
+        print("\n📤 SERVER PUSH CONFIGURATION")
+        print("="*40)
+        print(f"   Endpoint: {config.get('server_endpoint')}")
+        print(f"   Cooldown: {config.get('server_push_cooldown')}s")
+        print(f"   Timeout: {config.get('server_timeout')}s")
+        print(f"   Retry Attempts: {config.get('server_retry_attempts')}")
+        print(f"   CCTV Name: {config.get('cctv_name')}")
+        print("   JSON Structure:")
+        print("     {")
+        print('       "filename": "string",')
+        print('       "image_format": "jpg",')
+        print('       "image_data": "base64_string",')
+        print('       "detected_name": "string",')
+        print('       "cctv_name": "string"')
+        print("     }")
+        print("="*40)
+
+def print_multi_source_info(sources_config: Dict[str, Dict]):
+    """Print multi-source configuration information"""
+    print("\n🎯 MULTI-SOURCE CONFIGURATION")
+    print("="*50)
+    for source_id, source_config in sources_config.items():
+        print(f"📹 {source_id}:")
+        print(f"   URL: {source_config.get('url', 'N/A')}")
+        print(f"   Description: {source_config.get('description', 'No description')}")
+        print(f"   Priority: {source_config.get('priority', 'medium')}")
+        print(f"   CCTV Name: {source_config.get('cctv_name', 'Unknown')}")
+        print(f"   Processing Scale: {source_config.get('processing_scale', 1.0)}")
+    print("="*50)
+
+def print_verification_summary(processor):
+    """Print comprehensive verification summary from TrackingManager"""
+    try:
+        if hasattr(processor, 'get_verification_stats'):
+            stats = processor.get_verification_stats()
+            
+            print("\n" + "="*60)
+            print("✅ TRACKING MANAGER VERIFICATION SUMMARY")
+            print("="*60)
+            
+            # Aggregate stats
+            aggregate = stats.get('aggregate', {})
+            print(f"\n📊 AGGREGATE STATISTICS:")
+            print(f"   Total Detected: {aggregate.get('total_detected', 0)}")
+            print(f"   Total Verified: {aggregate.get('total_verified', 0)}")
+            print(f"   Total Rejected: {aggregate.get('total_rejected', 0)}")
+            print(f"   False Positives Prevented: {aggregate.get('false_positives_prevented', 0)}")
+            print(f"   Active Violation Tracks: {aggregate.get('active_tracks', 0)}")
+            print(f"   Currently Verified: {aggregate.get('currently_verified', 0)}")
+            
+            # Calculate rates
+            total_detected = max(1, aggregate.get('total_detected', 1))
+            total_verified = aggregate.get('total_verified', 0)
+            total_rejected = aggregate.get('total_rejected', 0)
+            false_positives_prevented = aggregate.get('false_positives_prevented', 0)
+            
+            print(f"\n📈 VERIFICATION SYSTEM METRICS:")
+            
+            # 1. What percentage of detections were verified?
+            verification_success_rate = (total_verified / total_detected) * 100
+            print(f"   Verified Detections: {verification_success_rate:.1f}% ({total_verified}/{total_detected})")
+            
+            # 2. What percentage of detections were rejected?
+            rejection_rate = (total_rejected / total_detected) * 100
+            print(f"   Rejected Detections: {rejection_rate:.1f}% ({total_rejected}/{total_detected})")
+            
+            # 3. Of the rejected detections, how many were false positives?
+            if total_rejected > 0:
+                false_positive_catch_rate = (false_positives_prevented / total_rejected) * 100
+                print(f"   False Positives Caught: {false_positive_catch_rate:.1f}% ({false_positives_prevented}/{total_rejected})")
+            else:
+                print(f"   False Positives Caught: N/A (no rejected detections)")
+            
+            # 4. Overall system accuracy (if we assume verified = correct)
+            total_decisions = total_verified + total_rejected
+            if total_decisions > 0:
+                accuracy = ((total_verified + false_positives_prevented) / total_decisions) * 100
+                print(f"   System Accuracy: {accuracy:.1f}%")
+            else:
+                print(f"   System Accuracy: N/A (no decisions made)")
+            
+            # Per-source stats
+            per_source = stats.get('per_source', {})
+            if per_source:
+                print(f"\n📊 PER-SOURCE STATISTICS:")
+                for source_id, source_stats in per_source.items():
+                    print(f"\n   📹 Source: {source_id}")
+                    print(f"      Detected: {source_stats.get('total_detected', 0)}")
+                    print(f"      Verified: {source_stats.get('total_verified', 0)}")
+                    print(f"      Rejected: {source_stats.get('total_rejected', 0)}")
+                    print(f"      Active Tracks: {source_stats.get('active_violation_tracks', 0)}")
+            
+            # System stats
+            system_stats = stats.get('system_stats', {})
+            if system_stats:
+                print(f"\n📊 SYSTEM STATISTICS:")
+                print(f"   Total Logged: {system_stats.get('total_logged', 0)}")
+                print(f"   Verified Logged: {system_stats.get('verified_logged', 0)}")
+                
+                if system_stats.get('last_verified_time'):
+                    last_time = datetime.datetime.fromtimestamp(system_stats['last_verified_time'])
+                    print(f"   Last Verified: {last_time.strftime('%H:%M:%S')}")
+            
+            print("="*60)
+            
+    except Exception as e:
+        print(f"⚠️ Error printing verification summary: {e}")
+        
+def monitor_verification_performance(processor, interval_seconds=30):
+    """Monitor verification performance periodically"""
+    def monitor_worker():
+        while getattr(processor, 'running', False):
+            try:
+                print_verification_summary(processor)
+                time.sleep(interval_seconds)
+            except Exception as e:
+                print(f"⚠️ Verification monitoring error: {e}")
+                time.sleep(interval_seconds)
+    
+    monitor_thread = threading.Thread(target=monitor_worker, daemon=True, name="verification_monitor")
+    monitor_thread.start()
+    print(f"📊 Started verification performance monitoring (interval: {interval_seconds}s)")
+
+
+def main():
+    # Load configuration
+    import argparse
+    parser = argparse.ArgumentParser(description='Run modular face recognition system')
+    parser.add_argument('--config', type=str, help='Path to custom configuration JSON file')
+    parser.add_argument('--multi-source', action='store_true', help='Enable multi-camera processing')
+    parser.add_argument('--sources-config', type=str, help='Path to multi-source configuration JSON file')
+    parser.add_argument('--camera', type=str, default='0', help='Camera source (default: 0)')
+    parser.add_argument('--rtsp', type=str, help='RTSP stream URL')
+    parser.add_argument('--no-gpu', action='store_true', help='Disable GPU acceleration')
+    parser.add_argument('--cctv-name', type=str, help='Override CCTV name')
+    parser.add_argument('--no-server-push', action='store_true', help='Disable server push')
+    parser.add_argument('--test-server', action='store_true', help='Test server connection before starting')
+    parser.add_argument('--test-email', action='store_true', help='Test email connection before starting')
+    args = parser.parse_args()
+    
+    # Load configuration
+    config = load_custom_config(args.config)
+    validate_email_config(config, test_connection=args.test_email)  
+    
+    # Resolve output.root_dir relative to LOG_ROOT if it's a relative path
+    if 'output' in config and 'root_dir' in config['output']:
+        root_dir = config['output']['root_dir']
+        if not os.path.isabs(root_dir):
+            # Convert to absolute path using LOG_ROOT
+            config['output']['root_dir'] = str(LOG_ROOT / root_dir)
+            print(f"📁 Output root resolved to: {config['output']['root_dir']}")    
+    
+    # Override GPU setting if requested
+    if args.no_gpu:
+        config['use_gpu'] = False
+        print("🎮 GPU acceleration disabled via command line")
+    
+    # Override server push setting if requested
+    if args.no_server_push:
+        config['server_push_enabled'] = False
+        print("📤 Server push disabled via command line")
+    
+    # Print system information
+    print_system_info(config)
+    
+    # Check GPU availability and update config
+    print("\n🔍 Checking GPU availability...")
+    config = check_gpu_availability(config)
+    check_onnx_gpu_availability()
+    
+    # Set environment variables for GPU optimization
+    if config.get('use_gpu', False):
+        os.environ['CUDA_VISIBLE_DEVICES'] = str(config.get('gpu_device', 0))
+        # Optimize for GPU
+        os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+        os.environ['TF_GPU_THREAD_MODE'] = 'gpu_private'
+        print("🎯 Set GPU environment variables")
+    
+    # Load multi-source configuration if enabled
+    if args.multi_source:
+        if args.sources_config and os.path.exists(args.sources_config):
+            try:
+                import json
+                with open(args.sources_config, 'r') as f:
+                    sources_config = json.load(f)
+                print(f"✅ Loaded multi-source configuration from: {args.sources_config}")
+            except Exception as e:
+                print(f"❌ Failed to load multi-source configuration: {e}")
+                print("🔄 Using default multi-source configuration")
+                sources_config = get_advanced_sources_config()
+        else:
+            print("🔄 Using default multi-source configuration")
+            sources_config = get_advanced_sources_config()
+        
+        print_multi_source_info(sources_config)
+        
+        # Test multi-stream connections
+        if not test_multi_stream_connections(sources_config):
+            print("❌ Multi-stream connection test failed. Please check:")
+            print("   - Camera connections")
+            print("   - RTSP URLs and credentials") 
+            print("   - Network connectivity")
+            return
+    else:
+        # Single source mode
+        #camera_source = args.camera
+        rtsp_source = args.rtsp
+
+        print(f"\n📹 Single Source Mode:")
+        print(f"CURRENTLY DISABLED!")
+        #print(f"   Camera Source: {camera_source}")
+        print(f"   RTSP Source: {rtsp_source}")
+        
+        # For single source, create a sources_config with one entry
+        sources_config = {
+            'main_camera': {
+                'url': rtsp_source,
+                'description': 'Main Camera',
+                'priority': 'high',
+                'processing_scale': 1.0,
+                'buffer_size': 3,
+                'cctv_name': args.cctv_name or config.get('cctv_name', 'Main-Camera')
+            }
         }
         
-        if preset not in presets:
-            preset = "violation_summary"
-        
-        base_config = presets[preset]
-        
-        # For small resolutions like 640x288, use more conservative scaling
-        base_width, base_height = 640, 480  # Reference resolution
-        
-        # Calculate scaling factors with limits for small frames
-        width_ratio = frame_width / base_width
-        height_ratio = frame_height / base_height
-        
-        # Use more conservative scaling for small frames
-        scale_ratio = min(width_ratio, height_ratio)  # Use the smaller ratio
-        
-        # Adjust scale - more aggressive reduction for small frames
-        scale = base_config["scale"] * scale_ratio
-        
-        # Ensure reasonable bounds for small resolutions
-        min_scale = 0.3
-        max_scale = 0.8  # Reduced maximum scale for small frames
-        scale = max(min(scale, max_scale), min_scale)
-        
-        # Use preset positions (already optimized for 640x288)
-        x = base_config["x"]
-        y = base_config["y"]
-        
-        return x, y, scale
- 
-    def save_debug_frame(self, frame: np.ndarray, results: List[Dict], 
-                        debug_info: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
-        """
-        Save debug frame with additional debugging information.
-        Now returns both success status and base64 data if enabled.
-        
-        Args:
-            frame: Frame to save
-            results: Recognition results
-            debug_info: Additional debug information
-            
-        Returns:
-            Tuple[bool, Optional[str]]: (success_status, base64_data)
-        """
-        if not self.logging_enabled or not self.image_log_folder:
-            return False, None
-        
-        base64_data = None
-        
-        try:
-            debug_frame = frame.copy()
-            
-            # Add debug information overlay (BEFORE resize)
-            y_offset = 30
-            for key, value in debug_info.items():
-                text = f"{key}: {value}"
-                cv2.putText(debug_frame, text, (10, y_offset),
-                          cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 1)
-                y_offset += 20
-            
-            # NEW: Apply resize AFTER debug overlay for better text quality
-            debug_frame = self._resize_image(debug_frame)
-            
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
-            filename = f"debug_{timestamp}.jpg"
-            filepath = self.image_log_folder / "debug" / filename
-            
-            success = cv2.imwrite(str(filepath), debug_frame)
-            
-            if success:
-                # Save base64 version if enabled
-                if self.enable_base64_logging:
-                    base64_filename = f"debug_{timestamp}"
-                    # Make debug info JSON serializable
-                    serializable_debug_info = self._make_json_serializable(debug_info)
-                    base64_success = self._save_base64_image(
-                        debug_frame, base64_filename, "debug", serializable_debug_info
-                    )
-                    
-                    if base64_success:
-                        base64_data = self._image_to_base64(debug_frame)
-                
-                self.logger.debug(f"Saved debug frame: {filename} (Base64: {base64_data is not None}, Resized: {self.enable_resize})")
-                return True, base64_data
+        # Test single stream connection
+        if not test_multi_stream_connections(sources_config):
+            print("❌ Stream connection test failed.")
+            return
+    
+    # Test server connection if enabled and requested
+    if config.get('server_push_enabled', False) and args.test_server:
+        if not test_server_connection(config):
+            print("❌ Server connection test failed. Continue without server push? (y/n)")
+            choice = input().strip().lower()
+            if choice != 'y':
+                print("🛑 Exiting...")
+                return
             else:
-                return False, None
+                config['server_push_enabled'] = False
+                print("⚠️  Continuing without server push")
                 
-        except Exception as e:
-            self.logger.error(f"Error saving debug frame: {e}")
-            return False, None
-   
-    def save_snapshot(self, frame: np.ndarray, description: str = "") -> Tuple[bool, Optional[str]]:
-        """
-        Save a snapshot with description.
-        Now returns both success status and base64 data if enabled.
+    
+    # Create robust face recognition system using factory
+    print("\n🔄 Creating face recognition system...")
+    try:
+        face_system = create_system(config, system_type="robust_face_recognition")
         
-        Args:
-            frame: Frame to save
-            description: Description of the snapshot
-            
-        Returns:
-            Tuple[bool, Optional[str]]: (success_status, base64_data)
-        """
-        if not self.logging_enabled or not self.image_log_folder:
-            return False, None
+        # Verify GPU usage
+        verify_gpu_usage(face_system)
         
-        base64_data = None
-        
-        try:
-            snapshot_frame = frame.copy()
-            
-            # NEW: Apply resize to snapshots (no annotation needed for snapshots)
-            snapshot_frame = self._resize_image(snapshot_frame)
-            
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            safe_description = "".join(c for c in description if c.isalnum() or c in (' ', '-', '_')).rstrip()
-            filename = f"snapshot_{timestamp}_{safe_description}.jpg" if description else f"snapshot_{timestamp}.jpg"
-            filepath = self.image_log_folder / "snapshots" / filename
-            
-            success = cv2.imwrite(str(filepath), snapshot_frame)
-            
+    except Exception as e:
+        print(f"❌ Failed to create face recognition system: {e}")
+        print("🔄 Falling back to CPU mode...")
+        config['use_gpu'] = False
+        face_system = create_system(config, system_type="robust_face_recognition")
+    
+    # Apply multi-source specific configurations
+    multi_source_config = {
+        'display_layout': config.get('display_layout', 'grid'),
+        'max_display_sources': config.get('max_display_sources', 4),
+        'processing_width': config.get('processing_width', 640),
+        'processing_height': config.get('processing_height', 480),
+        'processing_scale': config.get('processing_scale', 1.0),
+        'violation_verification_enabled': config.get('violation_verification_enabled', True),
+        'min_violation_duration': config.get('min_violation_duration', 0.5),
+        'min_violation_frames': config.get('min_violation_frames', 1),
+        'violation_confidence_threshold': config.get('violation_confidence_threshold', 0.6),
+        'log_interval': config.get('log_interval', 1),
+        'enable_logging': config.get('enable_logging', True),
+        'enable_image_logging': config.get('enable_image_logging', True),
+    }
+
+    # Merge with existing config
+    full_config = {**config, **multi_source_config}
+
+    # Initialize processor with full config
+    processor = MultiSourceRealTimeProcessor(
+        face_system, 
+        full_config  # Use the merged config
+    )
+    
+    # Apply configurations to processor
+    processor.apply_alert_config(config)
+    processor.apply_tracking_config(config)
+    processor.apply_logging_config(config)
+    
+    # 🆕 Apply violation verification configuration to all tracking managers
+    if 'tracking' in config and 'violation_verification_enabled' in config['tracking']:
+        verification_config = {
+            'violation_verification_enabled': config['tracking']['violation_verification_enabled'],
+            'min_violation_duration': config['tracking'].get('min_violation_duration', 5.0),
+            'min_violation_frames': config['tracking'].get('min_violation_frames', 5),
+            'violation_confidence_threshold': config['tracking'].get('violation_confidence_threshold', 0.85)
+        }
+        processor.apply_verification_config(verification_config)
+    
+    # Print comprehensive configuration status
+    print("\n" + "="*60)
+    print("🎯 MULTI-SOURCE SYSTEM CONFIGURATION STATUS")
+    print("="*60)
+    print(f"📊 Sources: {len(sources_config)} cameras configured")
+    #print(f"📊 Processing: Interval={config['processing_interval']}, Buffer={config['buffer_size']}")
+    print(f"🔍 Detection: Confidence={config['detection_confidence']}, Recognition Threshold={config['recognition_threshold']}")
+    print(f"🎯 Face Tracking: {'ENABLED' if config['tracking']['enabled'] else 'DISABLED'}")
+    
+    # 🆕 NEW: Print verification configuration
+    if config['tracking'].get('violation_verification_enabled', False):
+        print(f"✅ Violation Verification: ENABLED")
+        print(f"   - Min Duration: {config['tracking'].get('min_violation_duration', 5.0)}s")
+        print(f"   - Min Frames: {config['tracking'].get('min_violation_frames', 5)}")
+        print(f"   - Confidence Threshold: {config['tracking'].get('violation_confidence_threshold', 0.85)}")
+    else:
+        print(f"✅ Violation Verification: DISABLED")
+    
+    print(f"📝 Logging: {'ENABLED' if config['enable_logging'] else 'DISABLED'}")
+    print(f"🔊 Alerts: {'ENABLED' if config['enable_voice_alerts'] else 'DISABLED'}")
+    print(f"📤 Server Push: {'ENABLED' if config['server_push_enabled'] else 'DISABLED'}")
+    print(f"🐛 Debug: {'ENABLED' if config['debug']['enabled'] else 'DISABLED'}")
+    print(f"🖼️  Display Layout: {getattr(processor, 'display_layout', 'grid')}")
+    print(f"🎮 GPU Acceleration: {'ENABLED' if config['use_gpu'] else 'DISABLED'}")
+    if config['use_gpu']:
+        print(f"🎮 GPU Device: {config['gpu_device']}")
+    print("="*60)
+    
+    
+    # Print server push details if enabled
+    if config.get('server_push_enabled', False):
+        print_server_push_info(config)
+    
+    # Print module-specific status
+    processor.print_tracking_status()
+    processor.print_alert_status()
+    
+    # Apply display configuration
+    if hasattr(processor, 'set_display_size'):
+        processor.set_display_size(
+            config['display']['default_width'],
+            config['display']['default_height'],
+            config['display']['resize_method']
+        )
+    
+    # Apply debug configuration
+    if config['debug']['enabled']:
+        processor.toggle_debug_mode()
+    if config['display']['show_performance_stats']:
+        processor.toggle_performance_stats()
+    if config['display']['show_resize_info']:
+        processor.toggle_resize_info()    
+    
+    
+    
+    
+    # Final system readiness check
+    print("\n🔍 FINAL SYSTEM READINESS CHECK")
+    print("="*40)
+    print(f"📹 Sources: {len(sources_config)} cameras ready")
+    for source_id in sources_config.keys():
+        print(f"   - {source_id}")
+    print(f"🎮 GPU: {'READY' if config['use_gpu'] else 'CPU MODE'}")
+    print(f"📤 Server Push: {'READY' if config['server_push_enabled'] else 'DISABLED'}")
+    print(f"🔊 Audio Alerts: {'READY' if config['enable_voice_alerts'] else 'DISABLED'}")
+    print(f"🎯 Tracking: {'READY' if config['tracking']['enabled'] else 'DISABLED'}")
+    print(f"✅ Violation Verification: {'READY' if config['tracking'].get('violation_verification_enabled', False) else 'DISABLED'}")
+    print("="*40)
+    
+    # 🆕 NEW: Print verification-specific controls
+    print("\n🎮 VERIFICATION CONTROLS:")
+    print("   [V] - Toggle violation verification")
+    print("   [S] - Show verification statistics")
+    print("   [M] - Start verification monitoring")    
+    
+    # Print multi-source controls
+    print("\n🎮 MULTI-SOURCE CONTROLS:")
+    print("   [m] - Cycle through display layouts (grid, horizontal, vertical)")
+    print("   [n] - Toggle source health display")
+    print("   [0] - Show source health report")
+    print("   [l] - Toggle logging")
+    print("   [v] - Toggle voice alerts")
+    print("   [p] - Toggle performance stats")
+    print("   [d] - Toggle debug mode")
+    print("   [q] - Quit")
+    
+    # Add a small delay to ensure everything is ready
+    print("\n⏳ Starting multi-source processing in 3 seconds...")
+    time.sleep(3)
+    
+    # 🆕 CRITICAL: Ensure ImageLoggers are created for all sources
+    print("\n🔍 ENSURING IMAGE LOGGERS ARE CREATED FOR ALL SOURCES")
+    for source_id in sources_config.keys():
+        if source_id in processor.active_sources:
+            print(f"🔄 Ensuring ImageLogger for: {source_id}")
+            success = processor.force_create_image_logger(source_id)
             if success:
-                # Save base64 version if enabled
-                if self.enable_base64_logging:
-                    base64_filename = f"snapshot_{timestamp}_{safe_description}" if description else f"snapshot_{timestamp}"
-                    metadata = {"description": description} if description else {}
-                    base64_success = self._save_base64_image(
-                        snapshot_frame, base64_filename, "snapshots", metadata
-                    )
-                    
-                    if base64_success:
-                        base64_data = self._image_to_base64(snapshot_frame)
-                
-                self.logger.info(f"Saved snapshot: {filename} (Base64: {base64_data is not None}, Resized: {self.enable_resize})")
-                return True, base64_data
+                print(f"✅ ImageLogger created for: {source_id}")
             else:
-                return False, None
-                
-        except Exception as e:
-            self.logger.error(f"Error saving snapshot: {e}")
-            return False, None
+                print(f"❌ Failed to create ImageLogger for: {source_id}")
 
-    def disable_logging(self):
-        """Disable image logging."""
-        if self.logging_enabled:
-            self.logger.info(
-                f"Image logging disabled. Total images saved: {self.saved_image_count}, "
-                f"Resized images: {self.stats['resized_images']}"
-            )
-        self.logging_enabled = False
-
-
-
-    def update_annotation_config(self, annotation_config: Dict[str, Any]) -> None:
-        """
-        Update annotation configuration dynamically.
+    # 🆕 DEBUG: Check CCTV names before starting
+    print("\n🔍 PRE-START CCTV NAME CHECK")
+    processor.debug_cctv_names()
         
-        Args:
-            annotation_config: Dictionary with annotation configuration
-                - base_box_thickness: int (default: 1)
-                - base_text_thickness: int (default: 1) 
-                - min_text_scale: float (default: 0.3)
-                - max_text_scale: float (default: 0.8)
-        """
-        try:
-            self.base_box_thickness = annotation_config.get('base_box_thickness', 1)
-            self.base_text_thickness = annotation_config.get('base_text_thickness', 1)
-            self.min_text_scale = annotation_config.get('min_text_scale', 0.3)
-            self.max_text_scale = annotation_config.get('max_text_scale', 0.8)
+    # Start multi-source processing
+    try:
+        # 🆕 ONLY ONE SOURCE ADDITION BLOCK
+        print("\n🎯 ADDING SOURCES WITH DYNAMIC CCTV NAMING")
+        print("="*50)
+
+        # First, remove any existing sources to start fresh
+        existing_sources = list(processor.stream_managers.keys())
+        for source_id in existing_sources:
+            print(f"🔄 Removing existing source: {source_id}")
+            processor.remove_source(source_id)
+
+        # Now add the sources with proper dynamic naming
+        for source_id, source_config in sources_config.items():
+            print(f"📹 Adding source: {source_id}")
             
-            self.logger.info(f"Updated annotation config: box_thickness={self.base_box_thickness}, "
-                        f"text_thickness={self.base_text_thickness}, "
-                        f"text_scale_range=({self.min_text_scale}, {self.max_text_scale})")
+            # 🆕 DEBUG: Test CCTV naming before adding
+            test_url = source_config.get('url', '')
+            if test_url:
+                extracted_name = processor._extract_cctv_name_from_url(test_url, source_id)
+                print(f"   🔍 CCTV name extraction test: {extracted_name}")
+            
+            success = processor.add_source(source_id, source_config)
+            if success:
+                # Verify the CCTV name was set correctly
+                source_info = processor.get_source_info(source_id)
+                if source_info:
+                    actual_cctv_name = source_info.get('cctv_name', 'Unknown')
+                    print(f"✅ Successfully added {source_id} → {actual_cctv_name}")
+            else:
+                print(f"❌ Failed to add {source_id}")
+
+        print("="*50)
+        
+        # Print all sources information
+        processor.print_all_sources_info()
+        
+        # Print CCTV mapping
+        processor.print_cctv_mapping()
+        
+        # 🆕 CRITICAL: Setup logging ONLY ONCE after all sources are added
+        print("\n🔄 Setting up multi-source logging with dynamic CCTV names...")
+        processor.setup_multi_source_logging()
+        
+        # Run the multi-source processing
+        processor.run_multi_source_stable(sources_config)
+        
+        # 🆕 NEW: Start verification performance monitoring
+        print("\n📊 Starting verification performance monitoring...")
+        monitor_verification_performance(processor, interval_seconds=60)
+        
+        
+    except KeyboardInterrupt:
+        print("\n🛑 Shutting down by user request...")
+        
+        # 🆕 NEW: Print final verification summary
+        print("\n📊 FINAL VERIFICATION SUMMARY:")
+        print_verification_summary(processor)
+        
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        processor.stop_all_sources()
+
+if __name__ == "__main__":
+    main()
+
+    
                         
-        except Exception as e:
-            self.logger.error(f"Error updating annotation config: {e}")
-            
-    def update_resize_config(self, resize_config: Dict[str, Any]) -> None:
-        """
-        Update resize configuration dynamically.
-        
-        Args:
-            resize_config: Dictionary with resize configuration
-                - enable_image_resize: bool
-                - image_resize_width: int
-                - image_resize_height: int  
-                - image_resize_method: str ('default', 'high_quality', 'fast')
-        """
-        try:
-            self.enable_resize = resize_config.get('enable_image_resize', self.enable_resize)
-            self.resize_width = resize_config.get('image_resize_width', self.resize_width)
-            self.resize_height = resize_config.get('image_resize_height', self.resize_height)
-            self.resize_method = resize_config.get('image_resize_method', self.resize_method)
-            
-            self.logger.info(f"Updated resize config: enabled={self.enable_resize}, "
-                           f"size={self.resize_width}x{self.resize_height}, method={self.resize_method}")
-                           
-        except Exception as e:
-            self.logger.error(f"Error updating resize config: {e}")
-
-    def get_base64_image_data(self, image: np.ndarray, quality: int = None) -> Optional[str]:
-        """
-        Utility method to get base64 representation of an image without saving.
-        
-        Args:
-            image: OpenCV image to convert
-            quality: JPEG quality (1-100)
-            
-        Returns:
-            Optional[str]: Base64 encoded image or None if failed
-        """
-        try:
-            return self._image_to_base64(image, quality)
-        except Exception as e:
-            self.logger.error(f"Error getting base64 data: {e}")
-            return None
- 
-    def _save_base64_image(self, image: np.ndarray, filename: str, 
-                        subfolder: str = "violations", metadata: Dict = None) -> bool:
-        """
-        Save image as base64 encoded JSON file with ONLY required fields.
-        
-        Args:
-            image: Image to save
-            filename: Base filename (without extension)
-            subfolder: Subfolder within base64 directory
-            metadata: Additional metadata to include (for detected_name extraction)
-            
-        Returns:
-            bool: True if save successful
-        """
-        if not self.enable_base64_logging or not self.image_log_folder:
-            return False
-            
-        try:
-            # Convert image to base64
-            base64_data = self._image_to_base64(image)
-            
-            # 🆕 IMPROVED: Extract ALL detected names from violations, including Unknown
-            detected_names = []
-            if metadata and 'violations' in metadata:
-                # Extract ALL identities from violations, keep "Unknown" as separate entries
-                for violation in metadata['violations']:
-                    identity = violation.get('identity', 'Unknown')
-                    # 🆕 FIX: Include ALL identities, don't filter out 'Unknown'
-                    # Also handle None values properly
-                    if identity is None:
-                        identity = 'Unknown'
-                    detected_names.append(identity)
-            
-            # 🆕 IMPROVED: Create comma-separated string of ALL detected names
-            if detected_names:
-                # Join with comma separation, each identity is clearly separated
-                detected_name_str = ', '.join(detected_names)
-            else:
-                detected_name_str = "Unknown"
-            
-            # 🆕 UPDATED: Save ONLY the required fields
-            save_data = {
-                "filename": filename,
-                "image_format": "jpg", 
-                "image_data": base64_data,
-                "detected_name": detected_name_str,  # 🆕 Now properly formatted
-                "cctv_name": self.cctv_name  # 🆕 FIX: Use the instance's CCTV name
-            }
-            
-            # Save as JSON file
-            base64_folder = self.image_log_folder / "base64" / subfolder
-            json_filename = f"{filename}.json"
-            json_path = base64_folder / json_filename
-            
-            with open(json_path, 'w') as f:
-                json.dump(save_data, f, indent=2, ensure_ascii=False)
-            
-            self.stats['base64_saved'] += 1
-            self.logger.debug(f"💾 Saved base64 image with required fields: {json_filename}")
-            self.logger.debug(f"👤 Detected names: {detected_name_str}")
-            return True
-            
-        except Exception as e:
-            self.logger.error(f"❌ Error saving base64 image: {e}")
-            self.stats['errors'] += 1
-            return False
-        
-                
