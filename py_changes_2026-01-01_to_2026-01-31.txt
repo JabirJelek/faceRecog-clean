@@ -1,0 +1,1304 @@
+Python files changed from 2026-01-01 to 2026-01-31
+==================================================
+
+Found 631 unique .py files:
+
+  1. ProjectKnowledgeBase/active/autoEmbedPerson.py
+  2. ProjectKnowledgeBase/active/components/face_recog_modular2/__init__.py
+  3. ProjectKnowledgeBase/active/components/face_recog_modular2/alerting/__init__.py
+  4. ProjectKnowledgeBase/active/components/face_recog_modular2/alerting/alert_manager.py
+  5. ProjectKnowledgeBase/active/components/face_recog_modular2/alerting/voice_interface.py
+  6. ProjectKnowledgeBase/active/components/face_recog_modular2/config/__init__.py
+  7. ProjectKnowledgeBase/active/components/face_recog_modular2/config/config_manager.py
+  8. ProjectKnowledgeBase/active/components/face_recog_modular2/config/validation_rules.py
+  9. ProjectKnowledgeBase/active/components/face_recog_modular2/logging/__init__.py
+ 10. ProjectKnowledgeBase/active/components/face_recog_modular2/logging/data_logger.py
+ 11. ProjectKnowledgeBase/active/components/face_recog_modular2/logging/image_logger.py
+ 12. ProjectKnowledgeBase/active/components/face_recog_modular2/processing/__init__.py
+ 13. ProjectKnowledgeBase/active/components/face_recog_modular2/processing/face_detection.py
+ 14. ProjectKnowledgeBase/active/components/face_recog_modular2/processing/quality_assessment.py
+ 15. ProjectKnowledgeBase/active/components/face_recog_modular2/processing/scene_analysis.py
+ 16. ProjectKnowledgeBase/active/components/face_recog_modular2/processing/temporal_processing.py
+ 17. ProjectKnowledgeBase/active/components/face_recog_modular2/recognition/__init__.py
+ 18. ProjectKnowledgeBase/active/components/face_recog_modular2/recognition/base_system.py
+ 19. ProjectKnowledgeBase/active/components/face_recog_modular2/recognition/chroma_system.py
+ 20. ProjectKnowledgeBase/active/components/face_recog_modular2/recognition/robust_system.py
+ 21. ProjectKnowledgeBase/active/components/face_recog_modular2/recognition/voyager_system.py
+ 22. ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/__init__.py
+ 23. ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/base_processor.py
+ 24. ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/control_handler.py
+ 25. ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/frame_utils.py
+ 26. ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/multi_realtime.py
+ 27. ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/performance_manager.py
+ 28. ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/realtime_processing_headless.py
+ 29. ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/realtime_processor.py
+ 30. ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/stream_manager.py
+ 31. ProjectKnowledgeBase/active/components/face_recog_modular2/tracking/__init__.py
+ 32. ProjectKnowledgeBase/active/components/face_recog_modular2/tracking/face_tracker.py
+ 33. ProjectKnowledgeBase/active/components/face_recog_modular2/tracking/fairness_controller.py
+ 34. ProjectKnowledgeBase/active/components/face_recog_modular2/tracking/progressive_mask_detector.py
+ 35. ProjectKnowledgeBase/active/components/face_recog_modular2/tracking/tracking_manager.py
+ 36. ProjectKnowledgeBase/active/components/face_recog_modular2/visualization/__init__.py
+ 37. ProjectKnowledgeBase/active/components/face_recog_modular2/visualization/annotation_renderer.py
+ 38. ProjectKnowledgeBase/active/components/face_recog_modular2/visualization/display_resizer.py
+ 39. ProjectKnowledgeBase/active/components/face_recog_modular2_1/__init__.py
+ 40. ProjectKnowledgeBase/active/components/face_recog_modular2_1/alerting/__init__.py
+ 41. ProjectKnowledgeBase/active/components/face_recog_modular2_1/alerting/alert_manager.py
+ 42. ProjectKnowledgeBase/active/components/face_recog_modular2_1/alerting/voice_interface.py
+ 43. ProjectKnowledgeBase/active/components/face_recog_modular2_1/config/__init__.py
+ 44. ProjectKnowledgeBase/active/components/face_recog_modular2_1/config/config_manager.py
+ 45. ProjectKnowledgeBase/active/components/face_recog_modular2_1/config/validation_rules.py
+ 46. ProjectKnowledgeBase/active/components/face_recog_modular2_1/logging/__init__.py
+ 47. ProjectKnowledgeBase/active/components/face_recog_modular2_1/logging/data_logger.py
+ 48. ProjectKnowledgeBase/active/components/face_recog_modular2_1/logging/image_logger.py
+ 49. ProjectKnowledgeBase/active/components/face_recog_modular2_1/processing/__init__.py
+ 50. ProjectKnowledgeBase/active/components/face_recog_modular2_1/processing/face_detection.py
+ 51. ProjectKnowledgeBase/active/components/face_recog_modular2_1/processing/quality_assessment.py
+ 52. ProjectKnowledgeBase/active/components/face_recog_modular2_1/processing/scene_analysis.py
+ 53. ProjectKnowledgeBase/active/components/face_recog_modular2_1/processing/temporal_processing.py
+ 54. ProjectKnowledgeBase/active/components/face_recog_modular2_1/recognition/__init__.py
+ 55. ProjectKnowledgeBase/active/components/face_recog_modular2_1/recognition/base_system.py
+ 56. ProjectKnowledgeBase/active/components/face_recog_modular2_1/recognition/robust_system.py
+ 57. ProjectKnowledgeBase/active/components/face_recog_modular2_1/recognition/voyager_system.py
+ 58. ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/__init__.py
+ 59. ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/base_processor.py
+ 60. ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/control_handler.py
+ 61. ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/frame_utils.py
+ 62. ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/multi_realtime.py
+ 63. ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/performance_manager.py
+ 64. ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/realtime_processing_headless.py
+ 65. ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/realtime_processor.py
+ 66. ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/stream_manager.py
+ 67. ProjectKnowledgeBase/active/components/face_recog_modular2_1/tracking/__init__.py
+ 68. ProjectKnowledgeBase/active/components/face_recog_modular2_1/tracking/face_tracker.py
+ 69. ProjectKnowledgeBase/active/components/face_recog_modular2_1/tracking/fairness_controller.py
+ 70. ProjectKnowledgeBase/active/components/face_recog_modular2_1/tracking/progressive_mask_detector.py
+ 71. ProjectKnowledgeBase/active/components/face_recog_modular2_1/tracking/tracking_manager.py
+ 72. ProjectKnowledgeBase/active/components/face_recog_modular2_1/visualization/__init__.py
+ 73. ProjectKnowledgeBase/active/components/face_recog_modular2_1/visualization/annotation_renderer.py
+ 74. ProjectKnowledgeBase/active/components/face_recog_modular2_1/visualization/display_resizer.py
+ 75. ProjectKnowledgeBase/active/patterns/algorithm/entry_multi-USED-Laptop.py
+ 76. ProjectKnowledgeBase/active/patterns/algorithm/entry_multi-USED-Magick.py
+ 77. ProjectKnowledgeBase/active/patterns/algorithm/entry_multi-USED-TowerCPU.py
+ 78. ProjectKnowledgeBase/active/yolo-face_2.2.py
+ 79. ProjectKnowledgeBase/history/algorithms/0_history/0_history_entry/multi_entry_process.py
+ 80. ProjectKnowledgeBase/history/algorithms/0_history/0_history_entry/multi_entry_process_STORE.py
+ 81. ProjectKnowledgeBase/history/algorithms/0_history/0_history_entry/used_entry.py
+ 82. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/__init__.py
+ 83. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/alerting/__init__.py
+ 84. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/alerting/alert_manager.py
+ 85. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/alerting/violation_uploader.py
+ 86. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/alerting/violation_uploader1.py
+ 87. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/alerting/voice_interface.py
+ 88. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/config/__init__.py
+ 89. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/config/config_manager.py
+ 90. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/config/validation_rules.py
+ 91. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/logging/__init__.py
+ 92. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/logging/data_logger.py
+ 93. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/logging/image_logger.py
+ 94. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/logging/image_logger1.py
+ 95. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/processing/__init__.py
+ 96. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/processing/face_detection.py
+ 97. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/processing/quality_assessment.py
+ 98. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/processing/scene_analysis.py
+ 99. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/processing/temporal_processing.py
+100. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/recognition/__init__.py
+101. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/recognition/base_system.py
+102. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/recognition/robust_system.py
+103. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/recognition/voyager_system.py
+104. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/__init__.py
+105. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/base_processor.py
+106. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/control_handler.py
+107. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/frame_utils.py
+108. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/performance_manager.py
+109. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/realtime_processing_headless.py
+110. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/realtime_processor.py
+111. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/stream_manager.py
+112. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/tracking/__init__.py
+113. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/tracking/bytetrack_wrapper.py
+114. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/tracking/face_tracker.py
+115. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/tracking/fairness_controller.py
+116. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/tracking/person_tracker.py
+117. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/tracking/tracking_manager.py
+118. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/utils/__init__.py
+119. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/utils/common_types.py
+120. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/utils/performance_utils.py
+121. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/visualization/__init__.py
+122. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/visualization/annotation_renderer.py
+123. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/visualization/display_resizer.py
+124. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/__init__.py
+125. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/alerting/__init__.py
+126. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/alerting/alert_manager.py
+127. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/alerting/voice_interface.py
+128. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/config/__init__.py
+129. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/config/config_manager.py
+130. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/config/validation_rules.py
+131. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/logging/__init__.py
+132. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/logging/data_logger.py
+133. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/logging/image_logger.py
+134. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/processing/__init__.py
+135. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/processing/face_detection.py
+136. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/processing/quality_assessment.py
+137. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/processing/scene_analysis.py
+138. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/processing/temporal_processing.py
+139. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/recognition/__init__.py
+140. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/recognition/base_system.py
+141. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/recognition/robust_system.py
+142. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/recognition/voyager_system.py
+143. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/__init__.py
+144. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/base_processor.py
+145. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/control_handler.py
+146. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/frame_utils.py
+147. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/multi_realtime.py
+148. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/performance_manager.py
+149. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/realtime_processing_headless.py
+150. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/realtime_processor.py
+151. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/stream_manager.py
+152. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/tracking/__init__.py
+153. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/tracking/face_tracker.py
+154. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/tracking/fairness_controller.py
+155. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/tracking/progressive_mask_detector.py
+156. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/tracking/tracking_manager.py
+157. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/visualization/__init__.py
+158. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/visualization/annotation_renderer.py
+159. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/visualization/display_resizer.py
+160. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/__init__.py
+161. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/alerting/__init__.py
+162. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/alerting/alert_manager.py
+163. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/alerting/voice_interface.py
+164. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/config/__init__.py
+165. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/config/config_manager.py
+166. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/config/validation_rules.py
+167. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/logging/__init__.py
+168. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/logging/data_logger.py
+169. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/logging/image_logger.py
+170. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/processing/__init__.py
+171. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/processing/face_detection.py
+172. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/processing/quality_assessment.py
+173. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/processing/scene_analysis.py
+174. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/processing/temporal_processing.py
+175. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/recognition/__init__.py
+176. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/recognition/base_system.py
+177. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/recognition/robust_system.py
+178. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/recognition/voyager_system.py
+179. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/__init__.py
+180. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/control_handler.py
+181. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/frame_utils.py
+182. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/performance_manager.py
+183. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/stream_manager.py
+184. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/univ_process.py
+185. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/universal_processor.py
+186. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/tracking/__init__.py
+187. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/tracking/face_tracker.py
+188. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/tracking/fairness_controller.py
+189. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/tracking/progressive_mask_detector.py
+190. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/tracking/tracking_manager.py
+191. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/visualization/__init__.py
+192. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/visualization/annotation_renderer.py
+193. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/visualization/display_resizer.py
+194. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/__init__.py
+195. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/alerting/__init__.py
+196. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/alerting/alert_manager.py
+197. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/alerting/voice_interface.py
+198. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/config/__init__.py
+199. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/config/config_manager.py
+200. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/config/validation_rules.py
+201. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/logging/__init__.py
+202. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/logging/data_logger.py
+203. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/logging/image_logger-gpu.py
+204. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/logging/image_logger.py
+205. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/processing/__init__.py
+206. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/processing/face_detection.py
+207. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/processing/quality_assessment.py
+208. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/processing/scene_analysis.py
+209. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/processing/temporal_processing.py
+210. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/recognition/__init__.py
+211. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/recognition/base_system.py
+212. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/recognition/robust_system.py
+213. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/recognition/voyager_system.py
+214. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/__init__.py
+215. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/base_processor.py
+216. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/control_handler.py
+217. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/frame_utils.py
+218. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/performance_manager.py
+219. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/realtime_processing_headless.py
+220. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/realtime_processor.py
+221. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/stream_manager.py
+222. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/tracking/__init__.py
+223. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/tracking/face_tracker.py
+224. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/tracking/fairness_controller.py
+225. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/tracking/tracking_manager.py
+226. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/utils/__init__.py
+227. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/utils/common_types.py
+228. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/utils/performance_utils.py
+229. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/visualization/__init__.py
+230. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/visualization/annotation_renderer.py
+231. ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/visualization/display_resizer.py
+232. ProjectKnowledgeBase/history/algorithms/0_history/checkTF.py
+233. ProjectKnowledgeBase/history/algorithms/Bicubic-interpolation/bicubic-0.py
+234. ProjectKnowledgeBase/history/algorithms/Bicubic-interpolation/bicubic-1.py
+235. ProjectKnowledgeBase/history/algorithms/Bicubic-interpolation/bicubic.py
+236. ProjectKnowledgeBase/history/algorithms/history-try/1-try/createEmbeddingManual.py
+237. ProjectKnowledgeBase/history/algorithms/history-try/1-try/debug_json_structure.py
+238. ProjectKnowledgeBase/history/algorithms/history-try/1-try/embeddingFolder.py
+239. ProjectKnowledgeBase/history/algorithms/history-try/1-try/face_query_system.py
+240. ProjectKnowledgeBase/history/algorithms/history-try/1-try/quick_debug.py
+241. ProjectKnowledgeBase/history/algorithms/history-try/1-try/run_query.py
+242. ProjectKnowledgeBase/history/algorithms/history-try/10-try/recog-3.py
+243. ProjectKnowledgeBase/history/algorithms/history-try/10-try/recog-4.py
+244. ProjectKnowledgeBase/history/algorithms/history-try/11-try/recog-1.py
+245. ProjectKnowledgeBase/history/algorithms/history-try/11-try/recog-2.py
+246. ProjectKnowledgeBase/history/algorithms/history-try/12-try/recog-1.py
+247. ProjectKnowledgeBase/history/algorithms/history-try/12-try/recog-2.py
+248. ProjectKnowledgeBase/history/algorithms/history-try/13-try/recog-1.py
+249. ProjectKnowledgeBase/history/algorithms/history-try/14-try/recog-1.py
+250. ProjectKnowledgeBase/history/algorithms/history-try/15-try/notes.py
+251. ProjectKnowledgeBase/history/algorithms/history-try/15-try/recog-1.py
+252. ProjectKnowledgeBase/history/algorithms/history-try/15-try/recog-2.py
+253. ProjectKnowledgeBase/history/algorithms/history-try/16-try/base64_viewer.py
+254. ProjectKnowledgeBase/history/algorithms/history-try/2-try/autoEmbedPerson.py
+255. ProjectKnowledgeBase/history/algorithms/history-try/2-try/checking/balanced_face_tester.py
+256. ProjectKnowledgeBase/history/algorithms/history-try/2-try/checking/bias_analyzer.py
+257. ProjectKnowledgeBase/history/algorithms/history-try/2-try/checking/dataset_quality_checker.py
+258. ProjectKnowledgeBase/history/algorithms/history-try/2-try/checking/quick_quality_check.py
+259. ProjectKnowledgeBase/history/algorithms/history-try/2-try/checking/quick_test.py
+260. ProjectKnowledgeBase/history/algorithms/history-try/2-try/checking/test_face_recognition.py
+261. ProjectKnowledgeBase/history/algorithms/history-try/3-try/references-for-future/camera.py
+262. ProjectKnowledgeBase/history/algorithms/history-try/3-try/references-for-future/config.py
+263. ProjectKnowledgeBase/history/algorithms/history-try/3-try/references-for-future/face_detector.py
+264. ProjectKnowledgeBase/history/algorithms/history-try/3-try/references-for-future/face_recog_system1.py
+265. ProjectKnowledgeBase/history/algorithms/history-try/3-try/references-for-future/face_recognizer.py
+266. ProjectKnowledgeBase/history/algorithms/history-try/3-try/references-for-future/main.py
+267. ProjectKnowledgeBase/history/algorithms/history-try/3-try/worked/face_recog_system2.py
+268. ProjectKnowledgeBase/history/algorithms/history-try/3-try/worked/face_recog_system3.py
+269. ProjectKnowledgeBase/history/algorithms/history-try/4-try/recog-1.py
+270. ProjectKnowledgeBase/history/algorithms/history-try/4-try/recog-2.py
+271. ProjectKnowledgeBase/history/algorithms/history-try/4-try/recog-3.py
+272. ProjectKnowledgeBase/history/algorithms/history-try/5-try/history/model2onnx.py
+273. ProjectKnowledgeBase/history/algorithms/history-try/5-try/history/reco-1.py
+274. ProjectKnowledgeBase/history/algorithms/history-try/5-try/history/reco-2.py
+275. ProjectKnowledgeBase/history/algorithms/history-try/5-try/history/reco-3.py
+276. ProjectKnowledgeBase/history/algorithms/history-try/5-try/history/reco-4.py
+277. ProjectKnowledgeBase/history/algorithms/history-try/5-try/recog-1.py
+278. ProjectKnowledgeBase/history/algorithms/history-try/5-try/recog-2.py
+279. ProjectKnowledgeBase/history/algorithms/history-try/6-try/recog-1.py
+280. ProjectKnowledgeBase/history/algorithms/history-try/6-try/recog-2.py
+281. ProjectKnowledgeBase/history/algorithms/history-try/6-try/recog-3.py
+282. ProjectKnowledgeBase/history/algorithms/history-try/7-try/recog-1.py
+283. ProjectKnowledgeBase/history/algorithms/history-try/7-try/recog-2.py
+284. ProjectKnowledgeBase/history/algorithms/history-try/7-try/recog-3.py
+285. ProjectKnowledgeBase/history/algorithms/history-try/8-try/recog-1.py
+286. ProjectKnowledgeBase/history/algorithms/history-try/9-try/recog-1.py
+287. ProjectKnowledgeBase/history/algorithms/history-try/9-try/recog-2.py
+288. ProjectKnowledgeBase/history/algorithms/history-try/9-try/recog-3.py
+289. ProjectKnowledgeBase/history/algorithms/history-try/9-try/recog-4.py
+290. ProjectKnowledgeBase/history/algorithms/train_mask_detector.py
+291. ProjectKnowledgeBase/history/algorithms/yolo-face_1.py
+292. ProjectKnowledgeBase/history/algorithms/yolo-face_2.0.py
+293. ProjectKnowledgeBase/history/algorithms/yolo-face_2.1.py
+294. ProjectKnowledgeBase/history/decisions/DAG/app.py
+295. ProjectKnowledgeBase/history/decisions/DAG/pipeline/__init__.py
+296. ProjectKnowledgeBase/history/decisions/DAG/pipeline/core/__init__.py
+297. ProjectKnowledgeBase/history/decisions/DAG/pipeline/core/context.py
+298. ProjectKnowledgeBase/history/decisions/DAG/pipeline/core/orchestrator.py
+299. ProjectKnowledgeBase/history/decisions/DAG/pipeline/core/processor.py
+300. ProjectKnowledgeBase/history/decisions/DAG/pipeline/processors/__init__.py
+301. ProjectKnowledgeBase/history/decisions/DAG/pipeline/processors/detector.py
+302. ProjectKnowledgeBase/history/decisions/DAG/pipeline/processors/input_adapter.py
+303. ProjectKnowledgeBase/history/decisions/DAG/pipeline/processors/output_adapter.py
+304. ProjectKnowledgeBase/history/decisions/DAG/pipeline/processors/visualizer.py
+305. ProjectKnowledgeBase/history/decisions/DAG/setup_directory.py
+306. ProjectKnowledgeBase/references/algorithms/C_threading.py
+307. ProjectKnowledgeBase/references/algorithms/cctv_connect/cctvRecord.py
+308. ProjectKnowledgeBase/references/algorithms/cctv_connect/rtsp.py
+309. ProjectKnowledgeBase/references/algorithms/cctv_connect/rtsp2.py
+310. ProjectKnowledgeBase/references/algorithms/cctv_connect/rtsp3.py
+311. ProjectKnowledgeBase/references/algorithms/extractor/cameraFrameExtractor.py
+312. ProjectKnowledgeBase/references/algorithms/extractor/videoFrameExtractor.py
+313. ProjectKnowledgeBase/references/algorithms/searchGitHistory.py
+314. ProjectKnowledgeBase/references/algorithms/verification.py
+315. RandomScripts/0_history/checkTF.py
+316. RandomScripts/Bicubic-interpolation/bicubic-0.py
+317. RandomScripts/Bicubic-interpolation/bicubic-1.py
+318. RandomScripts/Bicubic-interpolation/bicubic.py
+319. RandomScripts/checkTF.py
+320. RandomScripts/searchGitHistory.py
+321. RandomScripts/verification.py
+322. cctv_connect/cctvRecord.py
+323. cctv_connect/rtsp.py
+324. cctv_connect/rtsp2.py
+325. cctv_connect/rtsp3.py
+326. exp.py
+327. extractor/cameraFrameExtractor.py
+328. extractor/videoFrameExtractor.py
+329. main.py
+330. run_py/16-try/base64_viewer.py
+331. run_py/C_threading.py
+332. run_py/DAG/app.py
+333. run_py/DAG/pipeline/__init__.py
+334. run_py/DAG/pipeline/core/__init__.py
+335. run_py/DAG/pipeline/core/context.py
+336. run_py/DAG/pipeline/core/orchestrator.py
+337. run_py/DAG/pipeline/core/processor.py
+338. run_py/DAG/pipeline/processors/__init__.py
+339. run_py/DAG/pipeline/processors/detector.py
+340. run_py/DAG/pipeline/processors/input_adapter.py
+341. run_py/DAG/pipeline/processors/output_adapter.py
+342. run_py/DAG/pipeline/processors/visualizer.py
+343. run_py/DAG/setup_directory.py
+344. run_py/autoEmbedPerson.py
+345. run_py/history-try/1-try/createEmbeddingManual.py
+346. run_py/history-try/1-try/debug_json_structure.py
+347. run_py/history-try/1-try/embeddingFolder.py
+348. run_py/history-try/1-try/face_query_system.py
+349. run_py/history-try/1-try/quick_debug.py
+350. run_py/history-try/1-try/run_query.py
+351. run_py/history-try/10-try/recog-3.py
+352. run_py/history-try/10-try/recog-4.py
+353. run_py/history-try/11-try/recog-1.py
+354. run_py/history-try/11-try/recog-2.py
+355. run_py/history-try/12-try/recog-1.py
+356. run_py/history-try/12-try/recog-2.py
+357. run_py/history-try/13-try/recog-1.py
+358. run_py/history-try/14-try/recog-1.py
+359. run_py/history-try/15-try/notes.py
+360. run_py/history-try/15-try/recog-1.py
+361. run_py/history-try/15-try/recog-2.py
+362. run_py/history-try/2-try/autoEmbedPerson.py
+363. run_py/history-try/2-try/checking/balanced_face_tester.py
+364. run_py/history-try/2-try/checking/bias_analyzer.py
+365. run_py/history-try/2-try/checking/dataset_quality_checker.py
+366. run_py/history-try/2-try/checking/quick_quality_check.py
+367. run_py/history-try/2-try/checking/quick_test.py
+368. run_py/history-try/2-try/checking/test_face_recognition.py
+369. run_py/history-try/3-try/references-for-future/camera.py
+370. run_py/history-try/3-try/references-for-future/config.py
+371. run_py/history-try/3-try/references-for-future/face_detector.py
+372. run_py/history-try/3-try/references-for-future/face_recog_system1.py
+373. run_py/history-try/3-try/references-for-future/face_recognizer.py
+374. run_py/history-try/3-try/references-for-future/main.py
+375. run_py/history-try/3-try/worked/face_recog_system2.py
+376. run_py/history-try/3-try/worked/face_recog_system3.py
+377. run_py/history-try/4-try/recog-1.py
+378. run_py/history-try/4-try/recog-2.py
+379. run_py/history-try/4-try/recog-3.py
+380. run_py/history-try/5-try/history/model2onnx.py
+381. run_py/history-try/5-try/history/reco-1.py
+382. run_py/history-try/5-try/history/reco-2.py
+383. run_py/history-try/5-try/history/reco-3.py
+384. run_py/history-try/5-try/history/reco-4.py
+385. run_py/history-try/5-try/recog-1.py
+386. run_py/history-try/5-try/recog-2.py
+387. run_py/history-try/6-try/recog-1.py
+388. run_py/history-try/6-try/recog-2.py
+389. run_py/history-try/6-try/recog-3.py
+390. run_py/history-try/7-try/recog-1.py
+391. run_py/history-try/7-try/recog-2.py
+392. run_py/history-try/7-try/recog-3.py
+393. run_py/history-try/8-try/recog-1.py
+394. run_py/history-try/9-try/recog-1.py
+395. run_py/history-try/9-try/recog-2.py
+396. run_py/history-try/9-try/recog-3.py
+397. run_py/history-try/9-try/recog-4.py
+398. run_py/modular/0_history/0_history_entry/multi_entry_process.py
+399. run_py/modular/0_history/0_history_entry/multi_entry_process_STORE.py
+400. run_py/modular/0_history/0_history_entry/used_entry.py
+401. run_py/modular/0_history/0_system_history/face_recog_modular/__init__.py
+402. run_py/modular/0_history/0_system_history/face_recog_modular/alerting/__init__.py
+403. run_py/modular/0_history/0_system_history/face_recog_modular/alerting/alert_manager.py
+404. run_py/modular/0_history/0_system_history/face_recog_modular/alerting/violation_uploader.py
+405. run_py/modular/0_history/0_system_history/face_recog_modular/alerting/violation_uploader1.py
+406. run_py/modular/0_history/0_system_history/face_recog_modular/alerting/voice_interface.py
+407. run_py/modular/0_history/0_system_history/face_recog_modular/config/__init__.py
+408. run_py/modular/0_history/0_system_history/face_recog_modular/config/config_manager.py
+409. run_py/modular/0_history/0_system_history/face_recog_modular/config/validation_rules.py
+410. run_py/modular/0_history/0_system_history/face_recog_modular/logging/__init__.py
+411. run_py/modular/0_history/0_system_history/face_recog_modular/logging/data_logger.py
+412. run_py/modular/0_history/0_system_history/face_recog_modular/logging/image_logger.py
+413. run_py/modular/0_history/0_system_history/face_recog_modular/logging/image_logger1.py
+414. run_py/modular/0_history/0_system_history/face_recog_modular/processing/__init__.py
+415. run_py/modular/0_history/0_system_history/face_recog_modular/processing/face_detection.py
+416. run_py/modular/0_history/0_system_history/face_recog_modular/processing/quality_assessment.py
+417. run_py/modular/0_history/0_system_history/face_recog_modular/processing/scene_analysis.py
+418. run_py/modular/0_history/0_system_history/face_recog_modular/processing/temporal_processing.py
+419. run_py/modular/0_history/0_system_history/face_recog_modular/recognition/__init__.py
+420. run_py/modular/0_history/0_system_history/face_recog_modular/recognition/base_system.py
+421. run_py/modular/0_history/0_system_history/face_recog_modular/recognition/robust_system.py
+422. run_py/modular/0_history/0_system_history/face_recog_modular/recognition/voyager_system.py
+423. run_py/modular/0_history/0_system_history/face_recog_modular/streaming/__init__.py
+424. run_py/modular/0_history/0_system_history/face_recog_modular/streaming/base_processor.py
+425. run_py/modular/0_history/0_system_history/face_recog_modular/streaming/control_handler.py
+426. run_py/modular/0_history/0_system_history/face_recog_modular/streaming/frame_utils.py
+427. run_py/modular/0_history/0_system_history/face_recog_modular/streaming/performance_manager.py
+428. run_py/modular/0_history/0_system_history/face_recog_modular/streaming/realtime_processing_headless.py
+429. run_py/modular/0_history/0_system_history/face_recog_modular/streaming/realtime_processor.py
+430. run_py/modular/0_history/0_system_history/face_recog_modular/streaming/stream_manager.py
+431. run_py/modular/0_history/0_system_history/face_recog_modular/tracking/__init__.py
+432. run_py/modular/0_history/0_system_history/face_recog_modular/tracking/bytetrack_wrapper.py
+433. run_py/modular/0_history/0_system_history/face_recog_modular/tracking/face_tracker.py
+434. run_py/modular/0_history/0_system_history/face_recog_modular/tracking/fairness_controller.py
+435. run_py/modular/0_history/0_system_history/face_recog_modular/tracking/person_tracker.py
+436. run_py/modular/0_history/0_system_history/face_recog_modular/tracking/tracking_manager.py
+437. run_py/modular/0_history/0_system_history/face_recog_modular/utils/__init__.py
+438. run_py/modular/0_history/0_system_history/face_recog_modular/utils/common_types.py
+439. run_py/modular/0_history/0_system_history/face_recog_modular/utils/performance_utils.py
+440. run_py/modular/0_history/0_system_history/face_recog_modular/visualization/__init__.py
+441. run_py/modular/0_history/0_system_history/face_recog_modular/visualization/annotation_renderer.py
+442. run_py/modular/0_history/0_system_history/face_recog_modular/visualization/display_resizer.py
+443. run_py/modular/0_history/0_system_history/face_recog_modular1/__init__.py
+444. run_py/modular/0_history/0_system_history/face_recog_modular1/alerting/__init__.py
+445. run_py/modular/0_history/0_system_history/face_recog_modular1/alerting/alert_manager.py
+446. run_py/modular/0_history/0_system_history/face_recog_modular1/alerting/voice_interface.py
+447. run_py/modular/0_history/0_system_history/face_recog_modular1/config/__init__.py
+448. run_py/modular/0_history/0_system_history/face_recog_modular1/config/config_manager.py
+449. run_py/modular/0_history/0_system_history/face_recog_modular1/config/validation_rules.py
+450. run_py/modular/0_history/0_system_history/face_recog_modular1/logging/__init__.py
+451. run_py/modular/0_history/0_system_history/face_recog_modular1/logging/data_logger.py
+452. run_py/modular/0_history/0_system_history/face_recog_modular1/logging/image_logger.py
+453. run_py/modular/0_history/0_system_history/face_recog_modular1/processing/__init__.py
+454. run_py/modular/0_history/0_system_history/face_recog_modular1/processing/face_detection.py
+455. run_py/modular/0_history/0_system_history/face_recog_modular1/processing/quality_assessment.py
+456. run_py/modular/0_history/0_system_history/face_recog_modular1/processing/scene_analysis.py
+457. run_py/modular/0_history/0_system_history/face_recog_modular1/processing/temporal_processing.py
+458. run_py/modular/0_history/0_system_history/face_recog_modular1/recognition/__init__.py
+459. run_py/modular/0_history/0_system_history/face_recog_modular1/recognition/base_system.py
+460. run_py/modular/0_history/0_system_history/face_recog_modular1/recognition/robust_system.py
+461. run_py/modular/0_history/0_system_history/face_recog_modular1/recognition/voyager_system.py
+462. run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/__init__.py
+463. run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/base_processor.py
+464. run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/control_handler.py
+465. run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/frame_utils.py
+466. run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/multi_realtime.py
+467. run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/performance_manager.py
+468. run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/realtime_processing_headless.py
+469. run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/realtime_processor.py
+470. run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/stream_manager.py
+471. run_py/modular/0_history/0_system_history/face_recog_modular1/tracking/__init__.py
+472. run_py/modular/0_history/0_system_history/face_recog_modular1/tracking/face_tracker.py
+473. run_py/modular/0_history/0_system_history/face_recog_modular1/tracking/fairness_controller.py
+474. run_py/modular/0_history/0_system_history/face_recog_modular1/tracking/progressive_mask_detector.py
+475. run_py/modular/0_history/0_system_history/face_recog_modular1/tracking/tracking_manager.py
+476. run_py/modular/0_history/0_system_history/face_recog_modular1/visualization/__init__.py
+477. run_py/modular/0_history/0_system_history/face_recog_modular1/visualization/annotation_renderer.py
+478. run_py/modular/0_history/0_system_history/face_recog_modular1/visualization/display_resizer.py
+479. run_py/modular/0_history/0_system_history/face_recog_modular3/__init__.py
+480. run_py/modular/0_history/0_system_history/face_recog_modular3/alerting/__init__.py
+481. run_py/modular/0_history/0_system_history/face_recog_modular3/alerting/alert_manager.py
+482. run_py/modular/0_history/0_system_history/face_recog_modular3/alerting/voice_interface.py
+483. run_py/modular/0_history/0_system_history/face_recog_modular3/config/__init__.py
+484. run_py/modular/0_history/0_system_history/face_recog_modular3/config/config_manager.py
+485. run_py/modular/0_history/0_system_history/face_recog_modular3/config/validation_rules.py
+486. run_py/modular/0_history/0_system_history/face_recog_modular3/logging/__init__.py
+487. run_py/modular/0_history/0_system_history/face_recog_modular3/logging/data_logger.py
+488. run_py/modular/0_history/0_system_history/face_recog_modular3/logging/image_logger.py
+489. run_py/modular/0_history/0_system_history/face_recog_modular3/processing/__init__.py
+490. run_py/modular/0_history/0_system_history/face_recog_modular3/processing/face_detection.py
+491. run_py/modular/0_history/0_system_history/face_recog_modular3/processing/quality_assessment.py
+492. run_py/modular/0_history/0_system_history/face_recog_modular3/processing/scene_analysis.py
+493. run_py/modular/0_history/0_system_history/face_recog_modular3/processing/temporal_processing.py
+494. run_py/modular/0_history/0_system_history/face_recog_modular3/recognition/__init__.py
+495. run_py/modular/0_history/0_system_history/face_recog_modular3/recognition/base_system.py
+496. run_py/modular/0_history/0_system_history/face_recog_modular3/recognition/robust_system.py
+497. run_py/modular/0_history/0_system_history/face_recog_modular3/recognition/voyager_system.py
+498. run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/__init__.py
+499. run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/control_handler.py
+500. run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/frame_utils.py
+501. run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/performance_manager.py
+502. run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/stream_manager.py
+503. run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/univ_process.py
+504. run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/universal_processor.py
+505. run_py/modular/0_history/0_system_history/face_recog_modular3/tracking/__init__.py
+506. run_py/modular/0_history/0_system_history/face_recog_modular3/tracking/face_tracker.py
+507. run_py/modular/0_history/0_system_history/face_recog_modular3/tracking/fairness_controller.py
+508. run_py/modular/0_history/0_system_history/face_recog_modular3/tracking/progressive_mask_detector.py
+509. run_py/modular/0_history/0_system_history/face_recog_modular3/tracking/tracking_manager.py
+510. run_py/modular/0_history/0_system_history/face_recog_modular3/visualization/__init__.py
+511. run_py/modular/0_history/0_system_history/face_recog_modular3/visualization/annotation_renderer.py
+512. run_py/modular/0_history/0_system_history/face_recog_modular3/visualization/display_resizer.py
+513. run_py/modular/0_history/0_system_history/face_recog_modular_headless/__init__.py
+514. run_py/modular/0_history/0_system_history/face_recog_modular_headless/alerting/__init__.py
+515. run_py/modular/0_history/0_system_history/face_recog_modular_headless/alerting/alert_manager.py
+516. run_py/modular/0_history/0_system_history/face_recog_modular_headless/alerting/voice_interface.py
+517. run_py/modular/0_history/0_system_history/face_recog_modular_headless/config/__init__.py
+518. run_py/modular/0_history/0_system_history/face_recog_modular_headless/config/config_manager.py
+519. run_py/modular/0_history/0_system_history/face_recog_modular_headless/config/validation_rules.py
+520. run_py/modular/0_history/0_system_history/face_recog_modular_headless/logging/__init__.py
+521. run_py/modular/0_history/0_system_history/face_recog_modular_headless/logging/data_logger.py
+522. run_py/modular/0_history/0_system_history/face_recog_modular_headless/logging/image_logger-gpu.py
+523. run_py/modular/0_history/0_system_history/face_recog_modular_headless/logging/image_logger.py
+524. run_py/modular/0_history/0_system_history/face_recog_modular_headless/processing/__init__.py
+525. run_py/modular/0_history/0_system_history/face_recog_modular_headless/processing/face_detection.py
+526. run_py/modular/0_history/0_system_history/face_recog_modular_headless/processing/quality_assessment.py
+527. run_py/modular/0_history/0_system_history/face_recog_modular_headless/processing/scene_analysis.py
+528. run_py/modular/0_history/0_system_history/face_recog_modular_headless/processing/temporal_processing.py
+529. run_py/modular/0_history/0_system_history/face_recog_modular_headless/recognition/__init__.py
+530. run_py/modular/0_history/0_system_history/face_recog_modular_headless/recognition/base_system.py
+531. run_py/modular/0_history/0_system_history/face_recog_modular_headless/recognition/robust_system.py
+532. run_py/modular/0_history/0_system_history/face_recog_modular_headless/recognition/voyager_system.py
+533. run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/__init__.py
+534. run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/base_processor.py
+535. run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/control_handler.py
+536. run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/frame_utils.py
+537. run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/performance_manager.py
+538. run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/realtime_processing_headless.py
+539. run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/realtime_processor.py
+540. run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/stream_manager.py
+541. run_py/modular/0_history/0_system_history/face_recog_modular_headless/tracking/__init__.py
+542. run_py/modular/0_history/0_system_history/face_recog_modular_headless/tracking/face_tracker.py
+543. run_py/modular/0_history/0_system_history/face_recog_modular_headless/tracking/fairness_controller.py
+544. run_py/modular/0_history/0_system_history/face_recog_modular_headless/tracking/tracking_manager.py
+545. run_py/modular/0_history/0_system_history/face_recog_modular_headless/utils/__init__.py
+546. run_py/modular/0_history/0_system_history/face_recog_modular_headless/utils/common_types.py
+547. run_py/modular/0_history/0_system_history/face_recog_modular_headless/utils/performance_utils.py
+548. run_py/modular/0_history/0_system_history/face_recog_modular_headless/visualization/__init__.py
+549. run_py/modular/0_history/0_system_history/face_recog_modular_headless/visualization/annotation_renderer.py
+550. run_py/modular/0_history/0_system_history/face_recog_modular_headless/visualization/display_resizer.py
+551. run_py/modular/entry_multi-USED-Laptop.py
+552. run_py/modular/entry_multi-USED-Magick.py
+553. run_py/modular/entry_multi-USED-TowerCPU.py
+554. run_py/modular/face_recog_modular2/__init__.py
+555. run_py/modular/face_recog_modular2/alerting/__init__.py
+556. run_py/modular/face_recog_modular2/alerting/alert_manager.py
+557. run_py/modular/face_recog_modular2/alerting/voice_interface.py
+558. run_py/modular/face_recog_modular2/config/__init__.py
+559. run_py/modular/face_recog_modular2/config/config_manager.py
+560. run_py/modular/face_recog_modular2/config/validation_rules.py
+561. run_py/modular/face_recog_modular2/logging/__init__.py
+562. run_py/modular/face_recog_modular2/logging/data_logger.py
+563. run_py/modular/face_recog_modular2/logging/image_logger.py
+564. run_py/modular/face_recog_modular2/processing/__init__.py
+565. run_py/modular/face_recog_modular2/processing/face_detection.py
+566. run_py/modular/face_recog_modular2/processing/quality_assessment.py
+567. run_py/modular/face_recog_modular2/processing/scene_analysis.py
+568. run_py/modular/face_recog_modular2/processing/temporal_processing.py
+569. run_py/modular/face_recog_modular2/recognition/__init__.py
+570. run_py/modular/face_recog_modular2/recognition/base_system.py
+571. run_py/modular/face_recog_modular2/recognition/chroma_system.py
+572. run_py/modular/face_recog_modular2/recognition/robust_system.py
+573. run_py/modular/face_recog_modular2/recognition/voyager_system.py
+574. run_py/modular/face_recog_modular2/streaming/__init__.py
+575. run_py/modular/face_recog_modular2/streaming/base_processor.py
+576. run_py/modular/face_recog_modular2/streaming/control_handler.py
+577. run_py/modular/face_recog_modular2/streaming/frame_utils.py
+578. run_py/modular/face_recog_modular2/streaming/multi_realtime.py
+579. run_py/modular/face_recog_modular2/streaming/performance_manager.py
+580. run_py/modular/face_recog_modular2/streaming/realtime_processing_headless.py
+581. run_py/modular/face_recog_modular2/streaming/realtime_processor.py
+582. run_py/modular/face_recog_modular2/streaming/stream_manager.py
+583. run_py/modular/face_recog_modular2/tracking/__init__.py
+584. run_py/modular/face_recog_modular2/tracking/face_tracker.py
+585. run_py/modular/face_recog_modular2/tracking/fairness_controller.py
+586. run_py/modular/face_recog_modular2/tracking/progressive_mask_detector.py
+587. run_py/modular/face_recog_modular2/tracking/tracking_manager.py
+588. run_py/modular/face_recog_modular2/visualization/__init__.py
+589. run_py/modular/face_recog_modular2/visualization/annotation_renderer.py
+590. run_py/modular/face_recog_modular2/visualization/display_resizer.py
+591. run_py/modular/face_recog_modular2_1/__init__.py
+592. run_py/modular/face_recog_modular2_1/alerting/__init__.py
+593. run_py/modular/face_recog_modular2_1/alerting/alert_manager.py
+594. run_py/modular/face_recog_modular2_1/alerting/voice_interface.py
+595. run_py/modular/face_recog_modular2_1/config/__init__.py
+596. run_py/modular/face_recog_modular2_1/config/config_manager.py
+597. run_py/modular/face_recog_modular2_1/config/validation_rules.py
+598. run_py/modular/face_recog_modular2_1/logging/__init__.py
+599. run_py/modular/face_recog_modular2_1/logging/data_logger.py
+600. run_py/modular/face_recog_modular2_1/logging/image_logger.py
+601. run_py/modular/face_recog_modular2_1/processing/__init__.py
+602. run_py/modular/face_recog_modular2_1/processing/face_detection.py
+603. run_py/modular/face_recog_modular2_1/processing/quality_assessment.py
+604. run_py/modular/face_recog_modular2_1/processing/scene_analysis.py
+605. run_py/modular/face_recog_modular2_1/processing/temporal_processing.py
+606. run_py/modular/face_recog_modular2_1/recognition/__init__.py
+607. run_py/modular/face_recog_modular2_1/recognition/base_system.py
+608. run_py/modular/face_recog_modular2_1/recognition/robust_system.py
+609. run_py/modular/face_recog_modular2_1/recognition/voyager_system.py
+610. run_py/modular/face_recog_modular2_1/streaming/__init__.py
+611. run_py/modular/face_recog_modular2_1/streaming/base_processor.py
+612. run_py/modular/face_recog_modular2_1/streaming/control_handler.py
+613. run_py/modular/face_recog_modular2_1/streaming/frame_utils.py
+614. run_py/modular/face_recog_modular2_1/streaming/multi_realtime.py
+615. run_py/modular/face_recog_modular2_1/streaming/performance_manager.py
+616. run_py/modular/face_recog_modular2_1/streaming/realtime_processing_headless.py
+617. run_py/modular/face_recog_modular2_1/streaming/realtime_processor.py
+618. run_py/modular/face_recog_modular2_1/streaming/stream_manager.py
+619. run_py/modular/face_recog_modular2_1/tracking/__init__.py
+620. run_py/modular/face_recog_modular2_1/tracking/face_tracker.py
+621. run_py/modular/face_recog_modular2_1/tracking/fairness_controller.py
+622. run_py/modular/face_recog_modular2_1/tracking/progressive_mask_detector.py
+623. run_py/modular/face_recog_modular2_1/tracking/tracking_manager.py
+624. run_py/modular/face_recog_modular2_1/visualization/__init__.py
+625. run_py/modular/face_recog_modular2_1/visualization/annotation_renderer.py
+626. run_py/modular/face_recog_modular2_1/visualization/display_resizer.py
+627. run_py/train_mask/train_mask_detector.py
+628. run_py/yolo-face_1.py
+629. run_py/yolo-face_2.0.py
+630. run_py/yolo-face_2.1.py
+631. run_py/yolo-face_2.2.py
+
+==================================================
+DETAILED COMMIT HISTORY
+==================================================
+
+4ef2c7f - JabirJelek - Fri Jan 30 16:40:39 2026 +0700 - Structurized the project
+ProjectKnowledgeBase/active/autoEmbedPerson.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/alerting/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/alerting/alert_manager.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/alerting/voice_interface.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/config/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/config/config_manager.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/config/validation_rules.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/logging/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/logging/data_logger.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/logging/image_logger.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/processing/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/processing/face_detection.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/processing/quality_assessment.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/processing/scene_analysis.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/processing/temporal_processing.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/recognition/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/recognition/base_system.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/recognition/chroma_system.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/recognition/robust_system.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/recognition/voyager_system.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/base_processor.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/control_handler.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/frame_utils.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/multi_realtime.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/performance_manager.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/realtime_processing_headless.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/realtime_processor.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/streaming/stream_manager.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/tracking/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/tracking/face_tracker.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/tracking/fairness_controller.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/tracking/progressive_mask_detector.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/tracking/tracking_manager.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/visualization/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/visualization/annotation_renderer.py
+ProjectKnowledgeBase/active/components/face_recog_modular2/visualization/display_resizer.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/alerting/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/alerting/alert_manager.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/alerting/voice_interface.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/config/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/config/config_manager.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/config/validation_rules.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/logging/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/logging/data_logger.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/logging/image_logger.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/processing/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/processing/face_detection.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/processing/quality_assessment.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/processing/scene_analysis.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/processing/temporal_processing.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/recognition/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/recognition/base_system.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/recognition/robust_system.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/recognition/voyager_system.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/base_processor.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/control_handler.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/frame_utils.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/multi_realtime.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/performance_manager.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/realtime_processing_headless.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/realtime_processor.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/streaming/stream_manager.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/tracking/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/tracking/face_tracker.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/tracking/fairness_controller.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/tracking/progressive_mask_detector.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/tracking/tracking_manager.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/visualization/__init__.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/visualization/annotation_renderer.py
+ProjectKnowledgeBase/active/components/face_recog_modular2_1/visualization/display_resizer.py
+ProjectKnowledgeBase/active/patterns/algorithm/entry_multi-USED-Laptop.py
+ProjectKnowledgeBase/active/patterns/algorithm/entry_multi-USED-Magick.py
+ProjectKnowledgeBase/active/patterns/algorithm/entry_multi-USED-TowerCPU.py
+ProjectKnowledgeBase/active/yolo-face_2.2.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_history_entry/multi_entry_process.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_history_entry/multi_entry_process_STORE.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_history_entry/used_entry.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/alerting/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/alerting/alert_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/alerting/violation_uploader.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/alerting/violation_uploader1.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/alerting/voice_interface.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/config/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/config/config_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/config/validation_rules.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/logging/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/logging/data_logger.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/logging/image_logger.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/logging/image_logger1.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/processing/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/processing/face_detection.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/processing/quality_assessment.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/processing/scene_analysis.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/processing/temporal_processing.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/recognition/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/recognition/base_system.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/recognition/robust_system.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/recognition/voyager_system.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/base_processor.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/control_handler.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/frame_utils.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/performance_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/realtime_processing_headless.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/realtime_processor.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/streaming/stream_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/tracking/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/tracking/bytetrack_wrapper.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/tracking/face_tracker.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/tracking/fairness_controller.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/tracking/person_tracker.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/tracking/tracking_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/utils/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/utils/common_types.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/utils/performance_utils.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/visualization/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/visualization/annotation_renderer.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular/visualization/display_resizer.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/alerting/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/alerting/alert_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/alerting/voice_interface.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/config/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/config/config_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/config/validation_rules.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/logging/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/logging/data_logger.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/logging/image_logger.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/processing/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/processing/face_detection.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/processing/quality_assessment.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/processing/scene_analysis.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/processing/temporal_processing.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/recognition/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/recognition/base_system.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/recognition/robust_system.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/recognition/voyager_system.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/base_processor.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/control_handler.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/frame_utils.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/multi_realtime.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/performance_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/realtime_processing_headless.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/realtime_processor.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/streaming/stream_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/tracking/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/tracking/face_tracker.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/tracking/fairness_controller.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/tracking/progressive_mask_detector.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/tracking/tracking_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/visualization/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/visualization/annotation_renderer.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular1/visualization/display_resizer.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/alerting/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/alerting/alert_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/alerting/voice_interface.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/config/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/config/config_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/config/validation_rules.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/logging/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/logging/data_logger.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/logging/image_logger.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/processing/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/processing/face_detection.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/processing/quality_assessment.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/processing/scene_analysis.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/processing/temporal_processing.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/recognition/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/recognition/base_system.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/recognition/robust_system.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/recognition/voyager_system.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/control_handler.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/frame_utils.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/performance_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/stream_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/univ_process.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/streaming/universal_processor.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/tracking/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/tracking/face_tracker.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/tracking/fairness_controller.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/tracking/progressive_mask_detector.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/tracking/tracking_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/visualization/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/visualization/annotation_renderer.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular3/visualization/display_resizer.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/alerting/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/alerting/alert_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/alerting/voice_interface.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/config/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/config/config_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/config/validation_rules.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/logging/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/logging/data_logger.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/logging/image_logger-gpu.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/logging/image_logger.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/processing/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/processing/face_detection.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/processing/quality_assessment.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/processing/scene_analysis.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/processing/temporal_processing.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/recognition/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/recognition/base_system.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/recognition/robust_system.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/recognition/voyager_system.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/base_processor.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/control_handler.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/frame_utils.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/performance_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/realtime_processing_headless.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/realtime_processor.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/streaming/stream_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/tracking/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/tracking/face_tracker.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/tracking/fairness_controller.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/tracking/tracking_manager.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/utils/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/utils/common_types.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/utils/performance_utils.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/visualization/__init__.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/visualization/annotation_renderer.py
+ProjectKnowledgeBase/history/algorithms/0_history/0_system_history/face_recog_modular_headless/visualization/display_resizer.py
+ProjectKnowledgeBase/history/algorithms/0_history/checkTF.py
+ProjectKnowledgeBase/history/algorithms/Bicubic-interpolation/bicubic-0.py
+ProjectKnowledgeBase/history/algorithms/Bicubic-interpolation/bicubic-1.py
+ProjectKnowledgeBase/history/algorithms/Bicubic-interpolation/bicubic.py
+ProjectKnowledgeBase/history/algorithms/history-try/1-try/createEmbeddingManual.py
+ProjectKnowledgeBase/history/algorithms/history-try/1-try/debug_json_structure.py
+ProjectKnowledgeBase/history/algorithms/history-try/1-try/embeddingFolder.py
+ProjectKnowledgeBase/history/algorithms/history-try/1-try/face_query_system.py
+ProjectKnowledgeBase/history/algorithms/history-try/1-try/quick_debug.py
+ProjectKnowledgeBase/history/algorithms/history-try/1-try/run_query.py
+ProjectKnowledgeBase/history/algorithms/history-try/10-try/recog-3.py
+ProjectKnowledgeBase/history/algorithms/history-try/10-try/recog-4.py
+ProjectKnowledgeBase/history/algorithms/history-try/11-try/recog-1.py
+ProjectKnowledgeBase/history/algorithms/history-try/11-try/recog-2.py
+ProjectKnowledgeBase/history/algorithms/history-try/12-try/recog-1.py
+ProjectKnowledgeBase/history/algorithms/history-try/12-try/recog-2.py
+ProjectKnowledgeBase/history/algorithms/history-try/13-try/recog-1.py
+ProjectKnowledgeBase/history/algorithms/history-try/14-try/recog-1.py
+ProjectKnowledgeBase/history/algorithms/history-try/15-try/notes.py
+ProjectKnowledgeBase/history/algorithms/history-try/15-try/recog-1.py
+ProjectKnowledgeBase/history/algorithms/history-try/15-try/recog-2.py
+ProjectKnowledgeBase/history/algorithms/history-try/16-try/base64_viewer.py
+ProjectKnowledgeBase/history/algorithms/history-try/2-try/autoEmbedPerson.py
+ProjectKnowledgeBase/history/algorithms/history-try/2-try/checking/balanced_face_tester.py
+ProjectKnowledgeBase/history/algorithms/history-try/2-try/checking/bias_analyzer.py
+ProjectKnowledgeBase/history/algorithms/history-try/2-try/checking/dataset_quality_checker.py
+ProjectKnowledgeBase/history/algorithms/history-try/2-try/checking/quick_quality_check.py
+ProjectKnowledgeBase/history/algorithms/history-try/2-try/checking/quick_test.py
+ProjectKnowledgeBase/history/algorithms/history-try/2-try/checking/test_face_recognition.py
+ProjectKnowledgeBase/history/algorithms/history-try/3-try/references-for-future/camera.py
+ProjectKnowledgeBase/history/algorithms/history-try/3-try/references-for-future/config.py
+ProjectKnowledgeBase/history/algorithms/history-try/3-try/references-for-future/face_detector.py
+ProjectKnowledgeBase/history/algorithms/history-try/3-try/references-for-future/face_recog_system1.py
+ProjectKnowledgeBase/history/algorithms/history-try/3-try/references-for-future/face_recognizer.py
+ProjectKnowledgeBase/history/algorithms/history-try/3-try/references-for-future/main.py
+ProjectKnowledgeBase/history/algorithms/history-try/3-try/worked/face_recog_system2.py
+ProjectKnowledgeBase/history/algorithms/history-try/3-try/worked/face_recog_system3.py
+ProjectKnowledgeBase/history/algorithms/history-try/4-try/recog-1.py
+ProjectKnowledgeBase/history/algorithms/history-try/4-try/recog-2.py
+ProjectKnowledgeBase/history/algorithms/history-try/4-try/recog-3.py
+ProjectKnowledgeBase/history/algorithms/history-try/5-try/history/model2onnx.py
+ProjectKnowledgeBase/history/algorithms/history-try/5-try/history/reco-1.py
+ProjectKnowledgeBase/history/algorithms/history-try/5-try/history/reco-2.py
+ProjectKnowledgeBase/history/algorithms/history-try/5-try/history/reco-3.py
+ProjectKnowledgeBase/history/algorithms/history-try/5-try/history/reco-4.py
+ProjectKnowledgeBase/history/algorithms/history-try/5-try/recog-1.py
+ProjectKnowledgeBase/history/algorithms/history-try/5-try/recog-2.py
+ProjectKnowledgeBase/history/algorithms/history-try/6-try/recog-1.py
+ProjectKnowledgeBase/history/algorithms/history-try/6-try/recog-2.py
+ProjectKnowledgeBase/history/algorithms/history-try/6-try/recog-3.py
+ProjectKnowledgeBase/history/algorithms/history-try/7-try/recog-1.py
+ProjectKnowledgeBase/history/algorithms/history-try/7-try/recog-2.py
+ProjectKnowledgeBase/history/algorithms/history-try/7-try/recog-3.py
+ProjectKnowledgeBase/history/algorithms/history-try/8-try/recog-1.py
+ProjectKnowledgeBase/history/algorithms/history-try/9-try/recog-1.py
+ProjectKnowledgeBase/history/algorithms/history-try/9-try/recog-2.py
+ProjectKnowledgeBase/history/algorithms/history-try/9-try/recog-3.py
+ProjectKnowledgeBase/history/algorithms/history-try/9-try/recog-4.py
+ProjectKnowledgeBase/history/algorithms/train_mask_detector.py
+ProjectKnowledgeBase/history/algorithms/yolo-face_1.py
+ProjectKnowledgeBase/history/algorithms/yolo-face_2.0.py
+ProjectKnowledgeBase/history/algorithms/yolo-face_2.1.py
+ProjectKnowledgeBase/history/decisions/DAG/app.py
+ProjectKnowledgeBase/history/decisions/DAG/pipeline/__init__.py
+ProjectKnowledgeBase/history/decisions/DAG/pipeline/core/__init__.py
+ProjectKnowledgeBase/history/decisions/DAG/pipeline/core/context.py
+ProjectKnowledgeBase/history/decisions/DAG/pipeline/core/orchestrator.py
+ProjectKnowledgeBase/history/decisions/DAG/pipeline/core/processor.py
+ProjectKnowledgeBase/history/decisions/DAG/pipeline/processors/__init__.py
+ProjectKnowledgeBase/history/decisions/DAG/pipeline/processors/detector.py
+ProjectKnowledgeBase/history/decisions/DAG/pipeline/processors/input_adapter.py
+ProjectKnowledgeBase/history/decisions/DAG/pipeline/processors/output_adapter.py
+ProjectKnowledgeBase/history/decisions/DAG/pipeline/processors/visualizer.py
+ProjectKnowledgeBase/history/decisions/DAG/setup_directory.py
+ProjectKnowledgeBase/references/algorithms/C_threading.py
+ProjectKnowledgeBase/references/algorithms/cctv_connect/cctvRecord.py
+ProjectKnowledgeBase/references/algorithms/cctv_connect/rtsp.py
+ProjectKnowledgeBase/references/algorithms/cctv_connect/rtsp2.py
+ProjectKnowledgeBase/references/algorithms/cctv_connect/rtsp3.py
+ProjectKnowledgeBase/references/algorithms/extractor/cameraFrameExtractor.py
+ProjectKnowledgeBase/references/algorithms/extractor/videoFrameExtractor.py
+ProjectKnowledgeBase/references/algorithms/searchGitHistory.py
+ProjectKnowledgeBase/references/algorithms/verification.py
+exp.py
+main.py
+
+8119be6 - faridraihan17@gmail.com - Wed Jan 28 15:35:05 2026 +0700 - Merge remote-tracking branch 'origin/master' into temp
+6eb8139 - faridraihan17@gmail.com - Wed Jan 28 15:29:39 2026 +0700 - commit and push
+run_py/modular/entry_multi-USED-TowerCPU.py
+
+0d9de8d - JabirJelek - Tue Jan 27 14:22:09 2026 +0700 - Upload the python file and gitignore.
+run_py/modular/entry_multi-USED-Magick.py
+
+c38b857 - faridraihan17@gmail.com - Mon Jan 26 13:36:15 2026 +0700 - Saving of the embedded dataset and implementation of interpolation with bicubic method
+RandomScripts/Bicubic-interpolation/bicubic-0.py
+RandomScripts/Bicubic-interpolation/bicubic-1.py
+RandomScripts/Bicubic-interpolation/bicubic.py
+run_py/autoEmbedPerson.py
+
+bf82dc4 - faridraihan17@gmail.com - Sat Jan 24 10:03:19 2026 +0700 - Folderize files for cleaner working directory
+RandomScripts/0_history/checkTF.py
+
+0c4d378 - faridraihan17@gmail.com - Fri Jan 23 16:32:44 2026 +0700 - Saving of the compression and decompression of folders.
+run_py/modular/entry_multi-USED-TowerCPU.py
+run_py/modular/face_recog_modular2/__init__.py
+run_py/modular/face_recog_modular2/recognition/chroma_system.py
+
+60aea38 - faridraihan17@gmail.com - Fri Jan 23 14:22:04 2026 +0700 - Make it so that we are saving the log file, and ignoring the actual images file, where each images file is heavy as is.
+run_py/modular/entry_multi-USED-TowerCPU.py
+run_py/modular/face_recog_modular2/__init__.py
+run_py/modular/face_recog_modular2/recognition/__init__.py
+run_py/modular/face_recog_modular2/recognition/chroma_system.py
+
+84b8d5a - Raihan Farid - Thu Jan 22 15:43:50 2026 +0700 - Addition of the cypthon to run in the laptop
+run_py/modular/entry_multi-USED-Laptop.py
+
+2f261a4 - JabirJelek - Wed Jan 21 10:35:46 2026 +0700 - Store the current project into git
+RandomScripts/checkTF.py
+RandomScripts/searchGitHistory.py
+RandomScripts/verification.py
+cctv_connect/cctvRecord.py
+cctv_connect/rtsp.py
+cctv_connect/rtsp2.py
+cctv_connect/rtsp3.py
+exp.py
+extractor/cameraFrameExtractor.py
+extractor/videoFrameExtractor.py
+run_py/16-try/base64_viewer.py
+run_py/C_threading.py
+run_py/DAG/app.py
+run_py/DAG/pipeline/__init__.py
+run_py/DAG/pipeline/core/__init__.py
+run_py/DAG/pipeline/core/context.py
+run_py/DAG/pipeline/core/orchestrator.py
+run_py/DAG/pipeline/core/processor.py
+run_py/DAG/pipeline/processors/__init__.py
+run_py/DAG/pipeline/processors/detector.py
+run_py/DAG/pipeline/processors/input_adapter.py
+run_py/DAG/pipeline/processors/output_adapter.py
+run_py/DAG/pipeline/processors/visualizer.py
+run_py/DAG/setup_directory.py
+run_py/autoEmbedPerson.py
+run_py/history-try/1-try/createEmbeddingManual.py
+run_py/history-try/1-try/debug_json_structure.py
+run_py/history-try/1-try/embeddingFolder.py
+run_py/history-try/1-try/face_query_system.py
+run_py/history-try/1-try/quick_debug.py
+run_py/history-try/1-try/run_query.py
+run_py/history-try/10-try/recog-3.py
+run_py/history-try/10-try/recog-4.py
+run_py/history-try/11-try/recog-1.py
+run_py/history-try/11-try/recog-2.py
+run_py/history-try/12-try/recog-1.py
+run_py/history-try/12-try/recog-2.py
+run_py/history-try/13-try/recog-1.py
+run_py/history-try/14-try/recog-1.py
+run_py/history-try/15-try/notes.py
+run_py/history-try/15-try/recog-1.py
+run_py/history-try/15-try/recog-2.py
+run_py/history-try/2-try/autoEmbedPerson.py
+run_py/history-try/2-try/checking/balanced_face_tester.py
+run_py/history-try/2-try/checking/bias_analyzer.py
+run_py/history-try/2-try/checking/dataset_quality_checker.py
+run_py/history-try/2-try/checking/quick_quality_check.py
+run_py/history-try/2-try/checking/quick_test.py
+run_py/history-try/2-try/checking/test_face_recognition.py
+run_py/history-try/3-try/references-for-future/camera.py
+run_py/history-try/3-try/references-for-future/config.py
+run_py/history-try/3-try/references-for-future/face_detector.py
+run_py/history-try/3-try/references-for-future/face_recog_system1.py
+run_py/history-try/3-try/references-for-future/face_recognizer.py
+run_py/history-try/3-try/references-for-future/main.py
+run_py/history-try/3-try/worked/face_recog_system2.py
+run_py/history-try/3-try/worked/face_recog_system3.py
+run_py/history-try/4-try/recog-1.py
+run_py/history-try/4-try/recog-2.py
+run_py/history-try/4-try/recog-3.py
+run_py/history-try/5-try/history/model2onnx.py
+run_py/history-try/5-try/history/reco-1.py
+run_py/history-try/5-try/history/reco-2.py
+run_py/history-try/5-try/history/reco-3.py
+run_py/history-try/5-try/history/reco-4.py
+run_py/history-try/5-try/recog-1.py
+run_py/history-try/5-try/recog-2.py
+run_py/history-try/6-try/recog-1.py
+run_py/history-try/6-try/recog-2.py
+run_py/history-try/6-try/recog-3.py
+run_py/history-try/7-try/recog-1.py
+run_py/history-try/7-try/recog-2.py
+run_py/history-try/7-try/recog-3.py
+run_py/history-try/8-try/recog-1.py
+run_py/history-try/9-try/recog-1.py
+run_py/history-try/9-try/recog-2.py
+run_py/history-try/9-try/recog-3.py
+run_py/history-try/9-try/recog-4.py
+run_py/modular/0_history/0_history_entry/multi_entry_process.py
+run_py/modular/0_history/0_history_entry/multi_entry_process_STORE.py
+run_py/modular/0_history/0_history_entry/used_entry.py
+run_py/modular/0_history/0_system_history/face_recog_modular/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular/alerting/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular/alerting/alert_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular/alerting/violation_uploader.py
+run_py/modular/0_history/0_system_history/face_recog_modular/alerting/violation_uploader1.py
+run_py/modular/0_history/0_system_history/face_recog_modular/alerting/voice_interface.py
+run_py/modular/0_history/0_system_history/face_recog_modular/config/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular/config/config_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular/config/validation_rules.py
+run_py/modular/0_history/0_system_history/face_recog_modular/logging/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular/logging/data_logger.py
+run_py/modular/0_history/0_system_history/face_recog_modular/logging/image_logger.py
+run_py/modular/0_history/0_system_history/face_recog_modular/logging/image_logger1.py
+run_py/modular/0_history/0_system_history/face_recog_modular/processing/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular/processing/face_detection.py
+run_py/modular/0_history/0_system_history/face_recog_modular/processing/quality_assessment.py
+run_py/modular/0_history/0_system_history/face_recog_modular/processing/scene_analysis.py
+run_py/modular/0_history/0_system_history/face_recog_modular/processing/temporal_processing.py
+run_py/modular/0_history/0_system_history/face_recog_modular/recognition/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular/recognition/base_system.py
+run_py/modular/0_history/0_system_history/face_recog_modular/recognition/robust_system.py
+run_py/modular/0_history/0_system_history/face_recog_modular/recognition/voyager_system.py
+run_py/modular/0_history/0_system_history/face_recog_modular/streaming/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular/streaming/base_processor.py
+run_py/modular/0_history/0_system_history/face_recog_modular/streaming/control_handler.py
+run_py/modular/0_history/0_system_history/face_recog_modular/streaming/frame_utils.py
+run_py/modular/0_history/0_system_history/face_recog_modular/streaming/performance_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular/streaming/realtime_processing_headless.py
+run_py/modular/0_history/0_system_history/face_recog_modular/streaming/realtime_processor.py
+run_py/modular/0_history/0_system_history/face_recog_modular/streaming/stream_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular/tracking/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular/tracking/bytetrack_wrapper.py
+run_py/modular/0_history/0_system_history/face_recog_modular/tracking/face_tracker.py
+run_py/modular/0_history/0_system_history/face_recog_modular/tracking/fairness_controller.py
+run_py/modular/0_history/0_system_history/face_recog_modular/tracking/person_tracker.py
+run_py/modular/0_history/0_system_history/face_recog_modular/tracking/tracking_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular/utils/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular/utils/common_types.py
+run_py/modular/0_history/0_system_history/face_recog_modular/utils/performance_utils.py
+run_py/modular/0_history/0_system_history/face_recog_modular/visualization/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular/visualization/annotation_renderer.py
+run_py/modular/0_history/0_system_history/face_recog_modular/visualization/display_resizer.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/alerting/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/alerting/alert_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/alerting/voice_interface.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/config/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/config/config_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/config/validation_rules.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/logging/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/logging/data_logger.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/logging/image_logger.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/processing/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/processing/face_detection.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/processing/quality_assessment.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/processing/scene_analysis.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/processing/temporal_processing.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/recognition/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/recognition/base_system.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/recognition/robust_system.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/recognition/voyager_system.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/base_processor.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/control_handler.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/frame_utils.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/multi_realtime.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/performance_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/realtime_processing_headless.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/realtime_processor.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/streaming/stream_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/tracking/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/tracking/face_tracker.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/tracking/fairness_controller.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/tracking/progressive_mask_detector.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/tracking/tracking_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/visualization/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/visualization/annotation_renderer.py
+run_py/modular/0_history/0_system_history/face_recog_modular1/visualization/display_resizer.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/alerting/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/alerting/alert_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/alerting/voice_interface.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/config/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/config/config_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/config/validation_rules.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/logging/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/logging/data_logger.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/logging/image_logger.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/processing/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/processing/face_detection.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/processing/quality_assessment.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/processing/scene_analysis.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/processing/temporal_processing.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/recognition/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/recognition/base_system.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/recognition/robust_system.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/recognition/voyager_system.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/control_handler.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/frame_utils.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/performance_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/stream_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/univ_process.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/streaming/universal_processor.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/tracking/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/tracking/face_tracker.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/tracking/fairness_controller.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/tracking/progressive_mask_detector.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/tracking/tracking_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/visualization/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/visualization/annotation_renderer.py
+run_py/modular/0_history/0_system_history/face_recog_modular3/visualization/display_resizer.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/alerting/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/alerting/alert_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/alerting/voice_interface.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/config/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/config/config_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/config/validation_rules.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/logging/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/logging/data_logger.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/logging/image_logger-gpu.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/logging/image_logger.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/processing/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/processing/face_detection.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/processing/quality_assessment.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/processing/scene_analysis.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/processing/temporal_processing.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/recognition/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/recognition/base_system.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/recognition/robust_system.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/recognition/voyager_system.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/base_processor.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/control_handler.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/frame_utils.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/performance_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/realtime_processing_headless.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/realtime_processor.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/streaming/stream_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/tracking/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/tracking/face_tracker.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/tracking/fairness_controller.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/tracking/tracking_manager.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/utils/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/utils/common_types.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/utils/performance_utils.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/visualization/__init__.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/visualization/annotation_renderer.py
+run_py/modular/0_history/0_system_history/face_recog_modular_headless/visualization/display_resizer.py
+run_py/modular/entry_multi-USED-Laptop.py
+run_py/modular/entry_multi-USED-Magick.py
+run_py/modular/entry_multi-USED-TowerCPU.py
+run_py/modular/face_recog_modular2/__init__.py
+run_py/modular/face_recog_modular2/alerting/__init__.py
+run_py/modular/face_recog_modular2/alerting/alert_manager.py
+run_py/modular/face_recog_modular2/alerting/voice_interface.py
+run_py/modular/face_recog_modular2/config/__init__.py
+run_py/modular/face_recog_modular2/config/config_manager.py
+run_py/modular/face_recog_modular2/config/validation_rules.py
+run_py/modular/face_recog_modular2/logging/__init__.py
+run_py/modular/face_recog_modular2/logging/data_logger.py
+run_py/modular/face_recog_modular2/logging/image_logger.py
+run_py/modular/face_recog_modular2/processing/__init__.py
+run_py/modular/face_recog_modular2/processing/face_detection.py
+run_py/modular/face_recog_modular2/processing/quality_assessment.py
+run_py/modular/face_recog_modular2/processing/scene_analysis.py
+run_py/modular/face_recog_modular2/processing/temporal_processing.py
+run_py/modular/face_recog_modular2/recognition/__init__.py
+run_py/modular/face_recog_modular2/recognition/base_system.py
+run_py/modular/face_recog_modular2/recognition/robust_system.py
+run_py/modular/face_recog_modular2/recognition/voyager_system.py
+run_py/modular/face_recog_modular2/streaming/__init__.py
+run_py/modular/face_recog_modular2/streaming/base_processor.py
+run_py/modular/face_recog_modular2/streaming/control_handler.py
+run_py/modular/face_recog_modular2/streaming/frame_utils.py
+run_py/modular/face_recog_modular2/streaming/multi_realtime.py
+run_py/modular/face_recog_modular2/streaming/performance_manager.py
+run_py/modular/face_recog_modular2/streaming/realtime_processing_headless.py
+run_py/modular/face_recog_modular2/streaming/realtime_processor.py
+run_py/modular/face_recog_modular2/streaming/stream_manager.py
+run_py/modular/face_recog_modular2/tracking/__init__.py
+run_py/modular/face_recog_modular2/tracking/face_tracker.py
+run_py/modular/face_recog_modular2/tracking/fairness_controller.py
+run_py/modular/face_recog_modular2/tracking/progressive_mask_detector.py
+run_py/modular/face_recog_modular2/tracking/tracking_manager.py
+run_py/modular/face_recog_modular2/visualization/__init__.py
+run_py/modular/face_recog_modular2/visualization/annotation_renderer.py
+run_py/modular/face_recog_modular2/visualization/display_resizer.py
+run_py/modular/face_recog_modular2_1/__init__.py
+run_py/modular/face_recog_modular2_1/alerting/__init__.py
+run_py/modular/face_recog_modular2_1/alerting/alert_manager.py
+run_py/modular/face_recog_modular2_1/alerting/voice_interface.py
+run_py/modular/face_recog_modular2_1/config/__init__.py
+run_py/modular/face_recog_modular2_1/config/config_manager.py
+run_py/modular/face_recog_modular2_1/config/validation_rules.py
+run_py/modular/face_recog_modular2_1/logging/__init__.py
+run_py/modular/face_recog_modular2_1/logging/data_logger.py
+run_py/modular/face_recog_modular2_1/logging/image_logger.py
+run_py/modular/face_recog_modular2_1/processing/__init__.py
+run_py/modular/face_recog_modular2_1/processing/face_detection.py
+run_py/modular/face_recog_modular2_1/processing/quality_assessment.py
+run_py/modular/face_recog_modular2_1/processing/scene_analysis.py
+run_py/modular/face_recog_modular2_1/processing/temporal_processing.py
+run_py/modular/face_recog_modular2_1/recognition/__init__.py
+run_py/modular/face_recog_modular2_1/recognition/base_system.py
+run_py/modular/face_recog_modular2_1/recognition/robust_system.py
+run_py/modular/face_recog_modular2_1/recognition/voyager_system.py
+run_py/modular/face_recog_modular2_1/streaming/__init__.py
+run_py/modular/face_recog_modular2_1/streaming/base_processor.py
+run_py/modular/face_recog_modular2_1/streaming/control_handler.py
+run_py/modular/face_recog_modular2_1/streaming/frame_utils.py
+run_py/modular/face_recog_modular2_1/streaming/multi_realtime.py
+run_py/modular/face_recog_modular2_1/streaming/performance_manager.py
+run_py/modular/face_recog_modular2_1/streaming/realtime_processing_headless.py
+run_py/modular/face_recog_modular2_1/streaming/realtime_processor.py
+run_py/modular/face_recog_modular2_1/streaming/stream_manager.py
+run_py/modular/face_recog_modular2_1/tracking/__init__.py
+run_py/modular/face_recog_modular2_1/tracking/face_tracker.py
+run_py/modular/face_recog_modular2_1/tracking/fairness_controller.py
+run_py/modular/face_recog_modular2_1/tracking/progressive_mask_detector.py
+run_py/modular/face_recog_modular2_1/tracking/tracking_manager.py
+run_py/modular/face_recog_modular2_1/visualization/__init__.py
+run_py/modular/face_recog_modular2_1/visualization/annotation_renderer.py
+run_py/modular/face_recog_modular2_1/visualization/display_resizer.py
+run_py/train_mask/train_mask_detector.py
+run_py/yolo-face_1.py
+run_py/yolo-face_2.0.py
+run_py/yolo-face_2.1.py
+run_py/yolo-face_2.2.py
+
+0123536 - JabirJelek - Wed Jan 21 10:28:14 2026 +0700 - Structure of the current project, all files will be stored here
+main.py

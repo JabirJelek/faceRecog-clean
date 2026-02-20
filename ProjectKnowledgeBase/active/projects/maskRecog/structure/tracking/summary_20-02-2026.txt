@@ -1,0 +1,108 @@
+The earlier summary focused on the **orchestrator** (`MultiSourceRealTimeProcessor`) and correctly identified its clarity issues (too many responsibilities, long methods, mixed concerns). It did not cover the `tracking` module, which you have now provided. That module is a separate subsystem with its own complexity.
+
+---
+
+## 1. Summary Accuracy Check
+
+- **For the orchestrator**: The summary remains accurate.  
+- **For the tracking module**: The summary was not intended to describe it, so it is neither correct nor incorrect. However, looking at the tracking code, we see similar patterns:
+
+  - `TrackingManager` orchestrates three components (`SimpleFaceTracker`, `ProgressiveMaskDetector`, `FairnessController`) but also contains **violation verification logic**, **cleanup logic**, and **statistics aggregation**.  
+  - The class is **large** (over 200 lines) with many internal methods.  
+  - There is **code duplication** (e.g., multiple `_cleanup_*` methods, repeated dictionary key checks).  
+  - **Print/logging statements** are mixed with business logic (e.g., `self.logger.warning` inside policy checks).  
+  - Configuration is passed as raw dicts and accessed ad‑hoc, making it hard to track which keys are used where.  
+  - **Tight coupling** – `TrackingManager` directly instantiates its components and knows their internals (e.g., calls `progressive_detector._remove_track`).  
+  - The **verification policy** is embedded in `_apply_policy_based_verification` with many magic numbers and thresholds.
+
+So the tracking module would benefit from the same kind of refactoring we discussed for the orchestrator.
+
+---
+
+## 2. Possibilities from the Discussed Structure
+
+Based on the earlier principles (single responsibility, clear interfaces, incremental refactoring), here are concrete possibilities for the tracking module:
+
+### 2.1 Extract Policy Enforcement into a Separate Class
+
+The violation verification logic currently lives inside `TrackingManager._apply_policy_based_verification`. This method is long, mixes temporal rules, threshold checks, and statistics updates. Create a `ViolationVerifier` class that:
+
+- Takes a configuration object (min duration, min frames, etc.).
+- Maintains its own state (verified tracks, start times).
+- Receives progressive mask data and decides whether a track’s violation is verified.
+- Returns a simple verdict (`verified`, `pending`, `none`) along with metadata.
+
+This would simplify `TrackingManager` and make the verification strategy swappable.
+
+### 2.2 Introduce a Cleanup Manager
+
+The consolidated cleanup logic (`_consolidated_cleanup`, `_cleanup_single_track`) is spread across the class. Move it to a dedicated `TrackCleanupManager` that knows about all the places where tracks can reside (tracker, violation_tracker, progressive_detector, etc.). This class would expose a single method `cleanup_track(track_id, reason)` and a periodic `cleanup_expired(current_time)`.
+
+### 2.3 Use Configuration Objects
+
+Replace the dictionary‑based config with a `TrackingConfig` dataclass (or `pydantic` model) that validates values and provides defaults. This makes it obvious which parameters are available and eliminates inline magic numbers. For example:
+
+```python
+@dataclass
+class TrackingConfig:
+    enabled: bool = True
+    min_violation_frames: int = 3
+    min_violation_duration: float = 0.5
+    # ... all other parameters
+```
+
+Then `TrackingManager` receives an instance of this config and passes relevant subsets to its components.
+
+### 4. Decouple Components via Interfaces
+
+Define clear abstract interfaces for the three sub‑components:
+
+```python
+class IFaceTracker(ABC):
+    @abstractmethod
+    def update(self, detections: List[Dict], frame_count: int) -> List[Dict]: ...
+
+class IProgressiveMaskDetector(ABC):
+    @abstractmethod
+    def update_track(self, track_id: str, mask_status: str, confidence: float, bbox, timestamp) -> Dict: ...
+
+class IFairnessController(ABC):
+    @abstractmethod
+    def ensure_fair_attention(self, results: List[Dict]) -> List[Dict]: ...
+```
+
+Then `TrackingManager` depends only on these interfaces. This allows you to:
+
+- Swap implementations (e.g., replace `SimpleFaceTracker` with a more advanced one).
+- Test each component in isolation with mocks.
+- Introduce new capabilities (e.g., a different verification algorithm) without touching the core manager.
+
+### 5. Move Logging to a Dedicated Logger
+
+Replace inline `self.logger.info` calls with structured logging at appropriate levels. Consider using a logger per class (already done) but avoid conditional logging inside tight loops unless absolutely necessary. For debugging, use a flag that enables detailed output rather than hard‑coded `if self.frame_count % 30 == 0` checks.
+
+### 6. Separate Statistics Collection
+
+The `get_tracking_stats()` method gathers data from all sub‑components. This could be delegated to a `StatsAggregator` that collects metrics from each component via a standard interface (e.g., `get_stats()`). The aggregator would then combine them into a single report.
+
+---
+
+## 3. How This Enables Exploration
+
+With a modular design, you can experiment with new ideas more easily:
+
+- **Try a different tracker** – implement a new class conforming to `IFaceTracker` and plug it in.
+- **Test alternative verification policies** – write a new `ViolationVerifier` with different rules (e.g., machine learning model, Bayesian inference) without touching the rest.
+- **Add a fairness strategy** – create a new `IFairnessController` that uses different prioritization.
+- **Experiment with progressive mask parameters** – because they are now in a dedicated config object, you can change them at runtime and see the effect.
+
+---
+
+## 4. Next Steps (Incremental)
+
+- Start by extracting the violation verification logic (low‑hanging fruit).  
+- Then move cleanup logic to a separate manager.  
+- Introduce configuration objects gradually – begin with the most frequently used parameters.  
+- Finally, define interfaces and refactor the manager to depend on them.
+
+Each step can be done without breaking the existing system, and you can immediately test with your current setup. Over time, the tracking module will become a set of focused, testable components that are easier to understand and extend.

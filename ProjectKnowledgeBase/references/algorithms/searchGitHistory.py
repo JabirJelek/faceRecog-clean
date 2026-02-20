@@ -13,8 +13,8 @@ import subprocess
 from datetime import datetime
 
 # Hardcoded start and end dates
-start_date = "2025-12-01"
-end_date = "2025-12-31"
+start_date = "2026-01-01"
+end_date = "2026-01-31"
 
 def get_py_files_in_date_range():
     print(f"Searching for .py files in git history from {start_date} to {end_date}...")
