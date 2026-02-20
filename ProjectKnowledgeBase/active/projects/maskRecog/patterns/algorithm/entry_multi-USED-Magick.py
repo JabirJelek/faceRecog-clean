@@ -9,6 +9,9 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
+LOG_ROOT = Path(__file__).parent.parent.parent.parent.parent
+
+
 from structure import create_system, ConfigManager
 from structure import MultiSourceRealTimeProcessor
 import time
@@ -230,109 +233,109 @@ def get_default_config():
         'enable_person_detection': True,
         'person_detection_confidence_threshold': 0.4,        
         
-    # ========== FRAME PROCESSING CONFIGURATION ==========
-    'frame_processing': {
-        # Basic processing parameters
-        'processing_width': 640,
-        'processing_height': 480,
-        'min_processing_scale': 0.3,
-        'max_processing_scale': 4.5,
-        'default_processing_scale': 1.0,
-        
-        # Color and normalization settings
-        'convert_to_rgb': True,  # Convert BGR to RGB for models that expect RGB
-        'normalize_values': False,  # Normalize pixel values to [0, 1]
-        'apply_mean_std_normalization': False,  # Apply ImageNet mean/std normalization
-        
-        # Normalization values (ImageNet standard)
-        'normalization_mean': [0.485, 0.456, 0.406],
-        'normalization_std': [0.229, 0.224, 0.225],
-        
-        # Debug and validation
-        'debug_mode': False,
-        'validate_frames': True,  # Enable frame validation
-        'frame_validation_threshold': 0.1,  # Reject frames with brightness < 10% or > 90%
-        
-        # Frame statistics collection
-        'collect_frame_stats': True,
-        'stats_update_interval': 30.0,  # Update stats every 30 seconds
-        
-        # Contrast enhancement
-        'contrast_enhancement': {
-            'enabled': True,
-            'method': 'clahe',  # 'clahe', 'histogram', or 'none'
-            'clahe_clip_limit': 3.0,
-            'clahe_grid_size': 8,
+        # ========== FRAME PROCESSING CONFIGURATION ==========
+        'frame_processing': {
+            # Basic processing parameters
+            'processing_width': 640,
+            'processing_height': 480,
+            'min_processing_scale': 0.3,
+            'max_processing_scale': 4.5,
+            'default_processing_scale': 1.0,
+            
+            # Color and normalization settings
+            'convert_to_rgb': True,  # Convert BGR to RGB for models that expect RGB
+            'normalize_values': False,  # Normalize pixel values to [0, 1]
+            'apply_mean_std_normalization': False,  # Apply ImageNet mean/std normalization
+            
+            # Normalization values (ImageNet standard)
+            'normalization_mean': [0.485, 0.456, 0.406],
+            'normalization_std': [0.229, 0.224, 0.225],
+            
+            # Debug and validation
+            'debug_mode': False,
+            'validate_frames': True,  # Enable frame validation
+            'frame_validation_threshold': 0.1,  # Reject frames with brightness < 10% or > 90%
+            
+            # Frame statistics collection
+            'collect_frame_stats': True,
+            'stats_update_interval': 30.0,  # Update stats every 30 seconds
+            
+            # Contrast enhancement
+            'contrast_enhancement': {
+                'enabled': True,
+                'method': 'clahe',  # 'clahe', 'histogram', or 'none'
+                'clahe_clip_limit': 3.0,
+                'clahe_grid_size': 8,
+            },
+            
+            # Region of interest (ROI) extraction
+            'roi_extraction': {
+                'enabled': True,
+                'default_padding': 10,  # Pixels to add around bbox
+                'min_roi_size': 32,  # Minimum ROI size in pixels
+            },
+            
+            # Multi-source composite settings
+            'composite_creation': {
+                'grid_target_width': 480,
+                'grid_target_height': 360,
+                'horizontal_target_height': 360,
+                'vertical_target_width': 480,
+                'maintain_aspect_ratio': True,
+                'max_composite_width': 1920,
+                'max_composite_height': 1080,
+            },
+            
+            # Frame buffering and queuing
+            'frame_buffer': {
+                'buffer_size': 3,
+                'queue_timeout': 0.1,  # seconds
+                'max_queue_size': 100,
+                'drop_old_frames': True,  # Drop old frames when queue is full
+            },
+            
+            # Frame quality assessment
+            'quality_assessment': {
+                'enabled': True,
+                'min_brightness': 20.0,
+                'max_brightness': 235.0,
+                'min_contrast': 10.0,
+                'blur_threshold': 100.0,  # Laplacian variance threshold
+            },
+            
+            # Performance optimization
+            'performance': {
+                'use_half_precision': False,  # Use float16 for processing
+                'enable_caching': True,
+                'cache_size': 10,  # Number of frames to cache
+                'optimize_for_size': True,  # Optimize memory usage
+            },
+            
+            # Frame preprocessing pipeline
+            'preprocessing_pipeline': [
+                'validate_frame',
+                'resize_for_processing',
+                'convert_color_space',
+                'enhance_contrast',
+                'normalize_if_needed'
+            ],
+            
+            # Color space conversion options
+            'color_space_conversion': {
+                'input_format': 'bgr',  # OpenCV default
+                'output_format': 'rgb',  # Most models expect RGB
+                'conversion_method': 'opencv',  # 'opencv', 'numpy', or 'manual'
+            },
+            
+            # Dynamic scaling parameters
+            'dynamic_scaling': {
+                'enabled': True,
+                'min_face_size': 50,  # Minimum face size for scaling decisions
+                'max_face_size': 300,  # Maximum face size for scaling decisions
+                'scale_adjustment_step': 0.1,
+                'stability_threshold': 0.8,  # Confidence threshold for stable scaling
+            },
         },
-        
-        # Region of interest (ROI) extraction
-        'roi_extraction': {
-            'enabled': True,
-            'default_padding': 10,  # Pixels to add around bbox
-            'min_roi_size': 32,  # Minimum ROI size in pixels
-        },
-        
-        # Multi-source composite settings
-        'composite_creation': {
-            'grid_target_width': 480,
-            'grid_target_height': 360,
-            'horizontal_target_height': 360,
-            'vertical_target_width': 480,
-            'maintain_aspect_ratio': True,
-            'max_composite_width': 1920,
-            'max_composite_height': 1080,
-        },
-        
-        # Frame buffering and queuing
-        'frame_buffer': {
-            'buffer_size': 3,
-            'queue_timeout': 0.1,  # seconds
-            'max_queue_size': 100,
-            'drop_old_frames': True,  # Drop old frames when queue is full
-        },
-        
-        # Frame quality assessment
-        'quality_assessment': {
-            'enabled': True,
-            'min_brightness': 20.0,
-            'max_brightness': 235.0,
-            'min_contrast': 10.0,
-            'blur_threshold': 100.0,  # Laplacian variance threshold
-        },
-        
-        # Performance optimization
-        'performance': {
-            'use_half_precision': False,  # Use float16 for processing
-            'enable_caching': True,
-            'cache_size': 10,  # Number of frames to cache
-            'optimize_for_size': True,  # Optimize memory usage
-        },
-        
-        # Frame preprocessing pipeline
-        'preprocessing_pipeline': [
-            'validate_frame',
-            'resize_for_processing',
-            'convert_color_space',
-            'enhance_contrast',
-            'normalize_if_needed'
-        ],
-        
-        # Color space conversion options
-        'color_space_conversion': {
-            'input_format': 'bgr',  # OpenCV default
-            'output_format': 'rgb',  # Most models expect RGB
-            'conversion_method': 'opencv',  # 'opencv', 'numpy', or 'manual'
-        },
-        
-        # Dynamic scaling parameters
-        'dynamic_scaling': {
-            'enabled': True,
-            'min_face_size': 50,  # Minimum face size for scaling decisions
-            'max_face_size': 300,  # Maximum face size for scaling decisions
-            'scale_adjustment_step': 0.1,
-            'stability_threshold': 0.8,  # Confidence threshold for stable scaling
-        },
-    },
         
         # ========== CCTV CONFIGURATION ==========
         'cctv_name': 'Default',  
@@ -622,8 +625,26 @@ def get_default_config():
             'quality_threshold_low': 0.3,
             'face_size_threshold_small': 50,
             'face_size_threshold_large': 200,
-        }
+        },
+        
+        'output': {
+            'root_dir': r'logs-running\magick\runs-magick',                    # Base directory for all runs
+            'create_timestamped_subdir': True,      # Create YYYYMMDD_HHMMSS subfolder
+            'enable_exit_status': True,              # Write exit_status.json on shutdown
+        },
+        'email': {
+            'enabled': True,
+            'recipient': 'faridraihan17@gmail.com',
+            'smtp_server': 'smtp.gmail.com',
+            'smtp_port': 587,
+            'smtp_user': 'faridraihan17@gmail.com',
+            'smtp_password': 'env:EMAIL_PASSWORD',        # Use environment variable for security
+            'use_tls': True,
+            'send_on_exit': True,                    # Send email after run finishes
+            'max_attachment_size_mb': 25,            # Common email limit
+        }        
     }
+    
     
 def get_advanced_sources_config():
     """Return advanced sources configuration with parameters"""
@@ -883,6 +904,14 @@ def main():
     
     # Load configuration
     config = load_custom_config(args.config)
+    
+    # Resolve output.root_dir relative to LOG_ROOT if it's a relative path
+    if 'output' in config and 'root_dir' in config['output']:
+        root_dir = config['output']['root_dir']
+        if not os.path.isabs(root_dir):
+            # Convert to absolute path using LOG_ROOT
+            config['output']['root_dir'] = str(LOG_ROOT / root_dir)
+            print(f"📁 Output root resolved to: {config['output']['root_dir']}")    
     
     # Override GPU setting if requested
     if args.no_gpu:

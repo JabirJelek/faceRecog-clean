@@ -1,0 +1,15 @@
+{
+  "exit_code": 130,
+  "exit_message": "Interrupted by user",
+  "timestamp": "2026-02-20T15:16:50.775215",
+  "run_directory": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\projects\\maskRecog\\logs-running\\magick\\runs-magick\\Process-Python_2026-02-20_15-16-48",
+  "statistics": {
+    "total_frames": 0,
+    "average_fps": 0,
+    "active_sources": 1,
+    "violations_detected": 0,
+    "violations_verified": 0,
+    "images_saved": 0,
+    "server_pushes": 0
+  }
+}

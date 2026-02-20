@@ -1,0 +1,12 @@
+📄 Console output redirected to D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\logs-running\magick\runs-magick\Process-Python_2026-02-20_15-16-48\console.log
+✅ Multi-source specific configuration applied
+🎬 Starting stabilized multi-source processing with None sources
+🏥 Health monitoring started
+🧹 Periodic maintenance started
+
+🛑 Shutting down by user request...
+📝 Exit status written to D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\logs-running\magick\runs-magick\Process-Python_2026-02-20_15-16-48\exit_status.json
+🗜️ Run directory zipped: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\logs-running\magick\runs-magick\Process-Python_2026-02-20_15-16-48.zip
+⚠️ Environment variable EMAIL_PASSWORD not set or empty
+❌ No valid SMTP password available, email not sent
+📧 Email thread started

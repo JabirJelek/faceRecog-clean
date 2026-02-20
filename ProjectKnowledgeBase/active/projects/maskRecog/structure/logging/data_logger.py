@@ -18,15 +18,26 @@ class DataLogger:
         self.log_counter = 0
         self.log_interval = 5
         self.log_columns = ['timestamp', 'identity', 'mask_status']
-    
+        
+    # logging/data_logger.py
+
     def setup_logging(self, filename: Optional[str] = None) -> bool:
-        """Setup CSV logging with face names and mask status."""
+        """Setup CSV logging with face names and mask status.
+        
+        Args:
+            filename: Full path to the CSV file (including directory).
+                    If None, a default name in the current directory is used.
+        """
         try:
             if filename is None:
                 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = f"face_recognition_detailed_{timestamp}.csv"
             
-            self.log_file = filename
+            # Ensure directory exists
+            filepath = Path(filename)
+            filepath.parent.mkdir(parents=True, exist_ok=True)
+            
+            self.log_file = str(filepath)
             self.log_start_time = datetime.datetime.now()
             
             # Write header
@@ -35,15 +46,14 @@ class DataLogger:
                 writer.writerow(self.log_columns)
             
             self.logging_enabled = True
-            print(f"📊 Detailed face logging ENABLED: {filename}")
+            print(f"📊 Detailed face logging ENABLED: {self.log_file}")
             return True
-            
         except Exception as e:
             print(f"❌ Failed to setup logging: {e}")
             self.logging_enabled = False
             self.log_file = None
             return False
-    
+        
     def collect_log_data(self, results: List[Dict]) -> List[Dict]:
         """Collect individual face recognition and mask status data."""
         log_entries = []

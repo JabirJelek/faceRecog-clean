@@ -560,43 +560,45 @@ class ImageLogger:
         
         return status
 
-    def setup_image_logging(self, base_filename: Optional[str] = None) -> bool:
+    def setup_image_logging(self, base_filename: Optional[str] = None, base_dir: Optional[str] = None) -> bool:
         """
         Setup image logging folder structure.
-        
+
         Args:
-            base_filename: Base filename for the logging session
-            
+            base_filename: Base filename for the logging session (used when base_dir is None).
+            base_dir: If provided, use this as the root folder for all images (no "_images" appended).
+
         Returns:
             bool: True if setup successful
         """
         try:
-            if base_filename is None:
-                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                base_filename = f"face_recognition_{timestamp}"
-            
-            # Extract base name without extension
-            base_name = Path(base_filename).stem
-            self.image_log_folder = Path(f"{base_name}_images")
-            
+            if base_dir is not None:
+                self.image_log_folder = Path(base_dir)
+            else:
+                if base_filename is None:
+                    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                    base_filename = f"face_recognition_{timestamp}"
+                base_name = Path(base_filename).stem
+                self.image_log_folder = Path(f"{base_name}_images")
+                
             # Create directory
             self.image_log_folder.mkdir(exist_ok=True)
-            
+
             # Create subdirectories
             (self.image_log_folder / "violations").mkdir(exist_ok=True)
             (self.image_log_folder / "debug").mkdir(exist_ok=True)
             (self.image_log_folder / "snapshots").mkdir(exist_ok=True)
-            
+
             # Create base64 subdirectories if enabled
             if self.enable_base64_logging:
                 (self.image_log_folder / "base64").mkdir(exist_ok=True)
                 (self.image_log_folder / "base64" / "violations").mkdir(exist_ok=True)
                 (self.image_log_folder / "base64" / "debug").mkdir(exist_ok=True)
                 (self.image_log_folder / "base64" / "snapshots").mkdir(exist_ok=True)
-            
+
             self.logging_enabled = True
             self.saved_image_count = 0
-            
+
             self.logger.info(f"Image logging ENABLED: {self.image_log_folder}")
             self.logger.info(f"  - Max images: {self.max_images_per_session}")
             self.logger.info(f"  - Quality: {self.image_quality}%")
@@ -613,7 +615,6 @@ class ImageLogger:
                 self.logger.info(f"  - Resize method: {self.resize_method}")
             
             return True
-            
         except Exception as e:
             self.logger.error(f"Failed to setup image logging: {e}")
             self.logging_enabled = False

@@ -1,5 +1,7 @@
 # streaming/multi_realtime.py
 
+# streaming/multi_realtime.py
+
 from typing import Dict, List, Optional, Union, Any, Tuple
 from queue import Queue
 import threading
@@ -13,6 +15,14 @@ from urllib.parse import urlparse
 from threading import Lock, RLock, Event
 import traceback
 import gc
+import os
+import sys
+import json
+import zipfile
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 
 
 from ..streaming.stream_manager import StreamManager
@@ -29,7 +39,29 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
     def __init__(self, face_system, config: Dict):
         super().__init__(face_system, config)
         
-        # 🆕 CRITICAL FIX: Use Event for thread-safe shutdown signaling
+        # ==========   OUTPUT DIRECTORY CONFIGURATION ==========
+        self.data_logger = None          # will be created if logging enabled
+        output_cfg = config.get('output', {})
+        self.output_root = output_cfg.get('root_dir', )
+        self.create_timestamped_subdir = output_cfg.get('create_timestamped_subdir', True)
+        self.enable_exit_status = output_cfg.get('enable_exit_status', True)
+        self.run_dir = None          # will be set by _create_run_directory()
+        self.image_log_dir = None
+        self.csv_log_dir = None
+        
+        # ==========   EMAIL CONFIGURATION ==========
+        email_cfg = config.get('email', {})
+        self.email_enabled = email_cfg.get('enabled', False)
+        self.email_recipient = email_cfg.get('recipient', '')
+        self.smtp_server = email_cfg.get('smtp_server', 'smtp.gmail.com')
+        self.smtp_port = email_cfg.get('smtp_port', 587)
+        self.smtp_user = email_cfg.get('smtp_user', '')
+        self.smtp_password = email_cfg.get('smtp_password', '')
+        self.email_use_tls = email_cfg.get('use_tls', True)
+        self.email_send_on_exit = email_cfg.get('send_on_exit', True)
+        self.email_max_attachment_mb = email_cfg.get('max_attachment_size_mb', 25)        
+        
+        # Use Event for thread-safe shutdown signaling
         self._shutdown_event = Event()
         self.running = False
         
@@ -141,6 +173,182 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                                
                                 
                                    
+
+    # ========== NEW: RUN DIRECTORY MANAGEMENT ==========
+    
+    def _create_run_directory(self):
+        """Create a timestamped directory for this run."""
+        timestamp = datetime.datetime.now().strftime("Process-Python_%Y-%m-%d_%H-%M-%S")
+        if self.create_timestamped_subdir:
+            self.run_dir = os.path.join(self.output_root, timestamp)
+        else:
+            self.run_dir = self.output_root
+        os.makedirs(self.run_dir, exist_ok=True)
+        
+        # Create subdirectories for different log types
+        self.image_log_dir = os.path.join(self.run_dir, 'images')
+        self.csv_log_dir = os.path.join(self.run_dir, 'csv_logs')
+        os.makedirs(self.image_log_dir, exist_ok=True)
+        os.makedirs(self.csv_log_dir, exist_ok=True)
+        
+        # Store in config for other components to use
+        self.config['run_dir'] = self.run_dir
+        self.config['image_log_dir'] = self.image_log_dir
+        self.config['csv_log_dir'] = self.csv_log_dir
+        
+        print(f"📁 Run directory created: {self.run_dir}")
+    
+    def _setup_file_logging(self):
+        """Redirect stdout/stderr to a log file inside run_dir."""
+        log_file = os.path.join(self.run_dir, 'console.log')
+        self.log_file_handle = open(log_file, 'w', encoding='utf-8')
+        # Save original streams to restore later if needed
+        self._original_stdout = sys.stdout
+        self._original_stderr = sys.stderr
+        sys.stdout = self.log_file_handle
+        sys.stderr = self.log_file_handle
+        print(f"📄 Console output redirected to {log_file}")
+    
+    def _restore_file_logging(self):
+        """Restore original stdout/stderr and close log file."""
+        if hasattr(self, 'log_file_handle') and self.log_file_handle:
+            sys.stdout = self._original_stdout
+            sys.stderr = self._original_stderr
+            self.log_file_handle.close()
+            print("📄 Console logging restored")
+    
+    # ========== NEW: EXIT STATUS ==========
+    
+    def write_exit_status(self, exit_code=0, exit_message="Normal shutdown"):
+        """Write exit status and final statistics to exit_status.json."""
+        if not self.enable_exit_status or not self.run_dir:
+            return
+        
+        status = {
+            'exit_code': exit_code,
+            'exit_message': exit_message,
+            'timestamp': datetime.datetime.now().isoformat(),
+            'run_directory': self.run_dir,
+            'statistics': {
+                'total_frames': self.frame_count,
+                'average_fps': self.fps,
+                'active_sources': len(self.active_sources),
+                'violations_detected': self.violation_stats.get('total_detected', 0),
+                'violations_verified': self.violation_stats.get('total_verified', 0),
+                'images_saved': sum(
+                    logger.get_logging_status()['saved_image_count']
+                    for logger in self.image_loggers.values()
+                ),
+                'server_pushes': sum(
+                    logger.get_logging_status()['stats']['server_pushes']
+                    for logger in self.image_loggers.values()
+                ),
+            }
+        }
+        status_file = os.path.join(self.run_dir, 'exit_status.json')
+        with open(status_file, 'w') as f:
+            json.dump(status, f, indent=2)
+        print(f"📝 Exit status written to {status_file}")
+    
+    # ========== NEW: EMAIL HANDLING ==========
+    
+    def _zip_run_directory(self) -> Optional[str]:
+        """Create a ZIP archive of the entire run directory."""
+        if not self.run_dir or not os.path.exists(self.run_dir):
+            return None
+        zip_name = f"{os.path.basename(self.run_dir)}.zip"
+        zip_path = os.path.join(os.path.dirname(self.run_dir), zip_name)
+        try:
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                for root, dirs, files in os.walk(self.run_dir):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, os.path.dirname(self.run_dir))
+                        zipf.write(file_path, arcname)
+            print(f"🗜️ Run directory zipped: {zip_path}")
+            return zip_path
+        except Exception as e:
+            print(f"❌ Failed to zip run directory: {e}")
+            return None
+    
+    def _load_password(self, password_setting: str) -> str:
+        """
+        Resolve a password setting to an actual password.
+        Supports:
+        - Plain text
+        - env:VAR_NAME  -> read from environment variable
+        - /path/to/file  -> read first line of file
+        """
+        if not password_setting:
+            return ""
+        
+        # Environment variable
+        if password_setting.startswith("env:"):
+            env_var = password_setting[4:]
+            pwd = os.environ.get(env_var, "")
+            if not pwd:
+                print(f"⚠️ Environment variable {env_var} not set or empty")
+            return pwd
+        
+        # File path (crude detection: contains path separator or ends with .txt/.xml)
+        if ('/' in password_setting or '\\' in password_setting or 
+            password_setting.endswith(('.txt', '.xml', '.pwd'))):
+            if os.path.exists(password_setting):
+                try:
+                    with open(password_setting, 'r') as f:
+                        pwd = f.readline().strip()
+                    return pwd
+                except Exception as e:
+                    print(f"⚠️ Could not read password from {password_setting}: {e}")
+                    return ""
+            else:
+                print(f"⚠️ Password file {password_setting} does not exist")
+                return ""
+        
+        # Assume plain text password
+        return password_setting
+
+    def _send_email(self, attachment_path: str):
+        """Send email with the ZIP archive attached."""
+        if not self.email_enabled:
+            return
+        
+        # Resolve password
+        password = self._load_password(self.smtp_password)
+        if not password:
+            print("❌ No valid SMTP password available, email not sent")
+            return
+        
+        msg = MIMEMultipart()
+        msg['From'] = self.smtp_user
+        msg['To'] = self.email_recipient
+        msg['Subject'] = f"Face Recognition Run - {os.path.basename(self.run_dir)}"
+        
+        try:
+            with open(attachment_path, 'rb') as f:
+                part = MIMEBase('application', 'zip')
+                part.set_payload(f.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', f'attachment; filename="{os.path.basename(attachment_path)}"')
+                msg.attach(part)
+            
+            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
+            if self.email_use_tls:
+                server.starttls()
+            server.login(self.smtp_user, password)
+            server.send_message(msg)
+            server.quit()
+            print(f"📧 Email sent to {self.email_recipient}")
+        except Exception as e:
+            print(f"❌ Email sending failed: {e}")
+            
+    def _send_email_async(self, attachment_path: str):
+        """Send email in a non‑blocking thread."""
+        def worker():
+            self._send_email(attachment_path)
+        thread = threading.Thread(target=worker, daemon=True)
+        thread.start()
+        print("📧 Email thread started")
                                 
     # ========== THREAD SAFE SHUTDOWN ==========
     
@@ -487,43 +695,47 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             del self._cctv_name_cache[source_id]
         
         print(f"🗑️ Removed configuration for source: {source_id}")
-                          
-
-
-                             
-                             
+                                          
                                    
     # ========== ENHANCED: Multi-source ImageLogger Management ==========
         
     def setup_multi_source_logging(self, base_filename: str = None):
-        """Setup logging for all active sources using source_configs - SINGLE INITIALIZATION POINT"""
+        """Setup logging for all active sources using source_configs"""
         try:
-            # 🆕 CHECK: If logging is already enabled, just return
+            # If logging already active, just return
             if self.image_logging_enabled and self.current_log_session:
                 print(f"📁 Multi-source logging already active: {self.current_log_session}")
                 self.print_multi_source_logging_status()
                 return True
-                
+            
+            # ===== ENSURE RUN DIRECTORY EXISTS =====
+            if self.run_dir is None:
+                self._create_run_directory()
+            
             if base_filename is None:
                 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 base_filename = f"multi_source_{timestamp}"
             
+            # After setting up image loggers, also setup data logger if needed
+            if self.logging_enabled:
+                self._setup_data_logging(base_filename)
+                
             self.current_log_session = base_filename
             print(f"📁 Setting up multi-source logging session: {base_filename}")
             
-            # 🆕 DEBUG: Check CCTV names before setup
+            # DEBUG: Check CCTV names before setup
             self.debug_cctv_names()
             
-            # 🆕 CRITICAL FIX: Ensure ALL sources have proper CCTV names BEFORE creating loggers
+            # Ensure ALL sources have proper CCTV names BEFORE creating loggers
             for source_id in self.active_sources:
                 if source_id in self.source_configs:
-                    # 🆕 ENSURE: Dynamic CCTV name is set in source_configs
+                    #   ENSURE: Dynamic CCTV name is set in source_configs
                     if 'cctv_name' not in self.source_configs[source_id] or not self.source_configs[source_id]['cctv_name']:
                         dynamic_name = self._get_dynamic_cctv_name(self.source_configs[source_id], source_id)
                         self.source_configs[source_id]['cctv_name'] = dynamic_name
                         print(f"🔄 Set dynamic CCTV name for {source_id}: {dynamic_name}")
             
-            # 🆕 SINGLE POINT: Setup logging for all active sources
+            #   SINGLE POINT: Setup logging for all active sources
             setup_count = 0
             for source_id in self.active_sources:
                 if source_id in self.source_configs:
@@ -542,7 +754,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             # Print CCTV name mapping
             self.print_cctv_mapping()
             
-            # 🆕 DEBUG: Verify CCTV names after setup
+            #   DEBUG: Verify CCTV names after setup
             self.debug_cctv_names()
             
             return setup_count > 0  # Return True if at least one logger was created
@@ -553,6 +765,23 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             traceback.print_exc()
             self.image_logging_enabled = False
             return False
+        
+    # ========== NEW: Setup data logging ==========
+    def _setup_data_logging(self, base_filename: str):
+        """Initialize the data logger with the centralized CSV directory."""
+        try:
+            from ..logging.data_logger import DataLogger
+            self.data_logger = DataLogger()
+            # Use the same base filename, but inside csv_log_dir
+            csv_path = os.path.join(self.csv_log_dir, base_filename)
+            success = self.data_logger.setup_logging(csv_path)
+            if success:
+                print(f"📊 Data logger initialized at: {csv_path}.csv")
+            else:
+                print("❌ Failed to initialize data logger")
+        except Exception as e:
+            print(f"❌ Error setting up data logger: {e}")
+            self.data_logger = None        
                                   
     def print_cctv_mapping(self):
         """Print mapping of source IDs to CCTV names using source_configs - OPTIMIZED"""
@@ -564,7 +793,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         print("📹 CCTV NAME MAPPING")
         print("="*50)
         for source_id, config in self.source_configs.items():
-            # 🆕 FIX: Use cached name to prevent repeated extraction
+            #   FIX: Use cached name to prevent repeated extraction
             cctv_name = self._get_cached_cctv_name(source_id)
             status = "🟢" if source_id in self.active_sources else "🔴"
             logger_status = "🖼️" if source_id in self.image_loggers else "❌"
@@ -576,7 +805,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         # If logger exists, return it
         if source_id in self.image_loggers:
             logger = self.image_loggers[source_id]
-            # 🆕 VERIFY: Check if CCTV name is properly set
+            #   VERIFY: Check if CCTV name is properly set
             if not logger.cctv_name or logger.cctv_name == 'Unknown-Camera':
                 source_config = self.get_source_config(source_id)
                 if source_config:
@@ -585,7 +814,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                     print(f"🔄 Updated CCTV name for existing logger {source_id}: {dynamic_cctv_name}")
             return logger
         
-        # 🆕 CRITICAL: If no logger exists but logging is enabled, try to create one on-demand
+        #   CRITICAL: If no logger exists but logging is enabled, try to create one on-demand
         if self.image_logging_enabled and source_id in self.active_sources:
             print(f"🔄 Creating on-demand ImageLogger for source: {source_id}")
             success = self.force_create_image_logger(source_id)
@@ -604,7 +833,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         print(f"Image loggers: {list(self.image_loggers.keys())}")
         
         for source_id in self.active_sources:
-            # 🆕 FIX: Use cached name to prevent repeated extraction
+            #   FIX: Use cached name to prevent repeated extraction
             cctv_name = self._get_cached_cctv_name(source_id)
             
             print(f"\n📹 Source: {source_id}")
@@ -621,7 +850,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         
         print("="*50)
 
-    # 🆕 ADD: Method to force create ImageLogger for a source
+    #   ADD: Method to force create ImageLogger for a source
     def force_create_image_logger(self, source_id: str) -> bool:
         """Force create ImageLogger for a specific source"""
         try:
@@ -671,7 +900,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             return False, None
         
         try:
-            # 🆕 ONLY check for verified violations using TrackingManager's flag
+            #   ONLY check for verified violations using TrackingManager's flag
             verified_violations = [
                 r for r in results 
                 if r.get('mask_status') == 'no_mask' 
@@ -691,7 +920,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 cctv_name = source_logger.cctv_name
                 print(f"✅ {cctv_name}: Verified violation logged (Total: {source_logger.saved_image_count})")
                 
-                # 🆕 Trigger synchronized audio alert ONLY for verified violations
+                #   Trigger synchronized audio alert ONLY for verified violations
                 if hasattr(self, 'alert_manager'):
                     # Filter only verified violations for alerting
                     alert_violations = []
@@ -721,7 +950,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             print(f"❌ Error logging violation for source {source_id}: {e}")
             return False, None
                 
-    # 🆕 UPDATE: Remove old verification methods that are no longer needed
+    #   UPDATE: Remove old verification methods that are no longer needed
     def _get_verified_violations(self, results: List[Dict]) -> List[Dict]:
         """
         DEPRECATED - Use TrackingManager's violation_verified flag instead
@@ -964,7 +1193,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
     def auto_health_monitoring(self):
         """Background health monitoring with safety checks"""
         def health_monitor():
-            # 🆕 FIX: Wait briefly for running flag to be set
+            #   FIX: Wait briefly for running flag to be set
             time.sleep(0.5)
             
             while getattr(self, 'running', False):
@@ -973,12 +1202,12 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                     time.sleep(self.health_check_interval)  # Configuratble interval
                 except Exception as e:
                     print(f"❌ Health monitoring error: {e}")
-                    # 🆕 ADD: Log the full traceback for debugging
+                    #   ADD: Log the full traceback for debugging
                     import traceback
                     traceback.print_exc()
                     time.sleep(60)  # Longer delay on error
         
-        # 🆕 ADD: Safety check to prevent multiple threads
+        #   ADD: Safety check to prevent multiple threads
         if hasattr(self, 'health_monitor_thread') and self.health_monitor_thread and self.health_monitor_thread.is_alive():
             print("⚠️ Health monitor thread already running")
             return
@@ -1032,7 +1261,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         maintenance_interval = self.maintenance_interval  # 5 minutes
         
         def maintenance_worker():
-            # 🆕 FIX: Wait briefly for running flag to be set
+            #   FIX: Wait briefly for running flag to be set
             time.sleep(0.5)
             
             last_maintenance = time.time()
@@ -1363,7 +1592,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             return False
         
         try:
-            # 🆕 SIMPLIFIED: Update tracking manager configuration
+            #   SIMPLIFIED: Update tracking manager configuration
             if source_id in self.tracking_managers:
                 self.tracking_managers[source_id].update_config(kwargs)
             
@@ -1380,7 +1609,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             print(f"❌ Failed to update source {source_id}: {e}")
             return False
 
-    # 🆕 NEW: Add method to get verification statistics from TrackingManager
+    #     Add method to get verification statistics from TrackingManager
     def get_verification_stats(self) -> Dict[str, Any]:
         """Get verification statistics from all TrackingManagers"""
         all_stats = {}
@@ -1415,14 +1644,14 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             return None
         
         source_config = self.source_configs[source_id]
-        # 🆕 FIX: Use cached CCTV name
+        #   FIX: Use cached CCTV name
         dynamic_cctv_name = self._get_cached_cctv_name(source_id)
         
         info = {
             'source_id': source_id,
             'url': source_config.get('url', 'unknown'),
             'cctv_name': dynamic_cctv_name,
-            'config': source_config.copy(),  # 🆕 Include full configuration
+            'config': source_config.copy(),  #   Include full configuration
             'active': source_id in self.active_sources,
             'has_stream_manager': source_id in self.stream_managers,
             'has_tracking_manager': source_id in self.tracking_managers,
@@ -1440,7 +1669,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         # Add logging info if available
         if source_id in self.image_loggers:
             info['logging_status'] = self.image_loggers[source_id].get_logging_status()
-            # 🆕 Ensure CCTV name is consistent
+            #   Ensure CCTV name is consistent
             info['cctv_name'] = info['logging_status'].get('cctv_name', dynamic_cctv_name)
         
         return info
@@ -1528,7 +1757,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         # First check if CCTV name is explicitly provided in config
         explicit_name = source_config.get('cctv_name')
         if explicit_name and explicit_name != "Unknown-Camera":
-            # 🆕 FIX: Remove print to prevent spam
+            #   FIX: Remove print to prevent spam
             # print(f"   🏷️ Using explicit CCTV name: {explicit_name}")
             return explicit_name
         
@@ -1536,7 +1765,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         url = source_config.get('url', '')
         if url and url.startswith('rtsp://'):
             extracted_name = self._extract_cctv_name_from_url(url, source_id)
-            # 🆕 FIX: Remove print to prevent spam
+            #   FIX: Remove print to prevent spam
             # print(f"   🌐 Extracted from URL: {extracted_name}")
             return extracted_name
         
@@ -1544,13 +1773,13 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         if source_id and (source_id.isdigit() or (isinstance(url, str) and url.isdigit())):
             cam_num = url if url.isdigit() else source_id
             local_name = f"Local-Camera-{cam_num}"
-            # 🆕 FIX: Remove print to prevent spam
+            #   FIX: Remove print to prevent spam
             # print(f"   📷 Local camera name: {local_name}")
             return local_name
         
         # Use source_id as fallback
         fallback_name = f"Camera-{source_id}" if source_id else "Unknown-Camera"
-        # 🆕 FIX: Remove print to prevent spam
+        #   FIX: Remove print to prevent spam
         # print(f"   🔄 Using fallback name: {fallback_name}")
         return fallback_name
     
@@ -1577,7 +1806,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 match = re.search(pattern, parsed.path)
                 if match:
                     channel_num = match.group(1)
-                    # 🆕 FIX: Remove debug print
+                    #   FIX: Remove debug print
                     # print(f"🔍 Pattern '{pattern}' matched channel: {channel_num}")
                     return f"Camera-{channel_num}"
             
@@ -1607,7 +1836,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             return f"Camera-{timestamp}"
             
         except Exception as e:
-            # 🆕 FIX: Only log errors in debug mode
+            #   FIX: Only log errors in debug mode
             if self.debug_mode:
                 print(f"⚠️ Error extracting CCTV name from URL: {e}")
             return "Unknown-Camera"
@@ -1912,7 +2141,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 f"Sources: {list(self.active_sources)}"
             ])
         
-        # 🆕 ENHANCED: Add identity control and verification stats
+        #   ENHANCED: Add identity control and verification stats
         if self.violation_verification_enabled:
             verified_count = sum(1 for r in results if r.get('violation_verified', False))
             unverified_count = sum(1 for r in results if r.get('mask_status') == 'no_mask' and not r.get('violation_verified', False))
@@ -2008,10 +2237,10 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         elif key == ord('C'):  # Show CCTV name mapping
             self.print_cctv_mapping()
         
-        elif key == ord('V'):  # 🆕 NEW: Toggle violation verification
+        elif key == ord('V'):  #     Toggle violation verification
             self.toggle_violation_verification()
         
-        elif key == ord('S'):  # 🆕 NEW: Show verification statistics
+        elif key == ord('S'):  #     Show verification statistics
             self.print_verification_stats()
         
         elif key == ord('q'):  # Quit
@@ -2237,44 +2466,37 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         
         return result            
                                                             
+    # ========== MODIFIED: Setup source logging to use run subdirs ==========
+    
     def _setup_source_logging(self, source_id: str) -> bool:
-        """Setup logging for a specific source using source_configs - OPTIMIZED"""
+        """Setup logging for a specific source using source_configs."""
         try:
-            # 🆕 CHECK: If ImageLogger already exists for this source, skip creation
             if source_id in self.image_loggers:
                 existing_logger = self.image_loggers[source_id]
                 status = existing_logger.get_logging_status()
                 print(f"📁 ImageLogger already exists for {source_id}: {status['image_log_folder']}")
                 return True
-            
+
             source_config = self.source_configs[source_id]
-            
-            # 🆕 FIX: Use cached CCTV name instead of recalculating
             cctv_name = self._get_cached_cctv_name(source_id)
-            
-            # 🆕 DEBUG: Print the CCTV name that will be used (only once)
             print(f"🔍 Creating ImageLogger for {source_id} with CCTV name: {cctv_name}")
-            
-            # 🆕 CREATE: ImageLogger with the properly configured source_config
+
             source_logger = ImageLogger(source_config)
-            
-            # 🆕 VERIFY: Check that the CCTV name was set correctly in ImageLogger
             if source_logger.cctv_name != cctv_name:
-                print(f"⚠️  CCTV name mismatch! Expected: {cctv_name}, Got: {source_logger.cctv_name}")
-                # Force update the CCTV name
+                print(f"⚠️ CCTV name mismatch! Expected: {cctv_name}, Got: {source_logger.cctv_name}")
                 source_logger.update_cctv_name(cctv_name)
-            
+
             safe_cctv_name = self._create_source_safe_name(cctv_name)
-            source_base_filename = f"{self.current_log_session}_{safe_cctv_name}"
-            
-            print(f"🔍 Setting up ImageLogger with base filename: {source_base_filename}")
-            
-            success = source_logger.setup_image_logging(source_base_filename)
+            # Construct the base directory for this source's images
+            source_image_dir = os.path.join(self.image_log_dir, f"{self.current_log_session}_{safe_cctv_name}")
+
+            print(f"🔍 Setting up ImageLogger with base directory: {source_image_dir}")
+
+            # Pass as base_dir, not base_filename
+            success = source_logger.setup_image_logging(base_dir=source_image_dir)
             if success:
                 self.image_loggers[source_id] = source_logger
                 print(f"✅ ImageLogger setup for source: {source_id} → {cctv_name}")
-                
-                # 🆕 VERIFY: Double-check the CCTV name after setup
                 status = source_logger.get_logging_status()
                 print(f"🔍 Verification - ImageLogger CCTV name: {status['cctv_name']}")
                 print(f"🔍 Verification - ImageLogger folder: {status['image_log_folder']}")
@@ -2282,20 +2504,19 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             else:
                 print(f"❌ Failed to setup ImageLogger for source: {source_id}")
                 return False
-                
         except Exception as e:
             print(f"❌ Error setting up logging for source {source_id}: {e}")
             import traceback
             traceback.print_exc()
             return False
-                                                                         
+                                                                               
     def _create_source_config(self, url_or_config: Union[str, int, Dict] = None, **kwargs) -> Dict[str, Any]:
         """
         Create source configuration from URL, camera index, or existing config dictionary.
         """
         config = {}
         
-        # 🆕 ENHANCED: Handle multiple input types
+        #   ENHANCED: Handle multiple input types
         if url_or_config is not None:
             if isinstance(url_or_config, dict):
                 # If a dictionary is provided, use it as base config
@@ -2307,7 +2528,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             # Default to first camera if no URL provided
             config['url'] = "0"
         
-        # 🆕 ENHANCED: Apply all keyword arguments (override existing)
+        #   ENHANCED: Apply all keyword arguments (override existing)
         config.update(kwargs)
         
         # Set defaults for required fields
@@ -2316,7 +2537,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         config.setdefault('processing_scale', 1.0)
         config.setdefault('buffer_size', 3)
         
-        # 🆕 ENHANCED: Merge with base configuration for missing values
+        #   ENHANCED: Merge with base configuration for missing values
         for key, value in self.config.items():
             if key not in config and not isinstance(value, (dict, list)):
                 config[key] = value
@@ -2401,9 +2622,19 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 success_count += 1
         return success_count    
    
+    # ========== MODIFIED: run_multi_source_stable ==========
     def run_multi_source_stable(self, sources_config: Dict[str, Dict]):
-        """Stabilized main processing loop"""
+        """Stabilized main processing loop with output directory and email."""
+        exit_code = 0
+        exit_message = "Normal shutdown"
         try:
+            # Create run directory if not already created (e.g., by setup_multi_source_logging)
+            if self.run_dir is None:
+                self._create_run_directory()
+            
+            # Redirect console output to file
+            self._setup_file_logging()
+            
             # Initialize sources
             success_count = self.apply_multi_source_config(sources_config)
             
@@ -2489,12 +2720,31 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             
             print("🛑 Processing loop ended")
             
+        except KeyboardInterrupt:
+            exit_code = 130
+            exit_message = "Interrupted by user"
+            print("\n🛑 Shutting down by user request...")
         except Exception as e:
+            exit_code = 1
+            exit_message = str(e)
             print(f"❌ Critical error in processing: {e}")
             traceback.print_exc()
         finally:
-            self.close()
-                   
+            # Write exit status
+            self.write_exit_status(exit_code, exit_message)
+            
+            # Optionally compress and email the run directory
+            if self.email_enabled and self.email_send_on_exit and self.run_dir:
+                zip_path = self._zip_run_directory()
+                if zip_path:
+                    self._send_email_async(zip_path)
+            
+            # Restore console output before closing (so prints go to terminal)
+            self._restore_file_logging()
+            
+            # Close all resources
+            self.close()                  
+                     
     # ========== ENHANCED: Logging Pipeline Integration ==========
                                    
     def create_multi_source_display(self, source_frames: Dict[str, np.ndarray], 
@@ -2563,7 +2813,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
     def _add_source_overlay(self, frame: np.ndarray, source_id: str, results: List[Dict]) -> np.ndarray:
         """Add source identifier overlay to frame with CCTV name """
         
-        # 🆕 NEW: Add violation verification status
+        #     Add violation verification status
         if self.violation_verification_enabled:
             verified_count = sum(1 for r in results if r.get('violation_verified', False))
             if verified_count > 0:
@@ -2635,7 +2885,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             violation_verified = result_copy.get('violation_verified', False)
             identity = result_copy.get('identity', 'Unknown')
             
-            # 🆕 UPDATED: More transparent identity policy
+            #   UPDATED: More transparent identity policy
             # 1. Always show identity if known, regardless of mask status
             # 2. Only mark as 'unverified' for logging/tracking purposes
             # 3. Never hide identity from display
@@ -2698,7 +2948,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         """Stop and release all stream managers with logging summary - ENHANCED"""
         print("🛑 Stopping all sources...")
         
-        # 🆕 ADD: Safety check to prevent multiple stops
+        #   ADD: Safety check to prevent multiple stops
         if not self.running:
             print("⚠️ Already stopping or stopped")
             return
@@ -2719,7 +2969,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             
             print(f"   TOTAL: {total_images} images, {total_server_pushes} server pushes")
         
-        # 🆕 NEW: Print violation verification summary - SAFE VERSION
+        #     Print violation verification summary - SAFE VERSION
         if self.violation_verification_enabled:
             print(f"\n✅ VIOLATION VERIFICATION SUMMARY:")
             print(f"   Total Detected: {self.violation_stats.get('total_detected', 0)}")
@@ -2739,10 +2989,10 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                             max(1, total_detected)) * 100
             print(f"   False Positive Prevention Rate: {prevention_rate:.1f}%")
         
-        # 🆕 ADD: Set running flag BEFORE cleanup
+        #   ADD: Set running flag BEFORE cleanup
         self.running = False
         
-        # 🆕 ADD: Brief pause to allow threads to notice
+        #   ADD: Brief pause to allow threads to notice
         time.sleep(0.5)
         
         # Call the enhanced cleanup
@@ -2754,14 +3004,14 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         """
         Enhanced logging that uses ONLY TrackingManager's verified violations
         """
-        # 🆕 NEW: Extract only verified violations from TrackingManager
+        # Extract only verified violations from TrackingManager
         verified_violations = []
         unverified_violations = []
         
         for result in results:
             if result.get('mask_status') == 'no_mask' and result.get('mask_confidence', 0) > 0.3:
                 if result.get('violation_verified', False):
-                    # 🆕 Use TrackingManager's verification metadata
+                    #   Use TrackingManager's verification metadata
                     verification_metadata = {
                         'violation_duration': result.get('violation_duration', 0),
                         'violation_frames': result.get('violation_frames', 0),
@@ -2777,36 +3027,41 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                     result_copy['verification_status'] = 'verified'
                     verified_violations.append(result_copy)
                     
-                    # 🆕 Update statistics
+                    #   Update statistics
                     self.violation_stats['total_verified'] += 1
                     self.violation_stats['last_verified_time'] = time.time()
                 else:
                     # Unverified violation - track but don't log
                     unverified_violations.append(result)
                     self.violation_stats['false_positives_prevented'] += 1
-        
-        # 🆕 ONLY log verified violations
+            
+        # Log verified violations (images)
         if verified_violations:
             success, _ = self.log_source_violation(source_id, frame, verified_violations, frame)
             if success:
                 self.violation_stats['total_logged'] += len(verified_violations)
+                # Also log to data logger (CSV)
+                if self.data_logger and self.logging_enabled:
+                    log_entries = self.data_logger.collect_log_data(verified_violations)
+                    if log_entries:
+                        self.data_logger.write_log_entries(log_entries)
                 
-                # Log verification details
-                for violation in verified_violations:
-                    identity = violation.get('identity', 'Unknown')
-                    duration = violation.get('violation_duration', 0)
-                    frames = violation.get('violation_frames', 0)
-                    level = violation.get('verification_level', 'unknown')
-                    
-                    verification_log = (
-                        f"✅ VERIFIED VIOLATION | "
-                        f"Source: {source_id} | "
-                        f"Identity: {identity} | "
-                        f"Level: {level} | "
-                        f"Duration: {duration:.1f}s | "
-                        f"Frames: {frames}"
-                    )
-                    print(verification_log)
+                    # Log verification details
+                    for violation in verified_violations:
+                        identity = violation.get('identity', 'Unknown')
+                        duration = violation.get('violation_duration', 0)
+                        frames = violation.get('violation_frames', 0)
+                        level = violation.get('verification_level', 'unknown')
+                        
+                        verification_log = (
+                            f"✅ VERIFIED VIOLATION | "
+                            f"Source: {source_id} | "
+                            f"Identity: {identity} | "
+                            f"Level: {level} | "
+                            f"Duration: {duration:.1f}s | "
+                            f"Frames: {frames}"
+                        )
+                        print(verification_log)
         
         # Log unverified violations for debugging only
         if unverified_violations and self.debug_mode:

@@ -1,0 +1,53 @@
+📄 Console output redirected to D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\runs-magick\Process-Python_2026-02-20_15-15-24\console.log
+✅ Multi-source specific configuration applied
+🎬 Starting stabilized multi-source processing with None sources
+🏥 Health monitoring started
+🧹 Periodic maintenance started
+🔍 [1-FACE-SYSTEM] 1 raw detections
+    Raw 0: bbox=[365, 214, 455, 337], mask='mask', conf=0.9999285936355591
+    Raw 0: bbox=[365, 214, 455, 337], identity='Raihan', mask='mask'
+🔍 [2-TO-TRACKER] Sending 1 results to tracker
+✅ Result 0: Progressive data exists - status=mask, progress=0.00, frames=0
+📊 Progressive data coverage: 1/1 results
+🔍 [3-TRACKER-RESULTS] 1 processed results
+    Tracked 0: identity='Raihan', verified=False, hidden=False
+🔍 [1-FACE-SYSTEM] 1 raw detections
+    Raw 0: bbox=[364, 214, 455, 337], mask='mask', conf=0.9999523162841797
+    Raw 0: bbox=[364, 214, 455, 337], identity='Raihan', mask='mask'
+🔍 [2-TO-TRACKER] Sending 1 results to tracker
+✅ Result 0: Progressive data exists - status=mask, progress=0.00, frames=0
+📊 Progressive data coverage: 1/1 results
+🔍 [3-TRACKER-RESULTS] 1 processed results
+    Tracked 0: identity='Raihan', verified=False, hidden=False
+🔍 [1-FACE-SYSTEM] 1 raw detections
+    Raw 0: bbox=[365, 214, 456, 336], mask='mask', conf=0.9999421834945679
+    Raw 0: bbox=[365, 214, 456, 336], identity='Raihan', mask='mask'
+🔍 [2-TO-TRACKER] Sending 1 results to tracker
+✅ Result 0: Progressive data exists - status=mask, progress=0.00, frames=0
+📊 Progressive data coverage: 1/1 results
+🔍 [3-TRACKER-RESULTS] 1 processed results
+    Tracked 0: identity='Raihan', verified=False, hidden=False
+🔍 [1-FACE-SYSTEM] 1 raw detections
+    Raw 0: bbox=[365, 214, 455, 337], mask='mask', conf=0.9998719692230225
+    Raw 0: bbox=[365, 214, 455, 337], identity='Raihan', mask='mask'
+🔍 [2-TO-TRACKER] Sending 1 results to tracker
+✅ Result 0: Progressive data exists - status=mask, progress=0.00, frames=0
+📊 Progressive data coverage: 1/1 results
+🔍 [3-TRACKER-RESULTS] 1 processed results
+    Tracked 0: identity='Raihan', verified=False, hidden=False
+🔍 [1-FACE-SYSTEM] 1 raw detections
+    Raw 0: bbox=[364, 214, 454, 336], mask='mask', conf=0.9994238615036011
+    Raw 0: bbox=[364, 214, 454, 336], identity='Raihan', mask='mask'
+🔍 [2-TO-TRACKER] Sending 1 results to tracker
+✅ Result 0: Progressive data exists - status=mask, progress=0.00, frames=0
+📊 Progressive data coverage: 1/1 results
+🔍 [3-TRACKER-RESULTS] 1 processed results
+    Tracked 0: identity='Raihan', verified=False, hidden=False
+🛑 Quitting...
+🛑 Quitting application...
+🛑 Processing loop ended
+📝 Exit status written to D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\runs-magick\Process-Python_2026-02-20_15-15-24\exit_status.json
+🗜️ Run directory zipped: D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\runs-magick\Process-Python_2026-02-20_15-15-24.zip
+⚠️ Environment variable EMAIL_PASSWORD not set or empty
+❌ No valid SMTP password available, email not sent
+📧 Email thread started
