@@ -4,31 +4,40 @@
 import sys
 import os
 from pathlib import Path
+import logging
+
 
 # Get the project root (go up 2 levels from current file)
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
-from structure2 import create_system, ConfigManager
-from structure2 import MultiSourceRealTimeProcessor
+LOG_ROOT = Path(__file__).parent.parent.parent.parent.parent
+
+
+from structure import create_system, ConfigManager
+from structure import MultiSourceRealTimeProcessor
 import time
 import os
 from typing import Dict
 import datetime
 import threading
 
+
+
+log_ger = logging.getLogger(__name__)
+
 def test_multi_stream_connections(sources_config: Dict[str, Dict]) -> bool:
     """Test if we can connect to all streams before starting main processing"""
-    print(f"\n🔍 Testing multi-stream connections for {len(sources_config)} sources...")
+    log_ger.debug(f"\n🔍 Testing multi-stream connections for {len(sources_config)} sources...")
     
     # FIXED: Use the correct module name
-    from structure2 import StreamManager
+    from structure import StreamManager
     
     successful_sources = []
     failed_sources = []
     
     for source_id, source_config in sources_config.items():
-        print(f"\n📹 Testing source: {source_id}")
+        log_ger.info(f"\n📹 Testing source: {source_id}")
         try:
             test_manager = StreamManager(source_config)
             success = test_manager.initialize_stream(source_config['url'])
@@ -40,33 +49,33 @@ def test_multi_stream_connections(sources_config: Dict[str, Dict]) -> bool:
                     frame_success, frame = test_manager.read_frame()
                     if frame_success and frame is not None:
                         frame_success_count += 1
-                        print(f"   ✅ Frame {i+1}: {frame.shape}")
+                        log_ger.info(f"   ✅ Frame {i+1}: {frame.shape}")
                     else:
-                        print(f"   ❌ Failed to read frame {i+1}")
+                        log_ger.warning(f"   ❌ Failed to read frame {i+1}")
                 
                 if frame_success_count >= 2:  # Require at least 2 successful frames
                     successful_sources.append(source_id)
-                    print(f"✅ Source {source_id} test successful")
+                    log_ger.info(f"✅ Source {source_id} test successful")
                 else:
                     failed_sources.append(source_id)
-                    print(f"❌ Source {source_id} test failed - insufficient frames")
+                    log_ger.warning(f"❌ Source {source_id} test failed - insufficient frames")
             else:
                 failed_sources.append(source_id)
-                print(f"❌ Source {source_id} test failed - initialization failed")
+                log_ger.warning(f"❌ Source {source_id} test failed - initialization failed")
                 
             test_manager.release()
             
         except Exception as e:
             failed_sources.append(source_id)
-            print(f"❌ Source {source_id} test error: {e}")
+            log_ger.warning(f"❌ Source {source_id} test error: {e}")
     
     # Print summary
-    print(f"\n📊 STREAM TEST SUMMARY:")
-    print(f"   ✅ Successful: {len(successful_sources)} sources")
-    print(f"   ❌ Failed: {len(failed_sources)} sources")
+    log_ger.info(f"\n📊 STREAM TEST SUMMARY:")
+    log_ger.info(f"   ✅ Successful: {len(successful_sources)} sources")
+    log_ger.warning(f"   ❌ Failed: {len(failed_sources)} sources")
     
     if failed_sources:
-        print(f"   Failed sources: {failed_sources}")
+        log_ger.info(f"   Failed sources: {failed_sources}")
     
     # Return True if at least one source is successful
     return len(successful_sources) > 0
@@ -84,9 +93,9 @@ def check_gpu_availability(config: dict) -> dict:
                 memory_info = torch.cuda.get_device_properties(current_device)
                 total_memory = memory_info.total_memory / (1024**3)  # Convert to GB
                 
-                print(f"🎮 GPU {current_device}: {gpu_name} available")
-                print(f"🎮 CUDA version: {torch.version.cuda}")
-                print(f"🎮 Total GPU Memory: {total_memory:.1f} GB")
+                log_ger.info(f"🎮 GPU {current_device}: {gpu_name} available")
+                log_ger.info(f"🎮 CUDA version: {torch.version.cuda}")
+                log_ger.info(f"🎮 Total GPU Memory: {total_memory:.1f} GB")
                 
                 # Test GPU functionality
                 test_tensor = torch.randn(1000, 1000).cuda()
@@ -94,18 +103,18 @@ def check_gpu_availability(config: dict) -> dict:
                 del test_tensor, test_result
                 torch.cuda.empty_cache()
                 
-                print("✅ GPU functionality test passed")
+                log_ger.info("✅ GPU functionality test passed")
                 config['use_gpu'] = True
                 return config
             else:
-                print(f"⚠️  GPU device {current_device} not available, falling back to CPU")
+                log_ger.warning(f"⚠️  GPU device {current_device} not available, falling back to CPU")
                 config['use_gpu'] = False
         else:
-            print("⚠️  CUDA not available, falling back to CPU")
+            log_ger.warning(f"⚠️  CUDA not available, falling back to CPU")
             config['use_gpu'] = False
             
     except Exception as e:
-        print(f"⚠️  GPU check failed: {e}, falling back to CPU")
+        log_ger.warning(f"⚠️  GPU check failed: {e}, falling back to CPU")
         config['use_gpu'] = False
     
     return config
@@ -115,34 +124,34 @@ def check_onnx_gpu_availability():
     try:
         import onnxruntime as ort
         available_providers = ort.get_available_providers()
-        print(f"🔧 Available ONNX Providers: {available_providers}")
+        log_ger.info(f"🔧 Available ONNX Providers: {available_providers}")
         
         if 'CUDAExecutionProvider' in available_providers:
-            print("✅ ONNX CUDA Execution Provider available")
+            log_ger.info("✅ ONNX CUDA Execution Provider available")
             return True
         else:
-            print("⚠️  ONNX CUDA Execution Provider not available")
+            log_ger.warning(f"⚠️  ONNX CUDA Execution Provider not available")
             return False
             
     except Exception as e:
-        print(f"⚠️  ONNX GPU check failed: {e}")
+        log_ger.warning(f"⚠️  ONNX GPU check failed: {e}")
         return False
 
 def print_system_info(config: dict):
     """Print comprehensive system information"""
-    print("\n" + "="*60)
-    print("🖥️  SYSTEM INFORMATION")
-    print("="*60)
+    log_ger.info("\n" + "="*60)
+    log_ger.info("🖥️  SYSTEM INFORMATION")
+    log_ger.info("="*60)
     
     # CPU Information
     try:
         import psutil
         cpu_count = psutil.cpu_count()
         memory_total = psutil.virtual_memory().total / (1024**3)  # GB
-        print(f"💻 CPU Cores: {cpu_count}")
-        print(f"💾 Total RAM: {memory_total:.1f} GB")
+        log_ger.info(f"💻 CPU Cores: {cpu_count}")
+        log_ger.info(f"💾 Total RAM: {memory_total:.1f} GB")
     except:
-        print("💻 CPU: Information not available")
+        log_ger.info("💻 CPU: Information not available")
     
     # GPU Information
     try:
@@ -152,63 +161,143 @@ def print_system_info(config: dict):
                 gpu_name = torch.cuda.get_device_name(i)
                 memory_info = torch.cuda.get_device_properties(i)
                 total_memory = memory_info.total_memory / (1024**3)
-                print(f"🎮 GPU {i}: {gpu_name} ({total_memory:.1f} GB)")
+                log_ger.info(f"🎮 GPU {i}: {gpu_name} ({total_memory:.1f} GB)")
         else:
-            print("🎮 GPU: No CUDA devices available")
+            log_ger.info("🎮 GPU: No CUDA devices available")
     except:
-        print("🎮 GPU: Information not available")
+        log_ger.info("🎮 GPU: Information not available")
     
     # Python Information
     import sys
-    print(f"🐍 Python Version: {sys.version.split()[0]}")
+    log_ger.info(f"🐍 Python Version: {sys.version.split()[0]}")
     
     # Library Versions
     try:
         import torch
-        print(f"🔥 PyTorch Version: {torch.__version__}")
+        log_ger.info(f"🔥 PyTorch Version: {torch.__version__}")
     except:
         pass
         
     try:
         import cv2
-        print(f"👁️  OpenCV Version: {cv2.__version__}")
+        log_ger.info(f"👁️  OpenCV Version: {cv2.__version__}")
     except:
         pass
         
     try:
         import onnxruntime as ort
-        print(f"🔧 ONNX Runtime Version: {ort.__version__}")
+        log_ger.info(f"🔧 ONNX Runtime Version: {ort.__version__}")
     except:
         pass
     
-    print("="*60)
+    log_ger.info("="*60)
 
 def verify_gpu_usage(face_system):
     """Verify that GPU is actually being used by the models"""
-    print("\n🔍 Verifying GPU usage...")
+    log_ger.info("\n🔍 Verifying GPU usage...")
     
     try:
         # Check YOLO model device
         if hasattr(face_system, 'detection_model') and face_system.detection_model:
             yolo_device = next(face_system.detection_model.model.parameters()).device
-            print(f"🎯 YOLO Model Device: {yolo_device}")
+            log_ger.info(f"🎯 YOLO Model Device: {yolo_device}")
         
         # Check ONNX mask detector
         if hasattr(face_system, 'mask_detector') and face_system.mask_detector:
             providers = face_system.mask_detector.get_providers()
-            print(f"🎯 ONNX Mask Detector Providers: {providers}")
+            log_ger.info(f"🎯 ONNX Mask Detector Providers: {providers}")
             
         # Check DeepFace backend
         try:
             from deepface.commons import functions
             backend = functions.get_backend()
-            print(f"🎯 DeepFace Backend: {backend}")
+            log_ger.info(f"🎯 DeepFace Backend: {backend}")
         except:
-            print("🎯 DeepFace Backend: Could not determine")
+            log_ger.info("🎯 DeepFace Backend: Could not determine")
             
     except Exception as e:
-        print(f"⚠️  GPU verification failed: {e}")
+        log_ger.warning(f"⚠️  GPU verification failed: {e}")
+        
+def validate_email_config(config: dict, test_connection: bool = False) -> None:
+    """Validate email configuration and resolve password; exit with helpful message on failure."""
+    email_cfg = config.get('email', {})
+    
+    # If email is disabled or empty, return
+    if not email_cfg:
+        return
+    
+    # Handle both single dict and list of dicts
+    if isinstance(email_cfg, dict):
+        items = [email_cfg]
+    elif isinstance(email_cfg, list):
+        items = email_cfg
+    else:
+        return  # unexpected type, ignore
+    
+    enabled_items = [item for item in items if item.get('enabled', False)]
+    if not enabled_items:
+        return  # no enabled email
+    
+    for idx, item in enumerate(enabled_items):
+        # Use the same validation logic as before, but with current item
+        password_setting = item.get('smtp_password', '')
+        if not password_setting:
+            log_ger.warning(f"❌ Email enabled for recipient {item.get('recipient', 'unknown')} but 'smtp_password' is missing.")
+            sys.exit(1)
 
+        resolved = None
+        source_desc = "unknown"
+
+        if password_setting.startswith("env:"):
+            env_var = password_setting[4:]
+            resolved = os.environ.get(env_var, "")
+            source_desc = f"environment variable '{env_var}'"
+            if not resolved:
+                log_ger.warning(f"❌ Email enabled for {item.get('recipient', 'unknown')} but {source_desc} is not set or empty.")
+                log_ger.info("\n💡 To fix:")
+                log_ger.info(f"   - Windows (Command Prompt): set {env_var}=your_password")
+                log_ger.info(f"   - Windows (PowerShell):     $env:{env_var} = 'your_password'")
+                log_ger.info(f"   - Linux/macOS:               export {env_var}=your_password")
+                sys.exit(1)
+        elif '/' in password_setting or '\\' in password_setting or password_setting.endswith(('.txt', '.pwd')):
+            source_desc = f"file '{password_setting}'"
+            if not os.path.exists(password_setting):
+                log_ger.warning(f"❌ Email enabled for {item.get('recipient', 'unknown')} but password file '{password_setting}' does not exist.")
+                sys.exit(1)
+            try:
+                with open(password_setting, 'r') as f:
+                    resolved = f.readline().strip()
+                if not resolved:
+                    log_ger.warning(f"❌ Password file '{password_setting}' is empty.")
+                    sys.exit(1)
+            except Exception as e:
+                log_ger.warning(f"❌ Could not read password file '{password_setting}': {e}")
+                sys.exit(1)
+        else:
+            resolved = password_setting
+            source_desc = "plain text in config"
+
+        if not resolved:
+            log_ger.warning(f"❌ Resolved password for {item.get('recipient', 'unknown')} from {source_desc} is empty.")
+            sys.exit(1)
+
+        log_ger.info(f"✅ Email password resolved for {item.get('recipient', 'unknown')} from {source_desc} (length {len(resolved)}).")
+
+        if test_connection:
+            try:
+                import smtplib
+                server = smtplib.SMTP(item.get('smtp_server', 'smtp.gmail.com'),
+                                      item.get('smtp_port', 587))
+                if item.get('use_tls', True):
+                    server.starttls()
+                server.login(item.get('smtp_user', ''), resolved)
+                server.quit()
+                log_ger.info(f"✅ SMTP login successful for {item.get('recipient', 'unknown')} – credentials are valid.")
+            except Exception as e:
+                log_ger.warning(f"❌ SMTP login failed for {item.get('recipient', 'unknown')}: {e}")
+                log_ger.info("   Check your username, password, and SMTP server settings.")
+                sys.exit(1)
+                          
 def get_default_config():
     """Return the complete default configuration"""
     return {
@@ -230,109 +319,109 @@ def get_default_config():
         'enable_person_detection': True,
         'person_detection_confidence_threshold': 0.4,        
         
-    # ========== FRAME PROCESSING CONFIGURATION ==========
-    'frame_processing': {
-        # Basic processing parameters
-        'processing_width': 640,
-        'processing_height': 480,
-        'min_processing_scale': 0.3,
-        'max_processing_scale': 4.5,
-        'default_processing_scale': 1.0,
-        
-        # Color and normalization settings
-        'convert_to_rgb': True,  # Convert BGR to RGB for models that expect RGB
-        'normalize_values': False,  # Normalize pixel values to [0, 1]
-        'apply_mean_std_normalization': False,  # Apply ImageNet mean/std normalization
-        
-        # Normalization values (ImageNet standard)
-        'normalization_mean': [0.485, 0.456, 0.406],
-        'normalization_std': [0.229, 0.224, 0.225],
-        
-        # Debug and validation
-        'debug_mode': False,
-        'validate_frames': True,  # Enable frame validation
-        'frame_validation_threshold': 0.1,  # Reject frames with brightness < 10% or > 90%
-        
-        # Frame statistics collection
-        'collect_frame_stats': True,
-        'stats_update_interval': 30.0,  # Update stats every 30 seconds
-        
-        # Contrast enhancement
-        'contrast_enhancement': {
-            'enabled': True,
-            'method': 'clahe',  # 'clahe', 'histogram', or 'none'
-            'clahe_clip_limit': 3.0,
-            'clahe_grid_size': 8,
+        # ========== FRAME PROCESSING CONFIGURATION ==========
+        'frame_processing': {
+            # Basic processing parameters
+            'processing_width': 640,
+            'processing_height': 480,
+            'min_processing_scale': 0.3,
+            'max_processing_scale': 4.5,
+            'default_processing_scale': 1.0,
+            
+            # Color and normalization settings
+            'convert_to_rgb': True,  # Convert BGR to RGB for models that expect RGB
+            'normalize_values': False,  # Normalize pixel values to [0, 1]
+            'apply_mean_std_normalization': False,  # Apply ImageNet mean/std normalization
+            
+            # Normalization values (ImageNet standard)
+            'normalization_mean': [0.485, 0.456, 0.406],
+            'normalization_std': [0.229, 0.224, 0.225],
+            
+            # Debug and validation
+            'debug_mode': False,
+            'validate_frames': True,  # Enable frame validation
+            'frame_validation_threshold': 0.1,  # Reject frames with brightness < 10% or > 90%
+            
+            # Frame statistics collection
+            'collect_frame_stats': True,
+            'stats_update_interval': 30.0,  # Update stats every 30 seconds
+            
+            # Contrast enhancement
+            'contrast_enhancement': {
+                'enabled': True,
+                'method': 'clahe',  # 'clahe', 'histogram', or 'none'
+                'clahe_clip_limit': 3.0,
+                'clahe_grid_size': 8,
+            },
+            
+            # Region of interest (ROI) extraction
+            'roi_extraction': {
+                'enabled': True,
+                'default_padding': 10,  # Pixels to add around bbox
+                'min_roi_size': 32,  # Minimum ROI size in pixels
+            },
+            
+            # Multi-source composite settings
+            'composite_creation': {
+                'grid_target_width': 480,
+                'grid_target_height': 360,
+                'horizontal_target_height': 360,
+                'vertical_target_width': 480,
+                'maintain_aspect_ratio': True,
+                'max_composite_width': 1920,
+                'max_composite_height': 1080,
+            },
+            
+            # Frame buffering and queuing
+            'frame_buffer': {
+                'buffer_size': 3,
+                'queue_timeout': 0.1,  # seconds
+                'max_queue_size': 100,
+                'drop_old_frames': True,  # Drop old frames when queue is full
+            },
+            
+            # Frame quality assessment
+            'quality_assessment': {
+                'enabled': True,
+                'min_brightness': 20.0,
+                'max_brightness': 235.0,
+                'min_contrast': 10.0,
+                'blur_threshold': 100.0,  # Laplacian variance threshold
+            },
+            
+            # Performance optimization
+            'performance': {
+                'use_half_precision': False,  # Use float16 for processing
+                'enable_caching': True,
+                'cache_size': 10,  # Number of frames to cache
+                'optimize_for_size': True,  # Optimize memory usage
+            },
+            
+            # Frame preprocessing pipeline
+            'preprocessing_pipeline': [
+                'validate_frame',
+                'resize_for_processing',
+                'convert_color_space',
+                'enhance_contrast',
+                'normalize_if_needed'
+            ],
+            
+            # Color space conversion options
+            'color_space_conversion': {
+                'input_format': 'bgr',  # OpenCV default
+                'output_format': 'rgb',  # Most models expect RGB
+                'conversion_method': 'opencv',  # 'opencv', 'numpy', or 'manual'
+            },
+            
+            # Dynamic scaling parameters
+            'dynamic_scaling': {
+                'enabled': True,
+                'min_face_size': 50,  # Minimum face size for scaling decisions
+                'max_face_size': 300,  # Maximum face size for scaling decisions
+                'scale_adjustment_step': 0.1,
+                'stability_threshold': 0.8,  # Confidence threshold for stable scaling
+            },
         },
-        
-        # Region of interest (ROI) extraction
-        'roi_extraction': {
-            'enabled': True,
-            'default_padding': 10,  # Pixels to add around bbox
-            'min_roi_size': 32,  # Minimum ROI size in pixels
-        },
-        
-        # Multi-source composite settings
-        'composite_creation': {
-            'grid_target_width': 480,
-            'grid_target_height': 360,
-            'horizontal_target_height': 360,
-            'vertical_target_width': 480,
-            'maintain_aspect_ratio': True,
-            'max_composite_width': 1920,
-            'max_composite_height': 1080,
-        },
-        
-        # Frame buffering and queuing
-        'frame_buffer': {
-            'buffer_size': 3,
-            'queue_timeout': 0.1,  # seconds
-            'max_queue_size': 100,
-            'drop_old_frames': True,  # Drop old frames when queue is full
-        },
-        
-        # Frame quality assessment
-        'quality_assessment': {
-            'enabled': True,
-            'min_brightness': 20.0,
-            'max_brightness': 235.0,
-            'min_contrast': 10.0,
-            'blur_threshold': 100.0,  # Laplacian variance threshold
-        },
-        
-        # Performance optimization
-        'performance': {
-            'use_half_precision': False,  # Use float16 for processing
-            'enable_caching': True,
-            'cache_size': 10,  # Number of frames to cache
-            'optimize_for_size': True,  # Optimize memory usage
-        },
-        
-        # Frame preprocessing pipeline
-        'preprocessing_pipeline': [
-            'validate_frame',
-            'resize_for_processing',
-            'convert_color_space',
-            'enhance_contrast',
-            'normalize_if_needed'
-        ],
-        
-        # Color space conversion options
-        'color_space_conversion': {
-            'input_format': 'bgr',  # OpenCV default
-            'output_format': 'rgb',  # Most models expect RGB
-            'conversion_method': 'opencv',  # 'opencv', 'numpy', or 'manual'
-        },
-        
-        # Dynamic scaling parameters
-        'dynamic_scaling': {
-            'enabled': True,
-            'min_face_size': 50,  # Minimum face size for scaling decisions
-            'max_face_size': 300,  # Maximum face size for scaling decisions
-            'scale_adjustment_step': 0.1,
-            'stability_threshold': 0.8,  # Confidence threshold for stable scaling
-        },
-    },
         
         # ========== CCTV CONFIGURATION ==========
         'cctv_name': 'Default',  
@@ -622,32 +711,46 @@ def get_default_config():
             'quality_threshold_low': 0.3,
             'face_size_threshold_small': 50,
             'face_size_threshold_large': 200,
-        }
+        },
+        
+        'output': {
+            'root_dir': r'logs-running\magick\runs-magick',                    # Base directory for all runs
+            'create_timestamped_subdir': True,      # Create YYYYMMDD_HHMMSS subfolder
+            'enable_exit_status': True,              # Write exit_status.json on shutdown
+        },
+        'email': [
+            {
+                'enabled': True,
+                'recipient': 'faridraihan17@gmail.com',
+                'language': 'en',          # 'en' or 'id'
+                'attach_zip': True,        # whether to include the ZIP archive
+                # SMTP settings (optional – if not provided, fallback to global)
+                'smtp_server': 'smtp.gmail.com',
+                'smtp_port': 587,
+                'smtp_user': 'faridraihan17@gmail.com',
+                'smtp_password': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\pass.txt',
+                'use_tls': True
+            },
+            {
+                'enabled': True,
+                'recipient': 'humanj241@gmail.com',
+                'language': 'id',          # 'en' or 'id'
+                'attach_zip': False        # whether to include the ZIP archive
+            },            
+            {
+                'enabled': False,
+                'recipient': 'ikeepmypromiz@gmail.com',
+                'language': 'en',          # 'en' or 'id'
+                'attach_zip': True        # whether to include the ZIP archive
+            }
+        ]     
     }
+    
     
 def get_advanced_sources_config():
     """Return advanced sources configuration with parameters"""
     return {
-        # '1': {
-        #     'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/601',
-        #     'description': 'Dekat meja IT',
-        #     'priority': 'low',
-        #     'processing_scale': 1,
-        #     'buffer_size': 100,
-        #     'cctv_name':None,            
-        # },
-        
-        
-        # '2': {
-        #     'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/501',
-        #     'description': 'Dekat meja bu Dyah',
-        #     'priority': 'medium',
-        #     'processing_scale':1,            
-        #     'buffer_size': 100,
-        #     'cctv_name':None,
-        # },
-        
-        '3': {
+        '1': {
             'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/101',
             'description': 'Atas Server Gedangan',
             'priority': 'medium',
@@ -656,15 +759,14 @@ def get_advanced_sources_config():
             'cctv_name':None,
         },
         
-        '4': {
+        '2': {
             'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/601',
             'description': 'Ruang Produksi',
             'priority': 'medium',
             'processing_scale':1,            
             'buffer_size': 100,
             'cctv_name':None,
-   
-        },                               
+        },                                  
     }
         
 def load_custom_config(config_path: str = None) -> Dict:
@@ -674,77 +776,77 @@ def load_custom_config(config_path: str = None) -> Dict:
             import json
             with open(config_path, 'r') as f:
                 custom_config = json.load(f)
-            print(f"✅ Loaded custom configuration from: {config_path}")
+            log_ger.info(f"✅ Loaded custom configuration from: {config_path}")
             return custom_config
         except Exception as e:
-            print(f"❌ Failed to load custom configuration: {e}")
-            print("🔄 Using default configuration")
+            log_ger.warning(f"❌ Failed to load custom configuration: {e}")
+            log_ger.info("🔄 Using default configuration")
     
     return get_default_config()
 
 def test_server_connection(config: dict) -> bool:
     """Test connection to the violation server"""
     if not config.get('server_push_enabled', False):
-        print("📤 Server push disabled, skipping server connection test")
+        log_ger.info("📤 Server push disabled, skipping server connection test")
         return True
         
     server_endpoint = config.get('server_endpoint', '')
     if not server_endpoint:
-        print("❌ No server endpoint configured")
+        log_ger.info("❌ No server endpoint configured")
         return False
         
     try:
         import requests
-        print(f"🔍 Testing server connection: {server_endpoint}")
+        log_ger.info(f"🔍 Testing server connection: {server_endpoint}")
         
         # Test health endpoint
         health_url = server_endpoint.replace('/api/violations', '/api/health')
         response = requests.get(health_url, timeout=10)
         
         if response.status_code == 200:
-            print(f"✅ Server connection successful: {health_url}")
+            log_ger.info(f"✅ Server connection successful: {health_url}")
             return True
         else:
-            print(f"❌ Server health check failed: {response.status_code}")
+            log_ger.warning(f"❌ Server health check failed: {response.status_code}")
             return False
             
     except Exception as e:
-        print(f"❌ Server connection test failed: {e}")
-        print("💡 Make sure the test server is running: python test_upload_server.py")
+        log_ger.warning(f"❌ Server connection test failed: {e}")
+        log_ger.info("💡 Make sure the test server is running: python test_upload_server.py")
         return False
 
 def print_server_push_info(config: dict):
     """Print server push configuration information"""
     if config.get('server_push_enabled', False):
-        print("\n📤 SERVER PUSH CONFIGURATION")
-        print("="*40)
-        print(f"   Endpoint: {config.get('server_endpoint')}")
-        print(f"   Cooldown: {config.get('server_push_cooldown')}s")
-        print(f"   Timeout: {config.get('server_timeout')}s")
-        print(f"   Retry Attempts: {config.get('server_retry_attempts')}")
-        print(f"   CCTV Name: {config.get('cctv_name')}")
-        print("   JSON Structure:")
-        print("     {")
-        print('       "filename": "string",')
-        print('       "image_format": "jpg",')
-        print('       "image_data": "base64_string",')
-        print('       "detected_name": "string",')
-        print('       "cctv_name": "string"')
-        print("     }")
-        print("="*40)
+        log_ger.info("\n📤 SERVER PUSH CONFIGURATION")
+        log_ger.info("="*40)
+        log_ger.info(f"   Endpoint: {config.get('server_endpoint')}")
+        log_ger.info(f"   Cooldown: {config.get('server_push_cooldown')}s")
+        log_ger.info(f"   Timeout: {config.get('server_timeout')}s")
+        log_ger.info(f"   Retry Attempts: {config.get('server_retry_attempts')}")
+        log_ger.info(f"   CCTV Name: {config.get('cctv_name')}")
+        log_ger.info("   JSON Structure:")
+        log_ger.info("     {")
+        log_ger.info('       "filename": "string",')
+        log_ger.info('       "image_format": "jpg",')
+        log_ger.info('       "image_data": "base64_string",')
+        log_ger.info('       "detected_name": "string",')
+        log_ger.info('       "cctv_name": "string"')
+        log_ger.info("     }")
+        log_ger.info("="*40)
 
 def print_multi_source_info(sources_config: Dict[str, Dict]):
     """Print multi-source configuration information"""
-    print("\n🎯 MULTI-SOURCE CONFIGURATION")
-    print("="*50)
+    log_ger.info("\n🎯 MULTI-SOURCE CONFIGURATION")
+    log_ger.info("="*50)
     for source_id, source_config in sources_config.items():
-        print(f"📹 {source_id}:")
-        print(f"   URL: {source_config.get('url', 'N/A')}")
-        print(f"   Description: {source_config.get('description', 'No description')}")
-        print(f"   Priority: {source_config.get('priority', 'medium')}")
-        print(f"   CCTV Name: {source_config.get('cctv_name', 'Unknown')}")
-        print(f"   Processing Scale: {source_config.get('processing_scale', 1.0)}")
-    print("="*50)
+        log_ger.info(f"📹 {source_id}:")
+        log_ger.info(f"   URL: {source_config.get('url', 'N/A')}")
+        log_ger.info(f"   Description: {source_config.get('description', 'No description')}")
+        log_ger.info(f"   Priority: {source_config.get('priority', 'medium')}")
+        log_ger.info(f"   CCTV Name: {source_config.get('cctv_name', 'Unknown')}")
+        log_ger.info(f"   Processing Scale: {source_config.get('processing_scale', 1.0)}")
+    log_ger.info("="*50)
 
 def print_verification_summary(processor):
     """Print comprehensive verification summary from TrackingManager"""
@@ -752,19 +854,19 @@ def print_verification_summary(processor):
         if hasattr(processor, 'get_verification_stats'):
             stats = processor.get_verification_stats()
             
-            print("\n" + "="*60)
-            print("✅ TRACKING MANAGER VERIFICATION SUMMARY")
-            print("="*60)
+            log_ger.info("\n" + "="*60)
+            log_ger.info("✅ TRACKING MANAGER VERIFICATION SUMMARY")
+            log_ger.info("="*60)
             
             # Aggregate stats
             aggregate = stats.get('aggregate', {})
-            print(f"\n📊 AGGREGATE STATISTICS:")
-            print(f"   Total Detected: {aggregate.get('total_detected', 0)}")
-            print(f"   Total Verified: {aggregate.get('total_verified', 0)}")
-            print(f"   Total Rejected: {aggregate.get('total_rejected', 0)}")
-            print(f"   False Positives Prevented: {aggregate.get('false_positives_prevented', 0)}")
-            print(f"   Active Violation Tracks: {aggregate.get('active_tracks', 0)}")
-            print(f"   Currently Verified: {aggregate.get('currently_verified', 0)}")
+            log_ger.info(f"\n📊 AGGREGATE STATISTICS:")
+            log_ger.info(f"   Total Detected: {aggregate.get('total_detected', 0)}")
+            log_ger.info(f"   Total Verified: {aggregate.get('total_verified', 0)}")
+            log_ger.info(f"   Total Rejected: {aggregate.get('total_rejected', 0)}")
+            log_ger.info(f"   False Positives Prevented: {aggregate.get('false_positives_prevented', 0)}")
+            log_ger.info(f"   Active Violation Tracks: {aggregate.get('active_tracks', 0)}")
+            log_ger.info(f"   Currently Verified: {aggregate.get('currently_verified', 0)}")
             
             # Calculate rates
             total_detected = max(1, aggregate.get('total_detected', 1))
@@ -772,57 +874,57 @@ def print_verification_summary(processor):
             total_rejected = aggregate.get('total_rejected', 0)
             false_positives_prevented = aggregate.get('false_positives_prevented', 0)
             
-            print(f"\n📈 VERIFICATION SYSTEM METRICS:")
+            log_ger.info(f"\n📈 VERIFICATION SYSTEM METRICS:")
             
             # 1. What percentage of detections were verified?
             verification_success_rate = (total_verified / total_detected) * 100
-            print(f"   Verified Detections: {verification_success_rate:.1f}% ({total_verified}/{total_detected})")
+            log_ger.info(f"   Verified Detections: {verification_success_rate:.1f}% ({total_verified}/{total_detected})")
             
             # 2. What percentage of detections were rejected?
             rejection_rate = (total_rejected / total_detected) * 100
-            print(f"   Rejected Detections: {rejection_rate:.1f}% ({total_rejected}/{total_detected})")
+            log_ger.info(f"   Rejected Detections: {rejection_rate:.1f}% ({total_rejected}/{total_detected})")
             
             # 3. Of the rejected detections, how many were false positives?
             if total_rejected > 0:
                 false_positive_catch_rate = (false_positives_prevented / total_rejected) * 100
-                print(f"   False Positives Caught: {false_positive_catch_rate:.1f}% ({false_positives_prevented}/{total_rejected})")
+                log_ger.info(f"   False Positives Caught: {false_positive_catch_rate:.1f}% ({false_positives_prevented}/{total_rejected})")
             else:
-                print(f"   False Positives Caught: N/A (no rejected detections)")
+                log_ger.info(f"   False Positives Caught: N/A (no rejected detections)")
             
             # 4. Overall system accuracy (if we assume verified = correct)
             total_decisions = total_verified + total_rejected
             if total_decisions > 0:
                 accuracy = ((total_verified + false_positives_prevented) / total_decisions) * 100
-                print(f"   System Accuracy: {accuracy:.1f}%")
+                log_ger.info(f"   System Accuracy: {accuracy:.1f}%")
             else:
-                print(f"   System Accuracy: N/A (no decisions made)")
+                log_ger.info(f"   System Accuracy: N/A (no decisions made)")
             
             # Per-source stats
             per_source = stats.get('per_source', {})
             if per_source:
-                print(f"\n📊 PER-SOURCE STATISTICS:")
+                log_ger.info(f"\n📊 PER-SOURCE STATISTICS:")
                 for source_id, source_stats in per_source.items():
-                    print(f"\n   📹 Source: {source_id}")
-                    print(f"      Detected: {source_stats.get('total_detected', 0)}")
-                    print(f"      Verified: {source_stats.get('total_verified', 0)}")
-                    print(f"      Rejected: {source_stats.get('total_rejected', 0)}")
-                    print(f"      Active Tracks: {source_stats.get('active_violation_tracks', 0)}")
+                    log_ger.info(f"\n   📹 Source: {source_id}")
+                    log_ger.info(f"      Detected: {source_stats.get('total_detected', 0)}")
+                    log_ger.info(f"      Verified: {source_stats.get('total_verified', 0)}")
+                    log_ger.info(f"      Rejected: {source_stats.get('total_rejected', 0)}")
+                    log_ger.info(f"      Active Tracks: {source_stats.get('active_violation_tracks', 0)}")
             
             # System stats
             system_stats = stats.get('system_stats', {})
             if system_stats:
-                print(f"\n📊 SYSTEM STATISTICS:")
-                print(f"   Total Logged: {system_stats.get('total_logged', 0)}")
-                print(f"   Verified Logged: {system_stats.get('verified_logged', 0)}")
+                log_ger.info(f"\n📊 SYSTEM STATISTICS:")
+                log_ger.info(f"   Total Logged: {system_stats.get('total_logged', 0)}")
+                log_ger.info(f"   Verified Logged: {system_stats.get('verified_logged', 0)}")
                 
                 if system_stats.get('last_verified_time'):
                     last_time = datetime.datetime.fromtimestamp(system_stats['last_verified_time'])
-                    print(f"   Last Verified: {last_time.strftime('%H:%M:%S')}")
+                    log_ger.info(f"   Last Verified: {last_time.strftime('%H:%M:%S')}")
             
-            print("="*60)
+            log_ger.info("="*60)
             
     except Exception as e:
-        print(f"⚠️ Error printing verification summary: {e}")
+        log_ger.warning(f"⚠️ Error printing verification summary: {e}")
         
 def monitor_verification_performance(processor, interval_seconds=30):
     """Monitor verification performance periodically"""
@@ -832,15 +934,23 @@ def monitor_verification_performance(processor, interval_seconds=30):
                 print_verification_summary(processor)
                 time.sleep(interval_seconds)
             except Exception as e:
-                print(f"⚠️ Verification monitoring error: {e}")
+                log_ger.warning(f"⚠️ Verification monitoring error: {e}")
                 time.sleep(interval_seconds)
     
     monitor_thread = threading.Thread(target=monitor_worker, daemon=True, name="verification_monitor")
     monitor_thread.start()
-    print(f"📊 Started verification performance monitoring (interval: {interval_seconds}s)")
+    log_ger.info(f"📊 Started verification performance monitoring (interval: {interval_seconds}s)")
 
 
 def main():
+    # === UNIFIED LOGGING CONFIGURATION ===
+    import logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    # ======================================
+
     # Load configuration
     import argparse
     parser = argparse.ArgumentParser(description='Run modular face recognition system')
@@ -853,26 +963,36 @@ def main():
     parser.add_argument('--cctv-name', type=str, help='Override CCTV name')
     parser.add_argument('--no-server-push', action='store_true', help='Disable server push')
     parser.add_argument('--test-server', action='store_true', help='Test server connection before starting')
+    parser.add_argument('--test-email', action='store_true', help='Test email connection before starting')
     args = parser.parse_args()
     
     # Load configuration
     config = load_custom_config(args.config)
+    # validate_email_config(config, test_connection=args.test_email)  
+    
+    # Resolve output.root_dir relative to LOG_ROOT if it's a relative path
+    if 'output' in config and 'root_dir' in config['output']:
+        root_dir = config['output']['root_dir']
+        if not os.path.isabs(root_dir):
+            # Convert to absolute path using LOG_ROOT
+            config['output']['root_dir'] = str(LOG_ROOT / root_dir)
+            log_ger.info(f"📁 Output root resolved to: {config['output']['root_dir']}")    
     
     # Override GPU setting if requested
     if args.no_gpu:
         config['use_gpu'] = False
-        print("🎮 GPU acceleration disabled via command line")
+        log_ger.info("🎮 GPU acceleration disabled via command line")
     
     # Override server push setting if requested
     if args.no_server_push:
         config['server_push_enabled'] = False
-        print("📤 Server push disabled via command line")
+        log_ger.info("📤 Server push disabled via command line")
     
     # Print system information
     print_system_info(config)
     
     # Check GPU availability and update config
-    print("\n🔍 Checking GPU availability...")
+    log_ger.info("\n🔍 Checking GPU availability...")
     config = check_gpu_availability(config)
     check_onnx_gpu_availability()
     
@@ -882,7 +1002,7 @@ def main():
         # Optimize for GPU
         os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
         os.environ['TF_GPU_THREAD_MODE'] = 'gpu_private'
-        print("🎯 Set GPU environment variables")
+        log_ger.info("🎯 Set GPU environment variables")
     
     # Load multi-source configuration if enabled
     if args.multi_source:
@@ -891,66 +1011,41 @@ def main():
                 import json
                 with open(args.sources_config, 'r') as f:
                     sources_config = json.load(f)
-                print(f"✅ Loaded multi-source configuration from: {args.sources_config}")
+                log_ger.info(f"✅ Loaded multi-source configuration from: {args.sources_config}")
             except Exception as e:
-                print(f"❌ Failed to load multi-source configuration: {e}")
-                print("🔄 Using default multi-source configuration")
+                log_ger.warning(f"❌ Failed to load multi-source configuration: {e}")
+                log_ger.info("🔄 Using default multi-source configuration")
                 sources_config = get_advanced_sources_config()
         else:
-            print("🔄 Using default multi-source configuration")
+            log_ger.info("🔄 Using default multi-source configuration")
             sources_config = get_advanced_sources_config()
         
         print_multi_source_info(sources_config)
         
         # Test multi-stream connections
         if not test_multi_stream_connections(sources_config):
-            print("❌ Multi-stream connection test failed. Please check:")
-            print("   - Camera connections")
-            print("   - RTSP URLs and credentials") 
-            print("   - Network connectivity")
+            log_ger.info("❌ Multi-stream connection test failed. Please check:")
+            log_ger.info("   - Camera connections")
+            log_ger.info("   - RTSP URLs and credentials") 
+            log_ger.info("   - Network connectivity")
             return
-    else:
-        # Single source mode
-        #camera_source = args.camera
-        rtsp_source = args.rtsp
-
-        print(f"\n📹 Single Source Mode:")
-        print(f"CURRENTLY DISABLED!")
-        #print(f"   Camera Source: {camera_source}")
-        print(f"   RTSP Source: {rtsp_source}")
-        
-        # For single source, create a sources_config with one entry
-        sources_config = {
-            'main_camera': {
-                'url': rtsp_source,
-                'description': 'Main Camera',
-                'priority': 'high',
-                'processing_scale': 1.0,
-                'buffer_size': 3,
-                'cctv_name': args.cctv_name or config.get('cctv_name', 'Main-Camera')
-            }
-        }
-        
-        # Test single stream connection
-        if not test_multi_stream_connections(sources_config):
-            print("❌ Stream connection test failed.")
-            return
+ 
     
     # Test server connection if enabled and requested
     if config.get('server_push_enabled', False) and args.test_server:
         if not test_server_connection(config):
-            print("❌ Server connection test failed. Continue without server push? (y/n)")
+            log_ger.info("❌ Server connection test failed. Continue without server push? (y/n)")
             choice = input().strip().lower()
             if choice != 'y':
-                print("🛑 Exiting...")
+                log_ger.info("🛑 Exiting...")
                 return
             else:
                 config['server_push_enabled'] = False
-                print("⚠️  Continuing without server push")
+                log_ger.warning(f"⚠️  Continuing without server push")
                 
     
     # Create robust face recognition system using factory
-    print("\n🔄 Creating face recognition system...")
+    log_ger.info("\n🔄 Creating face recognition system...")
     try:
         face_system = create_system(config, system_type="robust_face_recognition")
         
@@ -958,8 +1053,8 @@ def main():
         verify_gpu_usage(face_system)
         
     except Exception as e:
-        print(f"❌ Failed to create face recognition system: {e}")
-        print("🔄 Falling back to CPU mode...")
+        log_ger.warning(f"❌ Failed to create face recognition system: {e}")
+        log_ger.info("🔄 Falling back to CPU mode...")
         config['use_gpu'] = False
         face_system = create_system(config, system_type="robust_face_recognition")
     
@@ -1004,32 +1099,32 @@ def main():
         processor.apply_verification_config(verification_config)
     
     # Print comprehensive configuration status
-    print("\n" + "="*60)
-    print("🎯 MULTI-SOURCE SYSTEM CONFIGURATION STATUS")
-    print("="*60)
-    print(f"📊 Sources: {len(sources_config)} cameras configured")
-    #print(f"📊 Processing: Interval={config['processing_interval']}, Buffer={config['buffer_size']}")
-    print(f"🔍 Detection: Confidence={config['detection_confidence']}, Recognition Threshold={config['recognition_threshold']}")
-    print(f"🎯 Face Tracking: {'ENABLED' if config['tracking']['enabled'] else 'DISABLED'}")
+    log_ger.info("\n" + "="*60)
+    log_ger.info("🎯 MULTI-SOURCE SYSTEM CONFIGURATION STATUS")
+    log_ger.info("="*60)
+    log_ger.info(f"📊 Sources: {len(sources_config)} cameras configured")
+    #log_ger.info(f"📊 Processing: Interval={config['processing_interval']}, Buffer={config['buffer_size']}")
+    log_ger.info(f"🔍 Detection: Confidence={config['detection_confidence']}, Recognition Threshold={config['recognition_threshold']}")
+    log_ger.info(f"🎯 Face Tracking: {'ENABLED' if config['tracking']['enabled'] else 'DISABLED'}")
     
-    # 🆕 NEW: Print verification configuration
+    # Print verification configuration
     if config['tracking'].get('violation_verification_enabled', False):
-        print(f"✅ Violation Verification: ENABLED")
-        print(f"   - Min Duration: {config['tracking'].get('min_violation_duration', 5.0)}s")
-        print(f"   - Min Frames: {config['tracking'].get('min_violation_frames', 5)}")
-        print(f"   - Confidence Threshold: {config['tracking'].get('violation_confidence_threshold', 0.85)}")
+        log_ger.info(f"✅ Violation Verification: ENABLED")
+        log_ger.info(f"   - Min Duration: {config['tracking'].get('min_violation_duration', 5.0)}s")
+        log_ger.info(f"   - Min Frames: {config['tracking'].get('min_violation_frames', 5)}")
+        log_ger.info(f"   - Confidence Threshold: {config['tracking'].get('violation_confidence_threshold', 0.85)}")
     else:
-        print(f"✅ Violation Verification: DISABLED")
+        log_ger.info(f"✅ Violation Verification: DISABLED")
     
-    print(f"📝 Logging: {'ENABLED' if config['enable_logging'] else 'DISABLED'}")
-    print(f"🔊 Alerts: {'ENABLED' if config['enable_voice_alerts'] else 'DISABLED'}")
-    print(f"📤 Server Push: {'ENABLED' if config['server_push_enabled'] else 'DISABLED'}")
-    print(f"🐛 Debug: {'ENABLED' if config['debug']['enabled'] else 'DISABLED'}")
-    print(f"🖼️  Display Layout: {getattr(processor, 'display_layout', 'grid')}")
-    print(f"🎮 GPU Acceleration: {'ENABLED' if config['use_gpu'] else 'DISABLED'}")
+    log_ger.info(f"📝 Logging: {'ENABLED' if config['enable_logging'] else 'DISABLED'}")
+    log_ger.info(f"🔊 Alerts: {'ENABLED' if config['enable_voice_alerts'] else 'DISABLED'}")
+    log_ger.info(f"📤 Server Push: {'ENABLED' if config['server_push_enabled'] else 'DISABLED'}")
+    log_ger.info(f"🐛 Debug: {'ENABLED' if config['debug']['enabled'] else 'DISABLED'}")
+    log_ger.info(f"🖼️  Display Layout: {getattr(processor, 'display_layout', 'grid')}")
+    log_ger.info(f"🎮 GPU Acceleration: {'ENABLED' if config['use_gpu'] else 'DISABLED'}")
     if config['use_gpu']:
-        print(f"🎮 GPU Device: {config['gpu_device']}")
-    print("="*60)
+        log_ger.info(f"🎮 GPU Device: {config['gpu_device']}")
+    log_ger.info("="*60)
     
     
     # Print server push details if enabled
@@ -1060,75 +1155,75 @@ def main():
     
     
     # Final system readiness check
-    print("\n🔍 FINAL SYSTEM READINESS CHECK")
-    print("="*40)
-    print(f"📹 Sources: {len(sources_config)} cameras ready")
+    log_ger.info("\n🔍 FINAL SYSTEM READINESS CHECK")
+    log_ger.info("="*40)
+    log_ger.info(f"📹 Sources: {len(sources_config)} cameras ready")
     for source_id in sources_config.keys():
-        print(f"   - {source_id}")
-    print(f"🎮 GPU: {'READY' if config['use_gpu'] else 'CPU MODE'}")
-    print(f"📤 Server Push: {'READY' if config['server_push_enabled'] else 'DISABLED'}")
-    print(f"🔊 Audio Alerts: {'READY' if config['enable_voice_alerts'] else 'DISABLED'}")
-    print(f"🎯 Tracking: {'READY' if config['tracking']['enabled'] else 'DISABLED'}")
-    print(f"✅ Violation Verification: {'READY' if config['tracking'].get('violation_verification_enabled', False) else 'DISABLED'}")
-    print("="*40)
+        log_ger.info(f"   - {source_id}")
+    log_ger.info(f"🎮 GPU: {'READY' if config['use_gpu'] else 'CPU MODE'}")
+    log_ger.info(f"📤 Server Push: {'READY' if config['server_push_enabled'] else 'DISABLED'}")
+    log_ger.info(f"🔊 Audio Alerts: {'READY' if config['enable_voice_alerts'] else 'DISABLED'}")
+    log_ger.info(f"🎯 Tracking: {'READY' if config['tracking']['enabled'] else 'DISABLED'}")
+    log_ger.info(f"✅ Violation Verification: {'READY' if config['tracking'].get('violation_verification_enabled', False) else 'DISABLED'}")
+    log_ger.info("="*40)
     
-    # 🆕 NEW: Print verification-specific controls
-    print("\n🎮 VERIFICATION CONTROLS:")
-    print("   [V] - Toggle violation verification")
-    print("   [S] - Show verification statistics")
-    print("   [M] - Start verification monitoring")    
+    # Print verification-specific controls
+    log_ger.info("\n🎮 VERIFICATION CONTROLS:")
+    log_ger.info("   [V] - Toggle violation verification")
+    log_ger.info("   [S] - Show verification statistics")
+    log_ger.info("   [M] - Start verification monitoring")    
     
     # Print multi-source controls
-    print("\n🎮 MULTI-SOURCE CONTROLS:")
-    print("   [m] - Cycle through display layouts (grid, horizontal, vertical)")
-    print("   [n] - Toggle source health display")
-    print("   [0] - Show source health report")
-    print("   [l] - Toggle logging")
-    print("   [v] - Toggle voice alerts")
-    print("   [p] - Toggle performance stats")
-    print("   [d] - Toggle debug mode")
-    print("   [q] - Quit")
+    log_ger.info("\n🎮 MULTI-SOURCE CONTROLS:")
+    log_ger.info("   [m] - Cycle through display layouts (grid, horizontal, vertical)")
+    log_ger.info("   [n] - Toggle source health display")
+    log_ger.info("   [0] - Show source health report")
+    log_ger.info("   [l] - Toggle logging")
+    log_ger.info("   [v] - Toggle voice alerts")
+    log_ger.info("   [p] - Toggle performance stats")
+    log_ger.info("   [d] - Toggle debug mode")
+    log_ger.info("   [q] - Quit")
     
     # Add a small delay to ensure everything is ready
-    print("\n⏳ Starting multi-source processing in 3 seconds...")
+    log_ger.info("\n⏳ Starting multi-source processing in 3 seconds...")
     time.sleep(3)
     
     # 🆕 CRITICAL: Ensure ImageLoggers are created for all sources
-    print("\n🔍 ENSURING IMAGE LOGGERS ARE CREATED FOR ALL SOURCES")
+    log_ger.info("\n🔍 ENSURING IMAGE LOGGERS ARE CREATED FOR ALL SOURCES")
     for source_id in sources_config.keys():
         if source_id in processor.active_sources:
-            print(f"🔄 Ensuring ImageLogger for: {source_id}")
+            log_ger.info(f"🔄 Ensuring ImageLogger for: {source_id}")
             success = processor.force_create_image_logger(source_id)
             if success:
-                print(f"✅ ImageLogger created for: {source_id}")
+                log_ger.info(f"✅ ImageLogger created for: {source_id}")
             else:
-                print(f"❌ Failed to create ImageLogger for: {source_id}")
+                log_ger.warning(f"❌ Failed to create ImageLogger for: {source_id}")
 
     # 🆕 DEBUG: Check CCTV names before starting
-    print("\n🔍 PRE-START CCTV NAME CHECK")
+    log_ger.info("\n🔍 PRE-START CCTV NAME CHECK")
     processor.debug_cctv_names()
         
     # Start multi-source processing
     try:
         # 🆕 ONLY ONE SOURCE ADDITION BLOCK
-        print("\n🎯 ADDING SOURCES WITH DYNAMIC CCTV NAMING")
-        print("="*50)
+        log_ger.info("\n🎯 ADDING SOURCES WITH DYNAMIC CCTV NAMING")
+        log_ger.info("="*50)
 
         # First, remove any existing sources to start fresh
         existing_sources = list(processor.stream_managers.keys())
         for source_id in existing_sources:
-            print(f"🔄 Removing existing source: {source_id}")
+            log_ger.info(f"🔄 Removing existing source: {source_id}")
             processor.remove_source(source_id)
 
         # Now add the sources with proper dynamic naming
         for source_id, source_config in sources_config.items():
-            print(f"📹 Adding source: {source_id}")
+            log_ger.info(f"📹 Adding source: {source_id}")
             
             # 🆕 DEBUG: Test CCTV naming before adding
             test_url = source_config.get('url', '')
             if test_url:
                 extracted_name = processor._extract_cctv_name_from_url(test_url, source_id)
-                print(f"   🔍 CCTV name extraction test: {extracted_name}")
+                log_ger.info(f"   🔍 CCTV name extraction test: {extracted_name}")
             
             success = processor.add_source(source_id, source_config)
             if success:
@@ -1136,11 +1231,11 @@ def main():
                 source_info = processor.get_source_info(source_id)
                 if source_info:
                     actual_cctv_name = source_info.get('cctv_name', 'Unknown')
-                    print(f"✅ Successfully added {source_id} → {actual_cctv_name}")
+                    log_ger.info(f"✅ Successfully added {source_id} → {actual_cctv_name}")
             else:
-                print(f"❌ Failed to add {source_id}")
+                log_ger.warning(f"❌ Failed to add {source_id}")
 
-        print("="*50)
+        log_ger.info("="*50)
         
         # Print all sources information
         processor.print_all_sources_info()
@@ -1148,27 +1243,35 @@ def main():
         # Print CCTV mapping
         processor.print_cctv_mapping()
         
-        # 🆕 CRITICAL: Setup logging ONLY ONCE after all sources are added
-        print("\n🔄 Setting up multi-source logging with dynamic CCTV names...")
+        # Setup logging ONLY ONCE after all sources are added, because this is creating run directory.
+        log_ger.info("\n🔄 Setting up multi-source logging with dynamic CCTV names...")
         processor.setup_multi_source_logging()
+
+        
+        if processor.run_dir:
+            log_file = os.path.join(processor.run_dir, 'console.log')
+            file_handler = logging.FileHandler(log_file, encoding='utf-8')
+            file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+            logging.getLogger().addHandler(file_handler)
+            log_ger.info(f"📄 Console output will also be written to {log_file}")        
         
         # Run the multi-source processing
         processor.run_multi_source_stable(sources_config)
         
-        # 🆕 NEW: Start verification performance monitoring
-        print("\n📊 Starting verification performance monitoring...")
+        # Start verification performance monitoring
+        log_ger.info("\n📊 Starting verification performance monitoring...")
         monitor_verification_performance(processor, interval_seconds=60)
         
         
     except KeyboardInterrupt:
-        print("\n🛑 Shutting down by user request...")
+        log_ger.info("\n🛑 Shutting down by user request...")
         
-        # 🆕 NEW: Print final verification summary
-        print("\n📊 FINAL VERIFICATION SUMMARY:")
+        # Print final verification summary
+        log_ger.info("\n📊 FINAL VERIFICATION SUMMARY:")
         print_verification_summary(processor)
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        log_ger.warning(f"❌ Error: {e}")
         import traceback
         traceback.print_exc()
     finally:
@@ -1176,4 +1279,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
