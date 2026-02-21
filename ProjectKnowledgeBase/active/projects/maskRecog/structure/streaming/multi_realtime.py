@@ -57,6 +57,11 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         self._shutdown_event = Event()
         self.running = False
         
+        # Shutdown variable
+        self.shutdown_at = config.get('shutdown_at')
+        self.shutdown_target_time = None   # will store datetime object
+        self.shutdown_remaining = None      # initial seconds until shutdown        
+        
         # Multi-source management with thread safety
         self.stream_managers: Dict[str, StreamManager] = {}
         self.active_sources: List[str] = []
@@ -2977,6 +2982,25 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 logger.warning("❌ No valid sources could be initialized")
                 return
 
+            # Parse shutdown_at if provided
+            if self.shutdown_at:
+                try:
+                    # Try to parse as HH:MM:SS (today's date)
+                    shutdown_time = datetime.datetime.strptime(self.shutdown_at, "%H:%M:%S").time()
+                    now = datetime.datetime.now()
+                    self.shutdown_target_time = datetime.datetime.combine(now.date(), shutdown_time)
+                    # If the time is already past today, schedule for tomorrow
+                    if self.shutdown_target_time <= now:
+                        self.shutdown_target_time += datetime.timedelta(days=1)
+                        logger.info(f"⏰ Shutdown time {self.shutdown_at} is in the past, scheduling for tomorrow")
+                    self.shutdown_remaining = (self.shutdown_target_time - now).total_seconds()
+                    logger.info(f"⏰ Automatic shutdown scheduled at {self.shutdown_target_time.strftime('%Y-%m-%d %H:%M:%S')} "
+                                f"(in {self.shutdown_remaining:.0f} seconds)")
+                except Exception as e:
+                    logger.warning(f"⚠️ Invalid shutdown_at format: {self.shutdown_at}. Should be HH:MM:SS. Disabling timer.")
+                    self.shutdown_target_time = None
+                    self.shutdown_remaining = None
+
             # Set running flag and start threads
             self.running = True
             logger.info(f"🎬 Starting stabilized multi-source processing with {success_count} sources")
@@ -3026,6 +3050,18 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                             except Exception as e:
                                 logger.warning(f"⚠️ Processing error for {source_id}: {e}")
                                 all_results[source_id] = []
+                                
+                    # ---------- SHUTDOWN TIMER CHECK ----------
+                    if self.shutdown_target_time is not None:
+                        now = datetime.datetime.now()
+                        if now >= self.shutdown_target_time:
+                            logger.warning(f"⏰ Shutdown time reached ({self.shutdown_target_time.strftime('%H:%M:%S')}). Stopping...")
+                            self.running = False
+                            break
+                        # Optionally log remaining time every ~100 frames
+                        if self.processing_count % 100 == 0:
+                            remaining = (self.shutdown_target_time - now).total_seconds()
+                            logger.info(f"⏰ Shutdown in {remaining:.0f} seconds")                                
 
                     # ---------- GUI MODE ----------
                     if not self.headless:

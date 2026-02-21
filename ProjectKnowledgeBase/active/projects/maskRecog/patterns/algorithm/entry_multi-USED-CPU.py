@@ -603,7 +603,7 @@ def get_default_config():
         
         # ========== SERVER PUSH CONFIGURATION ==========        
         'server_push_enabled': True,
-        'server_endpoint': 'https://vps.scasda.my.id//actions/foto_pusat_data_unggah.php',
+        'server_endpoint': '',
         'server_push_cooldown': 5,
         'server_timeout': 10,
         'server_retry_attempts': 10,
@@ -696,6 +696,7 @@ def get_default_config():
         'headless': True,
         'use_gpu': False,
         'gpu_device': 0,
+        'shutdown_at' : '12:53', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours
         
         # ========== ANNOTATION CONFIGURATION ==========
         'annotation_box_thickness': 1,
@@ -713,11 +714,14 @@ def get_default_config():
             'face_size_threshold_large': 200,
         },
         
+        # Automatic folder location
         'output': {
             'root_dir': r'logs-running\magick\runs-magick',                    # Base directory for all runs
             'create_timestamped_subdir': True,      # Create YYYYMMDD_HHMMSS subfolder
             'enable_exit_status': True,              # Write exit_status.json on shutdown
         },
+        
+        # Email sending config
         'email': [
             {
                 'enabled': True,
@@ -768,7 +772,7 @@ def get_advanced_sources_config():
             'cctv_name':None,
         },                                  
     }
-         
+            
 def load_custom_config(config_path: str = None) -> Dict:
     """Load custom configuration from file if provided"""
     if config_path and os.path.exists(config_path):
@@ -964,6 +968,7 @@ def main():
     parser.add_argument('--no-server-push', action='store_true', help='Disable server push')
     parser.add_argument('--test-server', action='store_true', help='Test server connection before starting')
     parser.add_argument('--test-email', action='store_true', help='Test email connection before starting')
+    parser.add_argument('--shutdown-at', type=str, help='Automatically shutdown at specified time (HH:MM:SS)')
     args = parser.parse_args()
     
     # Load configuration
@@ -976,7 +981,12 @@ def main():
         if not os.path.isabs(root_dir):
             # Convert to absolute path using LOG_ROOT
             config['output']['root_dir'] = str(LOG_ROOT / root_dir)
-            log_ger.info(f"📁 Output root resolved to: {config['output']['root_dir']}")    
+            log_ger.info(f"📁 Output root resolved to: {config['output']['root_dir']}")
+            
+    # Initiate automatic shutdown        
+    if args.shutdown_at:
+        config['shutdown_at'] = args.shutdown_at
+        log_ger.info(f"⏰ Shutdown scheduled at {args.shutdown_at}")            
     
     # Override GPU setting if requested
     if args.no_gpu:
