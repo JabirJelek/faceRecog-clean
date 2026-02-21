@@ -16,12 +16,13 @@ class VoiceInterface:
     
     def __init__(self, config: Dict[str, Any]):
         self.config = config
+        self.logger = logging.getLogger(__name__)        
         self.server_url = config.get('alert_server_url')
         self.timeout = config.get('voice_timeout', 5)
         self.max_retries = config.get('voice_max_retries', 2)
         self.retry_delay = config.get('voice_retry_delay', 1.0)
         
-        self.logger = logging.getLogger(__name__)
+
         self.session = requests.Session()
         
         # Set default headers

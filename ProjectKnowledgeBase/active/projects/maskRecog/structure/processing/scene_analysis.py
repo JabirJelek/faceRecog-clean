@@ -13,12 +13,14 @@ class SceneContextAnalyzer:
     
     def __init__(self, config: Dict):
         self.config = config
+        # Initialize logger
+        self.logger = logging.getLogger(__name__)
+                
         self.previous_frame = None
         self.motion_history = deque(maxlen=30)
         self.context_history = deque(maxlen=50)
         
-        # Initialize logger
-        self.logger = logging.getLogger(__name__)
+
         
         # Context thresholds
         self.thresholds = {

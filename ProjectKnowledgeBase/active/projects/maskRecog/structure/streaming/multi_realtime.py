@@ -235,24 +235,24 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         
         logger.info(f"📁 Run directory created: {self.run_dir}")
     
-    def _setup_file_logging(self):
-        """Redirect stdout/stderr to a log file inside run_dir."""
-        log_file = os.path.join(self.run_dir, 'console.log')
-        self.log_file_handle = open(log_file, 'w', encoding='utf-8')
-        # Save original streams to restore later if needed
-        self._original_stdout = sys.stdout
-        self._original_stderr = sys.stderr
-        sys.stdout = self.log_file_handle
-        sys.stderr = self.log_file_handle
-        logger.info(f"📄 Console output redirected to {log_file}")
+    # def _setup_file_logging(self):
+    #     """Redirect stdout/stderr to a log file inside run_dir."""
+    #     log_file = os.path.join(self.run_dir, 'console.log')
+    #     self.log_file_handle = open(log_file, 'w', encoding='utf-8')
+    #     # Save original streams to restore later if needed
+    #     self._original_stdout = sys.stdout
+    #     self._original_stderr = sys.stderr
+    #     sys.stdout = self.log_file_handle
+    #     sys.stderr = self.log_file_handle
+    #     logger.info(f"📄 Console output redirected to {log_file}")
     
-    def _restore_file_logging(self):
-        """Restore original stdout/stderr and close log file."""
-        if hasattr(self, 'log_file_handle') and self.log_file_handle:
-            sys.stdout = self._original_stdout
-            sys.stderr = self._original_stderr
-            self.log_file_handle.close()
-            logger.info("📄 Console logging restored")
+    # def _restore_file_logging(self):
+    #     """Restore original stdout/stderr and close log file."""
+    #     if hasattr(self, 'log_file_handle') and self.log_file_handle:
+    #         sys.stdout = self._original_stdout
+    #         sys.stderr = self._original_stderr
+    #         self.log_file_handle.close()
+    #         logger.info("📄 Console logging restored")
     
     # ========== NEW: EXIT STATUS ==========
     
@@ -2968,9 +2968,6 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             if self.run_dir is None:
                 self._create_run_directory()
             
-            # Redirect console output to file
-            self._setup_file_logging()
-            
             # Initialize sources
             success_count = self.apply_multi_source_config(sources_config)
             
@@ -3075,9 +3072,6 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 zip_path = self._zip_run_directory()
                 if zip_path:
                     self._send_email(zip_path)   
-            
-            # Restore console output before closing (so logger.infos go to terminal)
-            self._restore_file_logging()
             
             # Close all resources
             self.close()                  

@@ -17,6 +17,7 @@ class FaceDetectionSystem:
     
     def __init__(self, config: Dict[str, Any]):
         self.config = config
+        self.logger = logging.getLogger(__name__)        
         self.detection_model = None
         self.model_loaded = False
         
@@ -29,7 +30,7 @@ class FaceDetectionSystem:
         self.total_detections = 0
         self.failed_detections = 0
         
-        self.logger = logging.getLogger(__name__)
+
         
         # GPU optimization - safe device selection
         self.device = self._get_safe_device()

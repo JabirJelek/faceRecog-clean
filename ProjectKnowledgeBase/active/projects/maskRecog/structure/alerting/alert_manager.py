@@ -17,6 +17,7 @@ class DurationAwareAlertManager:
     """
     def __init__(self, config: Dict):
         self.config = config
+        self.logger = logging.getLogger(__name__)        
         self.server_url = config.get('alert_server_url')
         self.cooldown_seconds = config.get('alert_cooldown_seconds', 0)
         self.enabled = config.get('enable_voice_alerts', False)
@@ -50,7 +51,7 @@ class DurationAwareAlertManager:
         self.last_alert_time_per_identity = {}
         
         
-        self.logger = logging.getLogger(__name__)
+
         
         # Replace prints with logger.info
         self.logger.info(f"Duration-aware batch alerts: {self.min_violation_frames} frames threshold")
