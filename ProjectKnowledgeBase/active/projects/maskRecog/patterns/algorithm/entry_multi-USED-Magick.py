@@ -693,7 +693,7 @@ def get_default_config():
         'base64_quality': 50,
         
         # ========== SYSTEM MODE ==========
-        'headless_mode': False,
+        'headless': True,
         'use_gpu': False,
         'gpu_device': 0,
         

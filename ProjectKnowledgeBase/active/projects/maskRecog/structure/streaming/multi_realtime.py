@@ -50,6 +50,9 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         self.image_log_dir = None
         self.csv_log_dir = None
         
+        # ==========   HEADLESS CONFIGURATION ==========
+        self.headless = config.get('headless', False)
+        
         # Use Event for thread-safe shutdown signaling
         self._shutdown_event = Event()
         self.running = False
@@ -378,7 +381,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 'MetadataOnly': "Metadata Only:",
                 'NoData': "Incomplete Data:",
                 'Successful': "Successful:",
-                'Failed': "Failed:",
+                'Failed': "Prematurely-Success:",
                 'UnknownStatus': "Unknown Status:",
                 'ScheduleWindow': "Schedule Window:",
                 'ReportTime': "Report Time:",
@@ -2964,47 +2967,55 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         exit_code = 0
         exit_message = "Normal shutdown"
         try:
-            # Create run directory if not already created (e.g., by setup_multi_source_logging)
+            # Create run directory if not already created
             if self.run_dir is None:
                 self._create_run_directory()
-            
+
             # Initialize sources
             success_count = self.apply_multi_source_config(sources_config)
-            
             if success_count == 0:
                 logger.warning("❌ No valid sources could be initialized")
                 return
-            
+
             # Set running flag and start threads
             self.running = True
             logger.info(f"🎬 Starting stabilized multi-source processing with {success_count} sources")
-            
+
             # Start background threads
             self.auto_health_monitoring()
             self.periodic_maintenance()
-                        
+
+            # Set up signal handlers for headless mode
+            if self.headless:
+                import signal
+                def signal_handler(sig, frame):
+                    logger.info("Received signal %s, stopping...", sig)
+                    self.running = False
+                signal.signal(signal.SIGINT, signal_handler)
+                signal.signal(signal.SIGTERM, signal_handler)
+                # Custom signal for toggling logging – only on platforms that support it
+                if hasattr(signal, 'SIGUSR1'):
+                    signal.signal(signal.SIGUSR1, lambda s,f: self.toggle_logging())
+                else:
+                    logger.info("SIGUSR1 not available on this platform; use file‑based control for toggling logging.")
+
             # Main processing loop
             consecutive_errors = 0
             max_consecutive_errors = 10
-
             while self.running and consecutive_errors < max_consecutive_errors:
                 try:
-                    # Check shutdown signal
+                    # Check shutdown event
                     if self._shutdown_event.is_set():
                         break
-                    
+
                     # Get frames from all sources
                     source_frames = self.get_multi_source_frames()
-                    
-                    # Skip if no frames
                     if not any(frame is not None for frame in source_frames.values()):
                         time.sleep(0.05)
                         consecutive_errors += 1
                         continue
-                    
-                    # Reset error counter
                     consecutive_errors = 0
-                    
+
                     # Process each source and collect results
                     all_results = {}
                     for source_id, frame in source_frames.items():
@@ -3015,44 +3026,57 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                             except Exception as e:
                                 logger.warning(f"⚠️ Processing error for {source_id}: {e}")
                                 all_results[source_id] = []
-                    
-                    # ========== CRITICAL: ADD DISPLAY CODE HERE ==========
-                    # Create combined display
-                    display_frame = self.create_multi_source_display(source_frames, all_results)
-                    
-                    # Draw debug info
-                    if self.show_performance_stats or self.debug_mode:
-                        total_results = []
-                        for results in all_results.values():
-                            total_results.extend(results)
-                        self.draw_debug_info(display_frame, total_results)
-                    
-                    # Draw resize info
-                    if hasattr(self, 'show_resize_info') and self.show_resize_info:
-                        self.draw_resize_info(display_frame)
-                    
-                    # Show the frame
-                    if display_frame is not None and display_frame.size > 0:
-                        cv2.imshow('Multi-Source Face Recognition', display_frame)
+
+                    # ---------- GUI MODE ----------
+                    if not self.headless:
+                        # Create combined display
+                        display_frame = self.create_multi_source_display(source_frames, all_results)
+
+                        # Draw debug / performance info
+                        if self.show_performance_stats or self.debug_mode:
+                            total_results = []
+                            for results in all_results.values():
+                                total_results.extend(results)
+                            self.draw_debug_info(display_frame, total_results)
+
+                        if self.show_resize_info:
+                            self.draw_resize_info(display_frame)
+
+                        # Show the frame
+                        if display_frame is not None and display_frame.size > 0:
+                            cv2.imshow('Multi-Source Face Recognition', display_frame)
+                        else:
+                            logger.warning("⚠️ No display frame generated")
+
+                        # Handle keyboard input
+                        key = cv2.waitKey(1) & 0xFF
+                        if key != 255:
+                            self.handle_key_controls(key)
+
+                    # ---------- HEADLESS MODE ----------
                     else:
-                        logger.warning("⚠️ No display frame generated")
-                    
-                    # Calculate FPS
+                        # Simple pacing to avoid 100% CPU
+                        time.sleep(0.033)  # ~30 fps
+
+                        # Optional file‑based control
+                        control_file = '/tmp/maskrecog_control'
+                        if os.path.exists(control_file):
+                            with open(control_file, 'r') as f:
+                                command = f.read().strip()
+                            os.remove(control_file)
+                            self._handle_control_command(command)
+
+                    # Calculate FPS (works in both modes)
                     self.calculate_fps()
-                    
-                    # Handle keyboard input
-                    key = cv2.waitKey(1) & 0xFF
-                    if key != 255:
-                        self.handle_key_controls(key)
-                    
+
                 except Exception as e:
                     consecutive_errors += 1
                     logger.warning(f"❌ Main loop error: {e}")
                     traceback.print_exc()
                     time.sleep(1)
-            
+
             logger.warning("🛑 Processing loop ended")
-            
+
         except KeyboardInterrupt:
             exit_code = 130
             exit_message = "Interrupted by user"
@@ -3065,17 +3089,16 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         finally:
             # Write exit status
             self.write_exit_status(exit_code, exit_message)
-            
- 
-            # In the finally block:
+
+            # Send email with results if configured
             if self.email_recipients and self.run_dir:
                 zip_path = self._zip_run_directory()
                 if zip_path:
-                    self._send_email(zip_path)   
-            
-            # Close all resources
-            self.close()                  
-                     
+                    self._send_email(zip_path)
+
+            # Close all resources (OpenCV windows closed conditionally inside close())
+            self.close()               
+              
     # ========== ENHANCED: Logging Pipeline Integration ==========
                                    
     def create_multi_source_display(self, source_frames: Dict[str, np.ndarray], 

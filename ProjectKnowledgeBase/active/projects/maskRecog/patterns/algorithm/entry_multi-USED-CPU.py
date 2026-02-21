@@ -693,7 +693,7 @@ def get_default_config():
         'base64_quality': 50,
         
         # ========== SYSTEM MODE ==========
-        'headless_mode': False,
+        'headless': False,
         'use_gpu': False,
         'gpu_device': 0,
         
@@ -714,7 +714,7 @@ def get_default_config():
         },
         
         'output': {
-            'root_dir': r'logs-running\magick\runs-magick',                    # Base directory for all runs
+            'root_dir': r'logs-running\cpu\runs-cpu',                    # Base directory for all runs
             'create_timestamped_subdir': True,      # Create YYYYMMDD_HHMMSS subfolder
             'enable_exit_status': True,              # Write exit_status.json on shutdown
         },
