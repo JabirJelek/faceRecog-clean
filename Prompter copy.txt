@@ -5,17 +5,34 @@
 - DO NOT INTRODUCES unused solution that does not relate to the query.
 - Focus on what is being queried in the instructions, only take note other non-related with instructions unless user asks for it.
 - effective changes
+- from debug error, focus applying that.
 
 
 #### Instructions
+IF you encounter unknown syntax because not existing in the codebase but might exist as external import, no need to concern about this.
 
-utiulize the exit_status.json for run_summaries.
+Stabilize from the error. No need to apply testing method unless asked for it. 
+
+
+
+ from debug of the codebase
+Success!
+📧 Email sent to faridraihan17@gmail.com (lang=en, attach=True)
+This is the first email send, intentionally.
+
+Fail-1!
+❌ Failed to send email to humanj241@gmail.com: 'smtp_password'
+This should be completed regardless of existing smtp config or not, because smtp is global.
+
+Fail-2
+📧 Email sent to itdiv@sinarcemaramasabadi.co.id (lang=en, attach=True)
+This should not be happening, because the enabled value is false.
 
 
 
 #### Tips
 
-follow Instructions, no need to add non-related solution.
+follow Instructions, no need to add non-related solution. 
 
 
 
@@ -25,31 +42,6 @@ Use this as references.
 
 https://github-com.translate.goog/karanpratapsingh/system-design?_x_tr_sl=en&_x_tr_tl=id&_x_tr_hl=id&_x_tr_pto=tc
 
-
-
-#### debug Error
-
-❌ Email sending failed: MultiSourceRealTimeProcessor._generate_email_body() missing 2 required positional arguments: 'run_summaries' and 'config'
-
-
-#### Expected email structure and conditional 
-
-# exit_status.json
-{
-  "exit_code": 130,
-  "exit_message": "Interrupted by user",
-  "timestamp": "2026-02-20T16:11:07.657876",
-  "run_directory": "D:\\RaihanFarid\\Dokumen\\faceRecog\\ProjectKnowledgeBase\\active\\logs-running\\magick\\runs-magick\\Process-Python_2026-02-20_16-11-01",
-  "statistics": {
-    "total_frames": 4,
-    "average_fps": 1.4888610630173165,
-    "active_sources": 1,
-    "violations_detected": 0,
-    "violations_verified": 0,
-    "images_saved": 0,
-    "server_pushes": 0
-  }
-}
 
 
 
@@ -66,8 +58,1349 @@ https://github-com.translate.goog/karanpratapsingh/system-design?_x_tr_sl=en&_x_
 
 
 
+# main/entry_multi.py
 
 
+import sys
+import os
+from pathlib import Path
+
+# Get the project root (go up 2 levels from current file)
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.append(str(PROJECT_ROOT))
+
+LOG_ROOT = Path(__file__).parent.parent.parent.parent.parent
+
+
+from structure import create_system, ConfigManager
+from structure import MultiSourceRealTimeProcessor
+import time
+import os
+from typing import Dict
+import datetime
+import threading
+
+def test_multi_stream_connections(sources_config: Dict[str, Dict]) -> bool:
+    """Test if we can connect to all streams before starting main processing"""
+    print(f"\n🔍 Testing multi-stream connections for {len(sources_config)} sources...")
+    
+    # FIXED: Use the correct module name
+    from structure import StreamManager
+    
+    successful_sources = []
+    failed_sources = []
+    
+    for source_id, source_config in sources_config.items():
+        print(f"\n📹 Testing source: {source_id}")
+        try:
+            test_manager = StreamManager(source_config)
+            success = test_manager.initialize_stream(source_config['url'])
+            
+            if success:
+                # Test reading a few frames
+                frame_success_count = 0
+                for i in range(3):
+                    frame_success, frame = test_manager.read_frame()
+                    if frame_success and frame is not None:
+                        frame_success_count += 1
+                        print(f"   ✅ Frame {i+1}: {frame.shape}")
+                    else:
+                        print(f"   ❌ Failed to read frame {i+1}")
+                
+                if frame_success_count >= 2:  # Require at least 2 successful frames
+                    successful_sources.append(source_id)
+                    print(f"✅ Source {source_id} test successful")
+                else:
+                    failed_sources.append(source_id)
+                    print(f"❌ Source {source_id} test failed - insufficient frames")
+            else:
+                failed_sources.append(source_id)
+                print(f"❌ Source {source_id} test failed - initialization failed")
+                
+            test_manager.release()
+            
+        except Exception as e:
+            failed_sources.append(source_id)
+            print(f"❌ Source {source_id} test error: {e}")
+    
+    # Print summary
+    print(f"\n📊 STREAM TEST SUMMARY:")
+    print(f"   ✅ Successful: {len(successful_sources)} sources")
+    print(f"   ❌ Failed: {len(failed_sources)} sources")
+    
+    if failed_sources:
+        print(f"   Failed sources: {failed_sources}")
+    
+    # Return True if at least one source is successful
+    return len(successful_sources) > 0
+
+def check_gpu_availability(config: dict) -> dict:
+    """Check and report GPU availability, updating config accordingly"""
+    try:
+        import torch
+        if torch.cuda.is_available():
+            device_count = torch.cuda.device_count()
+            current_device = config.get('gpu_device', 0)
+            
+            if current_device < device_count:
+                gpu_name = torch.cuda.get_device_name(current_device)
+                memory_info = torch.cuda.get_device_properties(current_device)
+                total_memory = memory_info.total_memory / (1024**3)  # Convert to GB
+                
+                print(f"🎮 GPU {current_device}: {gpu_name} available")
+                print(f"🎮 CUDA version: {torch.version.cuda}")
+                print(f"🎮 Total GPU Memory: {total_memory:.1f} GB")
+                
+                # Test GPU functionality
+                test_tensor = torch.randn(1000, 1000).cuda()
+                test_result = test_tensor * 2
+                del test_tensor, test_result
+                torch.cuda.empty_cache()
+                
+                print("✅ GPU functionality test passed")
+                config['use_gpu'] = True
+                return config
+            else:
+                print(f"⚠️  GPU device {current_device} not available, falling back to CPU")
+                config['use_gpu'] = False
+        else:
+            print("⚠️  CUDA not available, falling back to CPU")
+            config['use_gpu'] = False
+            
+    except Exception as e:
+        print(f"⚠️  GPU check failed: {e}, falling back to CPU")
+        config['use_gpu'] = False
+    
+    return config
+
+def check_onnx_gpu_availability():
+    """Check if ONNX Runtime can use GPU"""
+    try:
+        import onnxruntime as ort
+        available_providers = ort.get_available_providers()
+        print(f"🔧 Available ONNX Providers: {available_providers}")
+        
+        if 'CUDAExecutionProvider' in available_providers:
+            print("✅ ONNX CUDA Execution Provider available")
+            return True
+        else:
+            print("⚠️  ONNX CUDA Execution Provider not available")
+            return False
+            
+    except Exception as e:
+        print(f"⚠️  ONNX GPU check failed: {e}")
+        return False
+
+def print_system_info(config: dict):
+    """Print comprehensive system information"""
+    print("\n" + "="*60)
+    print("🖥️  SYSTEM INFORMATION")
+    print("="*60)
+    
+    # CPU Information
+    try:
+        import psutil
+        cpu_count = psutil.cpu_count()
+        memory_total = psutil.virtual_memory().total / (1024**3)  # GB
+        print(f"💻 CPU Cores: {cpu_count}")
+        print(f"💾 Total RAM: {memory_total:.1f} GB")
+    except:
+        print("💻 CPU: Information not available")
+    
+    # GPU Information
+    try:
+        import torch
+        if torch.cuda.is_available():
+            for i in range(torch.cuda.device_count()):
+                gpu_name = torch.cuda.get_device_name(i)
+                memory_info = torch.cuda.get_device_properties(i)
+                total_memory = memory_info.total_memory / (1024**3)
+                print(f"🎮 GPU {i}: {gpu_name} ({total_memory:.1f} GB)")
+        else:
+            print("🎮 GPU: No CUDA devices available")
+    except:
+        print("🎮 GPU: Information not available")
+    
+    # Python Information
+    import sys
+    print(f"🐍 Python Version: {sys.version.split()[0]}")
+    
+    # Library Versions
+    try:
+        import torch
+        print(f"🔥 PyTorch Version: {torch.__version__}")
+    except:
+        pass
+        
+    try:
+        import cv2
+        print(f"👁️  OpenCV Version: {cv2.__version__}")
+    except:
+        pass
+        
+    try:
+        import onnxruntime as ort
+        print(f"🔧 ONNX Runtime Version: {ort.__version__}")
+    except:
+        pass
+    
+    print("="*60)
+
+def verify_gpu_usage(face_system):
+    """Verify that GPU is actually being used by the models"""
+    print("\n🔍 Verifying GPU usage...")
+    
+    try:
+        # Check YOLO model device
+        if hasattr(face_system, 'detection_model') and face_system.detection_model:
+            yolo_device = next(face_system.detection_model.model.parameters()).device
+            print(f"🎯 YOLO Model Device: {yolo_device}")
+        
+        # Check ONNX mask detector
+        if hasattr(face_system, 'mask_detector') and face_system.mask_detector:
+            providers = face_system.mask_detector.get_providers()
+            print(f"🎯 ONNX Mask Detector Providers: {providers}")
+            
+        # Check DeepFace backend
+        try:
+            from deepface.commons import functions
+            backend = functions.get_backend()
+            print(f"🎯 DeepFace Backend: {backend}")
+        except:
+            print("🎯 DeepFace Backend: Could not determine")
+            
+    except Exception as e:
+        print(f"⚠️  GPU verification failed: {e}")
+        
+def validate_email_config(config: dict, test_connection: bool = False) -> None:
+    """Validate email configuration and resolve password; exit with helpful message on failure."""
+    email_cfg = config.get('email', {})
+    
+    # If email is disabled or empty, return
+    if not email_cfg:
+        return
+    
+    # Handle both single dict and list of dicts
+    if isinstance(email_cfg, dict):
+        items = [email_cfg]
+    elif isinstance(email_cfg, list):
+        items = email_cfg
+    else:
+        return  # unexpected type, ignore
+    
+    enabled_items = [item for item in items if item.get('enabled', False)]
+    if not enabled_items:
+        return  # no enabled email
+    
+    for idx, item in enumerate(enabled_items):
+        # Use the same validation logic as before, but with current item
+        password_setting = item.get('smtp_password', '')
+        if not password_setting:
+            print(f"❌ Email enabled for recipient {item.get('recipient', 'unknown')} but 'smtp_password' is missing.")
+            sys.exit(1)
+
+        resolved = None
+        source_desc = "unknown"
+
+        if password_setting.startswith("env:"):
+            env_var = password_setting[4:]
+            resolved = os.environ.get(env_var, "")
+            source_desc = f"environment variable '{env_var}'"
+            if not resolved:
+                print(f"❌ Email enabled for {item.get('recipient', 'unknown')} but {source_desc} is not set or empty.")
+                print("\n💡 To fix:")
+                print(f"   - Windows (Command Prompt): set {env_var}=your_password")
+                print(f"   - Windows (PowerShell):     $env:{env_var} = 'your_password'")
+                print(f"   - Linux/macOS:               export {env_var}=your_password")
+                sys.exit(1)
+        elif '/' in password_setting or '\\' in password_setting or password_setting.endswith(('.txt', '.pwd')):
+            source_desc = f"file '{password_setting}'"
+            if not os.path.exists(password_setting):
+                print(f"❌ Email enabled for {item.get('recipient', 'unknown')} but password file '{password_setting}' does not exist.")
+                sys.exit(1)
+            try:
+                with open(password_setting, 'r') as f:
+                    resolved = f.readline().strip()
+                if not resolved:
+                    print(f"❌ Password file '{password_setting}' is empty.")
+                    sys.exit(1)
+            except Exception as e:
+                print(f"❌ Could not read password file '{password_setting}': {e}")
+                sys.exit(1)
+        else:
+            resolved = password_setting
+            source_desc = "plain text in config"
+
+        if not resolved:
+            print(f"❌ Resolved password for {item.get('recipient', 'unknown')} from {source_desc} is empty.")
+            sys.exit(1)
+
+        print(f"✅ Email password resolved for {item.get('recipient', 'unknown')} from {source_desc} (length {len(resolved)}).")
+
+        if test_connection:
+            try:
+                import smtplib
+                server = smtplib.SMTP(item.get('smtp_server', 'smtp.gmail.com'),
+                                      item.get('smtp_port', 587))
+                if item.get('use_tls', True):
+                    server.starttls()
+                server.login(item.get('smtp_user', ''), resolved)
+                server.quit()
+                print(f"✅ SMTP login successful for {item.get('recipient', 'unknown')} – credentials are valid.")
+            except Exception as e:
+                print(f"❌ SMTP login failed for {item.get('recipient', 'unknown')}: {e}")
+                print("   Check your username, password, and SMTP server settings.")
+                sys.exit(1)
+                          
+def get_default_config():
+    """Return the complete default configuration"""
+    return {
+        # ========== MODEL PATHS ==========        
+        'detection_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\yolov12m-face.pt',
+        'embeddings_db_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\dataset\person_512.json',
+        'mask_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\mask_detector_cus4.onnx',
+        
+                                                # PLEASE FIX THE STABILITY OF THE VERIFICATION 
+                                                # VALUE BEFORE TRYING TO CHANGE THE TYPE OF mask MODEL USED.        
+        
+        # ========== CORE DETECTION PARAMETERS ==========
+        'detection_confidence': 0.5,
+        'recognition_threshold': 0.8,
+        'mask_detection_threshold': 0.6,  # INCREASED from 0.5 - makes mask detection more conservative
+        'detection_iou': 0.3,
+        'min_face_size': 10, # Min face height in pixels
+        'max_faces_per_frame': 15,
+        'enable_person_detection': True,
+        'person_detection_confidence_threshold': 0.4,        
+        
+        # ========== FRAME PROCESSING CONFIGURATION ==========
+        'frame_processing': {
+            # Basic processing parameters
+            'processing_width': 640,
+            'processing_height': 480,
+            'min_processing_scale': 0.3,
+            'max_processing_scale': 4.5,
+            'default_processing_scale': 1.0,
+            
+            # Color and normalization settings
+            'convert_to_rgb': True,  # Convert BGR to RGB for models that expect RGB
+            'normalize_values': False,  # Normalize pixel values to [0, 1]
+            'apply_mean_std_normalization': False,  # Apply ImageNet mean/std normalization
+            
+            # Normalization values (ImageNet standard)
+            'normalization_mean': [0.485, 0.456, 0.406],
+            'normalization_std': [0.229, 0.224, 0.225],
+            
+            # Debug and validation
+            'debug_mode': False,
+            'validate_frames': True,  # Enable frame validation
+            'frame_validation_threshold': 0.1,  # Reject frames with brightness < 10% or > 90%
+            
+            # Frame statistics collection
+            'collect_frame_stats': True,
+            'stats_update_interval': 30.0,  # Update stats every 30 seconds
+            
+            # Contrast enhancement
+            'contrast_enhancement': {
+                'enabled': True,
+                'method': 'clahe',  # 'clahe', 'histogram', or 'none'
+                'clahe_clip_limit': 3.0,
+                'clahe_grid_size': 8,
+            },
+            
+            # Region of interest (ROI) extraction
+            'roi_extraction': {
+                'enabled': True,
+                'default_padding': 10,  # Pixels to add around bbox
+                'min_roi_size': 32,  # Minimum ROI size in pixels
+            },
+            
+            # Multi-source composite settings
+            'composite_creation': {
+                'grid_target_width': 480,
+                'grid_target_height': 360,
+                'horizontal_target_height': 360,
+                'vertical_target_width': 480,
+                'maintain_aspect_ratio': True,
+                'max_composite_width': 1920,
+                'max_composite_height': 1080,
+            },
+            
+            # Frame buffering and queuing
+            'frame_buffer': {
+                'buffer_size': 3,
+                'queue_timeout': 0.1,  # seconds
+                'max_queue_size': 100,
+                'drop_old_frames': True,  # Drop old frames when queue is full
+            },
+            
+            # Frame quality assessment
+            'quality_assessment': {
+                'enabled': True,
+                'min_brightness': 20.0,
+                'max_brightness': 235.0,
+                'min_contrast': 10.0,
+                'blur_threshold': 100.0,  # Laplacian variance threshold
+            },
+            
+            # Performance optimization
+            'performance': {
+                'use_half_precision': False,  # Use float16 for processing
+                'enable_caching': True,
+                'cache_size': 10,  # Number of frames to cache
+                'optimize_for_size': True,  # Optimize memory usage
+            },
+            
+            # Frame preprocessing pipeline
+            'preprocessing_pipeline': [
+                'validate_frame',
+                'resize_for_processing',
+                'convert_color_space',
+                'enhance_contrast',
+                'normalize_if_needed'
+            ],
+            
+            # Color space conversion options
+            'color_space_conversion': {
+                'input_format': 'bgr',  # OpenCV default
+                'output_format': 'rgb',  # Most models expect RGB
+                'conversion_method': 'opencv',  # 'opencv', 'numpy', or 'manual'
+            },
+            
+            # Dynamic scaling parameters
+            'dynamic_scaling': {
+                'enabled': True,
+                'min_face_size': 50,  # Minimum face size for scaling decisions
+                'max_face_size': 300,  # Maximum face size for scaling decisions
+                'scale_adjustment_step': 0.1,
+                'stability_threshold': 0.8,  # Confidence threshold for stable scaling
+            },
+        },
+        
+        # ========== CCTV CONFIGURATION ==========
+        'cctv_name': 'Default',  
+        
+        # ========== MULTI-SOURCE DISPLAY CONFIGURATION ==========
+        'display_layout': 'grid',  # 'grid', 'horizontal', 'vertical'
+        'max_display_sources': 4,
+        
+        # ========== MULTI-SOURCE PROCESSING CONFIGURATION ==========
+        'processing_width': 640,
+        'processing_height': 480,
+        'processing_scale': 1.0,
+        
+        # ========== STREAM HEALTH MONITORING ==========
+        'stream_health': {
+            'check_interval': 30.0,  # seconds
+            'success_rate_threshold': 0.3,  # 30%
+            'unhealthy_retry_delay': 2.0,  # seconds
+            'max_consecutive_errors': 10,
+        },
+        
+        # ========== MAINTENANCE CONFIGURATION ==========
+        'maintenance_interval': 300.0,  # 5 minutes in seconds
+        
+        # ========== VIOLATION VERIFICATION (PROCESSOR LEVEL) ==========
+        'violation_verification_enabled': True,
+        'min_violation_duration': 0.1,  # seconds
+        'min_violation_frames': 1,
+        'violation_confidence_threshold': 0.4,
+        
+        # ========== LOGGING INTERVALS ==========
+        'log_interval': 1,  # Process every Nth frame
+        'enable_logging': True,
+        'enable_image_logging': True,
+        
+        # ========== RESOURCE MANAGEMENT ==========
+        'resource_monitoring': {
+            'memory_threshold_mb': 1024,  # Warn at 1GB
+            'cleanup_interval': 60.0,  # seconds
+            'max_open_files': 100,
+            'max_threads': 50,
+        },
+        
+        # ========== TRACKING BUFFER SIZES ==========
+        'tracking_buffers': {
+            'max_track_age': 500,  # seconds
+            'max_violation_history': 100,
+            'cleanup_old_tracks_interval': 60.0,
+        },
+        
+        # ========== GRID LAYOUT CONFIGURATION ==========
+        'grid_layout': {
+            'target_height': 360,
+            'target_width': 480,
+            'max_grid_size': 4,  # 2x2 grid max
+        },
+        
+        # ========== HORIZONTAL LAYOUT CONFIGURATION ==========
+        'horizontal_layout': {
+            'target_height': 360,
+            'maintain_aspect_ratio': True,
+        },
+        
+        # ========== VERTICAL LAYOUT CONFIGURATION ==========
+        'vertical_layout': {
+            'target_width': 480,
+            'maintain_aspect_ratio': True,
+        },
+        
+        # ========== SOURCE OVERLAY CONFIGURATION ==========
+        'source_overlay': {
+            'show_source_id': True,
+            'show_cctv_name': True,
+            'show_violation_count': True,
+            'font_scale': 0.5,
+            'font_thickness': 2,
+            'text_color': (255, 255, 255),  # White
+            'background_color': (0, 0, 0),  # Black with transparency
+            'background_alpha': 0.7,
+        },        
+            
+        # ========== ENHANCED TRACKING CONFIGURATION ==========
+        'tracking': {
+            'enabled': True,
+            'fairness_enabled': True,
+            'confidence_frames': 3,
+            'cooldown_seconds': 5,
+            'min_iou': 0.3,
+            'max_recognitions_per_person': 10,
+            'recent_window_size': 300,
+            'enable_velocity_prediction': True,
+            'enable_appearance_matching': True,
+            'max_track_age': 500,
+            
+            # ByteTrack person tracking configuration
+            'enable_person_tracking': True,
+            'enabled':True,
+            'person_track_confidence': 0.55,
+            'person_track_max_age': 90,
+            'person_iou_threshold': 0.3,
+            'bytetrack_track_thresh': 0.5,
+            'bytetrack_track_buffer': 100,
+            'bytetrack_match_thresh': 0.8,
+            'bytetrack_min_box_area': 10,
+            
+            # 🎯 Progressive mask detection configuration
+            'progressive_mask': {          
+                
+                # Buffer and temporal parameters
+                'mask_buffer_size': 200,
+                'min_mask_frames': 2,
+                'occlusion_timeout': 3.0,
+                
+                # Confidence and stability thresholds  
+                'mask_confidence_threshold': 0.1,
+                'mask_consistency_threshold': 0.1,
+                
+                # Require higher stability before committing
+                'min_stability_to_commit': 0.15,
+                
+                # State holding parameters
+                'state_hold_duration': 15.0,
+                'verification_grace_ratio': 0.1,
+                
+                # Spatial consistency parameters
+                'spatial_consistency_weight': 0.3,
+                'max_bbox_variation': 0.45,
+                
+                # Extreme confidence handling
+                'extreme_confidence_threshold': 0.95,
+                'extreme_mask_penalty': 0.8,
+                'extreme_no_mask_boost': 0.9,
+                
+                # Initial weight parameters
+                'initial_mask_weight': 0.5,
+                'initial_no_mask_weight': 0.5,
+                
+                # Weight adjustment parameters (NEW - optional to expose)
+                'weight_increase_high_conf': 0.4,
+                'weight_decrease_low_conf': 0.3,
+                'weight_increase_opposite': 0.1,
+                
+                'confidence_smoothing_factor': 0.3,
+                'stability_smoothing_factor': 0.2,                
+            },
+            
+            # 🎯 **MODIFIED** Violation verification configuration
+            'violation_verification_enabled': True,
+            'min_violation_duration': 1,       # DECREASED from 20.0 - quicker to detect violations
+            'min_violation_frames': 1,           # DECREASED from 35 - quicker to detect violations
+            'violation_confidence_threshold': 0.15, # DECREASED from 0.9 - more sensitive to violations
+        },    
+        
+        # ========== VIOLATION VERIFICATION CONFIGURATION ==========
+        'violation_verification': {
+            'enabled': True,
+            'min_duration_seconds': 0.1,           # DECREASED from 30 - faster verification
+            'min_frames': 1 ,                     # DECREASED from 50 - faster verification
+            'confidence_threshold': 0.1,         # DECREASED from 0.85 - more sensitive
+            'progressive_verification': True,
+            'log_unverified_violations': True,
+            'unverified_log_cooldown': 10,        # DECREASED from 15 - more frequent logging
+            'false_negative_monitoring': True,
+            # 🆕 Modified multi-level verification
+            'verification_levels': {
+                'low': {'duration': 1.5, 'frames': 1},      # Quicker initial detection
+                'medium': {'duration': 2.0, 'frames': 2},  # Medium confidence
+                'high': {'duration': 3.0, 'frames': 3}    # High confidence (verified)
+            }
+        },  
+                
+        # ========== LOGGING CONFIGURATION ==========
+        'enable_logging': True,
+        'enable_image_logging': True,
+        'log_interval': 5,
+        'image_log_interval': 5,
+        'max_images_per_session': 5000,
+        'min_save_interval': 1.0,
+        
+        # ========== SERVER PUSH CONFIGURATION ==========        
+        'server_push_enabled': True,
+        'server_endpoint': '',
+        'server_push_cooldown': 5,
+        'server_timeout': 10,
+        'server_retry_attempts': 10,
+        'server_retry_delay': 2,
+        
+        # ========== IMAGE RESIZE CONFIGURATION ==========
+        'enable_image_resize': True,
+        'image_resize_width': 1024,
+        'image_resize_height': 576,
+        'image_resize_method': 'default',
+        
+        # ========== ALERT CONFIGURATION ==========
+        'enable_voice_alerts': True,
+        'alert_server_url': " ",
+        'alert_cooldown_seconds': 15,            # DECREASED from 20 - more responsive alerts
+        'min_violation_frames': 1,              # DECREASED from 20 - more sensitive
+        'min_violation_seconds': 1,              # DECREASED from 12 - faster alerts
+        'max_gap_frames': 10,                    # INCREASED from 8 - more tolerant to gaps
+        'alert_language': 'id',
+        'alert_style': 'formal',
+        'enable_individual_alerts': True,
+        'enable_group_alerts': True,
+        'alert_timeout_seconds': 2,              # DECREASED from 3 - faster alert processing
+        # 🆕 Modified alert verification requirements
+        'alert_verification_required': True,
+        'min_alert_confidence': 0.85,            # DECREASED from 0.9 - more sensitive alerts
+        'alert_buffer_size': 100,                 # DECREASED from 25 - faster alert decisions
+        
+        # ========== FAISS SYSTEM CONFIGURATION ========== 
+        'use_faiss_gpu': True,  # Enable GPU acceleration for FAISS
+        'faiss_index_type': 'FlatL2',  # Options: 'FlatL2', 'FlatIP', 'IVFFlat', 'IVFPQ'
+        'faiss_nlist': 100,  # For IVF indices
+        'faiss_pq_m': 8,  # For IVFPQ: number of sub-vectors
+        'faiss_pq_bits': 8,  # For IVFPQ: bits per sub-vector
+        'faiss_max_l2_distance': 100.0,  # For L2 distance normalization
+        
+        # Model paths
+        'embedding_model': 'Facenet512',
+        
+        # ========== STREAM MANAGEMENT CONFIGURATION ==========
+        'stream_manager': {
+            'max_reconnect_attempts': 10,
+            'reconnect_delay': 3,
+            'health_check_interval': 10,
+            'max_frame_gap': 5,
+            'buffer_size': 100,
+            'open_timeout': 10000,
+            'read_timeout': 5000,
+        },
+        
+        # ========== DISPLAY CONFIGURATION ==========
+        'display': {
+            'default_width': 1280,
+            'default_height': 720,
+            'max_display_width': 1920,
+            'max_display_height': 1080,
+            'resize_method': 'fit_to_screen',
+            'show_resize_info': False,
+            'show_performance_stats': False,
+        },
+        
+        # ========== DEBUG CONFIGURATION ==========
+        'debug': {
+            'enabled': False,
+            'show_detection_debug': False,
+            'save_debug_frames': False,
+            'max_debug_frames': 100,
+            'verbose': False,
+        },
+        
+        # ========== CONTEXT-AWARE SCALING ==========
+        'context_aware_scaling': {
+            'enabled': True,
+            'debug_mode': False,
+            'min_context_samples': 10,
+            'max_context_samples': 100,
+        },
+        
+        # ========== ADVANCED FEATURES ==========
+        'enable_multi_scale': True,
+        'enable_temporal_fusion': True,
+        'enable_quality_aware': True,
+ 
+        
+        # ========== BASE64 CONFIGURATION ==========
+        'enable_base64_logging': True,
+        'base64_quality': 50,
+        
+        # ========== SYSTEM MODE ==========
+        'headless_mode': False,
+        'use_gpu': False,
+        'gpu_device': 0,
+        
+        # ========== ANNOTATION CONFIGURATION ==========
+        'annotation_box_thickness': 1,
+        'annotation_text_thickness': 1, 
+        'annotation_min_text_scale': 0.3,
+        'annotation_max_text_scale': 0.8,
+        
+        # ========== PERFORMANCE TUNING ==========
+        'performance': {
+            'fps_update_interval': 5.0,
+            'dynamic_adjustment_enabled': True,
+            'quality_threshold_high': 0.8,
+            'quality_threshold_low': 0.3,
+            'face_size_threshold_small': 50,
+            'face_size_threshold_large': 200,
+        },
+        
+        'output': {
+            'root_dir': r'logs-running\magick\runs-magick',                    # Base directory for all runs
+            'create_timestamped_subdir': True,      # Create YYYYMMDD_HHMMSS subfolder
+            'enable_exit_status': True,              # Write exit_status.json on shutdown
+        },
+        'email': [
+            {
+                'enabled': True,
+                'recipient': 'faridraihan17@gmail.com',
+                'language': 'en',          # 'en' or 'id'
+                'attach_zip': True,        # whether to include the ZIP archive
+                # SMTP settings (optional – if not provided, fallback to global)
+                'smtp_server': 'smtp.gmail.com',
+                'smtp_port': 587,
+                'smtp_user': 'faridraihan17@gmail.com',
+                'smtp_password': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\pass.txt',
+                'use_tls': True
+            },
+            {
+                'enabled': True,
+                'recipient': 'humanj241@gmail.com',
+                'language': 'id',          # 'en' or 'id'
+                'attach_zip': True,        # whether to include the ZIP archive
+                # SMTP settings (optional – if not provided, fallback to global)
+                # 'smtp_server': 'smtp.gmail.com',
+                # 'smtp_port': 587,
+                # 'smtp_user': 'faridraihan17@gmail.com',
+                # 'smtp_password': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\pass.txt',
+                # 'use_tls': True
+            },            
+            {
+                'enabled': False,
+                'recipient': 'itdiv@sinarcemaramasabadi.co.id',
+                'language': 'en',          # 'en' or 'id'
+                'attach_zip': True,        # whether to include the ZIP archive
+                # SMTP settings (optional – if not provided, fallback to global)
+                'smtp_server': 'smtp.gmail.com',
+                'smtp_port': 587,
+                'smtp_user': 'faridraihan17@gmail.com',
+                'smtp_password': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\pass.txt',
+                'use_tls': True
+            }
+        ]     
+    }
+    
+    
+def get_advanced_sources_config():
+    """Return advanced sources configuration with parameters"""
+    return {
+        # '1': {
+        #     'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/601',
+        #     'description': 'Dekat meja IT',
+        #     'priority': 'low',
+        #     'processing_scale': 1,
+        #     'buffer_size': 100,
+        #     'cctv_name':None,            
+        # },
+        
+        
+        # '2': {
+        #     'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/501',
+        #     'description': 'Dekat meja bu Dyah',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },
+        
+        # '3': {
+        #     'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/101',
+        #     'description': 'Atas Server Gedangan',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },
+        
+        # '4': {
+        #     'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/601',
+        #     'description': 'Ruang Produksi',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },   
+        
+        # '5': {
+        #     'url': 'rtsp://admin:admin@192.168.110.137:1935',
+        #     'description': 'HP Pribadi',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },     
+                         
+        '6': {
+            'url': '0',
+            'description': 'Main Camera',
+            'priority': 'medium',
+            'processing_scale':1,            
+            'buffer_size': 100,
+            'cctv_name':None,
+        },
+        
+        # '7': {
+        #     'url': 'rtsp://admin:admin888@192.168.110.40:554/Streaming/Channels/601',
+        #     'description': 'Pojok dekat MIS',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },                                  
+    }
+        
+def load_custom_config(config_path: str = None) -> Dict:
+    """Load custom configuration from file if provided"""
+    if config_path and os.path.exists(config_path):
+        try:
+            import json
+            with open(config_path, 'r') as f:
+                custom_config = json.load(f)
+            print(f"✅ Loaded custom configuration from: {config_path}")
+            return custom_config
+        except Exception as e:
+            print(f"❌ Failed to load custom configuration: {e}")
+            print("🔄 Using default configuration")
+    
+    return get_default_config()
+
+def test_server_connection(config: dict) -> bool:
+    """Test connection to the violation server"""
+    if not config.get('server_push_enabled', False):
+        print("📤 Server push disabled, skipping server connection test")
+        return True
+        
+    server_endpoint = config.get('server_endpoint', '')
+    if not server_endpoint:
+        print("❌ No server endpoint configured")
+        return False
+        
+    try:
+        import requests
+        print(f"🔍 Testing server connection: {server_endpoint}")
+        
+        # Test health endpoint
+        health_url = server_endpoint.replace('/api/violations', '/api/health')
+        response = requests.get(health_url, timeout=10)
+        
+        if response.status_code == 200:
+            print(f"✅ Server connection successful: {health_url}")
+            return True
+        else:
+            print(f"❌ Server health check failed: {response.status_code}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Server connection test failed: {e}")
+        print("💡 Make sure the test server is running: python test_upload_server.py")
+        return False
+
+def print_server_push_info(config: dict):
+    """Print server push configuration information"""
+    if config.get('server_push_enabled', False):
+        print("\n📤 SERVER PUSH CONFIGURATION")
+        print("="*40)
+        print(f"   Endpoint: {config.get('server_endpoint')}")
+        print(f"   Cooldown: {config.get('server_push_cooldown')}s")
+        print(f"   Timeout: {config.get('server_timeout')}s")
+        print(f"   Retry Attempts: {config.get('server_retry_attempts')}")
+        print(f"   CCTV Name: {config.get('cctv_name')}")
+        print("   JSON Structure:")
+        print("     {")
+        print('       "filename": "string",')
+        print('       "image_format": "jpg",')
+        print('       "image_data": "base64_string",')
+        print('       "detected_name": "string",')
+        print('       "cctv_name": "string"')
+        print("     }")
+        print("="*40)
+
+def print_multi_source_info(sources_config: Dict[str, Dict]):
+    """Print multi-source configuration information"""
+    print("\n🎯 MULTI-SOURCE CONFIGURATION")
+    print("="*50)
+    for source_id, source_config in sources_config.items():
+        print(f"📹 {source_id}:")
+        print(f"   URL: {source_config.get('url', 'N/A')}")
+        print(f"   Description: {source_config.get('description', 'No description')}")
+        print(f"   Priority: {source_config.get('priority', 'medium')}")
+        print(f"   CCTV Name: {source_config.get('cctv_name', 'Unknown')}")
+        print(f"   Processing Scale: {source_config.get('processing_scale', 1.0)}")
+    print("="*50)
+
+def print_verification_summary(processor):
+    """Print comprehensive verification summary from TrackingManager"""
+    try:
+        if hasattr(processor, 'get_verification_stats'):
+            stats = processor.get_verification_stats()
+            
+            print("\n" + "="*60)
+            print("✅ TRACKING MANAGER VERIFICATION SUMMARY")
+            print("="*60)
+            
+            # Aggregate stats
+            aggregate = stats.get('aggregate', {})
+            print(f"\n📊 AGGREGATE STATISTICS:")
+            print(f"   Total Detected: {aggregate.get('total_detected', 0)}")
+            print(f"   Total Verified: {aggregate.get('total_verified', 0)}")
+            print(f"   Total Rejected: {aggregate.get('total_rejected', 0)}")
+            print(f"   False Positives Prevented: {aggregate.get('false_positives_prevented', 0)}")
+            print(f"   Active Violation Tracks: {aggregate.get('active_tracks', 0)}")
+            print(f"   Currently Verified: {aggregate.get('currently_verified', 0)}")
+            
+            # Calculate rates
+            total_detected = max(1, aggregate.get('total_detected', 1))
+            total_verified = aggregate.get('total_verified', 0)
+            total_rejected = aggregate.get('total_rejected', 0)
+            false_positives_prevented = aggregate.get('false_positives_prevented', 0)
+            
+            print(f"\n📈 VERIFICATION SYSTEM METRICS:")
+            
+            # 1. What percentage of detections were verified?
+            verification_success_rate = (total_verified / total_detected) * 100
+            print(f"   Verified Detections: {verification_success_rate:.1f}% ({total_verified}/{total_detected})")
+            
+            # 2. What percentage of detections were rejected?
+            rejection_rate = (total_rejected / total_detected) * 100
+            print(f"   Rejected Detections: {rejection_rate:.1f}% ({total_rejected}/{total_detected})")
+            
+            # 3. Of the rejected detections, how many were false positives?
+            if total_rejected > 0:
+                false_positive_catch_rate = (false_positives_prevented / total_rejected) * 100
+                print(f"   False Positives Caught: {false_positive_catch_rate:.1f}% ({false_positives_prevented}/{total_rejected})")
+            else:
+                print(f"   False Positives Caught: N/A (no rejected detections)")
+            
+            # 4. Overall system accuracy (if we assume verified = correct)
+            total_decisions = total_verified + total_rejected
+            if total_decisions > 0:
+                accuracy = ((total_verified + false_positives_prevented) / total_decisions) * 100
+                print(f"   System Accuracy: {accuracy:.1f}%")
+            else:
+                print(f"   System Accuracy: N/A (no decisions made)")
+            
+            # Per-source stats
+            per_source = stats.get('per_source', {})
+            if per_source:
+                print(f"\n📊 PER-SOURCE STATISTICS:")
+                for source_id, source_stats in per_source.items():
+                    print(f"\n   📹 Source: {source_id}")
+                    print(f"      Detected: {source_stats.get('total_detected', 0)}")
+                    print(f"      Verified: {source_stats.get('total_verified', 0)}")
+                    print(f"      Rejected: {source_stats.get('total_rejected', 0)}")
+                    print(f"      Active Tracks: {source_stats.get('active_violation_tracks', 0)}")
+            
+            # System stats
+            system_stats = stats.get('system_stats', {})
+            if system_stats:
+                print(f"\n📊 SYSTEM STATISTICS:")
+                print(f"   Total Logged: {system_stats.get('total_logged', 0)}")
+                print(f"   Verified Logged: {system_stats.get('verified_logged', 0)}")
+                
+                if system_stats.get('last_verified_time'):
+                    last_time = datetime.datetime.fromtimestamp(system_stats['last_verified_time'])
+                    print(f"   Last Verified: {last_time.strftime('%H:%M:%S')}")
+            
+            print("="*60)
+            
+    except Exception as e:
+        print(f"⚠️ Error printing verification summary: {e}")
+        
+def monitor_verification_performance(processor, interval_seconds=30):
+    """Monitor verification performance periodically"""
+    def monitor_worker():
+        while getattr(processor, 'running', False):
+            try:
+                print_verification_summary(processor)
+                time.sleep(interval_seconds)
+            except Exception as e:
+                print(f"⚠️ Verification monitoring error: {e}")
+                time.sleep(interval_seconds)
+    
+    monitor_thread = threading.Thread(target=monitor_worker, daemon=True, name="verification_monitor")
+    monitor_thread.start()
+    print(f"📊 Started verification performance monitoring (interval: {interval_seconds}s)")
+
+
+def main():
+    # Load configuration
+    import argparse
+    parser = argparse.ArgumentParser(description='Run modular face recognition system')
+    parser.add_argument('--config', type=str, help='Path to custom configuration JSON file')
+    parser.add_argument('--multi-source', action='store_true', help='Enable multi-camera processing')
+    parser.add_argument('--sources-config', type=str, help='Path to multi-source configuration JSON file')
+    parser.add_argument('--camera', type=str, default='0', help='Camera source (default: 0)')
+    parser.add_argument('--rtsp', type=str, help='RTSP stream URL')
+    parser.add_argument('--no-gpu', action='store_true', help='Disable GPU acceleration')
+    parser.add_argument('--cctv-name', type=str, help='Override CCTV name')
+    parser.add_argument('--no-server-push', action='store_true', help='Disable server push')
+    parser.add_argument('--test-server', action='store_true', help='Test server connection before starting')
+    parser.add_argument('--test-email', action='store_true', help='Test email connection before starting')
+    args = parser.parse_args()
+    
+    # Load configuration
+    config = load_custom_config(args.config)
+    # validate_email_config(config, test_connection=args.test_email)  
+    
+    # Resolve output.root_dir relative to LOG_ROOT if it's a relative path
+    if 'output' in config and 'root_dir' in config['output']:
+        root_dir = config['output']['root_dir']
+        if not os.path.isabs(root_dir):
+            # Convert to absolute path using LOG_ROOT
+            config['output']['root_dir'] = str(LOG_ROOT / root_dir)
+            print(f"📁 Output root resolved to: {config['output']['root_dir']}")    
+    
+    # Override GPU setting if requested
+    if args.no_gpu:
+        config['use_gpu'] = False
+        print("🎮 GPU acceleration disabled via command line")
+    
+    # Override server push setting if requested
+    if args.no_server_push:
+        config['server_push_enabled'] = False
+        print("📤 Server push disabled via command line")
+    
+    # Print system information
+    print_system_info(config)
+    
+    # Check GPU availability and update config
+    print("\n🔍 Checking GPU availability...")
+    config = check_gpu_availability(config)
+    check_onnx_gpu_availability()
+    
+    # Set environment variables for GPU optimization
+    if config.get('use_gpu', False):
+        os.environ['CUDA_VISIBLE_DEVICES'] = str(config.get('gpu_device', 0))
+        # Optimize for GPU
+        os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+        os.environ['TF_GPU_THREAD_MODE'] = 'gpu_private'
+        print("🎯 Set GPU environment variables")
+    
+    # Load multi-source configuration if enabled
+    if args.multi_source:
+        if args.sources_config and os.path.exists(args.sources_config):
+            try:
+                import json
+                with open(args.sources_config, 'r') as f:
+                    sources_config = json.load(f)
+                print(f"✅ Loaded multi-source configuration from: {args.sources_config}")
+            except Exception as e:
+                print(f"❌ Failed to load multi-source configuration: {e}")
+                print("🔄 Using default multi-source configuration")
+                sources_config = get_advanced_sources_config()
+        else:
+            print("🔄 Using default multi-source configuration")
+            sources_config = get_advanced_sources_config()
+        
+        print_multi_source_info(sources_config)
+        
+        # Test multi-stream connections
+        if not test_multi_stream_connections(sources_config):
+            print("❌ Multi-stream connection test failed. Please check:")
+            print("   - Camera connections")
+            print("   - RTSP URLs and credentials") 
+            print("   - Network connectivity")
+            return
+    else:
+        # Single source mode
+        #camera_source = args.camera
+        rtsp_source = args.rtsp
+
+        print(f"\n📹 Single Source Mode:")
+        print(f"CURRENTLY DISABLED!")
+        #print(f"   Camera Source: {camera_source}")
+        print(f"   RTSP Source: {rtsp_source}")
+        
+        # For single source, create a sources_config with one entry
+        sources_config = {
+            'main_camera': {
+                'url': rtsp_source,
+                'description': 'Main Camera',
+                'priority': 'high',
+                'processing_scale': 1.0,
+                'buffer_size': 3,
+                'cctv_name': args.cctv_name or config.get('cctv_name', 'Main-Camera')
+            }
+        }
+        
+        # Test single stream connection
+        if not test_multi_stream_connections(sources_config):
+            print("❌ Stream connection test failed.")
+            return
+    
+    # Test server connection if enabled and requested
+    if config.get('server_push_enabled', False) and args.test_server:
+        if not test_server_connection(config):
+            print("❌ Server connection test failed. Continue without server push? (y/n)")
+            choice = input().strip().lower()
+            if choice != 'y':
+                print("🛑 Exiting...")
+                return
+            else:
+                config['server_push_enabled'] = False
+                print("⚠️  Continuing without server push")
+                
+    
+    # Create robust face recognition system using factory
+    print("\n🔄 Creating face recognition system...")
+    try:
+        face_system = create_system(config, system_type="robust_face_recognition")
+        
+        # Verify GPU usage
+        verify_gpu_usage(face_system)
+        
+    except Exception as e:
+        print(f"❌ Failed to create face recognition system: {e}")
+        print("🔄 Falling back to CPU mode...")
+        config['use_gpu'] = False
+        face_system = create_system(config, system_type="robust_face_recognition")
+    
+    # Apply multi-source specific configurations
+    multi_source_config = {
+        'display_layout': config.get('display_layout', 'grid'),
+        'max_display_sources': config.get('max_display_sources', 4),
+        'processing_width': config.get('processing_width', 640),
+        'processing_height': config.get('processing_height', 480),
+        'processing_scale': config.get('processing_scale', 1.0),
+        'violation_verification_enabled': config.get('violation_verification_enabled', True),
+        'min_violation_duration': config.get('min_violation_duration', 0.5),
+        'min_violation_frames': config.get('min_violation_frames', 1),
+        'violation_confidence_threshold': config.get('violation_confidence_threshold', 0.6),
+        'log_interval': config.get('log_interval', 1),
+        'enable_logging': config.get('enable_logging', True),
+        'enable_image_logging': config.get('enable_image_logging', True),
+    }
+
+    # Merge with existing config
+    full_config = {**config, **multi_source_config}
+
+    # Initialize processor with full config
+    processor = MultiSourceRealTimeProcessor(
+        face_system, 
+        full_config  # Use the merged config
+    )
+    
+    # Apply configurations to processor
+    processor.apply_alert_config(config)
+    processor.apply_tracking_config(config)
+    processor.apply_logging_config(config)
+    
+    # 🆕 Apply violation verification configuration to all tracking managers
+    if 'tracking' in config and 'violation_verification_enabled' in config['tracking']:
+        verification_config = {
+            'violation_verification_enabled': config['tracking']['violation_verification_enabled'],
+            'min_violation_duration': config['tracking'].get('min_violation_duration', 5.0),
+            'min_violation_frames': config['tracking'].get('min_violation_frames', 5),
+            'violation_confidence_threshold': config['tracking'].get('violation_confidence_threshold', 0.85)
+        }
+        processor.apply_verification_config(verification_config)
+    
+    # Print comprehensive configuration status
+    print("\n" + "="*60)
+    print("🎯 MULTI-SOURCE SYSTEM CONFIGURATION STATUS")
+    print("="*60)
+    print(f"📊 Sources: {len(sources_config)} cameras configured")
+    #print(f"📊 Processing: Interval={config['processing_interval']}, Buffer={config['buffer_size']}")
+    print(f"🔍 Detection: Confidence={config['detection_confidence']}, Recognition Threshold={config['recognition_threshold']}")
+    print(f"🎯 Face Tracking: {'ENABLED' if config['tracking']['enabled'] else 'DISABLED'}")
+    
+    # 🆕 NEW: Print verification configuration
+    if config['tracking'].get('violation_verification_enabled', False):
+        print(f"✅ Violation Verification: ENABLED")
+        print(f"   - Min Duration: {config['tracking'].get('min_violation_duration', 5.0)}s")
+        print(f"   - Min Frames: {config['tracking'].get('min_violation_frames', 5)}")
+        print(f"   - Confidence Threshold: {config['tracking'].get('violation_confidence_threshold', 0.85)}")
+    else:
+        print(f"✅ Violation Verification: DISABLED")
+    
+    print(f"📝 Logging: {'ENABLED' if config['enable_logging'] else 'DISABLED'}")
+    print(f"🔊 Alerts: {'ENABLED' if config['enable_voice_alerts'] else 'DISABLED'}")
+    print(f"📤 Server Push: {'ENABLED' if config['server_push_enabled'] else 'DISABLED'}")
+    print(f"🐛 Debug: {'ENABLED' if config['debug']['enabled'] else 'DISABLED'}")
+    print(f"🖼️  Display Layout: {getattr(processor, 'display_layout', 'grid')}")
+    print(f"🎮 GPU Acceleration: {'ENABLED' if config['use_gpu'] else 'DISABLED'}")
+    if config['use_gpu']:
+        print(f"🎮 GPU Device: {config['gpu_device']}")
+    print("="*60)
+    
+    
+    # Print server push details if enabled
+    if config.get('server_push_enabled', False):
+        print_server_push_info(config)
+    
+    # Print module-specific status
+    processor.print_tracking_status()
+    processor.print_alert_status()
+    
+    # Apply display configuration
+    if hasattr(processor, 'set_display_size'):
+        processor.set_display_size(
+            config['display']['default_width'],
+            config['display']['default_height'],
+            config['display']['resize_method']
+        )
+    
+    # Apply debug configuration
+    if config['debug']['enabled']:
+        processor.toggle_debug_mode()
+    if config['display']['show_performance_stats']:
+        processor.toggle_performance_stats()
+    if config['display']['show_resize_info']:
+        processor.toggle_resize_info()    
+    
+    
+    
+    
+    # Final system readiness check
+    print("\n🔍 FINAL SYSTEM READINESS CHECK")
+    print("="*40)
+    print(f"📹 Sources: {len(sources_config)} cameras ready")
+    for source_id in sources_config.keys():
+        print(f"   - {source_id}")
+    print(f"🎮 GPU: {'READY' if config['use_gpu'] else 'CPU MODE'}")
+    print(f"📤 Server Push: {'READY' if config['server_push_enabled'] else 'DISABLED'}")
+    print(f"🔊 Audio Alerts: {'READY' if config['enable_voice_alerts'] else 'DISABLED'}")
+    print(f"🎯 Tracking: {'READY' if config['tracking']['enabled'] else 'DISABLED'}")
+    print(f"✅ Violation Verification: {'READY' if config['tracking'].get('violation_verification_enabled', False) else 'DISABLED'}")
+    print("="*40)
+    
+    # 🆕 NEW: Print verification-specific controls
+    print("\n🎮 VERIFICATION CONTROLS:")
+    print("   [V] - Toggle violation verification")
+    print("   [S] - Show verification statistics")
+    print("   [M] - Start verification monitoring")    
+    
+    # Print multi-source controls
+    print("\n🎮 MULTI-SOURCE CONTROLS:")
+    print("   [m] - Cycle through display layouts (grid, horizontal, vertical)")
+    print("   [n] - Toggle source health display")
+    print("   [0] - Show source health report")
+    print("   [l] - Toggle logging")
+    print("   [v] - Toggle voice alerts")
+    print("   [p] - Toggle performance stats")
+    print("   [d] - Toggle debug mode")
+    print("   [q] - Quit")
+    
+    # Add a small delay to ensure everything is ready
+    print("\n⏳ Starting multi-source processing in 3 seconds...")
+    time.sleep(3)
+    
+    # 🆕 CRITICAL: Ensure ImageLoggers are created for all sources
+    print("\n🔍 ENSURING IMAGE LOGGERS ARE CREATED FOR ALL SOURCES")
+    for source_id in sources_config.keys():
+        if source_id in processor.active_sources:
+            print(f"🔄 Ensuring ImageLogger for: {source_id}")
+            success = processor.force_create_image_logger(source_id)
+            if success:
+                print(f"✅ ImageLogger created for: {source_id}")
+            else:
+                print(f"❌ Failed to create ImageLogger for: {source_id}")
+
+    # 🆕 DEBUG: Check CCTV names before starting
+    print("\n🔍 PRE-START CCTV NAME CHECK")
+    processor.debug_cctv_names()
+        
+    # Start multi-source processing
+    try:
+        # 🆕 ONLY ONE SOURCE ADDITION BLOCK
+        print("\n🎯 ADDING SOURCES WITH DYNAMIC CCTV NAMING")
+        print("="*50)
+
+        # First, remove any existing sources to start fresh
+        existing_sources = list(processor.stream_managers.keys())
+        for source_id in existing_sources:
+            print(f"🔄 Removing existing source: {source_id}")
+            processor.remove_source(source_id)
+
+        # Now add the sources with proper dynamic naming
+        for source_id, source_config in sources_config.items():
+            print(f"📹 Adding source: {source_id}")
+            
+            # 🆕 DEBUG: Test CCTV naming before adding
+            test_url = source_config.get('url', '')
+            if test_url:
+                extracted_name = processor._extract_cctv_name_from_url(test_url, source_id)
+                print(f"   🔍 CCTV name extraction test: {extracted_name}")
+            
+            success = processor.add_source(source_id, source_config)
+            if success:
+                # Verify the CCTV name was set correctly
+                source_info = processor.get_source_info(source_id)
+                if source_info:
+                    actual_cctv_name = source_info.get('cctv_name', 'Unknown')
+                    print(f"✅ Successfully added {source_id} → {actual_cctv_name}")
+            else:
+                print(f"❌ Failed to add {source_id}")
+
+        print("="*50)
+        
+        # Print all sources information
+        processor.print_all_sources_info()
+        
+        # Print CCTV mapping
+        processor.print_cctv_mapping()
+        
+        # 🆕 CRITICAL: Setup logging ONLY ONCE after all sources are added
+        print("\n🔄 Setting up multi-source logging with dynamic CCTV names...")
+        processor.setup_multi_source_logging()
+        
+        # Run the multi-source processing
+        processor.run_multi_source_stable(sources_config)
+        
+        # 🆕 NEW: Start verification performance monitoring
+        print("\n📊 Starting verification performance monitoring...")
+        monitor_verification_performance(processor, interval_seconds=60)
+        
+        
+    except KeyboardInterrupt:
+        print("\n🛑 Shutting down by user request...")
+        
+        # 🆕 NEW: Print final verification summary
+        print("\n📊 FINAL VERIFICATION SUMMARY:")
+        print_verification_summary(processor)
+        
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        processor.stop_all_sources()
+
+if __name__ == "__main__":
+    main()
+    
 
 # streaming/multi_realtime.py
 
@@ -117,18 +1450,6 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         self.run_dir = None          # will be set by _create_run_directory()
         self.image_log_dir = None
         self.csv_log_dir = None
-        
-        # ==========   EMAIL CONFIGURATION ==========
-        email_cfg = config.get('email', {})
-        self.email_enabled = email_cfg.get('enabled', False)
-        self.email_recipient = email_cfg.get('recipient', '')
-        self.smtp_server = email_cfg.get('smtp_server', 'smtp.gmail.com')
-        self.smtp_port = email_cfg.get('smtp_port', 587)
-        self.smtp_user = email_cfg.get('smtp_user', '')
-        self.smtp_password = email_cfg.get('smtp_password', '')
-        self.email_use_tls = email_cfg.get('use_tls', True)
-        self.email_send_on_exit = email_cfg.get('send_on_exit', True)
-        self.email_max_attachment_mb = email_cfg.get('max_attachment_size_mb', 25)        
         
         # Use Event for thread-safe shutdown signaling
         self._shutdown_event = Event()
@@ -223,6 +1544,54 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         # Display settings
         self.show_resize_info = False
         self.show_source_health = False
+        
+        # ==========   EMAIL CONFIGURATION ==========
+        email_cfg = config.get('email', {})
+        
+        # Handle both dict (legacy) and list (new) formats
+        if isinstance(email_cfg, list):
+            # List of recipient dicts
+            self.email_recipients = email_cfg
+            self.email_enabled = any(recip.get('enabled', False) for recip in self.email_recipients)
+            # Set legacy single-recipient attributes to defaults (not used, but avoid AttributeError)
+            self.email_recipient = ''
+            self.smtp_server = 'smtp.gmail.com'
+            self.smtp_port = 587
+            self.smtp_user = ''
+            self.smtp_password = ''
+            self.email_use_tls = True
+            self.email_send_on_exit = True
+            self.email_max_attachment_mb = 25
+        else:
+            # Legacy dict format – convert to list internally
+            self.email_enabled = email_cfg.get('enabled', False)
+            self.email_recipient = email_cfg.get('recipient', '')
+            self.smtp_server = email_cfg.get('smtp_server', 'smtp.gmail.com')
+            self.smtp_port = email_cfg.get('smtp_port', 587)
+            self.smtp_user = email_cfg.get('smtp_user', '')
+            self.smtp_password = email_cfg.get('smtp_password', '')
+            self.email_use_tls = email_cfg.get('use_tls', True)
+            self.email_send_on_exit = email_cfg.get('send_on_exit', True)
+            self.email_max_attachment_mb = email_cfg.get('max_attachment_size_mb', 25)
+            
+            # Build a list with one recipient if enabled
+            if self.email_enabled and self.email_recipient:
+                self.email_recipients = [{
+                    'enabled': self.email_enabled,
+                    'recipient': self.email_recipient,
+                    'smtp_server': self.smtp_server,
+                    'smtp_port': self.smtp_port,
+                    'smtp_user': self.smtp_user,
+                    'smtp_password': self.smtp_password,
+                    'use_tls': self.email_use_tls,
+                    'attach_zip': True,      # default for legacy
+                    'language': 'en'          # default for legacy
+                }]
+            else:
+                self.email_recipients = []
+        
+        # Override enabled flag based on actual recipients (ensures consistency)
+        self.email_enabled = len(self.email_recipients) > 0  
             
         # Other configurations    
         self.image_logging_enabled = config.get('enable_image_logging', False)
@@ -606,43 +1975,90 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
     </html>
     """
         return html
+        
+    def _build_run_summaries(self) -> List[Dict]:
+        """
+        Build a list of run summaries from the current run directory.
+        Returns a list containing one summary dict (compatible with _generate_email_body).
+        """
+        run_summaries = []
+        status_file = os.path.join(self.run_dir, 'exit_status.json')
+
+        if not os.path.exists(status_file):
+            print("⚠️ exit_status.json not found, using fallback summary.")
+            # Fallback minimal summary
+            fallback = {
+                'CollectionType': 'METADATA_ONLY',
+                'Status': 'UNKNOWN',
+                'FolderName': os.path.basename(self.run_dir),
+                'CreationTime': datetime.datetime.fromtimestamp(os.path.getctime(self.run_dir)),
+                'ExitCode': -1,
+                'Metadata': {}
+            }
+            return [fallback]
+
+        try:
+            with open(status_file, 'r') as f:
+                exit_data = json.load(f)
+
+            # Determine CollectionType
+            collection_type = 'METADATA_ONLY'
+            if self.image_log_dir and os.path.exists(self.image_log_dir):
+                if any(os.scandir(self.image_log_dir)):
+                    collection_type = 'SUMMARY_METADATA'
+            if self.csv_log_dir and os.path.exists(self.csv_log_dir):
+                if any(os.scandir(self.csv_log_dir)):
+                    collection_type = 'SUMMARY_METADATA'
+
+            # Status based on exit code (0 = success, others = failed)
+            exit_code = exit_data.get('exit_code', 1)
+            status = 'SUCCESS' if exit_code == 0 else 'FAILED'
+
+            # Folder creation time
+            folder_name = os.path.basename(self.run_dir)
+            creation_time = datetime.datetime.fromtimestamp(os.path.getctime(self.run_dir))
+
+            # Metadata – can be extended with more fields from exit_data if desired
+            metadata = {}
+
+            summary = {
+                'CollectionType': collection_type,
+                'Status': status,
+                'FolderName': folder_name,
+                'CreationTime': creation_time,
+                'ExitCode': exit_code,
+                'Metadata': metadata
+            }
+            run_summaries.append(summary)
+
+        except Exception as e:
+            print(f"⚠️ Failed to read exit_status.json: {e}")
+            # Fallback as above
+            run_summaries = [{
+                'CollectionType': 'METADATA_ONLY',
+                'Status': 'UNKNOWN',
+                'FolderName': os.path.basename(self.run_dir),
+                'CreationTime': datetime.datetime.fromtimestamp(os.path.getctime(self.run_dir)),
+                'ExitCode': -1,
+                'Metadata': {}
+            }]
+
+        return run_summaries    
 
     def _send_email(self, attachment_path: str):
-        """Send email with the ZIP archive attached."""
-        if not self.email_enabled:
+        """Send emails to all configured recipients."""
+        if not self.email_recipients:
             return
-        
-        # Resolve password
-        password = self._load_password(self.smtp_password)
-        if not password:
-            print("❌ No valid SMTP password available, email not sent")
-            return
-        
-        msg = MIMEMultipart()
-        msg['From'] = self.smtp_user
-        msg['To'] = self.email_recipient
-        msg['Subject'] = f"Face Recognition Run - {os.path.basename(self.run_dir)}"
-        
-        try:
-            with open(attachment_path, 'rb') as f:
-                part = MIMEBase('application', 'zip')
-                part.set_payload(f.read())
-                encoders.encode_base64(part)
-                part.add_header('Content-Disposition', f'attachment; filename="{os.path.basename(attachment_path)}"')
-                msg.attach(part)
-                
-            self._generate_email_body()
-            
-            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
-            if self.email_use_tls:
-                server.starttls()
-            server.login(self.smtp_user, password)
-            server.send_message(msg)
-            server.quit()
-            print(f"📧 Email sent to {self.email_recipient}")
-        except Exception as e:
-            print(f"❌ Email sending failed: {e}")
-            
+
+        # Read exit_status.json once for all emails
+        run_summaries = self._build_run_summaries()
+
+        for recip in self.email_recipients:
+            try:
+                self._send_single_email(recip, attachment_path, run_summaries)
+            except Exception as e:
+                print(f"❌ Failed to send email to {recip['recipient']}: {e}")
+                                        
     def _send_email_async(self, attachment_path: str):
         """Send email in a non‑blocking thread."""
         def worker():
@@ -650,6 +2066,44 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         thread = threading.Thread(target=worker, daemon=True)
         thread.start()
         print("📧 Email thread started")
+
+    def _send_single_email(self, recip: dict, attachment_path: str, run_summaries: list):
+        """Send a single email using the recipient's settings."""
+        password = self._load_password(recip['smtp_password'])
+        if not password:
+            print(f"⚠️ No password for {recip['recipient']}, skipping.")
+            return
+
+        msg = MIMEMultipart()
+        msg['From'] = recip['smtp_user']
+        msg['To'] = recip['recipient']
+        msg['Subject'] = f"Face Recognition Run - {os.path.basename(self.run_dir)}"
+
+        # Generate HTML in the recipient's language
+        html_body = self._generate_email_body(
+            run_summaries, self.config,
+            language=recip['language']
+        )
+        from email.mime.text import MIMEText
+        msg.attach(MIMEText(html_body, 'html'))
+
+        # Conditionally attach the ZIP archive
+        if recip['attach_zip'] and attachment_path and os.path.exists(attachment_path):
+            with open(attachment_path, 'rb') as f:
+                part = MIMEBase('application', 'zip')
+                part.set_payload(f.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', f'attachment; filename="{os.path.basename(attachment_path)}"')
+                msg.attach(part)
+
+        # Send
+        server = smtplib.SMTP(recip['smtp_server'], recip['smtp_port'])
+        if recip['use_tls']:
+            server.starttls()
+        server.login(recip['smtp_user'], password)
+        server.send_message(msg)
+        server.quit()
+        print(f"📧 Email sent to {recip['recipient']} (lang={recip['language']}, attach={recip['attach_zip']})")        
                                 
     # ========== THREAD SAFE SHUTDOWN ==========
     
@@ -3017,11 +4471,12 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             # Write exit status
             self.write_exit_status(exit_code, exit_message)
             
-            # Optionally compress and email the run directory
-            if self.email_enabled and self.email_send_on_exit and self.run_dir:
+ 
+            # In the finally block:
+            if self.email_recipients and self.run_dir:
                 zip_path = self._zip_run_directory()
                 if zip_path:
-                    self._send_email_async(zip_path)
+                    self._send_email(zip_path)   
             
             # Restore console output before closing (so prints go to terminal)
             self._restore_file_logging()
@@ -3359,1315 +4814,4 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                         f"Progress: {progress.get('overall', 0):.1%}")
                                                 
         
-                    
 
-
-# main/entry_multi.py
-
-
-import sys
-import os
-from pathlib import Path
-
-# Get the project root (go up 2 levels from current file)
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-sys.path.append(str(PROJECT_ROOT))
-
-LOG_ROOT = Path(__file__).parent.parent.parent.parent.parent
-
-
-from structure import create_system, ConfigManager
-from structure import MultiSourceRealTimeProcessor
-import time
-import os
-from typing import Dict
-import datetime
-import threading
-
-def test_multi_stream_connections(sources_config: Dict[str, Dict]) -> bool:
-    """Test if we can connect to all streams before starting main processing"""
-    print(f"\n🔍 Testing multi-stream connections for {len(sources_config)} sources...")
-    
-    # FIXED: Use the correct module name
-    from structure import StreamManager
-    
-    successful_sources = []
-    failed_sources = []
-    
-    for source_id, source_config in sources_config.items():
-        print(f"\n📹 Testing source: {source_id}")
-        try:
-            test_manager = StreamManager(source_config)
-            success = test_manager.initialize_stream(source_config['url'])
-            
-            if success:
-                # Test reading a few frames
-                frame_success_count = 0
-                for i in range(3):
-                    frame_success, frame = test_manager.read_frame()
-                    if frame_success and frame is not None:
-                        frame_success_count += 1
-                        print(f"   ✅ Frame {i+1}: {frame.shape}")
-                    else:
-                        print(f"   ❌ Failed to read frame {i+1}")
-                
-                if frame_success_count >= 2:  # Require at least 2 successful frames
-                    successful_sources.append(source_id)
-                    print(f"✅ Source {source_id} test successful")
-                else:
-                    failed_sources.append(source_id)
-                    print(f"❌ Source {source_id} test failed - insufficient frames")
-            else:
-                failed_sources.append(source_id)
-                print(f"❌ Source {source_id} test failed - initialization failed")
-                
-            test_manager.release()
-            
-        except Exception as e:
-            failed_sources.append(source_id)
-            print(f"❌ Source {source_id} test error: {e}")
-    
-    # Print summary
-    print(f"\n📊 STREAM TEST SUMMARY:")
-    print(f"   ✅ Successful: {len(successful_sources)} sources")
-    print(f"   ❌ Failed: {len(failed_sources)} sources")
-    
-    if failed_sources:
-        print(f"   Failed sources: {failed_sources}")
-    
-    # Return True if at least one source is successful
-    return len(successful_sources) > 0
-
-def check_gpu_availability(config: dict) -> dict:
-    """Check and report GPU availability, updating config accordingly"""
-    try:
-        import torch
-        if torch.cuda.is_available():
-            device_count = torch.cuda.device_count()
-            current_device = config.get('gpu_device', 0)
-            
-            if current_device < device_count:
-                gpu_name = torch.cuda.get_device_name(current_device)
-                memory_info = torch.cuda.get_device_properties(current_device)
-                total_memory = memory_info.total_memory / (1024**3)  # Convert to GB
-                
-                print(f"🎮 GPU {current_device}: {gpu_name} available")
-                print(f"🎮 CUDA version: {torch.version.cuda}")
-                print(f"🎮 Total GPU Memory: {total_memory:.1f} GB")
-                
-                # Test GPU functionality
-                test_tensor = torch.randn(1000, 1000).cuda()
-                test_result = test_tensor * 2
-                del test_tensor, test_result
-                torch.cuda.empty_cache()
-                
-                print("✅ GPU functionality test passed")
-                config['use_gpu'] = True
-                return config
-            else:
-                print(f"⚠️  GPU device {current_device} not available, falling back to CPU")
-                config['use_gpu'] = False
-        else:
-            print("⚠️  CUDA not available, falling back to CPU")
-            config['use_gpu'] = False
-            
-    except Exception as e:
-        print(f"⚠️  GPU check failed: {e}, falling back to CPU")
-        config['use_gpu'] = False
-    
-    return config
-
-def check_onnx_gpu_availability():
-    """Check if ONNX Runtime can use GPU"""
-    try:
-        import onnxruntime as ort
-        available_providers = ort.get_available_providers()
-        print(f"🔧 Available ONNX Providers: {available_providers}")
-        
-        if 'CUDAExecutionProvider' in available_providers:
-            print("✅ ONNX CUDA Execution Provider available")
-            return True
-        else:
-            print("⚠️  ONNX CUDA Execution Provider not available")
-            return False
-            
-    except Exception as e:
-        print(f"⚠️  ONNX GPU check failed: {e}")
-        return False
-
-def print_system_info(config: dict):
-    """Print comprehensive system information"""
-    print("\n" + "="*60)
-    print("🖥️  SYSTEM INFORMATION")
-    print("="*60)
-    
-    # CPU Information
-    try:
-        import psutil
-        cpu_count = psutil.cpu_count()
-        memory_total = psutil.virtual_memory().total / (1024**3)  # GB
-        print(f"💻 CPU Cores: {cpu_count}")
-        print(f"💾 Total RAM: {memory_total:.1f} GB")
-    except:
-        print("💻 CPU: Information not available")
-    
-    # GPU Information
-    try:
-        import torch
-        if torch.cuda.is_available():
-            for i in range(torch.cuda.device_count()):
-                gpu_name = torch.cuda.get_device_name(i)
-                memory_info = torch.cuda.get_device_properties(i)
-                total_memory = memory_info.total_memory / (1024**3)
-                print(f"🎮 GPU {i}: {gpu_name} ({total_memory:.1f} GB)")
-        else:
-            print("🎮 GPU: No CUDA devices available")
-    except:
-        print("🎮 GPU: Information not available")
-    
-    # Python Information
-    import sys
-    print(f"🐍 Python Version: {sys.version.split()[0]}")
-    
-    # Library Versions
-    try:
-        import torch
-        print(f"🔥 PyTorch Version: {torch.__version__}")
-    except:
-        pass
-        
-    try:
-        import cv2
-        print(f"👁️  OpenCV Version: {cv2.__version__}")
-    except:
-        pass
-        
-    try:
-        import onnxruntime as ort
-        print(f"🔧 ONNX Runtime Version: {ort.__version__}")
-    except:
-        pass
-    
-    print("="*60)
-
-def verify_gpu_usage(face_system):
-    """Verify that GPU is actually being used by the models"""
-    print("\n🔍 Verifying GPU usage...")
-    
-    try:
-        # Check YOLO model device
-        if hasattr(face_system, 'detection_model') and face_system.detection_model:
-            yolo_device = next(face_system.detection_model.model.parameters()).device
-            print(f"🎯 YOLO Model Device: {yolo_device}")
-        
-        # Check ONNX mask detector
-        if hasattr(face_system, 'mask_detector') and face_system.mask_detector:
-            providers = face_system.mask_detector.get_providers()
-            print(f"🎯 ONNX Mask Detector Providers: {providers}")
-            
-        # Check DeepFace backend
-        try:
-            from deepface.commons import functions
-            backend = functions.get_backend()
-            print(f"🎯 DeepFace Backend: {backend}")
-        except:
-            print("🎯 DeepFace Backend: Could not determine")
-            
-    except Exception as e:
-        print(f"⚠️  GPU verification failed: {e}")
-        
-def validate_email_config(config: dict, test_connection: bool = False) -> None:
-    """Validate email configuration and resolve password; exit with helpful message on failure."""
-    email_cfg = config.get('email', {})
-    if not email_cfg.get('enabled', False):
-        return  # email disabled – nothing to validate
-
-    password_setting = email_cfg.get('smtp_password', '')
-    if not password_setting:
-        print("❌ Email is enabled but 'smtp_password' is missing from config.")
-        sys.exit(1)
-
-    # Use the same resolution logic as MultiSourceRealTimeProcessor._load_password
-    resolved = None
-    source_desc = "unknown"
-
-    if password_setting.startswith("env:"):
-        env_var = password_setting[4:]
-        resolved = os.environ.get(env_var, "")
-        source_desc = f"environment variable '{env_var}'"
-        if not resolved:
-            print(f"❌ Email enabled but {source_desc} is not set or empty.")
-            print("\n💡 To fix:")
-            print(f"   - Windows (Command Prompt): set {env_var}=your_password")
-            print(f"   - Windows (PowerShell):     $env:{env_var} = 'your_password'")
-            print(f"   - Linux/macOS:               export {env_var}=your_password")
-            print("\n   Or change the config to use a plain password or a file:")
-            print("   'smtp_password': 'your_plain_password'")
-            print("   'smtp_password': '/path/to/password.txt'")
-            sys.exit(1)
-    elif '/' in password_setting or '\\' in password_setting or password_setting.endswith(('.txt', '.pwd')):
-        # File path
-        source_desc = f"file '{password_setting}'"
-        if not os.path.exists(password_setting):
-            print(f"❌ Email enabled but password file '{password_setting}' does not exist.")
-            sys.exit(1)
-        try:
-            with open(password_setting, 'r') as f:
-                resolved = f.readline().strip()
-            if not resolved:
-                print(f"❌ Password file '{password_setting}' is empty.")
-                sys.exit(1)
-        except Exception as e:
-            print(f"❌ Could not read password file '{password_setting}': {e}")
-            sys.exit(1)
-    else:
-        # Plain text
-        resolved = password_setting
-        source_desc = "plain text in config"
-
-    if not resolved:
-        print(f"❌ Resolved password from {source_desc} is empty.")
-        sys.exit(1)
-
-    print(f"✅ Email password resolved from {source_desc} (length {len(resolved)}).")
-
-    # Optional: test SMTP connection
-    if test_connection:
-        try:
-            import smtplib
-            server = smtplib.SMTP(email_cfg.get('smtp_server', 'smtp.gmail.com'),
-                                  email_cfg.get('smtp_port', 587))
-            if email_cfg.get('use_tls', True):
-                server.starttls()
-            server.login(email_cfg.get('smtp_user', ''), resolved)
-            server.quit()
-            print("✅ SMTP login successful – credentials are valid.")
-        except Exception as e:
-            print(f"❌ SMTP login failed: {e}")
-            print("   Check your username, password, and SMTP server settings.")
-            sys.exit(1)
-            
-def get_default_config():
-    """Return the complete default configuration"""
-    return {
-        # ========== MODEL PATHS ==========        
-        'detection_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\yolov12m-face.pt',
-        'embeddings_db_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\dataset\person_512.json',
-        'mask_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\mask_detector_cus4.onnx',
-        
-                                                # PLEASE FIX THE STABILITY OF THE VERIFICATION 
-                                                # VALUE BEFORE TRYING TO CHANGE THE TYPE OF mask MODEL USED.        
-        
-        # ========== CORE DETECTION PARAMETERS ==========
-        'detection_confidence': 0.5,
-        'recognition_threshold': 0.8,
-        'mask_detection_threshold': 0.6,  # INCREASED from 0.5 - makes mask detection more conservative
-        'detection_iou': 0.3,
-        'min_face_size': 10, # Min face height in pixels
-        'max_faces_per_frame': 15,
-        'enable_person_detection': True,
-        'person_detection_confidence_threshold': 0.4,        
-        
-        # ========== FRAME PROCESSING CONFIGURATION ==========
-        'frame_processing': {
-            # Basic processing parameters
-            'processing_width': 640,
-            'processing_height': 480,
-            'min_processing_scale': 0.3,
-            'max_processing_scale': 4.5,
-            'default_processing_scale': 1.0,
-            
-            # Color and normalization settings
-            'convert_to_rgb': True,  # Convert BGR to RGB for models that expect RGB
-            'normalize_values': False,  # Normalize pixel values to [0, 1]
-            'apply_mean_std_normalization': False,  # Apply ImageNet mean/std normalization
-            
-            # Normalization values (ImageNet standard)
-            'normalization_mean': [0.485, 0.456, 0.406],
-            'normalization_std': [0.229, 0.224, 0.225],
-            
-            # Debug and validation
-            'debug_mode': False,
-            'validate_frames': True,  # Enable frame validation
-            'frame_validation_threshold': 0.1,  # Reject frames with brightness < 10% or > 90%
-            
-            # Frame statistics collection
-            'collect_frame_stats': True,
-            'stats_update_interval': 30.0,  # Update stats every 30 seconds
-            
-            # Contrast enhancement
-            'contrast_enhancement': {
-                'enabled': True,
-                'method': 'clahe',  # 'clahe', 'histogram', or 'none'
-                'clahe_clip_limit': 3.0,
-                'clahe_grid_size': 8,
-            },
-            
-            # Region of interest (ROI) extraction
-            'roi_extraction': {
-                'enabled': True,
-                'default_padding': 10,  # Pixels to add around bbox
-                'min_roi_size': 32,  # Minimum ROI size in pixels
-            },
-            
-            # Multi-source composite settings
-            'composite_creation': {
-                'grid_target_width': 480,
-                'grid_target_height': 360,
-                'horizontal_target_height': 360,
-                'vertical_target_width': 480,
-                'maintain_aspect_ratio': True,
-                'max_composite_width': 1920,
-                'max_composite_height': 1080,
-            },
-            
-            # Frame buffering and queuing
-            'frame_buffer': {
-                'buffer_size': 3,
-                'queue_timeout': 0.1,  # seconds
-                'max_queue_size': 100,
-                'drop_old_frames': True,  # Drop old frames when queue is full
-            },
-            
-            # Frame quality assessment
-            'quality_assessment': {
-                'enabled': True,
-                'min_brightness': 20.0,
-                'max_brightness': 235.0,
-                'min_contrast': 10.0,
-                'blur_threshold': 100.0,  # Laplacian variance threshold
-            },
-            
-            # Performance optimization
-            'performance': {
-                'use_half_precision': False,  # Use float16 for processing
-                'enable_caching': True,
-                'cache_size': 10,  # Number of frames to cache
-                'optimize_for_size': True,  # Optimize memory usage
-            },
-            
-            # Frame preprocessing pipeline
-            'preprocessing_pipeline': [
-                'validate_frame',
-                'resize_for_processing',
-                'convert_color_space',
-                'enhance_contrast',
-                'normalize_if_needed'
-            ],
-            
-            # Color space conversion options
-            'color_space_conversion': {
-                'input_format': 'bgr',  # OpenCV default
-                'output_format': 'rgb',  # Most models expect RGB
-                'conversion_method': 'opencv',  # 'opencv', 'numpy', or 'manual'
-            },
-            
-            # Dynamic scaling parameters
-            'dynamic_scaling': {
-                'enabled': True,
-                'min_face_size': 50,  # Minimum face size for scaling decisions
-                'max_face_size': 300,  # Maximum face size for scaling decisions
-                'scale_adjustment_step': 0.1,
-                'stability_threshold': 0.8,  # Confidence threshold for stable scaling
-            },
-        },
-        
-        # ========== CCTV CONFIGURATION ==========
-        'cctv_name': 'Default',  
-        
-        # ========== MULTI-SOURCE DISPLAY CONFIGURATION ==========
-        'display_layout': 'grid',  # 'grid', 'horizontal', 'vertical'
-        'max_display_sources': 4,
-        
-        # ========== MULTI-SOURCE PROCESSING CONFIGURATION ==========
-        'processing_width': 640,
-        'processing_height': 480,
-        'processing_scale': 1.0,
-        
-        # ========== STREAM HEALTH MONITORING ==========
-        'stream_health': {
-            'check_interval': 30.0,  # seconds
-            'success_rate_threshold': 0.3,  # 30%
-            'unhealthy_retry_delay': 2.0,  # seconds
-            'max_consecutive_errors': 10,
-        },
-        
-        # ========== MAINTENANCE CONFIGURATION ==========
-        'maintenance_interval': 300.0,  # 5 minutes in seconds
-        
-        # ========== VIOLATION VERIFICATION (PROCESSOR LEVEL) ==========
-        'violation_verification_enabled': True,
-        'min_violation_duration': 0.1,  # seconds
-        'min_violation_frames': 1,
-        'violation_confidence_threshold': 0.4,
-        
-        # ========== LOGGING INTERVALS ==========
-        'log_interval': 1,  # Process every Nth frame
-        'enable_logging': True,
-        'enable_image_logging': True,
-        
-        # ========== RESOURCE MANAGEMENT ==========
-        'resource_monitoring': {
-            'memory_threshold_mb': 1024,  # Warn at 1GB
-            'cleanup_interval': 60.0,  # seconds
-            'max_open_files': 100,
-            'max_threads': 50,
-        },
-        
-        # ========== TRACKING BUFFER SIZES ==========
-        'tracking_buffers': {
-            'max_track_age': 500,  # seconds
-            'max_violation_history': 100,
-            'cleanup_old_tracks_interval': 60.0,
-        },
-        
-        # ========== GRID LAYOUT CONFIGURATION ==========
-        'grid_layout': {
-            'target_height': 360,
-            'target_width': 480,
-            'max_grid_size': 4,  # 2x2 grid max
-        },
-        
-        # ========== HORIZONTAL LAYOUT CONFIGURATION ==========
-        'horizontal_layout': {
-            'target_height': 360,
-            'maintain_aspect_ratio': True,
-        },
-        
-        # ========== VERTICAL LAYOUT CONFIGURATION ==========
-        'vertical_layout': {
-            'target_width': 480,
-            'maintain_aspect_ratio': True,
-        },
-        
-        # ========== SOURCE OVERLAY CONFIGURATION ==========
-        'source_overlay': {
-            'show_source_id': True,
-            'show_cctv_name': True,
-            'show_violation_count': True,
-            'font_scale': 0.5,
-            'font_thickness': 2,
-            'text_color': (255, 255, 255),  # White
-            'background_color': (0, 0, 0),  # Black with transparency
-            'background_alpha': 0.7,
-        },        
-            
-        # ========== ENHANCED TRACKING CONFIGURATION ==========
-        'tracking': {
-            'enabled': True,
-            'fairness_enabled': True,
-            'confidence_frames': 3,
-            'cooldown_seconds': 5,
-            'min_iou': 0.3,
-            'max_recognitions_per_person': 10,
-            'recent_window_size': 300,
-            'enable_velocity_prediction': True,
-            'enable_appearance_matching': True,
-            'max_track_age': 500,
-            
-            # ByteTrack person tracking configuration
-            'enable_person_tracking': True,
-            'enabled':True,
-            'person_track_confidence': 0.55,
-            'person_track_max_age': 90,
-            'person_iou_threshold': 0.3,
-            'bytetrack_track_thresh': 0.5,
-            'bytetrack_track_buffer': 100,
-            'bytetrack_match_thresh': 0.8,
-            'bytetrack_min_box_area': 10,
-            
-            # 🎯 Progressive mask detection configuration
-            'progressive_mask': {          
-                
-                # Buffer and temporal parameters
-                'mask_buffer_size': 200,
-                'min_mask_frames': 2,
-                'occlusion_timeout': 3.0,
-                
-                # Confidence and stability thresholds  
-                'mask_confidence_threshold': 0.1,
-                'mask_consistency_threshold': 0.1,
-                
-                # Require higher stability before committing
-                'min_stability_to_commit': 0.15,
-                
-                # State holding parameters
-                'state_hold_duration': 15.0,
-                'verification_grace_ratio': 0.1,
-                
-                # Spatial consistency parameters
-                'spatial_consistency_weight': 0.3,
-                'max_bbox_variation': 0.45,
-                
-                # Extreme confidence handling
-                'extreme_confidence_threshold': 0.95,
-                'extreme_mask_penalty': 0.8,
-                'extreme_no_mask_boost': 0.9,
-                
-                # Initial weight parameters
-                'initial_mask_weight': 0.5,
-                'initial_no_mask_weight': 0.5,
-                
-                # Weight adjustment parameters (NEW - optional to expose)
-                'weight_increase_high_conf': 0.4,
-                'weight_decrease_low_conf': 0.3,
-                'weight_increase_opposite': 0.1,
-                
-                'confidence_smoothing_factor': 0.3,
-                'stability_smoothing_factor': 0.2,                
-            },
-            
-            # 🎯 **MODIFIED** Violation verification configuration
-            'violation_verification_enabled': True,
-            'min_violation_duration': 1,       # DECREASED from 20.0 - quicker to detect violations
-            'min_violation_frames': 1,           # DECREASED from 35 - quicker to detect violations
-            'violation_confidence_threshold': 0.15, # DECREASED from 0.9 - more sensitive to violations
-        },    
-        
-        # ========== VIOLATION VERIFICATION CONFIGURATION ==========
-        'violation_verification': {
-            'enabled': True,
-            'min_duration_seconds': 0.1,           # DECREASED from 30 - faster verification
-            'min_frames': 1 ,                     # DECREASED from 50 - faster verification
-            'confidence_threshold': 0.1,         # DECREASED from 0.85 - more sensitive
-            'progressive_verification': True,
-            'log_unverified_violations': True,
-            'unverified_log_cooldown': 10,        # DECREASED from 15 - more frequent logging
-            'false_negative_monitoring': True,
-            # 🆕 Modified multi-level verification
-            'verification_levels': {
-                'low': {'duration': 1.5, 'frames': 1},      # Quicker initial detection
-                'medium': {'duration': 2.0, 'frames': 2},  # Medium confidence
-                'high': {'duration': 3.0, 'frames': 3}    # High confidence (verified)
-            }
-        },  
-                
-        # ========== LOGGING CONFIGURATION ==========
-        'enable_logging': True,
-        'enable_image_logging': True,
-        'log_interval': 5,
-        'image_log_interval': 5,
-        'max_images_per_session': 5000,
-        'min_save_interval': 1.0,
-        
-        # ========== SERVER PUSH CONFIGURATION ==========        
-        'server_push_enabled': True,
-        'server_endpoint': '',
-        'server_push_cooldown': 5,
-        'server_timeout': 10,
-        'server_retry_attempts': 10,
-        'server_retry_delay': 2,
-        
-        # ========== IMAGE RESIZE CONFIGURATION ==========
-        'enable_image_resize': True,
-        'image_resize_width': 1024,
-        'image_resize_height': 576,
-        'image_resize_method': 'default',
-        
-        # ========== ALERT CONFIGURATION ==========
-        'enable_voice_alerts': True,
-        'alert_server_url': " ",
-        'alert_cooldown_seconds': 15,            # DECREASED from 20 - more responsive alerts
-        'min_violation_frames': 1,              # DECREASED from 20 - more sensitive
-        'min_violation_seconds': 1,              # DECREASED from 12 - faster alerts
-        'max_gap_frames': 10,                    # INCREASED from 8 - more tolerant to gaps
-        'alert_language': 'id',
-        'alert_style': 'formal',
-        'enable_individual_alerts': True,
-        'enable_group_alerts': True,
-        'alert_timeout_seconds': 2,              # DECREASED from 3 - faster alert processing
-        # 🆕 Modified alert verification requirements
-        'alert_verification_required': True,
-        'min_alert_confidence': 0.85,            # DECREASED from 0.9 - more sensitive alerts
-        'alert_buffer_size': 100,                 # DECREASED from 25 - faster alert decisions
-        
-        # ========== FAISS SYSTEM CONFIGURATION ========== 
-        'use_faiss_gpu': True,  # Enable GPU acceleration for FAISS
-        'faiss_index_type': 'FlatL2',  # Options: 'FlatL2', 'FlatIP', 'IVFFlat', 'IVFPQ'
-        'faiss_nlist': 100,  # For IVF indices
-        'faiss_pq_m': 8,  # For IVFPQ: number of sub-vectors
-        'faiss_pq_bits': 8,  # For IVFPQ: bits per sub-vector
-        'faiss_max_l2_distance': 100.0,  # For L2 distance normalization
-        
-        # Model paths
-        'embedding_model': 'Facenet512',
-        
-        # ========== STREAM MANAGEMENT CONFIGURATION ==========
-        'stream_manager': {
-            'max_reconnect_attempts': 10,
-            'reconnect_delay': 3,
-            'health_check_interval': 10,
-            'max_frame_gap': 5,
-            'buffer_size': 100,
-            'open_timeout': 10000,
-            'read_timeout': 5000,
-        },
-        
-        # ========== DISPLAY CONFIGURATION ==========
-        'display': {
-            'default_width': 1280,
-            'default_height': 720,
-            'max_display_width': 1920,
-            'max_display_height': 1080,
-            'resize_method': 'fit_to_screen',
-            'show_resize_info': False,
-            'show_performance_stats': False,
-        },
-        
-        # ========== DEBUG CONFIGURATION ==========
-        'debug': {
-            'enabled': False,
-            'show_detection_debug': False,
-            'save_debug_frames': False,
-            'max_debug_frames': 100,
-            'verbose': False,
-        },
-        
-        # ========== CONTEXT-AWARE SCALING ==========
-        'context_aware_scaling': {
-            'enabled': True,
-            'debug_mode': False,
-            'min_context_samples': 10,
-            'max_context_samples': 100,
-        },
-        
-        # ========== ADVANCED FEATURES ==========
-        'enable_multi_scale': True,
-        'enable_temporal_fusion': True,
-        'enable_quality_aware': True,
- 
-        
-        # ========== BASE64 CONFIGURATION ==========
-        'enable_base64_logging': True,
-        'base64_quality': 50,
-        
-        # ========== SYSTEM MODE ==========
-        'headless_mode': False,
-        'use_gpu': False,
-        'gpu_device': 0,
-        
-        # ========== ANNOTATION CONFIGURATION ==========
-        'annotation_box_thickness': 1,
-        'annotation_text_thickness': 1, 
-        'annotation_min_text_scale': 0.3,
-        'annotation_max_text_scale': 0.8,
-        
-        # ========== PERFORMANCE TUNING ==========
-        'performance': {
-            'fps_update_interval': 5.0,
-            'dynamic_adjustment_enabled': True,
-            'quality_threshold_high': 0.8,
-            'quality_threshold_low': 0.3,
-            'face_size_threshold_small': 50,
-            'face_size_threshold_large': 200,
-        },
-        
-        'output': {
-            'root_dir': r'logs-running\magick\runs-magick',                    # Base directory for all runs
-            'create_timestamped_subdir': True,      # Create YYYYMMDD_HHMMSS subfolder
-            'enable_exit_status': True,              # Write exit_status.json on shutdown
-        },
-        'email': {
-            'enabled': True,
-            'recipient': 'faridraihan17@gmail.com',
-            'smtp_server': 'smtp.gmail.com',
-            'smtp_port': 587,
-            'smtp_user': 'faridraihan17@gmail.com',
-            'smtp_password': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\pass.txt',        # Use environment variable for security
-            'use_tls': True,
-            'send_on_exit': True,                    # Send email after run finishes
-            'max_attachment_size_mb': 25,            # Common email limit
-        }        
-    }
-    
-    
-def get_advanced_sources_config():
-    """Return advanced sources configuration with parameters"""
-    return {
-        # '1': {
-        #     'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/601',
-        #     'description': 'Dekat meja IT',
-        #     'priority': 'low',
-        #     'processing_scale': 1,
-        #     'buffer_size': 100,
-        #     'cctv_name':None,            
-        # },
-        
-        
-        # '2': {
-        #     'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/501',
-        #     'description': 'Dekat meja bu Dyah',
-        #     'priority': 'medium',
-        #     'processing_scale':1,            
-        #     'buffer_size': 100,
-        #     'cctv_name':None,
-        # },
-        
-        # '3': {
-        #     'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/101',
-        #     'description': 'Atas Server Gedangan',
-        #     'priority': 'medium',
-        #     'processing_scale':1,            
-        #     'buffer_size': 100,
-        #     'cctv_name':None,
-        # },
-        
-        # '4': {
-        #     'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/601',
-        #     'description': 'Ruang Produksi',
-        #     'priority': 'medium',
-        #     'processing_scale':1,            
-        #     'buffer_size': 100,
-        #     'cctv_name':None,
-        # },   
-        
-        # '5': {
-        #     'url': 'rtsp://admin:admin@192.168.110.137:1935',
-        #     'description': 'HP Pribadi',
-        #     'priority': 'medium',
-        #     'processing_scale':1,            
-        #     'buffer_size': 100,
-        #     'cctv_name':None,
-        # },     
-                         
-        '6': {
-            'url': '0',
-            'description': 'Main Camera',
-            'priority': 'medium',
-            'processing_scale':1,            
-            'buffer_size': 100,
-            'cctv_name':None,
-        },
-        
-        # '7': {
-        #     'url': 'rtsp://admin:admin888@192.168.110.40:554/Streaming/Channels/601',
-        #     'description': 'Pojok dekat MIS',
-        #     'priority': 'medium',
-        #     'processing_scale':1,            
-        #     'buffer_size': 100,
-        #     'cctv_name':None,
-        # },                                  
-    }
-        
-def load_custom_config(config_path: str = None) -> Dict:
-    """Load custom configuration from file if provided"""
-    if config_path and os.path.exists(config_path):
-        try:
-            import json
-            with open(config_path, 'r') as f:
-                custom_config = json.load(f)
-            print(f"✅ Loaded custom configuration from: {config_path}")
-            return custom_config
-        except Exception as e:
-            print(f"❌ Failed to load custom configuration: {e}")
-            print("🔄 Using default configuration")
-    
-    return get_default_config()
-
-def test_server_connection(config: dict) -> bool:
-    """Test connection to the violation server"""
-    if not config.get('server_push_enabled', False):
-        print("📤 Server push disabled, skipping server connection test")
-        return True
-        
-    server_endpoint = config.get('server_endpoint', '')
-    if not server_endpoint:
-        print("❌ No server endpoint configured")
-        return False
-        
-    try:
-        import requests
-        print(f"🔍 Testing server connection: {server_endpoint}")
-        
-        # Test health endpoint
-        health_url = server_endpoint.replace('/api/violations', '/api/health')
-        response = requests.get(health_url, timeout=10)
-        
-        if response.status_code == 200:
-            print(f"✅ Server connection successful: {health_url}")
-            return True
-        else:
-            print(f"❌ Server health check failed: {response.status_code}")
-            return False
-            
-    except Exception as e:
-        print(f"❌ Server connection test failed: {e}")
-        print("💡 Make sure the test server is running: python test_upload_server.py")
-        return False
-
-def print_server_push_info(config: dict):
-    """Print server push configuration information"""
-    if config.get('server_push_enabled', False):
-        print("\n📤 SERVER PUSH CONFIGURATION")
-        print("="*40)
-        print(f"   Endpoint: {config.get('server_endpoint')}")
-        print(f"   Cooldown: {config.get('server_push_cooldown')}s")
-        print(f"   Timeout: {config.get('server_timeout')}s")
-        print(f"   Retry Attempts: {config.get('server_retry_attempts')}")
-        print(f"   CCTV Name: {config.get('cctv_name')}")
-        print("   JSON Structure:")
-        print("     {")
-        print('       "filename": "string",')
-        print('       "image_format": "jpg",')
-        print('       "image_data": "base64_string",')
-        print('       "detected_name": "string",')
-        print('       "cctv_name": "string"')
-        print("     }")
-        print("="*40)
-
-def print_multi_source_info(sources_config: Dict[str, Dict]):
-    """Print multi-source configuration information"""
-    print("\n🎯 MULTI-SOURCE CONFIGURATION")
-    print("="*50)
-    for source_id, source_config in sources_config.items():
-        print(f"📹 {source_id}:")
-        print(f"   URL: {source_config.get('url', 'N/A')}")
-        print(f"   Description: {source_config.get('description', 'No description')}")
-        print(f"   Priority: {source_config.get('priority', 'medium')}")
-        print(f"   CCTV Name: {source_config.get('cctv_name', 'Unknown')}")
-        print(f"   Processing Scale: {source_config.get('processing_scale', 1.0)}")
-    print("="*50)
-
-def print_verification_summary(processor):
-    """Print comprehensive verification summary from TrackingManager"""
-    try:
-        if hasattr(processor, 'get_verification_stats'):
-            stats = processor.get_verification_stats()
-            
-            print("\n" + "="*60)
-            print("✅ TRACKING MANAGER VERIFICATION SUMMARY")
-            print("="*60)
-            
-            # Aggregate stats
-            aggregate = stats.get('aggregate', {})
-            print(f"\n📊 AGGREGATE STATISTICS:")
-            print(f"   Total Detected: {aggregate.get('total_detected', 0)}")
-            print(f"   Total Verified: {aggregate.get('total_verified', 0)}")
-            print(f"   Total Rejected: {aggregate.get('total_rejected', 0)}")
-            print(f"   False Positives Prevented: {aggregate.get('false_positives_prevented', 0)}")
-            print(f"   Active Violation Tracks: {aggregate.get('active_tracks', 0)}")
-            print(f"   Currently Verified: {aggregate.get('currently_verified', 0)}")
-            
-            # Calculate rates
-            total_detected = max(1, aggregate.get('total_detected', 1))
-            total_verified = aggregate.get('total_verified', 0)
-            total_rejected = aggregate.get('total_rejected', 0)
-            false_positives_prevented = aggregate.get('false_positives_prevented', 0)
-            
-            print(f"\n📈 VERIFICATION SYSTEM METRICS:")
-            
-            # 1. What percentage of detections were verified?
-            verification_success_rate = (total_verified / total_detected) * 100
-            print(f"   Verified Detections: {verification_success_rate:.1f}% ({total_verified}/{total_detected})")
-            
-            # 2. What percentage of detections were rejected?
-            rejection_rate = (total_rejected / total_detected) * 100
-            print(f"   Rejected Detections: {rejection_rate:.1f}% ({total_rejected}/{total_detected})")
-            
-            # 3. Of the rejected detections, how many were false positives?
-            if total_rejected > 0:
-                false_positive_catch_rate = (false_positives_prevented / total_rejected) * 100
-                print(f"   False Positives Caught: {false_positive_catch_rate:.1f}% ({false_positives_prevented}/{total_rejected})")
-            else:
-                print(f"   False Positives Caught: N/A (no rejected detections)")
-            
-            # 4. Overall system accuracy (if we assume verified = correct)
-            total_decisions = total_verified + total_rejected
-            if total_decisions > 0:
-                accuracy = ((total_verified + false_positives_prevented) / total_decisions) * 100
-                print(f"   System Accuracy: {accuracy:.1f}%")
-            else:
-                print(f"   System Accuracy: N/A (no decisions made)")
-            
-            # Per-source stats
-            per_source = stats.get('per_source', {})
-            if per_source:
-                print(f"\n📊 PER-SOURCE STATISTICS:")
-                for source_id, source_stats in per_source.items():
-                    print(f"\n   📹 Source: {source_id}")
-                    print(f"      Detected: {source_stats.get('total_detected', 0)}")
-                    print(f"      Verified: {source_stats.get('total_verified', 0)}")
-                    print(f"      Rejected: {source_stats.get('total_rejected', 0)}")
-                    print(f"      Active Tracks: {source_stats.get('active_violation_tracks', 0)}")
-            
-            # System stats
-            system_stats = stats.get('system_stats', {})
-            if system_stats:
-                print(f"\n📊 SYSTEM STATISTICS:")
-                print(f"   Total Logged: {system_stats.get('total_logged', 0)}")
-                print(f"   Verified Logged: {system_stats.get('verified_logged', 0)}")
-                
-                if system_stats.get('last_verified_time'):
-                    last_time = datetime.datetime.fromtimestamp(system_stats['last_verified_time'])
-                    print(f"   Last Verified: {last_time.strftime('%H:%M:%S')}")
-            
-            print("="*60)
-            
-    except Exception as e:
-        print(f"⚠️ Error printing verification summary: {e}")
-        
-def monitor_verification_performance(processor, interval_seconds=30):
-    """Monitor verification performance periodically"""
-    def monitor_worker():
-        while getattr(processor, 'running', False):
-            try:
-                print_verification_summary(processor)
-                time.sleep(interval_seconds)
-            except Exception as e:
-                print(f"⚠️ Verification monitoring error: {e}")
-                time.sleep(interval_seconds)
-    
-    monitor_thread = threading.Thread(target=monitor_worker, daemon=True, name="verification_monitor")
-    monitor_thread.start()
-    print(f"📊 Started verification performance monitoring (interval: {interval_seconds}s)")
-
-
-def main():
-    # Load configuration
-    import argparse
-    parser = argparse.ArgumentParser(description='Run modular face recognition system')
-    parser.add_argument('--config', type=str, help='Path to custom configuration JSON file')
-    parser.add_argument('--multi-source', action='store_true', help='Enable multi-camera processing')
-    parser.add_argument('--sources-config', type=str, help='Path to multi-source configuration JSON file')
-    parser.add_argument('--camera', type=str, default='0', help='Camera source (default: 0)')
-    parser.add_argument('--rtsp', type=str, help='RTSP stream URL')
-    parser.add_argument('--no-gpu', action='store_true', help='Disable GPU acceleration')
-    parser.add_argument('--cctv-name', type=str, help='Override CCTV name')
-    parser.add_argument('--no-server-push', action='store_true', help='Disable server push')
-    parser.add_argument('--test-server', action='store_true', help='Test server connection before starting')
-    parser.add_argument('--test-email', action='store_true', help='Test email connection before starting')
-    args = parser.parse_args()
-    
-    # Load configuration
-    config = load_custom_config(args.config)
-    validate_email_config(config, test_connection=args.test_email)  
-    
-    # Resolve output.root_dir relative to LOG_ROOT if it's a relative path
-    if 'output' in config and 'root_dir' in config['output']:
-        root_dir = config['output']['root_dir']
-        if not os.path.isabs(root_dir):
-            # Convert to absolute path using LOG_ROOT
-            config['output']['root_dir'] = str(LOG_ROOT / root_dir)
-            print(f"📁 Output root resolved to: {config['output']['root_dir']}")    
-    
-    # Override GPU setting if requested
-    if args.no_gpu:
-        config['use_gpu'] = False
-        print("🎮 GPU acceleration disabled via command line")
-    
-    # Override server push setting if requested
-    if args.no_server_push:
-        config['server_push_enabled'] = False
-        print("📤 Server push disabled via command line")
-    
-    # Print system information
-    print_system_info(config)
-    
-    # Check GPU availability and update config
-    print("\n🔍 Checking GPU availability...")
-    config = check_gpu_availability(config)
-    check_onnx_gpu_availability()
-    
-    # Set environment variables for GPU optimization
-    if config.get('use_gpu', False):
-        os.environ['CUDA_VISIBLE_DEVICES'] = str(config.get('gpu_device', 0))
-        # Optimize for GPU
-        os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
-        os.environ['TF_GPU_THREAD_MODE'] = 'gpu_private'
-        print("🎯 Set GPU environment variables")
-    
-    # Load multi-source configuration if enabled
-    if args.multi_source:
-        if args.sources_config and os.path.exists(args.sources_config):
-            try:
-                import json
-                with open(args.sources_config, 'r') as f:
-                    sources_config = json.load(f)
-                print(f"✅ Loaded multi-source configuration from: {args.sources_config}")
-            except Exception as e:
-                print(f"❌ Failed to load multi-source configuration: {e}")
-                print("🔄 Using default multi-source configuration")
-                sources_config = get_advanced_sources_config()
-        else:
-            print("🔄 Using default multi-source configuration")
-            sources_config = get_advanced_sources_config()
-        
-        print_multi_source_info(sources_config)
-        
-        # Test multi-stream connections
-        if not test_multi_stream_connections(sources_config):
-            print("❌ Multi-stream connection test failed. Please check:")
-            print("   - Camera connections")
-            print("   - RTSP URLs and credentials") 
-            print("   - Network connectivity")
-            return
-    else:
-        # Single source mode
-        #camera_source = args.camera
-        rtsp_source = args.rtsp
-
-        print(f"\n📹 Single Source Mode:")
-        print(f"CURRENTLY DISABLED!")
-        #print(f"   Camera Source: {camera_source}")
-        print(f"   RTSP Source: {rtsp_source}")
-        
-        # For single source, create a sources_config with one entry
-        sources_config = {
-            'main_camera': {
-                'url': rtsp_source,
-                'description': 'Main Camera',
-                'priority': 'high',
-                'processing_scale': 1.0,
-                'buffer_size': 3,
-                'cctv_name': args.cctv_name or config.get('cctv_name', 'Main-Camera')
-            }
-        }
-        
-        # Test single stream connection
-        if not test_multi_stream_connections(sources_config):
-            print("❌ Stream connection test failed.")
-            return
-    
-    # Test server connection if enabled and requested
-    if config.get('server_push_enabled', False) and args.test_server:
-        if not test_server_connection(config):
-            print("❌ Server connection test failed. Continue without server push? (y/n)")
-            choice = input().strip().lower()
-            if choice != 'y':
-                print("🛑 Exiting...")
-                return
-            else:
-                config['server_push_enabled'] = False
-                print("⚠️  Continuing without server push")
-                
-    
-    # Create robust face recognition system using factory
-    print("\n🔄 Creating face recognition system...")
-    try:
-        face_system = create_system(config, system_type="robust_face_recognition")
-        
-        # Verify GPU usage
-        verify_gpu_usage(face_system)
-        
-    except Exception as e:
-        print(f"❌ Failed to create face recognition system: {e}")
-        print("🔄 Falling back to CPU mode...")
-        config['use_gpu'] = False
-        face_system = create_system(config, system_type="robust_face_recognition")
-    
-    # Apply multi-source specific configurations
-    multi_source_config = {
-        'display_layout': config.get('display_layout', 'grid'),
-        'max_display_sources': config.get('max_display_sources', 4),
-        'processing_width': config.get('processing_width', 640),
-        'processing_height': config.get('processing_height', 480),
-        'processing_scale': config.get('processing_scale', 1.0),
-        'violation_verification_enabled': config.get('violation_verification_enabled', True),
-        'min_violation_duration': config.get('min_violation_duration', 0.5),
-        'min_violation_frames': config.get('min_violation_frames', 1),
-        'violation_confidence_threshold': config.get('violation_confidence_threshold', 0.6),
-        'log_interval': config.get('log_interval', 1),
-        'enable_logging': config.get('enable_logging', True),
-        'enable_image_logging': config.get('enable_image_logging', True),
-    }
-
-    # Merge with existing config
-    full_config = {**config, **multi_source_config}
-
-    # Initialize processor with full config
-    processor = MultiSourceRealTimeProcessor(
-        face_system, 
-        full_config  # Use the merged config
-    )
-    
-    # Apply configurations to processor
-    processor.apply_alert_config(config)
-    processor.apply_tracking_config(config)
-    processor.apply_logging_config(config)
-    
-    # 🆕 Apply violation verification configuration to all tracking managers
-    if 'tracking' in config and 'violation_verification_enabled' in config['tracking']:
-        verification_config = {
-            'violation_verification_enabled': config['tracking']['violation_verification_enabled'],
-            'min_violation_duration': config['tracking'].get('min_violation_duration', 5.0),
-            'min_violation_frames': config['tracking'].get('min_violation_frames', 5),
-            'violation_confidence_threshold': config['tracking'].get('violation_confidence_threshold', 0.85)
-        }
-        processor.apply_verification_config(verification_config)
-    
-    # Print comprehensive configuration status
-    print("\n" + "="*60)
-    print("🎯 MULTI-SOURCE SYSTEM CONFIGURATION STATUS")
-    print("="*60)
-    print(f"📊 Sources: {len(sources_config)} cameras configured")
-    #print(f"📊 Processing: Interval={config['processing_interval']}, Buffer={config['buffer_size']}")
-    print(f"🔍 Detection: Confidence={config['detection_confidence']}, Recognition Threshold={config['recognition_threshold']}")
-    print(f"🎯 Face Tracking: {'ENABLED' if config['tracking']['enabled'] else 'DISABLED'}")
-    
-    # 🆕 NEW: Print verification configuration
-    if config['tracking'].get('violation_verification_enabled', False):
-        print(f"✅ Violation Verification: ENABLED")
-        print(f"   - Min Duration: {config['tracking'].get('min_violation_duration', 5.0)}s")
-        print(f"   - Min Frames: {config['tracking'].get('min_violation_frames', 5)}")
-        print(f"   - Confidence Threshold: {config['tracking'].get('violation_confidence_threshold', 0.85)}")
-    else:
-        print(f"✅ Violation Verification: DISABLED")
-    
-    print(f"📝 Logging: {'ENABLED' if config['enable_logging'] else 'DISABLED'}")
-    print(f"🔊 Alerts: {'ENABLED' if config['enable_voice_alerts'] else 'DISABLED'}")
-    print(f"📤 Server Push: {'ENABLED' if config['server_push_enabled'] else 'DISABLED'}")
-    print(f"🐛 Debug: {'ENABLED' if config['debug']['enabled'] else 'DISABLED'}")
-    print(f"🖼️  Display Layout: {getattr(processor, 'display_layout', 'grid')}")
-    print(f"🎮 GPU Acceleration: {'ENABLED' if config['use_gpu'] else 'DISABLED'}")
-    if config['use_gpu']:
-        print(f"🎮 GPU Device: {config['gpu_device']}")
-    print("="*60)
-    
-    
-    # Print server push details if enabled
-    if config.get('server_push_enabled', False):
-        print_server_push_info(config)
-    
-    # Print module-specific status
-    processor.print_tracking_status()
-    processor.print_alert_status()
-    
-    # Apply display configuration
-    if hasattr(processor, 'set_display_size'):
-        processor.set_display_size(
-            config['display']['default_width'],
-            config['display']['default_height'],
-            config['display']['resize_method']
-        )
-    
-    # Apply debug configuration
-    if config['debug']['enabled']:
-        processor.toggle_debug_mode()
-    if config['display']['show_performance_stats']:
-        processor.toggle_performance_stats()
-    if config['display']['show_resize_info']:
-        processor.toggle_resize_info()    
-    
-    
-    
-    
-    # Final system readiness check
-    print("\n🔍 FINAL SYSTEM READINESS CHECK")
-    print("="*40)
-    print(f"📹 Sources: {len(sources_config)} cameras ready")
-    for source_id in sources_config.keys():
-        print(f"   - {source_id}")
-    print(f"🎮 GPU: {'READY' if config['use_gpu'] else 'CPU MODE'}")
-    print(f"📤 Server Push: {'READY' if config['server_push_enabled'] else 'DISABLED'}")
-    print(f"🔊 Audio Alerts: {'READY' if config['enable_voice_alerts'] else 'DISABLED'}")
-    print(f"🎯 Tracking: {'READY' if config['tracking']['enabled'] else 'DISABLED'}")
-    print(f"✅ Violation Verification: {'READY' if config['tracking'].get('violation_verification_enabled', False) else 'DISABLED'}")
-    print("="*40)
-    
-    # 🆕 NEW: Print verification-specific controls
-    print("\n🎮 VERIFICATION CONTROLS:")
-    print("   [V] - Toggle violation verification")
-    print("   [S] - Show verification statistics")
-    print("   [M] - Start verification monitoring")    
-    
-    # Print multi-source controls
-    print("\n🎮 MULTI-SOURCE CONTROLS:")
-    print("   [m] - Cycle through display layouts (grid, horizontal, vertical)")
-    print("   [n] - Toggle source health display")
-    print("   [0] - Show source health report")
-    print("   [l] - Toggle logging")
-    print("   [v] - Toggle voice alerts")
-    print("   [p] - Toggle performance stats")
-    print("   [d] - Toggle debug mode")
-    print("   [q] - Quit")
-    
-    # Add a small delay to ensure everything is ready
-    print("\n⏳ Starting multi-source processing in 3 seconds...")
-    time.sleep(3)
-    
-    # 🆕 CRITICAL: Ensure ImageLoggers are created for all sources
-    print("\n🔍 ENSURING IMAGE LOGGERS ARE CREATED FOR ALL SOURCES")
-    for source_id in sources_config.keys():
-        if source_id in processor.active_sources:
-            print(f"🔄 Ensuring ImageLogger for: {source_id}")
-            success = processor.force_create_image_logger(source_id)
-            if success:
-                print(f"✅ ImageLogger created for: {source_id}")
-            else:
-                print(f"❌ Failed to create ImageLogger for: {source_id}")
-
-    # 🆕 DEBUG: Check CCTV names before starting
-    print("\n🔍 PRE-START CCTV NAME CHECK")
-    processor.debug_cctv_names()
-        
-    # Start multi-source processing
-    try:
-        # 🆕 ONLY ONE SOURCE ADDITION BLOCK
-        print("\n🎯 ADDING SOURCES WITH DYNAMIC CCTV NAMING")
-        print("="*50)
-
-        # First, remove any existing sources to start fresh
-        existing_sources = list(processor.stream_managers.keys())
-        for source_id in existing_sources:
-            print(f"🔄 Removing existing source: {source_id}")
-            processor.remove_source(source_id)
-
-        # Now add the sources with proper dynamic naming
-        for source_id, source_config in sources_config.items():
-            print(f"📹 Adding source: {source_id}")
-            
-            # 🆕 DEBUG: Test CCTV naming before adding
-            test_url = source_config.get('url', '')
-            if test_url:
-                extracted_name = processor._extract_cctv_name_from_url(test_url, source_id)
-                print(f"   🔍 CCTV name extraction test: {extracted_name}")
-            
-            success = processor.add_source(source_id, source_config)
-            if success:
-                # Verify the CCTV name was set correctly
-                source_info = processor.get_source_info(source_id)
-                if source_info:
-                    actual_cctv_name = source_info.get('cctv_name', 'Unknown')
-                    print(f"✅ Successfully added {source_id} → {actual_cctv_name}")
-            else:
-                print(f"❌ Failed to add {source_id}")
-
-        print("="*50)
-        
-        # Print all sources information
-        processor.print_all_sources_info()
-        
-        # Print CCTV mapping
-        processor.print_cctv_mapping()
-        
-        # 🆕 CRITICAL: Setup logging ONLY ONCE after all sources are added
-        print("\n🔄 Setting up multi-source logging with dynamic CCTV names...")
-        processor.setup_multi_source_logging()
-        
-        # Run the multi-source processing
-        processor.run_multi_source_stable(sources_config)
-        
-        # 🆕 NEW: Start verification performance monitoring
-        print("\n📊 Starting verification performance monitoring...")
-        monitor_verification_performance(processor, interval_seconds=60)
-        
-        
-    except KeyboardInterrupt:
-        print("\n🛑 Shutting down by user request...")
-        
-        # 🆕 NEW: Print final verification summary
-        print("\n📊 FINAL VERIFICATION SUMMARY:")
-        print_verification_summary(processor)
-        
-    except Exception as e:
-        print(f"❌ Error: {e}")
-        import traceback
-        traceback.print_exc()
-    finally:
-        processor.stop_all_sources()
-
-if __name__ == "__main__":
-    main()
-
-    
-                        

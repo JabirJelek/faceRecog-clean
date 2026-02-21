@@ -47,18 +47,6 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         self.image_log_dir = None
         self.csv_log_dir = None
         
-        # ==========   EMAIL CONFIGURATION ==========
-        email_cfg = config.get('email', {})
-        self.email_enabled = email_cfg.get('enabled', False)
-        self.email_recipient = email_cfg.get('recipient', '')
-        self.smtp_server = email_cfg.get('smtp_server', 'smtp.gmail.com')
-        self.smtp_port = email_cfg.get('smtp_port', 587)
-        self.smtp_user = email_cfg.get('smtp_user', '')
-        self.smtp_password = email_cfg.get('smtp_password', '')
-        self.email_use_tls = email_cfg.get('use_tls', True)
-        self.email_send_on_exit = email_cfg.get('send_on_exit', True)
-        self.email_max_attachment_mb = email_cfg.get('max_attachment_size_mb', 25)        
-        
         # Use Event for thread-safe shutdown signaling
         self._shutdown_event = Event()
         self.running = False
@@ -152,6 +140,54 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         # Display settings
         self.show_resize_info = False
         self.show_source_health = False
+        
+        # ==========   EMAIL CONFIGURATION ==========
+        email_cfg = config.get('email', {})
+        
+        # Handle both dict (legacy) and list (new) formats
+        if isinstance(email_cfg, list):
+            # List of recipient dicts
+            self.email_recipients = email_cfg
+            self.email_enabled = any(recip.get('enabled', False) for recip in self.email_recipients)
+            # Set legacy single-recipient attributes to defaults (not used, but avoid AttributeError)
+            self.email_recipient = ''
+            self.smtp_server = 'smtp.gmail.com'
+            self.smtp_port = 587
+            self.smtp_user = ''
+            self.smtp_password = ''
+            self.email_use_tls = True
+            self.email_send_on_exit = True
+            self.email_max_attachment_mb = 25
+        else:
+            # Legacy dict format – convert to list internally
+            self.email_enabled = email_cfg.get('enabled', False)
+            self.email_recipient = email_cfg.get('recipient', '')
+            self.smtp_server = email_cfg.get('smtp_server', 'smtp.gmail.com')
+            self.smtp_port = email_cfg.get('smtp_port', 587)
+            self.smtp_user = email_cfg.get('smtp_user', '')
+            self.smtp_password = email_cfg.get('smtp_password', '')
+            self.email_use_tls = email_cfg.get('use_tls', True)
+            self.email_send_on_exit = email_cfg.get('send_on_exit', True)
+            self.email_max_attachment_mb = email_cfg.get('max_attachment_size_mb', 25)
+            
+            # Build a list with one recipient if enabled
+            if self.email_enabled and self.email_recipient:
+                self.email_recipients = [{
+                    'enabled': self.email_enabled,
+                    'recipient': self.email_recipient,
+                    'smtp_server': self.smtp_server,
+                    'smtp_port': self.smtp_port,
+                    'smtp_user': self.smtp_user,
+                    'smtp_password': self.smtp_password,
+                    'use_tls': self.email_use_tls,
+                    'attach_zip': True,      # default for legacy
+                    'language': 'en'          # default for legacy
+                }]
+            else:
+                self.email_recipients = []
+        
+        # Override enabled flag based on actual recipients (ensures consistency)
+        self.email_enabled = len(self.email_recipients) > 0  
             
         # Other configurations    
         self.image_logging_enabled = config.get('enable_image_logging', False)
@@ -535,102 +571,94 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
     </html>
     """
         return html
-
-    def _send_email(self, attachment_path: str):
-        """Send email with the ZIP archive attached and an HTML summary."""
-        if not self.email_enabled:
-            return
-
-        # Resolve password
-        password = self._load_password(self.smtp_password)
-        if not password:
-            print("❌ No valid SMTP password available, email not sent")
-            return
-
-        msg = MIMEMultipart()
-        msg['From'] = self.smtp_user
-        msg['To'] = self.email_recipient
-        msg['Subject'] = f"Face Recognition Run - {os.path.basename(self.run_dir)}"
-
-        # Build run summary from exit_status.json
+        
+    def _build_run_summaries(self) -> List[Dict]:
+        """
+        Build a list of run summaries from the current run directory.
+        Returns a list containing one summary dict (compatible with _generate_email_body).
+        """
         run_summaries = []
         status_file = os.path.join(self.run_dir, 'exit_status.json')
-        if os.path.exists(status_file):
-            try:
-                with open(status_file, 'r') as f:
-                    exit_data = json.load(f)
 
-                # Determine CollectionType (full data or metadata only)
-                collection_type = 'METADATA_ONLY'
-                if self.image_log_dir and os.path.exists(self.image_log_dir):
-                    if any(os.scandir(self.image_log_dir)):
-                        collection_type = 'SUMMARY_METADATA'
-                if self.csv_log_dir and os.path.exists(self.csv_log_dir):
-                    if any(os.scandir(self.csv_log_dir)):
-                        collection_type = 'SUMMARY_METADATA'
+        if not os.path.exists(status_file):
+            print("⚠️ exit_status.json not found, using fallback summary.")
+            # Fallback minimal summary
+            fallback = {
+                'CollectionType': 'METADATA_ONLY',
+                'Status': 'UNKNOWN',
+                'FolderName': os.path.basename(self.run_dir),
+                'CreationTime': datetime.datetime.fromtimestamp(os.path.getctime(self.run_dir)),
+                'ExitCode': -1,
+                'Metadata': {}
+            }
+            return [fallback]
 
-                # Status based on exit code
-                exit_code = exit_data.get('exit_code', 1)
-                status = 'SUCCESS' if exit_code == 0 else 'FAILED'
-
-                # Folder creation time
-                folder_name = os.path.basename(self.run_dir)
-                creation_time = datetime.datetime.fromtimestamp(os.path.getctime(self.run_dir))
-
-                # Metadata (can be extended later)
-                metadata = {}
-
-                summary = {
-                    'CollectionType': collection_type,
-                    'Status': status,
-                    'FolderName': folder_name,
-                    'CreationTime': creation_time,
-                    'ExitCode': exit_code,
-                    'Metadata': metadata
-                }
-                run_summaries.append(summary)
-            except Exception as e:
-                print(f"⚠️ Failed to read exit_status.json for email body: {e}")
-                # Fallback minimal summary
-                run_summaries = [{
-                    'CollectionType': 'METADATA_ONLY',
-                    'Status': 'UNKNOWN',
-                    'FolderName': os.path.basename(self.run_dir),
-                    'CreationTime': datetime.datetime.fromtimestamp(os.path.getctime(self.run_dir)),
-                    'ExitCode': -1,
-                    'Metadata': {}
-                }]
-        else:
-            print("⚠️ exit_status.json not found, email will have only attachment.")
-            run_summaries = []  # empty list – _generate_email_body handles it
-
-        # Generate HTML body
-        language = self.config.get('email', {}).get('language', 'en')
-        html_body = self._generate_email_body(run_summaries, self.config, language=language)
-
-        # Attach HTML part
-        from email.mime.text import MIMEText
-        msg.attach(MIMEText(html_body, 'html'))
-
-        # Attach zip archive
         try:
-            with open(attachment_path, 'rb') as f:
-                part = MIMEBase('application', 'zip')
-                part.set_payload(f.read())
-                encoders.encode_base64(part)
-                part.add_header('Content-Disposition', f'attachment; filename="{os.path.basename(attachment_path)}"')
-                msg.attach(part)
+            with open(status_file, 'r') as f:
+                exit_data = json.load(f)
 
-            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
-            if self.email_use_tls:
-                server.starttls()
-            server.login(self.smtp_user, password)
-            server.send_message(msg)
-            server.quit()
-            print(f"📧 Email sent to {self.email_recipient}")
+            # Determine CollectionType
+            collection_type = 'METADATA_ONLY'
+            if self.image_log_dir and os.path.exists(self.image_log_dir):
+                if any(os.scandir(self.image_log_dir)):
+                    collection_type = 'SUMMARY_METADATA'
+            if self.csv_log_dir and os.path.exists(self.csv_log_dir):
+                if any(os.scandir(self.csv_log_dir)):
+                    collection_type = 'SUMMARY_METADATA'
+
+            # Status based on exit code (0 = success, others = failed)
+            exit_code = exit_data.get('exit_code', 1)
+            status = 'SUCCESS' if exit_code == 0 else 'FAILED'
+
+            # Folder creation time
+            folder_name = os.path.basename(self.run_dir)
+            creation_time = datetime.datetime.fromtimestamp(os.path.getctime(self.run_dir))
+
+            # Metadata – can be extended with more fields from exit_data if desired
+            metadata = {}
+
+            summary = {
+                'CollectionType': collection_type,
+                'Status': status,
+                'FolderName': folder_name,
+                'CreationTime': creation_time,
+                'ExitCode': exit_code,
+                'Metadata': metadata
+            }
+            run_summaries.append(summary)
+
         except Exception as e:
-            print(f"❌ Email sending failed: {e}")
-                    
+            print(f"⚠️ Failed to read exit_status.json: {e}")
+            # Fallback as above
+            run_summaries = [{
+                'CollectionType': 'METADATA_ONLY',
+                'Status': 'UNKNOWN',
+                'FolderName': os.path.basename(self.run_dir),
+                'CreationTime': datetime.datetime.fromtimestamp(os.path.getctime(self.run_dir)),
+                'ExitCode': -1,
+                'Metadata': {}
+            }]
+
+        return run_summaries    
+
+    def _send_email(self, attachment_path: str):
+        """Send emails to all enabled recipients."""
+        if not self.email_recipients:
+            return
+
+        # Only send to enabled recipients
+        enabled_recipients = [r for r in self.email_recipients if r.get('enabled', False)]
+        if not enabled_recipients:
+            return
+
+        run_summaries = self._build_run_summaries()
+
+        for recip in enabled_recipients:
+            try:
+                self._send_single_email(recip, attachment_path, run_summaries)
+            except Exception as e:
+                print(f"❌ Failed to send email to {recip['recipient']}: {e}")
+                                        
     def _send_email_async(self, attachment_path: str):
         """Send email in a non‑blocking thread."""
         def worker():
@@ -638,7 +666,56 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         thread = threading.Thread(target=worker, daemon=True)
         thread.start()
         print("📧 Email thread started")
-                                
+
+    def _send_single_email(self, recip: dict, attachment_path: str, run_summaries: list):
+        """Send a single email using the recipient's settings, falling back to first recipient's SMTP if needed."""
+        # Get SMTP settings with fallback to first recipient's values
+        if self.email_recipients:
+            first = self.email_recipients[0]
+            smtp_server = recip.get('smtp_server') or first.get('smtp_server')
+            smtp_port = recip.get('smtp_port') or first.get('smtp_port')
+            smtp_user = recip.get('smtp_user') or first.get('smtp_user')
+            smtp_password = recip.get('smtp_password') or first.get('smtp_password')
+            use_tls = recip.get('use_tls') if 'use_tls' in recip else first.get('use_tls', True)
+        else:
+            # Should not happen because we only call with enabled recipients
+            print("⚠️ No email recipients configured, skipping.")
+            return
+
+        # Resolve password (file/env support)
+        password = self._load_password(smtp_password)
+        if not password:
+            print(f"⚠️ No password for {recip['recipient']}, skipping.")
+            return
+
+        msg = MIMEMultipart()
+        msg['From'] = smtp_user
+        msg['To'] = recip['recipient']
+        msg['Subject'] = f"Face Recognition Run - {os.path.basename(self.run_dir)}"
+
+        html_body = self._generate_email_body(
+            run_summaries, self.config,
+            language=recip.get('language', 'en')
+        )
+        from email.mime.text import MIMEText
+        msg.attach(MIMEText(html_body, 'html'))
+
+        if recip.get('attach_zip', False) and attachment_path and os.path.exists(attachment_path):
+            with open(attachment_path, 'rb') as f:
+                part = MIMEBase('application', 'zip')
+                part.set_payload(f.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', f'attachment; filename="{os.path.basename(attachment_path)}"')
+                msg.attach(part)
+
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        if use_tls:
+            server.starttls()
+        server.login(smtp_user, password)
+        server.send_message(msg)
+        server.quit()
+        print(f"📧 Email sent to {recip['recipient']} (lang={recip.get('language','en')}, attach={recip.get('attach_zip', False)})")
+                                  
     # ========== THREAD SAFE SHUTDOWN ==========
     
     def close(self):
@@ -3005,11 +3082,12 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             # Write exit status
             self.write_exit_status(exit_code, exit_message)
             
-            # Optionally compress and email the run directory
-            if self.email_enabled and self.email_send_on_exit and self.run_dir:
+ 
+            # In the finally block:
+            if self.email_recipients and self.run_dir:
                 zip_path = self._zip_run_directory()
                 if zip_path:
-                    self._send_email_async(zip_path)
+                    self._send_email(zip_path)   
             
             # Restore console output before closing (so prints go to terminal)
             self._restore_file_logging()
