@@ -1,5 +1,6 @@
 # alerting/alert_manager.py
 
+# alerting/alert_manager.py
 import threading
 import requests
 from urllib.parse import quote
@@ -7,6 +8,7 @@ from typing import Dict, List, Optional, Tuple, Set
 import time
 import numpy as np
 from collections import defaultdict
+import logging   
 
 class DurationAwareAlertManager:
     """
@@ -26,7 +28,7 @@ class DurationAwareAlertManager:
         self.min_violation_seconds = config.get('min_violation_seconds', 0)
         self.max_gap_frames = config.get('max_gap_frames', 5)
         
-        # 🆕 PHASE 1: Batch Logic Parameters
+        # Batch Logic Parameters
         self.max_names_in_alert = config.get('max_names_in_alert', 4)
         self.batch_window_seconds = config.get('batch_window_seconds', 5)
         self.min_batch_size = config.get('min_batch_size', 2)
@@ -35,7 +37,7 @@ class DurationAwareAlertManager:
         self.violation_timers = {}
         self.alerted_identities = set()
         
-        # 🆕 PHASE 1: Batch tracking for multiple violators
+        # Batch tracking for multiple violators
         self.batch_violators = defaultdict(list)  # identity -> list of violation entries
         self.batch_start_time = 0
         self.pending_batch = set()  # Identities pending in current batch
@@ -47,9 +49,12 @@ class DurationAwareAlertManager:
         
         self.last_alert_time_per_identity = {}
         
-        print(f"🔊 Duration-aware batch alerts: {self.min_violation_frames} frames threshold")
-        print(f"   Batch logic: window={self.batch_window_seconds}s, min={self.min_batch_size}")
-
+        
+        self.logger = logging.getLogger(__name__)
+        
+        # Replace prints with logger.info
+        self.logger.info(f"Duration-aware batch alerts: {self.min_violation_frames} frames threshold")
+        self.logger.info(f"Batch logic: window={self.batch_window_seconds}s, min={self.min_batch_size}")
     def update_batch_violators(self, violations: List[Dict], current_frame_count: int):
         """
         Update batch tracking for multiple violators
@@ -153,17 +158,17 @@ class DurationAwareAlertManager:
             response = requests.get(alert_url, timeout=timeout)
             
             if response.status_code == 200:
-                print(f"🔊 Voice alert sent: {message}")
+                self.logger.info(f"Voice alert sent: {message}")   
             else:
-                print(f"❌ Alert server returned status: {response.status_code}")
+                self.logger.error(f"Alert server returned status: {response.status_code}")   
                 
         except requests.exceptions.Timeout:
-            print(f"⏰ Alert request timed out after {timeout} seconds")
+            self.logger.warning(f"Alert request timed out after {timeout} seconds")   
         except requests.exceptions.RequestException as e:
-            print(f"❌ Failed to send voice alert: {e}")
+            self.logger.error(f"Failed to send voice alert: {e}")   
         except Exception as e:
-            print(f"❌ Unexpected error in alert thread: {e}")
-    
+            self.logger.error(f"Unexpected error in alert thread: {e}")   
+            
     def send_voice_alert(self, message: str, identity: str = None, mask_status: str = None) -> bool:
         """Send voice alert to server in non-blocking thread"""
         if not self.enabled or not self.server_url:
@@ -361,8 +366,8 @@ class DurationAwareAlertManager:
             success = self.send_voice_alert(message)
             
             if success:
-                print(f"🔊 Batch alert triggered for {len(batch_violations)} violators")
-                print(f"   Message: {message}")
+                self.logger.info(f"Batch alert triggered for {len(batch_violations)} violators")   
+                self.logger.info(f"Message: {message}")   
                 
                 # Mark identities as alerted
                 for violation in batch_violations:
@@ -392,7 +397,7 @@ class DurationAwareAlertManager:
             self.min_violation_seconds = config.get('min_violation_seconds', self.min_violation_seconds)
             self.max_gap_frames = config.get('max_gap_frames', self.max_gap_frames)
             
-            # 🆕 Phase 1: Batch configuration
+            # Batch configuration
             self.max_names_in_alert = config.get('max_names_in_alert', self.max_names_in_alert)
             self.batch_window_seconds = config.get('batch_window_seconds', self.batch_window_seconds)
             self.min_batch_size = config.get('min_batch_size', self.min_batch_size)
@@ -406,13 +411,13 @@ class DurationAwareAlertManager:
             self.alert_style = config.get('alert_style', 'formal')
             self.alert_timeout_seconds = config.get('alert_timeout_seconds', 10)
             
-            print(f"🔊 Alert config updated with batch logic")
-            print(f"   Batch: window={self.batch_window_seconds}s, min={self.min_batch_size}")
-            print(f"   Names: max={self.max_names_in_alert}")
+            self.logger.info(f"Alert config updated with batch logic")   
+            self.logger.info(f"Batch: window={self.batch_window_seconds}s, min={self.min_batch_size}")   
+            self.logger.info(f"Names: max={self.max_names_in_alert}")   
             
         except Exception as e:
-            print(f"❌ Error updating alert config: {e}")
-    
+            self.logger.error(f"Error updating alert config: {e}")   
+            
     def get_alert_config(self) -> Dict:
         """Get current alert configuration"""
         config = {
@@ -449,7 +454,7 @@ class DurationAwareAlertManager:
     def reset_batch(self):
         """Manually reset current batch (for testing/debugging)"""
         self._reset_batch_tracking(time.time())
-        print("🔊 Batch tracking reset")
+        self.logger.info("Batch tracking reset")   
     
     # Legacy methods for backward compatibility
     
@@ -506,7 +511,7 @@ class DurationAwareAlertManager:
         
         if success:
             self.last_image_log_time = current_time
-            print(f"🔊 Synchronized audio alert sent with image logging: {message}")
+            self.logger.info(f"Synchronized audio alert sent with image logging: {message}")   
             
             # Mark identities as alerted to avoid duplicate alerts
             for violation in violations:
@@ -514,4 +519,5 @@ class DurationAwareAlertManager:
                 self.alerted_identities.add(identity)
         
         return success
+    
     

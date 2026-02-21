@@ -7,6 +7,7 @@ from typing import Dict, List, Tuple, Optional
 import time
 import torch
 import math
+import logging
 
 
 class TemporalFusion:
@@ -69,15 +70,21 @@ class TemporalFusion:
 class MultiScaleFaceProcessor:
     def __init__(self, config: Dict):
         self.config = config
+        self.logger = logging.getLogger(__name__)
+        if config.get('verbose', False):
+            self.logger.setLevel(logging.DEBUG)
+        else:
+            self.logger.setLevel(logging.INFO)    
+                    
         self.scale_factors = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75]  # Added more scales
         self.rotation_angles = [-15, -10, -5, 0, 5, 10, 15]  # Increased rotation range
         
         # CUDA device setup
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         if self.device.type == 'cuda':
-            print(f"Using GPU: {torch.cuda.get_device_name()}")
+            self.logger.info(f"Using GPU: %s ",{torch.cuda.get_device_name()})
         else:
-            print("Using CPU - CUDA not available")
+            self.logger.info("Using CPU - CUDA not available")
         
     def _extract_single_embedding(self, face_roi: np.ndarray) -> Optional[np.ndarray]:
         """Extract embedding from a single face ROI"""
@@ -106,7 +113,7 @@ class MultiScaleFaceProcessor:
                 
         except Exception as e:
             if self.config.get('verbose', False):
-                print(f"Multi-scale embedding extraction error: {e}")
+                self.logger.warning(f"Multi-scale embedding extraction error: %s", e)
                 
         return None
         
@@ -131,7 +138,7 @@ class MultiScaleFaceProcessor:
             
         except Exception as e:
             if self.config.get('verbose', False):
-                print(f"GPU rotation failed: {e}, falling back to CPU")
+                self.logger.warning(f"GPU rotation failed: {e}, falling back to CPU")
             return self._rotate_face_cpu(face, angle)
     
     def _rotate_face_cpu(self, face: np.ndarray, angle: float) -> np.ndarray:

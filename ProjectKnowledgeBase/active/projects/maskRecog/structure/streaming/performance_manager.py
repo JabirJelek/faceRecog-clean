@@ -9,11 +9,13 @@ import time
 import numpy as np
 from typing import Dict, List, Tuple, Any
 from queue import deque
+import logging
 
 
 class PerformanceManager:
     def __init__(self, config: Dict):
         self.config = config
+        self.logger = logging.getLogger(__name__)
         
         # Performance tracking with enhanced history for momentum
         self.performance_history = []
@@ -45,9 +47,9 @@ class PerformanceManager:
         self.adaptive_check_interval = config.get('adaptive_check_interval', 30)
         self.max_history_size = config.get('max_history_size', 50)
         
-        print("🎯 PerformanceManager initialized with momentum-based historical scaling")
-        print(f"   - Scale range: {self.min_processing_scale:.2f} to {self.max_processing_scale:.2f}")
-        print(f"   - Cooldown range: {self.min_cooldown_seconds}s to {self.max_cooldown_seconds}s")
+        self.logger.info("🎯 PerformanceManager initialized with momentum-based historical scaling")
+        self.logger.info(f"   - Scale range: {self.min_processing_scale:.2f} to {self.max_processing_scale:.2f}")
+        self.logger.info(f"   - Cooldown range: {self.min_cooldown_seconds}s to {self.max_cooldown_seconds}s")
 
     def analyze_detection_performance(self, results: List[Dict], original_frame_shape: Tuple[int, int]) -> Dict:
         """Comprehensive analysis of detection performance with historical context"""
@@ -257,9 +259,9 @@ class PerformanceManager:
             # Log the adjustment
             direction_symbol = "🔼" if direction > 0 else "🔽"
             reason = self.get_adjustment_reason(performance, direction)
-            print(f"{direction_symbol} Dynamic adjustment: {old_scale:.2f} → {new_scale:.2f}")
-            print(f"   📈 Momentum: {momentum:.2f}x | Cooldown: {self.adjustment_cooldown}s")
-            print(f"   📊 Reason: {reason}")
+            self.logger.info(f"{direction_symbol} Dynamic adjustment: {old_scale:.2f} → {new_scale:.2f}")
+            self.logger.info(f"   📈 Momentum: {momentum:.2f}x | Cooldown: {self.adjustment_cooldown}s")
+            self.logger.info(f"   📊 Reason: {reason}")
 
     def calculate_detection_quality(self, performance: Dict) -> float:
         """Calculate overall detection quality score (0-1) with historical weighting"""
@@ -334,7 +336,7 @@ class PerformanceManager:
         """Toggle dynamic adjustment on/off"""
         self.dynamic_adjustment_enabled = not self.dynamic_adjustment_enabled
         status = "ENABLED" if self.dynamic_adjustment_enabled else "DISABLED"
-        print(f"🎯 Dynamic adjustment: {status}")
+        self.logger.info(f"🎯 Dynamic adjustment: {status}")
     
     def reset_dynamic_scaling(self):
         """Reset dynamic scaling to default values with cooldown"""
@@ -346,8 +348,8 @@ class PerformanceManager:
         self.consecutive_good_detections = 0
         self.adjustment_cooldown = 5  # Reset cooldown
         self.last_adjustment_time = time.time()
-        print(f"🔄 Dynamic scaling reset: {old_scale:.2f} → 1.00")
-        print(f"   ⏰ Cooldown set: {self.adjustment_cooldown}s")
+        self.logger.info(f"🔄 Dynamic scaling reset: {old_scale:.2f} → 1.00")
+        self.logger.info(f"   ⏰ Cooldown set: {self.adjustment_cooldown}s")
     
     def enable_small_face_mode(self):
         """Enable optimized settings for small face detection"""
@@ -355,6 +357,6 @@ class PerformanceManager:
         self.target_face_size = 60
         self.min_face_size = 20
         self.adjustment_cooldown = 3  # Short cooldown for initial adjustment
-        print("🔍 Small face detection mode ENABLED in PerformanceManager")
-        print(f"   📐 Scale set to: {self.current_processing_scale:.2f}")
+        self.logger.info("🔍 Small face detection mode ENABLED in PerformanceManager")
+        self.logger.info(f"   📐 Scale set to: {self.current_processing_scale:.2f}")
         

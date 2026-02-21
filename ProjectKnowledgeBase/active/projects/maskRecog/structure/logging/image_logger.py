@@ -21,6 +21,7 @@ class ImageLogger:
     
     def __init__(self, config: Dict[str, Any]):
         self.config = config
+        self.logger = logging.getLogger(__name__)        
         self.logging_enabled = False
         self.image_log_folder: Optional[Path] = None
         self.saved_image_count = 0
@@ -46,13 +47,7 @@ class ImageLogger:
         self.resize_width = config.get('image_resize_width', 640)
         self.resize_height = config.get('image_resize_height', 480)
         self.resize_method = config.get('image_resize_method', 'default')
-        
-        # 🆕 FIX: Enhanced CCTV name configuration with better fallback
-        self.cctv_name = config.get('cctv_name')
-        if not self.cctv_name or self.cctv_name == 'Unknown-Camera':
-            # Try to extract from URL or other config parameters
-            self.cctv_name = self._extract_cctv_name_from_config(config)
-        print(f"📹 ImageLogger initialized with CCTV name: {self.cctv_name}")
+
         
         # Server push configuration
         self.server_push_enabled = config.get('server_push_enabled', False)
@@ -77,9 +72,17 @@ class ImageLogger:
             # REMOVE violation verification stats
         }
         
-        self.logger = logging.getLogger(__name__)
+
         self.recent_violations = deque(maxlen=10)
         self.pending_server_violations = deque(maxlen=50)
+        
+                
+        # 🆕 FIX: Enhanced CCTV name configuration with better fallback
+        self.cctv_name = config.get('cctv_name')
+        if not self.cctv_name or self.cctv_name == 'Unknown-Camera':
+            # Try to extract from URL or other config parameters
+            self.cctv_name = self._extract_cctv_name_from_config(config)
+        self.logger.info(f"📹 ImageLogger initialized with CCTV name: {self.cctv_name}")
 
     def _extract_cctv_name_from_config(self, config: Dict[str, Any]) -> str:
         """
@@ -204,7 +207,7 @@ class ImageLogger:
         except:
             return "Unknown-Camera"
 
-    # 🆕 NEW: Method to update CCTV name dynamically
+    # 🆕 Method to update CCTV name dynamically
     def update_cctv_name(self, cctv_name: str) -> None:
         """
         Update CCTV name dynamically.
@@ -222,21 +225,21 @@ class ImageLogger:
                      
     def debug_server_push(self, violation_data: Dict[str, Any]) -> None:
         """Debug method to check why server push isn't working"""
-        print(f"🔍 DEBUG SERVER PUSH:")
-        print(f"  - Server push enabled: {self.server_push_enabled}")
-        print(f"  - Server endpoint: {self.server_endpoint}")
-        print(f"  - Base64 data available: {bool(violation_data.get('image_data'))}")
-        print(f"  - Base64 data length: {len(violation_data.get('image_data', ''))}")
-        print(f"  - Filename: {violation_data.get('filename')}")
-        print(f"  - Detected name: {violation_data.get('detected_name')}")
-        print(f"  - CCTV name: {self.cctv_name}")
+        self.logger.debug(f"🔍 DEBUG SERVER PUSH:")
+        self.logger.debug(f"  - Server push enabled: {self.server_push_enabled}")
+        self.logger.debug(f"  - Server endpoint: {self.server_endpoint}")
+        self.logger.debug(f"  - Base64 data available: {bool(violation_data.get('image_data'))}")
+        self.logger.debug(f"  - Base64 data length: {len(violation_data.get('image_data', ''))}")
+        self.logger.debug(f"  - Filename: {violation_data.get('filename')}")
+        self.logger.debug(f"  - Detected name: {violation_data.get('detected_name')}")
+        self.logger.debug(f"  - CCTV name: {self.cctv_name}")
         
         # Check cooldown
         current_time = time.time()
         time_since_last_push = current_time - self.last_server_push_time
-        print(f"  - Time since last push: {time_since_last_push:.1f}s")
-        print(f"  - Cooldown period: {self.server_push_cooldown}s")
-        print(f"  - Can push: {time_since_last_push >= self.server_push_cooldown}")      
+        self.logger.debug(f"  - Time since last push: {time_since_last_push:.1f}s")
+        self.logger.debug(f"  - Cooldown period: {self.server_push_cooldown}s")
+        self.logger.debug(f"  - Can push: {time_since_last_push >= self.server_push_cooldown}")      
     
     def push_violation_to_server(self, violation_data: Dict[str, Any]) -> bool:
         """

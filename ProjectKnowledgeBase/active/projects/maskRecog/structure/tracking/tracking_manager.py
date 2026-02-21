@@ -18,9 +18,10 @@ class TrackingManager:
     def __init__(self, config: Dict[str, Any]):
         # Store configuration
         self.config = config
+        self.logger = logging.getLogger(__name__)        
         
         # DEBUG: Log entire config for troubleshooting
-        print(f"🔧 [TrackingManager] Received config with keys: {list(config.keys())}")
+        self.logger.debug(f"🔧 [TrackingManager] Received config with keys: {list(config.keys())}")
         
         # ========== EXTRACT TRACKING CONFIG FIRST ==========
         tracking_config = config.get('tracking', {})
@@ -28,9 +29,9 @@ class TrackingManager:
         # If no tracking config at root, check if config IS the tracking config
         if not tracking_config and 'confidence_frames' in config:
             tracking_config = config
-            print(f"⚠️  Config appears to be tracking config itself, using as tracking_config")
+            self.logger.warning(f"⚠️  Config appears to be tracking config itself, using as tracking_config")
         
-        print(f"🔧 [TrackingManager] Tracking config: {list(tracking_config.keys())}")
+        self.logger.debug(f"🔧 [TrackingManager] Tracking config: {list(tracking_config.keys())}")
         
         # Extract progressive_mask configuration
         progressive_config = {}
@@ -38,12 +39,12 @@ class TrackingManager:
         # First, check if progressive_mask is at the root level
         if 'progressive_mask' in config:
             progressive_config = config['progressive_mask']
-            print(f"✅ Found progressive_mask at root level")
+            self.logger.info(f"✅ Found progressive_mask at root level")
         
         # If not, check if it's nested inside tracking config
         elif 'progressive_mask' in tracking_config:
             progressive_config = tracking_config['progressive_mask']
-            print(f"✅ Found progressive_mask inside tracking config")
+            self.logger.info(f"✅ Found progressive_mask inside tracking config")
         
         # If we still don't have it, look for any nested structure
         else:
@@ -51,7 +52,7 @@ class TrackingManager:
             def find_progressive_config(config_dict, path=""):
                 for key, value in config_dict.items():
                     if key == 'progressive_mask' and isinstance(value, dict):
-                        print(f"✅ Found progressive_mask at path: {path}.{key}")
+                        self.logger.info(f"✅ Found progressive_mask at path: {path}.{key}")
                         return value
                     elif isinstance(value, dict):
                         result = find_progressive_config(value, f"{path}.{key}")
@@ -63,14 +64,14 @@ class TrackingManager:
         
         # If still empty, use empty dict
         if not progressive_config:
-            print(f"⚠️  No progressive_mask configuration found, using defaults")
+            self.logger.warning(f"⚠️  No progressive_mask configuration found, using defaults")
             progressive_config = {}
         
         # DEBUG: Show what we're passing to ProgressiveMaskDetector
-        print(f"🔧 [TrackingManager] Passing to ProgressiveMaskDetector:")
-        print(f"   Config: {progressive_config}")
+        self.logger.debug(f"🔧 [TrackingManager] Passing to ProgressiveMaskDetector:")
+        self.logger.info(f"   Config: {progressive_config}")
         if progressive_config:
-            print(f"   Keys: {list(progressive_config.keys())}")
+            self.logger.info(f"   Keys: {list(progressive_config.keys())}")
         
         # ========== INITIALIZE COMPONENTS IN CORRECT ORDER ==========
         
@@ -88,7 +89,7 @@ class TrackingManager:
         self.fairness_enabled = tracking_config.get('fairness_enabled', True)
         
         # Setup logger for debugging
-        self.logger = logging.getLogger(__name__)
+
         if not self.logger.handlers:
             handler = logging.StreamHandler()
             formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -96,7 +97,7 @@ class TrackingManager:
             self.logger.addHandler(handler)
             self.logger.setLevel(logging.INFO)
         
-        # CRITICAL: Log policy threshold sanity check at initialization
+        # Log policy threshold sanity check at initialization
         self.logger.info(f"Policy Thresholds - min_violation_frames: {self.min_violation_frames}, "
                         f"min_violation_duration: {self.min_violation_duration}s")
         
@@ -192,7 +193,7 @@ class TrackingManager:
         self.reset_reasons[reason] += 1
         
         if track_id == "0" or track_id == 0:
-            self.logger.warning(f"CRITICAL: Cleaning up track_id=0 with reason: {reason}")
+            self.logger.critical(f"CRITICAL: Cleaning up track_id=0 with reason: {reason}")
             # Log stack trace for track_id=0 cleanup
             import traceback
             self.logger.debug(f"Stack trace for track_id=0 cleanup:\n{traceback.format_stack()}")
@@ -313,7 +314,7 @@ class TrackingManager:
                 verification_progress = progressive_data.get('verification_progress', 0)
                 
                 if mask_status == 'no_mask' and verification_progress == 0.0:
-                    self.logger.warning(f"TRACK_ID=0 POLICY CHECK: no_mask but 0.00 progress, "
+                    self.logger.debug(f"TRACK_ID=0 POLICY CHECK: no_mask but 0.00 progress, "
                                       f"is_stable={progressive_data.get('is_stable', False)}, "
                                       f"frames={progressive_data.get('frames_processed', 0)}")
             

@@ -17,6 +17,7 @@ class StreamManager:
     
     def __init__(self, config: Dict[str, Any] = None):
         self.config = config or {}
+        self.logger = logging.getLogger(__name__)
         
         # Stream properties
         self.cap = None
@@ -84,7 +85,7 @@ class StreamManager:
         # Setup logging
         self.setup_logging()
         
-        print("🎬 StreamManager initialized with robust reconnection handling")
+        self.logger.info("🎬 StreamManager initialized with robust reconnection handling")
 
     def setup_logging(self):
         """Setup logging for stream manager"""
@@ -120,7 +121,7 @@ class StreamManager:
             self.source = source
             self.stream_type = self._detect_stream_type(source)
             
-            print(f"🔍 Initializing {self.stream_type} stream: {source}")
+            self.logger.info(f"🔍 Initializing {self.stream_type} stream: {source}")
             
             # Release existing stream if any
             if self.cap is not None:
@@ -138,16 +139,16 @@ class StreamManager:
                 
                 # Get stream info
                 self._log_stream_info()
-                print(f"✅ Stream initialized successfully: {source}")
+                self.logger.info(f"✅ Stream initialized successfully: {source}")
                 return True
             else:
                 self.last_error_message = f"Failed to initialize {self.stream_type} stream"
-                print(f"❌ {self.last_error_message}")
+                self.logger.warning(f"❌ {self.last_error_message}")
                 return False
                 
         except Exception as e:
             self.last_error_message = f"Stream initialization error: {e}"
-            print(f"❌ {self.last_error_message}")
+            self.logger.warning(f"❌ {self.last_error_message}")
             return False
 
     def _detect_stream_type(self, source: str) -> str:
@@ -187,7 +188,7 @@ class StreamManager:
                 return self._initialize_generic(source)
                 
         except Exception as e:
-            print(f"❌ {self.stream_type} initialization failed: {e}")
+            self.logger.warning(f"❌ {self.stream_type} initialization failed: {e}")
             return False
 
     def _initialize_camera(self, source: str, config: Dict) -> bool:
@@ -201,11 +202,11 @@ class StreamManager:
             else:
                 backend = config.get('backend', cv2.CAP_ANY)
             
-            print(f"📷 Attempting to open camera {camera_id} with backend {backend}")
+            self.logger.info(f"📷 Attempting to open camera {camera_id} with backend {backend}")
             self.cap = cv2.VideoCapture(camera_id, backend)
             
             if not self.cap.isOpened():
-                print(f"❌ Failed to open camera {camera_id} with backend {backend}")
+                self.logger.warning(f"❌ Failed to open camera {camera_id} with backend {backend}")
                 # Fallback to default backend
                 self.cap = cv2.VideoCapture(camera_id)
                 if not self.cap.isOpened():
@@ -222,15 +223,15 @@ class StreamManager:
             for attempt in range(3):
                 ret, frame = self.cap.read()
                 if ret and frame is not None:
-                    print(f"✅ Camera {camera_id} opened successfully")
+                    self.logger.info(f"✅ Camera {camera_id} opened successfully")
                     return True
                 time.sleep(0.1)
             
-            print(f"❌ Camera {camera_id} opened but cannot read frames")
+            self.logger.warning(f"❌ Camera {camera_id} opened but cannot read frames")
             return False
                 
         except Exception as e:
-            print(f"❌ Camera initialization error: {e}")
+            self.logger.warning(f"❌ Camera initialization error: {e}")
             return False
         
     def _initialize_rtsp(self, source: str, config: Dict) -> bool:
@@ -239,11 +240,11 @@ class StreamManager:
             optimized_url = self._optimize_rtsp_url(source)
             backend = config.get('backend', cv2.CAP_FFMPEG)
             
-            print(f"🌐 Attempting to open RTSP stream: {optimized_url}")
+            self.logger.debug(f"🌐 Attempting to open RTSP stream: {optimized_url}")
             self.cap = cv2.VideoCapture(optimized_url, backend)
             
             if not self.cap.isOpened():
-                print(f"❌ Failed to open RTSP stream")
+                self.logger.warning(f"❌ Failed to open RTSP stream")
                 return False
             
             # Set RTSP properties for stability
@@ -254,14 +255,14 @@ class StreamManager:
             # Test frame read with timeout
             ret, frame = self._read_frame_with_timeout(10.0)
             if ret and frame is not None:
-                print(f"✅ RTSP stream opened successfully")
+                self.logger.info(f"✅ RTSP stream opened successfully")
                 return True
             else:
-                print(f"❌ RTSP stream opened but cannot read frames")
+                self.logger.warning(f"❌ RTSP stream opened but cannot read frames")
                 return False
                 
         except Exception as e:
-            print(f"❌ RTSP initialization error: {e}")
+            self.logger.warning(f"❌ RTSP initialization error: {e}")
             return False
 
     def _initialize_cctv(self, source: str, config: Dict) -> bool:
@@ -269,11 +270,11 @@ class StreamManager:
         try:
             backend = config.get('backend', cv2.CAP_FFMPEG)
             
-            print(f"📡 Attempting to open CCTV stream: {source}")
+            self.logger.info(f"📡 Attempting to open CCTV stream: {source}")
             self.cap = cv2.VideoCapture(source, backend)
             
             if not self.cap.isOpened():
-                print(f"❌ Failed to open CCTV stream")
+                self.logger.warning(f"❌ Failed to open CCTV stream")
                 return False
             
             # Set CCTV properties
@@ -284,28 +285,28 @@ class StreamManager:
             # Test frame read
             ret, frame = self._read_frame_with_timeout(15.0)
             if ret and frame is not None:
-                print(f"✅ CCTV stream opened successfully")
+                self.logger.info(f"✅ CCTV stream opened successfully")
                 return True
             else:
-                print(f"❌ CCTV stream opened but cannot read frames")
+                self.logger.warning(f"❌ CCTV stream opened but cannot read frames")
                 return False
                 
         except Exception as e:
-            print(f"❌ CCTV initialization error: {e}")
+            self.logger.warning(f"❌ CCTV initialization error: {e}")
             return False
 
     def _initialize_video_file(self, source: str, config: Dict) -> bool:
         """Initialize video file"""
         try:
             if not Path(source).exists():
-                print(f"❌ Video file not found: {source}")
+                self.logger.warning(f"❌ Video file not found: {source}")
                 return False
                 
-            print(f"🎥 Attempting to open video file: {source}")
+            self.logger.info(f"🎥 Attempting to open video file: {source}")
             self.cap = cv2.VideoCapture(source)
             
             if not self.cap.isOpened():
-                print(f"❌ Failed to open video file")
+                self.logger.warning(f"❌ Failed to open video file")
                 return False
             
             self.cap.set(cv2.CAP_PROP_BUFFERSIZE, config.get('buffer_size', 1))
@@ -314,37 +315,37 @@ class StreamManager:
             ret, frame = self.cap.read()
             if ret:
                 self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Reset to beginning
-                print(f"✅ Video file opened successfully")
+                self.logger.info(f"✅ Video file opened successfully")
                 return True
             else:
-                print(f"❌ Video file opened but cannot read frames")
+                self.logger.warning(f"❌ Video file opened but cannot read frames")
                 return False
                 
         except Exception as e:
-            print(f"❌ Video file initialization error: {e}")
+            self.logger.warning(f"❌ Video file initialization error: {e}")
             return False
 
     def _initialize_generic(self, source: str) -> bool:
         """Initialize generic stream with default settings"""
         try:
-            print(f"🔗 Attempting to open generic stream: {source}")
+            self.logger.info(f"🔗 Attempting to open generic stream: {source}")
             self.cap = cv2.VideoCapture(source)
             
             if not self.cap.isOpened():
-                print(f"❌ Failed to open generic stream")
+                self.logger.warning(f"❌ Failed to open generic stream")
                 return False
             
             # Test frame read
             ret, frame = self._read_frame_with_timeout(5.0)
             if ret and frame is not None:
-                print(f"✅ Generic stream opened successfully")
+                self.logger.info(f"✅ Generic stream opened successfully")
                 return True
             else:
-                print(f"❌ Generic stream opened but cannot read frames")
+                self.logger.warning(f"❌ Generic stream opened but cannot read frames")
                 return False
                 
         except Exception as e:
-            print(f"❌ Generic stream initialization error: {e}")
+            self.logger.warning(f"❌ Generic stream initialization error: {e}")
             return False
 
     # ========== THREADING AND QUEUE MANAGEMENT ==========
@@ -352,31 +353,31 @@ class StreamManager:
     def start_capture(self):
         """Start background thread for frame capture"""
         if self.running:
-            print("⚠️  Capture already running")
+            self.logger.warning("⚠️  Capture already running")
             return
             
         if not self.is_opened:
-            print("❌ Cannot start capture - stream not initialized")
+            self.logger.warning("❌ Cannot start capture - stream not initialized")
             return
             
         self.running = True
         self.capture_thread = threading.Thread(target=self._capture_frames, daemon=True)
         self.capture_thread.start()
-        print("🎬 Frame capture started")
+        self.logger.info("🎬 Frame capture started")
 
     def stop_capture(self):
         """Stop background frame capture"""
         self.running = False
         if self.capture_thread and self.capture_thread.is_alive():
             self.capture_thread.join(timeout=2.0)
-            print("🛑 Frame capture stopped")
+            self.logger.warning("🛑 Frame capture stopped")
 
     def _capture_frames(self):
         """Background thread for continuous frame capture"""
         reconnect_attempts = 0
         max_queue_size = self.config.get('buffer_size', 3)
         
-        print("🎥 Capture thread started")
+        self.logger.info("🎥 Capture thread started")
         
         while self.running:
             try:
@@ -384,17 +385,17 @@ class StreamManager:
                 success, frame = self.read_frame()
                 
                 if not success or frame is None:
-                    print(f"⚠️  Frame capture failed (attempt {reconnect_attempts + 1})")
+                    self.logger.warning(f"⚠️  Frame capture failed (attempt {reconnect_attempts + 1})")
                     reconnect_attempts += 1
                     
                     if reconnect_attempts >= 3:  # Quick reconnection attempts
-                        print("🔄 Attempting quick reconnection...")
+                        self.logger.info("🔄 Attempting quick reconnection...")
                         if self._attempt_reconnection():
                             reconnect_attempts = 0
                             continue
                     
                     if reconnect_attempts >= self.max_reconnect_attempts:
-                        print("❌ Max reconnection attempts reached in capture thread")
+                        self.logger.warning("❌ Max reconnection attempts reached in capture thread")
                         break
                     
                     time.sleep(1.0)  # Shorter sleep for faster recovery
@@ -419,7 +420,7 @@ class StreamManager:
                     pass  # Skip frame if queue is full
                             
             except Exception as e:
-                print(f"🚨 Capture thread error: {e}")
+                self.logger.warning(f"🚨 Capture thread error: {e}")
                 time.sleep(1.0)
 
     def get_frame(self, timeout: float = 0.1) -> Optional[np.ndarray]:
@@ -462,7 +463,7 @@ class StreamManager:
         """
         with self.lock:
             if not self.is_opened or self.cap is None:
-                print("🚨 Stream not initialized in read_frame")
+                self.logger.warning("🚨 Stream not initialized in read_frame")
                 return False, None
             
             try:
@@ -472,7 +473,7 @@ class StreamManager:
                 if not ret:
                     error_code = self.cap.get(cv2.CAP_PROP_POS_MSEC)
                     if error_code == -1072873821:  # MSMF network read error
-                        print("⚠️ MSMF network read error - attempting recovery")
+                        self.logger.warning("⚠️ MSMF network read error - attempting recovery")
                         self.error_count += 1
                         
                         # Reset the capture object
@@ -480,7 +481,7 @@ class StreamManager:
                             return False, None
                     
                     self.error_count += 1
-                    print(f"🚨 Frame read failed (error #{self.error_count})")
+                    self.logger.warning(f"🚨 Frame read failed (error #{self.error_count})")
                     
                     if self._should_reconnect():
                         self._attempt_reconnection()
@@ -497,7 +498,7 @@ class StreamManager:
                 return True, frame
                 
             except Exception as e:
-                print(f"🚨 Exception reading frame: {e}")
+                self.logger.warning(f"🚨 Exception reading frame: {e}")
                 self.error_count += 1
                 
                 if self._should_reconnect():
@@ -517,13 +518,13 @@ class StreamManager:
                 # Reinitialize with same parameters
                 success = self._initialize_by_type(self.source)
                 if success:
-                    print("✅ Capture reset successful")
+                    self.logger.info("✅ Capture reset successful")
                     return True
                 else:
-                    print("❌ Capture reset failed")
+                    self.logger.warning("❌ Capture reset failed")
                     return False
         except Exception as e:
-            print(f"❌ Capture reset error: {e}")
+            self.logger.warning(f"❌ Capture reset error: {e}")
         
         return False    
     
@@ -545,7 +546,7 @@ class StreamManager:
 
     def _attempt_reconnection(self) -> bool:
         """Attempt to reconnect to the stream"""
-        print(f"🔄 Attempting reconnection ({self.reconnect_attempts + 1}/{self.max_reconnect_attempts})")
+        self.logger.info(f"🔄 Attempting reconnection ({self.reconnect_attempts + 1}/{self.max_reconnect_attempts})")
         
         self.last_reconnect_time = time.time()
         self.reconnect_attempts += 1
@@ -562,11 +563,11 @@ class StreamManager:
         success = self.initialize_stream(self.source)
         
         if success:
-            print("✅ Reconnection successful!")
+            self.logger.info("✅ Reconnection successful!")
             self.reconnect_attempts = 0
             return True
         else:
-            print(f"❌ Reconnection attempt {self.reconnect_attempts} failed")
+            self.logger.warning(f"❌ Reconnection attempt {self.reconnect_attempts} failed")
             return False
 
     def _start_health_monitor(self):
@@ -574,7 +575,7 @@ class StreamManager:
         if self.health_monitor_thread is None or not self.health_monitor_thread.is_alive():
             self.health_monitor_thread = threading.Thread(target=self._health_monitor_loop, daemon=True)
             self.health_monitor_thread.start()
-            print("❤️  Stream health monitor started")
+            self.logger.info("❤️  Stream health monitor started")
 
     def _health_monitor_loop(self):
         """Background health monitoring loop"""
@@ -583,7 +584,7 @@ class StreamManager:
                 time.sleep(self.health_check_interval)
                 self._check_stream_health()
             except Exception as e:
-                print(f"🚨 Health monitor error: {e}")
+                self.logger.warning(f"🚨 Health monitor error: {e}")
 
     def _check_stream_health(self):
         """Check stream health and trigger reconnection if needed"""
@@ -593,9 +594,9 @@ class StreamManager:
         time_since_last_frame = time.time() - self.last_successful_frame_time
         
         if time_since_last_frame > self.max_frame_gap:
-            print(f"⚠️  Stream health check: No frames for {time_since_last_frame:.1f}s")
+            self.logger.warning(f"⚠️  Stream health check: No frames for {time_since_last_frame:.1f}s")
             if self._should_reconnect():
-                print("🔄 Health monitor triggering reconnection...")
+                self.logger.info("🔄 Health monitor triggering reconnection...")
                 self._attempt_reconnection()
 
     # ========== UTILITY METHODS ==========
@@ -616,7 +617,7 @@ class StreamManager:
                 result[0], result[1] = self.cap.read()
             except Exception as e:
                 result[0] = False
-                print(f"🚨 Frame read exception: {e}")
+                self.logger.warning(f"🚨 Frame read exception: {e}")
         
         thread = threading.Thread(target=read_frame)
         thread.daemon = True
@@ -624,7 +625,7 @@ class StreamManager:
         thread.join(timeout)
         
         if thread.is_alive():
-            print(f"⏰ Frame read timeout after {timeout}s")
+            self.logger.info(f"⏰ Frame read timeout after {timeout}s")
             return False, None
         
         return result[0], result[1]
@@ -649,14 +650,14 @@ class StreamManager:
             height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
             fps = self.cap.get(cv2.CAP_PROP_FPS)
             
-            print(f"📊 Stream Info:")
-            print(f"   Type: {self.stream_type}")
-            print(f"   Resolution: {width}x{height}")
-            print(f"   FPS: {fps:.1f}")
-            print(f"   Source: {self.source}")
+            self.logger.info(f"📊 Stream Info:")
+            self.logger.info(f"   Type: {self.stream_type}")
+            self.logger.info(f"   Resolution: {width}x{height}")
+            self.logger.info(f"   FPS: {fps:.1f}")
+            self.logger.info(f"   Source: {self.source}")
             
         except Exception as e:
-            print(f"⚠️  Could not get stream info: {e}")
+            self.logger.warning(f"⚠️  Could not get stream info: {e}")
 
     # ========== PUBLIC INTERFACE ==========
     
@@ -734,7 +735,7 @@ class StreamManager:
 
     def release(self):
         """Release stream resources"""
-        print("🔴 Releasing StreamManager...")
+        self.logger.warning("🔴 Releasing StreamManager...")
         self.running = False
         
         # Stop capture thread
@@ -753,7 +754,7 @@ class StreamManager:
         self.clear_queue()
         
         self.is_opened = False
-        print("🔴 StreamManager released")
+        self.logger.warning("🔴 StreamManager released")
 
     def __del__(self):
         """Destructor to ensure proper cleanup"""

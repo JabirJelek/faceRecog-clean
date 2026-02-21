@@ -7,6 +7,11 @@ import csv
 import datetime
 from pathlib import Path
 from typing import List, Dict, Optional
+import logging
+logger = logging.getLogger(__name__)
+
+logger.error
+logger.info
 
 class DataLogger:
     """Handles CSV logging of recognition results."""
@@ -46,10 +51,10 @@ class DataLogger:
                 writer.writerow(self.log_columns)
             
             self.logging_enabled = True
-            print(f"📊 Detailed face logging ENABLED: {self.log_file}")
+            logger.info(f"📊 Detailed face logging ENABLED: {self.log_file}")
             return True
         except Exception as e:
-            print(f"❌ Failed to setup logging: {e}")
+            logger.error(f"❌ Failed to setup logging: {e}")
             self.logging_enabled = False
             self.log_file = None
             return False
@@ -97,22 +102,22 @@ class DataLogger:
             
             # Periodic status update
             if self.log_counter % 10 == 0:
-                print(f"📊 Logged {self.log_counter} face entries")
+                logger.info(f"📊 Logged {self.log_counter} face entries")
                 
         except Exception as e:
-            print(f"❌ Log write error: {e}")
+            logger.error(f"❌ Log write error: {e}")
     
     def toggle_logging(self, filename: Optional[str] = None):
         """Toggle logging on/off."""
         if not self.logging_enabled:
             self.setup_logging(filename)
-            print("🟢 Enhanced logging STARTED")
+            logger.info("🟢 Enhanced logging STARTED")
         else:
             if self.log_file:
                 duration = datetime.datetime.now() - self.log_start_time
-                print(f"🔴 Logging STOPPED: {self.log_file}")
-                print(f"   - Duration: {duration}")
-                print(f"   - CSV entries: {self.log_counter}")
+                logger.error(f"🔴 Logging STOPPED: {self.log_file}")
+                logger.error(f"   - Duration: {duration}")
+                logger.error(f"   - CSV entries: {self.log_counter}")
             
             self.logging_enabled = False
             self.log_file = None

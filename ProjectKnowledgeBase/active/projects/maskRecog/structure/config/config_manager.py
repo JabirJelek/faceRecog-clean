@@ -1,24 +1,28 @@
 # config/config_manager.py
+
 from typing import Dict, List
-from collections import  deque
+from collections import deque
 import time
 import json
+import logging 
+
+logger = logging.getLogger(__name__)  
 
 
 class ConfigManager:
     """Unified configuration manager for hierarchical configuration management"""
     
     def __init__(self, base_config: Dict):
-        self.base = base_config.copy()  # Deep copy to prevent mutations
+        self.base = base_config.copy()
         self.derived = self._build_derived_configs()
         self.validation_rules = self._build_validation_rules()
-        self.config_history = deque(maxlen=10)  # Track config changes
+        self.config_history = deque(maxlen=10)
         
-        # Validate base config
         self._validate_config(self.base)
         
-        print("✅ ConfigManager initialized with unified configuration system")
-    
+        # Replaced print with logger.info
+        logger.info("✅ ConfigManager initialized with unified configuration system")
+        
     def _build_derived_configs(self) -> Dict[str, Dict]:
         """Build all derived configurations from base"""
         derived_configs = {}
@@ -149,7 +153,7 @@ class ConfigManager:
             'min_face_quality': {'min': 0.0, 'max': 1.0, 'type': float},
             'temporal_buffer_size': {'min': 1, 'max': 50, 'type': int},
         }
-    
+        
     def _validate_config(self, config: Dict) -> bool:
         """Validate configuration against rules"""
         errors = []
@@ -157,96 +161,93 @@ class ConfigManager:
         for key, rules in self.validation_rules.items():
             if key in config:
                 value = config[key]
-                # Type check
                 if not isinstance(value, rules['type']):
                     errors.append(f"{key}: expected {rules['type']}, got {type(value)}")
-                # Range check
                 elif 'min' in rules and value < rules['min']:
                     errors.append(f"{key}: value {value} below minimum {rules['min']}")
                 elif 'max' in rules and value > rules['max']:
                     errors.append(f"{key}: value {value} above maximum {rules['max']}")
         
         if errors:
-            print("❌ Configuration validation errors:")
+            # Use logger.error for errors, logging each line separately
+            logger.error("❌ Configuration validation errors:")
             for error in errors:
-                print(f"   - {error}")
+                logger.error(f"   - {error}")
             return False
         
         return True
     
     def get_component_config(self, component_name: str) -> Dict:
         """Get configuration for specific component"""
+ 
         if component_name in self.derived:
             config = self.derived[component_name]
-            # Log config usage
             self.config_history.append({
                 'component': component_name,
                 'timestamp': time.time(),
-                'config_keys': list(config.keys())[:5]  # First 5 keys for logging
+                'config_keys': list(config.keys())[:5]
             })
             return config
         else:
-            print(f"⚠️  Config for '{component_name}' not found, using base config")
+            # Warning for missing config
+            logger.warning(f"⚠️  Config for '{component_name}' not found, using base config")
             return self.base
     
     def get_available_configs(self) -> List[str]:
         """Get list of available configuration profiles"""
+ 
         return ['base'] + list(self.derived.keys())
     
     def create_custom_config(self, profile_name: str, base_profile: str, overrides: Dict) -> bool:
         """Create a custom configuration profile"""
+ 
         if profile_name in self.derived:
-            print(f"❌ Config profile '{profile_name}' already exists")
+            logger.error(f"❌ Config profile '{profile_name}' already exists")
             return False
         
-        # Get base profile
         if base_profile == 'base':
             base_config = self.base
         elif base_profile in self.derived:
             base_config = self.derived[base_profile]
         else:
-            print(f"❌ Base profile '{base_profile}' not found")
+            logger.error(f"❌ Base profile '{base_profile}' not found")
             return False
         
-        # Apply overrides
         custom_config = {**base_config, **overrides}
         
-        # Validate
         if not self._validate_config(custom_config):
             return False
         
-        # Store
         self.derived[profile_name] = custom_config
-        print(f"✅ Created custom config profile: '{profile_name}'")
+        logger.info(f"✅ Created custom config profile: '{profile_name}'")
         return True
     
     def update_config_value(self, profile_name: str, key: str, value: any) -> bool:
         """Update a specific configuration value"""
+ 
         if profile_name == 'base':
             config = self.base
         elif profile_name in self.derived:
             config = self.derived[profile_name]
         else:
-            print(f"❌ Config profile '{profile_name}' not found")
+            logger.error(f"❌ Config profile '{profile_name}' not found")
             return False
         
-        # Validate the update
         if key in self.validation_rules:
             rules = self.validation_rules[key]
             if not isinstance(value, rules['type']):
-                print(f"❌ Invalid type for {key}: expected {rules['type']}")
+                logger.error(f"❌ Invalid type for {key}: expected {rules['type']}")
                 return False
             if 'min' in rules and value < rules['min']:
-                print(f"❌ Value for {key} below minimum {rules['min']}")
+                logger.error(f"❌ Value for {key} below minimum {rules['min']}")
                 return False
             if 'max' in rules and value > rules['max']:
-                print(f"❌ Value for {key} above maximum {rules['max']}")
+                logger.error(f"❌ Value for {key} above maximum {rules['max']}")
                 return False
         
-        # Apply update
         old_value = config.get(key)
         config[key] = value
-        print(f"🔄 Updated {profile_name}.{key}: {old_value} → {value}")
+        logger.info(f"🔄 Updated {profile_name}.{key}: {old_value} → {value}")
         return True
     
     def get_config_info(self, profile_name: str = None) -> Dict:
@@ -282,12 +283,13 @@ class ConfigManager:
     
     def export_config(self, profile_name: str, filepath: str = None) -> bool:
         """Export configuration to JSON file"""
+ 
         if profile_name == 'base':
             config = self.base
         elif profile_name in self.derived:
             config = self.derived[profile_name]
         else:
-            print(f"❌ Config profile '{profile_name}' not found")
+            logger.error(f"❌ Config profile '{profile_name}' not found")
             return False
         
         try:
@@ -298,31 +300,29 @@ class ConfigManager:
             with open(filepath, 'w') as f:
                 json.dump(config, f, indent=2)
             
-            print(f"✅ Exported config '{profile_name}' to {filepath}")
+            logger.info(f"✅ Exported config '{profile_name}' to {filepath}")
             return True
         except Exception as e:
-            print(f"❌ Failed to export config: {e}")
+            logger.error(f"❌ Failed to export config: {e}")
             return False
     
     def import_config(self, filepath: str, profile_name: str = None) -> bool:
         """Import configuration from JSON file"""
+ 
         try:
             with open(filepath, 'r') as f:
                 imported_config = json.load(f)
             
-            # Determine profile name
             if profile_name is None:
                 profile_name = Path(filepath).stem
             
-            # Validate imported config
             if not self._validate_config(imported_config):
                 return False
             
-            # Store as custom profile
             self.derived[profile_name] = imported_config
-            print(f"✅ Imported config as '{profile_name}' from {filepath}")
+            logger.info(f"✅ Imported config as '{profile_name}' from {filepath}")
             return True
             
         except Exception as e:
-            print(f"❌ Failed to import config: {e}")
+            logger.error(f"❌ Failed to import config: {e}")
             return False

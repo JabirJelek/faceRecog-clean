@@ -7,6 +7,9 @@ Common frame processing utilities for both windowed and headless modes
 import cv2
 import numpy as np
 from typing import Tuple, Optional, Dict, List, Any
+import logging
+
+logger = logging.getLogger(__name__)
 
 class FrameUtils:
     
@@ -37,7 +40,7 @@ class FrameUtils:
             
             return cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_AREA)
         except Exception as e:
-            print(f"❌ Error in enhanced_resize_for_processing: {e}")
+            logger.warning(f"❌ Error in enhanced_resize_for_processing: {e}")
             return frame  # Fallback to original frame
     
     @staticmethod
