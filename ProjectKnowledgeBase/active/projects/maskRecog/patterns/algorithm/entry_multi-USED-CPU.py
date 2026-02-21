@@ -693,7 +693,7 @@ def get_default_config():
         'base64_quality': 50,
         
         # ========== SYSTEM MODE ==========
-        'headless': False,
+        'headless': True,
         'use_gpu': False,
         'gpu_device': 0,
         
@@ -714,7 +714,7 @@ def get_default_config():
         },
         
         'output': {
-            'root_dir': r'logs-running\cpu\runs-cpu',                    # Base directory for all runs
+            'root_dir': r'logs-running\magick\runs-magick',                    # Base directory for all runs
             'create_timestamped_subdir': True,      # Create YYYYMMDD_HHMMSS subfolder
             'enable_exit_status': True,              # Write exit_status.json on shutdown
         },
@@ -768,7 +768,7 @@ def get_advanced_sources_config():
             'cctv_name':None,
         },                                  
     }
-        
+         
 def load_custom_config(config_path: str = None) -> Dict:
     """Load custom configuration from file if provided"""
     if config_path and os.path.exists(config_path):
@@ -1029,7 +1029,32 @@ def main():
             log_ger.info("   - RTSP URLs and credentials") 
             log_ger.info("   - Network connectivity")
             return
- 
+    # else:
+    #     # Single source mode
+    #     #camera_source = args.camera
+    #     rtsp_source = args.rtsp
+
+    #     log_ger.info(f"\n📹 Single Source Mode:")
+    #     log_ger.info(f"CURRENTLY DISABLED!")
+    #     #log_ger.info(f"   Camera Source: {camera_source}")
+    #     log_ger.info(f"   RTSP Source: {rtsp_source}")
+        
+    #     # For single source, create a sources_config with one entry
+    #     sources_config = {
+    #         'main_camera': {
+    #             'url': rtsp_source,
+    #             'description': 'Main Camera',
+    #             'priority': 'high',
+    #             'processing_scale': 1.0,
+    #             'buffer_size': 3,
+    #             'cctv_name': args.cctv_name or config.get('cctv_name', 'Main-Camera')
+    #         }
+    #     }
+        
+    #     # Test single stream connection
+    #     if not test_multi_stream_connections(sources_config):
+    #         log_ger.info("❌ Stream connection test failed.")
+    #         return
     
     # Test server connection if enabled and requested
     if config.get('server_push_enabled', False) and args.test_server:
