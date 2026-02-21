@@ -603,7 +603,7 @@ def get_default_config():
         
         # ========== SERVER PUSH CONFIGURATION ==========        
         'server_push_enabled': True,
-        'server_endpoint': '',
+        'server_endpoint': 'https://vps.scasda.my.id//actions/foto_pusat_data_unggah.php',
         'server_push_cooldown': 5,
         'server_timeout': 10,
         'server_retry_attempts': 10,
@@ -728,7 +728,7 @@ def get_default_config():
                 'smtp_server': 'smtp.gmail.com',
                 'smtp_port': 587,
                 'smtp_user': 'faridraihan17@gmail.com',
-                'smtp_password': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\pass.txt',
+                'smtp_password': r'D:\raihan\document\projects\faceRecog\ProjectKnowledgeBase\pass.txt',
                 'use_tls': True
             },
             {
