@@ -601,7 +601,7 @@ def get_default_config():
         'max_images_per_session': 5000,
         'min_save_interval': 1.0,
         
-        # ========== SERVER PUSH CONFIGURATION ==========        
+        # ========== MODIFIABLE! SERVER PUSH CONFIGURATION ==========        
         'server_push_enabled': True,
         'server_endpoint': '',
         'server_push_cooldown': 5,
@@ -615,13 +615,13 @@ def get_default_config():
         'image_resize_height': 576,
         'image_resize_method': 'default',
         
-        # ========== ALERT CONFIGURATION ==========
+        # ========== MODIFIABLE! ALERT CONFIGURATION ==========
         'enable_voice_alerts': True,
         'alert_server_url': " ",
-        'alert_cooldown_seconds': 15,            # DECREASED from 20 - more responsive alerts
-        'min_violation_frames': 1,              # DECREASED from 20 - more sensitive
-        'min_violation_seconds': 1,              # DECREASED from 12 - faster alerts
-        'max_gap_frames': 10,                    # INCREASED from 8 - more tolerant to gaps
+        'alert_cooldown_seconds': 15,            # DECREASED - more responsive alerts
+        'min_violation_frames': 1,              # DECREASED - more sensitive
+        'min_violation_seconds': 1,              # DECREASED - faster alerts
+        'max_gap_frames': 10,                    # INCREASED - more tolerant to gaps
         'alert_language': 'id',
         'alert_style': 'formal',
         'enable_individual_alerts': True,
@@ -693,10 +693,10 @@ def get_default_config():
         'base64_quality': 50,
         
         # ========== SYSTEM MODE ==========
-        'headless': True,
+        'headless': False,
         'use_gpu': False,
         'gpu_device': 0,
-        'shutdown_at' : '12:53', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours
+        'shutdown_at' : '11:56:45', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours MODIFIABLE!
         
         # ========== ANNOTATION CONFIGURATION ==========
         'annotation_box_thickness': 1,
@@ -716,7 +716,7 @@ def get_default_config():
         
         # Automatic folder location
         'output': {
-            'root_dir': r'logs-running\magick\runs-magick',                    # Base directory for all runs
+            'root_dir': r'logs-running\cpu\runs-cpu',                    # Base directory for all runs
             'create_timestamped_subdir': True,      # Create YYYYMMDD_HHMMSS subfolder
             'enable_exit_status': True,              # Write exit_status.json on shutdown
         },
@@ -724,10 +724,10 @@ def get_default_config():
         # Email sending config
         'email': [
             {
-                'enabled': True,
+                'enabled': False,
                 'recipient': 'faridraihan17@gmail.com',
                 'language': 'en',          # 'en' or 'id'
-                'attach_zip': True,        # whether to include the ZIP archive
+                'attach_zip': False,        # whether to include the ZIP archive
                 # SMTP settings (optional – if not provided, fallback to global)
                 'smtp_server': 'smtp.gmail.com',
                 'smtp_port': 587,
