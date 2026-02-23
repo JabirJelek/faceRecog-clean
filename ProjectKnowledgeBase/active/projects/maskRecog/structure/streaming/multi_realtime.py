@@ -40,10 +40,13 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
     def __init__(self, face_system, config: Dict):
         super().__init__(face_system, config)
         
+        # Store full configuration for later access
+        self.config = config
+        
         # ==========   OUTPUT DIRECTORY CONFIGURATION ==========
         self.data_logger = None          # will be created if logging enabled
         output_cfg = config.get('output', {})
-        self.output_root = output_cfg.get('root_dir', )
+        self.output_root = output_cfg.get('root_dir', '')      # FIXED syntax
         self.create_timestamped_subdir = output_cfg.get('create_timestamped_subdir', True)
         self.enable_exit_status = output_cfg.get('enable_exit_status', True)
         self.run_dir = None          # will be set by _create_run_directory()
@@ -216,9 +219,6 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         
         logger.info("🎯 MultiSourceRealTimeProcessor initialized with enhanced thread safety")
                                
-                                
-                                   
-
     # ========== NEW: RUN DIRECTORY MANAGEMENT ==========
     
     def _create_run_directory(self):
@@ -242,25 +242,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         self.config['csv_log_dir'] = self.csv_log_dir
         
         logger.info(f"📁 Run directory created: {self.run_dir}")
-    
-    # def _setup_file_logging(self):
-    #     """Redirect stdout/stderr to a log file inside run_dir."""
-    #     log_file = os.path.join(self.run_dir, 'console.log')
-    #     self.log_file_handle = open(log_file, 'w', encoding='utf-8')
-    #     # Save original streams to restore later if needed
-    #     self._original_stdout = sys.stdout
-    #     self._original_stderr = sys.stderr
-    #     sys.stdout = self.log_file_handle
-    #     sys.stderr = self.log_file_handle
-    #     logger.info(f"📄 Console output redirected to {log_file}")
-    
-    # def _restore_file_logging(self):
-    #     """Restore original stdout/stderr and close log file."""
-    #     if hasattr(self, 'log_file_handle') and self.log_file_handle:
-    #         sys.stdout = self._original_stdout
-    #         sys.stderr = self._original_stderr
-    #         self.log_file_handle.close()
-    #         logger.info("📄 Console logging restored")
+ 
     
     # ========== NEW: EXIT STATUS ==========
     
@@ -834,19 +816,19 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 
             except Exception as e:
                 logger.warning(f"⚠️ Error cleaning up tracker {source_id}: {e}")
-    
+        
     def _close_all_loggers(self):
         """Close all image loggers safely"""
         for source_id, img_logger in list(self.image_loggers.items()):
             try:
                 # Close logger if it has close method
-                if hasattr(img_logger, 'close'):
-                    logger.close()
+                if hasattr(img_logger, 'close'):          # FIXED: use img_logger, not logger
+                    img_logger.close()
                     
                 # Explicitly close CSV file if open
-                if hasattr(logger, 'csv_file') and logger.csv_file:
+                if hasattr(img_logger, 'csv_file') and img_logger.csv_file:
                     try:
-                        logger.csv_file.close()
+                        img_logger.csv_file.close()
                     except:
                         pass
                 
@@ -956,7 +938,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             logger.warning(f"⚠️ Resource monitoring error: {e}")
                         
     def print_info_final_statistics(self):
-        """logger.info final processing statistics"""
+        """Print final processing statistics"""
         logger.info("\n" + "="*60)
         logger.info("📊 FINAL PROCESSING STATISTICS")
         logger.info("="*60)
@@ -1157,7 +1139,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             self.data_logger = None        
                                   
     def print_cctv_mapping(self):
-        """logger.info mapping of source IDs to CCTV names using source_configs - OPTIMIZED"""
+        """Print mapping of source IDs to CCTV names using source_configs - OPTIMIZED"""
         if not self.source_configs:
             logger.info("ℹ️  No CCTV mapping available - no sources configured")
             return
@@ -1175,19 +1157,26 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
      
     def get_source_image_logger(self, source_id: str) -> Optional[ImageLogger]:
         """Get ImageLogger for specific source with fallback and automatic creation"""
-        # If logger exists, return it
+        from ..logging.image_logger import ImageLogger  # import for type check
+        
+        # If logger exists, verify it's the correct type
         if source_id in self.image_loggers:
             img_logger = self.image_loggers[source_id]
-            #   VERIFY: Check if CCTV name is properly set
-            if not img_logger.cctv_name or img_logger.cctv_name == 'Unknown-Camera':
-                source_config = self.get_source_config(source_id)
-                if source_config:
-                    dynamic_cctv_name = self._get_dynamic_cctv_name(source_config, source_id)
-                    img_logger.update_cctv_name(dynamic_cctv_name)
-                    logger.info(f"🔄 Updated CCTV name for existing logger {source_id}: {dynamic_cctv_name}")
-            return logger
+            if isinstance(img_logger, ImageLogger):
+                # Update CCTV name if needed
+                if not img_logger.cctv_name or img_logger.cctv_name == 'Unknown-Camera':
+                    source_config = self.get_source_config(source_id)
+                    if source_config:
+                        dynamic_cctv_name = self._get_dynamic_cctv_name(source_config, source_id)
+                        img_logger.update_cctv_name(dynamic_cctv_name)
+                        logger.info(f"🔄 Updated CCTV name for existing logger {source_id}: {dynamic_cctv_name}")
+                return img_logger
+            else:
+                # Wrong type – remove it and try to recreate
+                logger.warning(f"⚠️ Removing invalid logger for {source_id} (type: {type(img_logger)})")
+                self.image_loggers.pop(source_id, None)
         
-        #   CRITICAL: If no logger exists but logging is enabled, try to create one on-demand
+        # If no valid logger exists but logging is enabled, try to create one on-demand
         if self.image_logging_enabled and source_id in self.active_sources:
             logger.info(f"🔄 Creating on-demand ImageLogger for source: {source_id}")
             success = self.force_create_image_logger(source_id)
@@ -1247,12 +1236,28 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 self.current_log_session = f"multi_source_{timestamp}"
                 logger.info(f"🔄 Created new logging session: {self.current_log_session}")
             
-            return self._setup_source_logging(source_id)
+            # Attempt to create the logger
+            success = self._setup_source_logging(source_id)
+            if not success:
+                logger.warning(f"❌ _setup_source_logging failed for {source_id}")
+                return False
+            
+            # 🟢 VERIFY that the logger was actually stored and is the right type
+            from ..logging.image_logger import ImageLogger
+            stored_logger = self.image_loggers.get(source_id)
+            if not isinstance(stored_logger, ImageLogger):
+                logger.warning(f"❌ After creation, {source_id} logger is {type(stored_logger)}. Expected ImageLogger.")
+                # Clean up invalid entry
+                self.image_loggers.pop(source_id, None)
+                return False
+            
+            logger.info(f"✅ Successfully created and verified ImageLogger for {source_id}")
+            return True
             
         except Exception as e:
             logger.warning(f"❌ Error forcing ImageLogger creation for {source_id}: {e}")
-            return False        
-    
+            return False
+        
     def get_multi_source_logging_status(self) -> Dict[str, Dict]:
         """Get logging status for all sources with CCTV names"""
         status_report = {}
@@ -1261,7 +1266,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             status_report[source_id] = logger.get_logging_status()
         
         return status_report
-    
+        
     def log_source_violation(self, source_id: str, frame: np.ndarray, results: List[Dict], original_frame: np.ndarray = None):
         """Log violation for specific source - UPDATED to use only verified violations"""
         if not self.image_logging_enabled:
@@ -1271,7 +1276,14 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         if not source_logger:
             logger.warning(f"❌ No ImageLogger available for source: {source_id}")
             return False, None
-        
+
+        # ----- ADD TYPE CHECK -----
+        from ..logging.image_logger import ImageLogger
+        if not isinstance(source_logger, ImageLogger):
+            logger.warning(f"❌ Invalid logger type for {source_id}: {type(source_logger)}. Expected ImageLogger.")
+            return False, None
+        # --------------------------
+
         try:
             #   ONLY check for verified violations using TrackingManager's flag
             verified_violations = [
@@ -1336,7 +1348,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         ]
             
     def print_multi_source_logging_status(self):
-        """logger.info comprehensive logging status for all sources with CCTV names"""
+        """Print comprehensive logging status for all sources with CCTV names"""
         status_report = self.get_multi_source_logging_status()
         
         logger.info("\n" + "="*60)
@@ -1483,7 +1495,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         """Safe violation logging with error handling"""
         try:
             if (self.image_logging_enabled and 
-                self.processing_count % self.log_interval == 0):
+                self.frame_count % self.log_interval == 0):
                 self._handle_violation_logging(source_id, frame, results)
         except Exception as e:
             logger.warning(f"⚠️ Violation logging error for {source_id}: {e}")
@@ -1605,23 +1617,23 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         current_time = time.time()
         for source_id, tracker in self.tracking_managers.items():
             try:
-                # Clean up old face tracks
-                tracker.face_tracker.cleanup_old_tracks(
-                    tracker.frame_count, 
-                    tracker.max_track_age
-                )
+                # Clean up old face tracks – CHECK METHOD EXISTS
+                if hasattr(tracker.face_tracker, '_cleanup_old_tracks'):
+                    tracker.face_tracker._cleanup_old_tracks(
+                        tracker.frame_count, 
+                        tracker.max_track_age
+                    )
+                else:
+                    logger.debug(f"_cleanup_old_tracks not available for {source_id}, skipping")
                 
-                # Clean up violation tracks
+                # Clean up violation tracks (already safe)
                 if hasattr(tracker, '_cleanup_old_violation_tracks'):
                     tracker._cleanup_old_violation_tracks(current_time)
                     
             except Exception as e:
                 logger.warning(f"⚠️ Memory optimization error for {source_id}: {e}")
         
-        # Clear verified violations history
-        if hasattr(self, 'verified_violations'):
-            if len(self.verified_violations) > 100:
-                self.verified_violations = self.verified_violations[-50:]
+        # REMOVED: reference to undefined self.verified_violations
         
         # Force garbage collection
         import gc
@@ -1667,7 +1679,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         logger.warning("🛑 Starting stable shutdown...")
         
         # logger.info final statistics
-        self.print_final_statistics()
+        self.print_info_final_statistics()          # FIXED method name
         
         # Call the enhanced cleanup
         self.close()
@@ -1808,7 +1820,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             logger.warning(f"❌ Error applying multi-source configuration: {e}")
                             
     def print_tracking_status(self):
-        """logger.info tracking status for all sources"""
+        """Print tracking status for all sources"""
         logger.info("\n" + "="*50)
         logger.info("👤 MULTI-SOURCE TRACKING SYSTEM STATUS")
         logger.info("="*50)
@@ -1831,7 +1843,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         logger.info("="*50)
            
     def print_alert_status(self):
-        """logger.info current alert system status"""
+        """Print current alert system status"""
         if hasattr(self, 'alert_manager') and self.alert_manager:
             config = self.alert_manager.get_alert_config()
             logger.info("\n" + "="*50)
@@ -2032,7 +2044,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         return info
     
     def print_all_sources_info(self):
-        """logger.info information about all active sources using source_configs"""
+        """Print information about all active sources using source_configs"""
         logger.info("\n" + "="*60)
         logger.info("📊 ALL ACTIVE SOURCES INFORMATION")
         logger.info("="*60)
@@ -2521,7 +2533,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
     # ========== ENHANCED: Control Methods with CCTV Info ==========
     
     def print_verification_stats(self):
-        """logger.info verification statistics"""
+        """Print verification statistics"""
         logger.info("\n" + "="*60)
         logger.info("✅ VIOLATION VERIFICATION STATISTICS")
         logger.info("="*60)
@@ -2545,7 +2557,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         logger.info("="*60)    
     
     def print_control_reference(self):
-        """logger.info multi-source control reference with CCTV info"""
+        """Print multi-source control reference with CCTV info"""
         logger.info("\n🎮 MULTI-SOURCE CONTROLS:")
         logger.info("   [m] - Cycle display layouts (grid, horizontal, vertical)")
         logger.info("   [n] - Toggle source health display") 
@@ -2918,7 +2930,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         return url.isdigit() or url in ['0', '1', '2']
  
     def _print_source_details(self, source_id: str, config: Dict):
-        """logger.info detailed information about the added source"""
+        """Print detailed information about the added source"""
         url = config.get('url', 'Unknown')
         description = config.get('description', 'No description')
         cctv_name = self._get_dynamic_cctv_name(config, source_id)
@@ -2976,20 +2988,19 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             if self.run_dir is None:
                 self._create_run_directory()
 
-            # Initialize sources
-            success_count = self.apply_multi_source_config(sources_config)
-            if success_count == 0:
+            # Initialize sources – only add those not already present
+            success_count = self.add_sources(sources_config)
+            # If we added no new sources but there are already active sources, proceed anyway
+            if success_count == 0 and len(self.active_sources) == 0:
                 logger.warning("❌ No valid sources could be initialized")
                 return
 
             # Parse shutdown_at if provided
             if self.shutdown_at:
                 try:
-                    # Try to parse as HH:MM:SS (today's date)
                     shutdown_time = datetime.datetime.strptime(self.shutdown_at, "%H:%M:%S").time()
                     now = datetime.datetime.now()
                     self.shutdown_target_time = datetime.datetime.combine(now.date(), shutdown_time)
-                    # If the time is already past today, schedule for tomorrow
                     if self.shutdown_target_time <= now:
                         self.shutdown_target_time += datetime.timedelta(days=1)
                         logger.info(f"⏰ Shutdown time {self.shutdown_at} is in the past, scheduling for tomorrow")
@@ -3003,7 +3014,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
 
             # Set running flag and start threads
             self.running = True
-            logger.info(f"🎬 Starting stabilized multi-source processing with {success_count} sources")
+            logger.info(f"🎬 Starting stabilized multi-source processing with {len(self.active_sources)} sources")
 
             # Start background threads
             self.auto_health_monitoring()
@@ -3017,7 +3028,6 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                     self.running = False
                 signal.signal(signal.SIGINT, signal_handler)
                 signal.signal(signal.SIGTERM, signal_handler)
-                # Custom signal for toggling logging – only on platforms that support it
                 if hasattr(signal, 'SIGUSR1'):
                     signal.signal(signal.SIGUSR1, lambda s,f: self.toggle_logging())
                 else:
@@ -3059,7 +3069,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                             self.running = False
                             break
                         # Optionally log remaining time every ~100 frames
-                        if self.processing_count % 100 == 0:
+                        if self.frame_count % 100 == 0:      # FIXED: self.frame_count, not self.processing_count
                             remaining = (self.shutdown_target_time - now).total_seconds()
                             logger.info(f"⏰ Shutdown in {remaining:.0f} seconds")                                
 
@@ -3314,7 +3324,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         return health_report
 
     def print_source_health_report(self):
-        """logger.info comprehensive health status for all sources"""
+        """Print comprehensive health status for all sources"""
         health_report = self.get_source_health_report()
         
         logger.info("\n" + "="*60)
@@ -3463,6 +3473,17 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                     progress = violation['violation_progress']
                     logger.info(f"   ⏳ Unverified: {identity} (conf: {confidence:.2f}) - "
                         f"Progress: {progress.get('overall', 0):.1%}")
-                                                
-        
-                    
+
+    def _handle_control_command(self, command: str):
+        """Handle commands from control file in headless mode."""
+        command = command.lower().strip()
+        if command == 'toggle_logging':
+            self.toggle_logging()
+        elif command == 'toggle_verification':
+            self.toggle_violation_verification()
+        elif command == 'status':
+            self.print_info_final_statistics()
+        elif command == 'quit':
+            self.running = False
+        else:
+            logger.warning(f"Unknown control command: {command}")

@@ -601,7 +601,7 @@ def get_default_config():
         'max_images_per_session': 5000,
         'min_save_interval': 1.0,
         
-        # ========== SERVER PUSH CONFIGURATION ==========        
+        # ========== MODIFIABLE! SERVER PUSH CONFIGURATION ==========        
         'server_push_enabled': True,
         'server_endpoint': '',
         'server_push_cooldown': 5,
@@ -615,13 +615,13 @@ def get_default_config():
         'image_resize_height': 576,
         'image_resize_method': 'default',
         
-        # ========== ALERT CONFIGURATION ==========
+        # ========== MODIFIABLE! ALERT CONFIGURATION ==========
         'enable_voice_alerts': True,
         'alert_server_url': " ",
-        'alert_cooldown_seconds': 15,            # DECREASED from 20 - more responsive alerts
-        'min_violation_frames': 1,              # DECREASED from 20 - more sensitive
-        'min_violation_seconds': 1,              # DECREASED from 12 - faster alerts
-        'max_gap_frames': 10,                    # INCREASED from 8 - more tolerant to gaps
+        'alert_cooldown_seconds': 15,            # DECREASED - more responsive alerts
+        'min_violation_frames': 1,              # DECREASED - more sensitive
+        'min_violation_seconds': 1,              # DECREASED - faster alerts
+        'max_gap_frames': 10,                    # INCREASED - more tolerant to gaps
         'alert_language': 'id',
         'alert_style': 'formal',
         'enable_individual_alerts': True,
@@ -696,7 +696,7 @@ def get_default_config():
         'headless': True,
         'use_gpu': False,
         'gpu_device': 0,
-        'shutdown_at' : '12:53', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours
+        'shutdown_at' : '10:25:30', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours MODIFIABLE!
         
         # ========== ANNOTATION CONFIGURATION ==========
         'annotation_box_thickness': 1,
@@ -753,52 +753,7 @@ def get_default_config():
     
 def get_advanced_sources_config():
     """Return advanced sources configuration with parameters"""
-    return {
-        # '1': {
-        #     'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/601',
-        #     'description': 'Dekat meja IT',
-        #     'priority': 'low',
-        #     'processing_scale': 1,
-        #     'buffer_size': 100,
-        #     'cctv_name':None,            
-        # },
-        
-        
-        # '2': {
-        #     'url': 'rtsp://admin:admin888@192.168.110.34:554/Streaming/Channels/501',
-        #     'description': 'Dekat meja bu Dyah',
-        #     'priority': 'medium',
-        #     'processing_scale':1,            
-        #     'buffer_size': 100,
-        #     'cctv_name':None,
-        # },
-        
-        # '3': {
-        #     'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/101',
-        #     'description': 'Atas Server Gedangan',
-        #     'priority': 'medium',
-        #     'processing_scale':1,            
-        #     'buffer_size': 100,
-        #     'cctv_name':None,
-        # },
-        
-        # '4': {
-        #     'url': 'rtsp://admin:Admin888@192.168.0.2:554/Streaming/Channels/601',
-        #     'description': 'Ruang Produksi',
-        #     'priority': 'medium',
-        #     'processing_scale':1,            
-        #     'buffer_size': 100,
-        #     'cctv_name':None,
-        # },   
-        
-        # '5': {
-        #     'url': 'rtsp://admin:admin@192.168.110.137:1935',
-        #     'description': 'HP Pribadi',
-        #     'priority': 'medium',
-        #     'processing_scale':1,            
-        #     'buffer_size': 100,
-        #     'cctv_name':None,
-        # },     
+    return {  
                          
         '6': {
             'url': '0',
@@ -808,17 +763,9 @@ def get_advanced_sources_config():
             'buffer_size': 100,
             'cctv_name':None,
         },
-        
-        # '7': {
-        #     'url': 'rtsp://admin:admin888@192.168.110.40:554/Streaming/Channels/601',
-        #     'description': 'Pojok dekat MIS',
-        #     'priority': 'medium',
-        #     'processing_scale':1,            
-        #     'buffer_size': 100,
-        #     'cctv_name':None,
-        # },                                  
+                                 
     }
-        
+            
 def load_custom_config(config_path: str = None) -> Dict:
     """Load custom configuration from file if provided"""
     if config_path and os.path.exists(config_path):
