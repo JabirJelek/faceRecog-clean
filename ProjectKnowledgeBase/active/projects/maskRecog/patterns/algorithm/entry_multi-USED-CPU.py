@@ -603,7 +603,7 @@ def get_default_config():
         
         # ========== SERVER PUSH CONFIGURATION ==========        
         'server_push_enabled': True,
-        'server_endpoint': '',
+        'server_endpoint': 'https://vps.scasda.my.id//actions/foto_pusat_data_unggah.php',
         'server_push_cooldown': 5,
         'server_timeout': 10,
         'server_retry_attempts': 10,
@@ -617,7 +617,7 @@ def get_default_config():
         
         # ========== ALERT CONFIGURATION ==========
         'enable_voice_alerts': True,
-        'alert_server_url': " ",
+        'alert_server_url': "https://vps.scasda.my.id/actions/a_notifikasi_suara_speaker.php",
         'alert_cooldown_seconds': 15,            # DECREASED from 20 - more responsive alerts
         'min_violation_frames': 1,              # DECREASED from 20 - more sensitive
         'min_violation_seconds': 1,              # DECREASED from 12 - faster alerts
@@ -696,7 +696,7 @@ def get_default_config():
         'headless': True,
         'use_gpu': False,
         'gpu_device': 0,
-        'shutdown_at' : '12:53', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours
+        'shutdown_at' : '16:15:00', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours
         
         # ========== ANNOTATION CONFIGURATION ==========
         'annotation_box_thickness': 1,
@@ -716,7 +716,7 @@ def get_default_config():
         
         # Automatic folder location
         'output': {
-            'root_dir': r'logs-running\magick\runs-magick',                    # Base directory for all runs
+            'root_dir': r'logs-running\cpu\runs-cpu',                    # Base directory for all runs
             'create_timestamped_subdir': True,      # Create YYYYMMDD_HHMMSS subfolder
             'enable_exit_status': True,              # Write exit_status.json on shutdown
         },
@@ -742,10 +742,10 @@ def get_default_config():
                 'attach_zip': False        # whether to include the ZIP archive
             },            
             {
-                'enabled': False,
-                'recipient': 'ikeepmypromiz@gmail.com',
+                'enabled': True,
+                'recipient': 'itdiv@sinarcemaramasabadi.co.id',
                 'language': 'en',          # 'en' or 'id'
-                'attach_zip': True        # whether to include the ZIP archive
+                'attach_zip': False        # whether to include the ZIP archive
             }
         ]     
     }
