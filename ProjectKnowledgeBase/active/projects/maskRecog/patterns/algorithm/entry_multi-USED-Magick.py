@@ -717,6 +717,7 @@ def get_default_config():
         # Automatic folder location
         'output': {
             'root_dir': r'logs-running\magick\runs-magick',                    # Base directory for all runs
+            "violations_folder": "/path/to/violations", # optional
             'create_timestamped_subdir': True,      # Create YYYYMMDD_HHMMSS subfolder
             'enable_exit_status': True,              # Write exit_status.json on shutdown
         },
@@ -736,10 +737,10 @@ def get_default_config():
                 'use_tls': True
             },
             {
-                'enabled': False,
+                'enabled': True,
                 'recipient': 'humanj241@gmail.com',
                 'language': 'id',          # 'en' or 'id'
-                'attach_zip': False        # whether to include the ZIP archive
+                'attach_zip': True        # whether to include the ZIP archive
             },            
             {
                 'enabled': False,

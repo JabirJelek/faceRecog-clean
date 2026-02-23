@@ -47,6 +47,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         self.data_logger = None          # will be created if logging enabled
         output_cfg = config.get('output', {})
         self.output_root = output_cfg.get('root_dir', '')      # FIXED syntax
+        self.violations_folder = output_cfg.get('violations_folder', None)   # new        
         self.create_timestamped_subdir = output_cfg.get('create_timestamped_subdir', True)
         self.enable_exit_status = output_cfg.get('enable_exit_status', True)
         self.run_dir = None          # will be set by _create_run_directory()
@@ -229,6 +230,15 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         else:
             self.run_dir = self.output_root
         os.makedirs(self.run_dir, exist_ok=True)
+        
+        if self.violations_folder:
+            # Create a timestamped subfolder inside the violations folder
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            self.image_log_dir = os.path.join(self.violations_folder, timestamp)
+        else:
+            self.image_log_dir = os.path.join(self.run_dir, 'images')
+        
+        os.makedirs(self.image_log_dir, exist_ok=True)        
         
         # Create subdirectories for different log types
         self.image_log_dir = os.path.join(self.run_dir, 'images')
@@ -2854,8 +2864,11 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 source_logger.update_cctv_name(cctv_name)
 
             safe_cctv_name = self._create_source_safe_name(cctv_name)
-            # Construct the base directory for this source's images
-            source_image_dir = os.path.join(self.image_log_dir, f"{self.current_log_session}_{safe_cctv_name}")
+            
+            # Base directory for this source's images: 
+            #   image_log_dir / f"{self.current_log_session}_{safe_cctv_name}"
+            source_image_dir = os.path.join(self.image_log_dir, 
+                                            f"{self.current_log_session}_{safe_cctv_name}")
 
             logger.debug(f"🔍 Setting up ImageLogger with base directory: {source_image_dir}")
 
@@ -3498,3 +3511,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             self.running = False
         else:
             logger.warning(f"Unknown control command: {command}")
+            
+            
+            
+            
