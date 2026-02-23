@@ -603,7 +603,7 @@ def get_default_config():
         
         # ========== MODIFIABLE! SERVER PUSH CONFIGURATION ==========        
         'server_push_enabled': True,
-        'server_endpoint': '',
+        'server_endpoint': 'https://vps.scasda.my.id//actions/foto_pusat_data_unggah.php',
         'server_push_cooldown': 5,
         'server_timeout': 10,
         'server_retry_attempts': 10,
@@ -617,11 +617,11 @@ def get_default_config():
         
         # ========== MODIFIABLE! ALERT CONFIGURATION ==========
         'enable_voice_alerts': True,
-        'alert_server_url': " ",
-        'alert_cooldown_seconds': 15,            # DECREASED - more responsive alerts
-        'min_violation_frames': 1,              # DECREASED - more sensitive
-        'min_violation_seconds': 1,              # DECREASED - faster alerts
-        'max_gap_frames': 10,                    # INCREASED - more tolerant to gaps
+        'alert_server_url': "https://vps.scasda.my.id/actions/a_notifikasi_suara_speaker.php",
+        'alert_cooldown_seconds': 15,            # DECREASED from 20 - more responsive alerts
+        'min_violation_frames': 1,              # DECREASED from 20 - more sensitive
+        'min_violation_seconds': 1,              # DECREASED from 12 - faster alerts
+        'max_gap_frames': 10,                    # INCREASED from 8 - more tolerant to gaps
         'alert_language': 'id',
         'alert_style': 'formal',
         'enable_individual_alerts': True,
@@ -696,7 +696,7 @@ def get_default_config():
         'headless': False,
         'use_gpu': False,
         'gpu_device': 0,
-        'shutdown_at' : '11:56:45', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours MODIFIABLE!
+        'shutdown_at' : '12:53', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours
         
         # ========== ANNOTATION CONFIGURATION ==========
         'annotation_box_thickness': 1,
@@ -742,10 +742,10 @@ def get_default_config():
                 'attach_zip': False        # whether to include the ZIP archive
             },            
             {
-                'enabled': False,
-                'recipient': 'ikeepmypromiz@gmail.com',
+                'enabled': True,
+                'recipient': 'itdiv@sinarcemaramasabadi.co.id',
                 'language': 'en',          # 'en' or 'id'
-                'attach_zip': True        # whether to include the ZIP archive
+                'attach_zip': False        # whether to include the ZIP archive
             }
         ]     
     }
