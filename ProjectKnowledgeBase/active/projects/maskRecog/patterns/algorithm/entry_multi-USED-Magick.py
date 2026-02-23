@@ -302,7 +302,7 @@ def get_default_config():
     """Return the complete default configuration"""
     return {
         # ========== MODEL PATHS ==========        
-        'detection_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\yolov12m-face.pt',
+        'detection_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\yolov12s-face.pt',
         'embeddings_db_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\dataset\person_512.json',
         'mask_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\mask_detector_cus4.onnx',
         
@@ -312,9 +312,9 @@ def get_default_config():
         # ========== CORE DETECTION PARAMETERS ==========
         'detection_confidence': 0.5,
         'recognition_threshold': 0.8,
-        'mask_detection_threshold': 0.6,  # INCREASED from 0.5 - makes mask detection more conservative
+        'mask_detection_threshold': 0.6,            # INCREASED from 0.5 - makes mask detection more conservative
         'detection_iou': 0.3,
-        'min_face_size': 10, # Min face height in pixels
+        'min_face_size': 10,                        # Min face height in pixels
         'max_faces_per_frame': 15,
         'enable_person_detection': True,
         'person_detection_confidence_threshold': 0.4,        
@@ -329,8 +329,8 @@ def get_default_config():
             'default_processing_scale': 1.0,
             
             # Color and normalization settings
-            'convert_to_rgb': True,  # Convert BGR to RGB for models that expect RGB
-            'normalize_values': False,  # Normalize pixel values to [0, 1]
+            'convert_to_rgb': True,                 # Convert BGR to RGB for models that expect RGB
+            'normalize_values': False,              # Normalize pixel values to [0, 1]
             'apply_mean_std_normalization': False,  # Apply ImageNet mean/std normalization
             
             # Normalization values (ImageNet standard)
@@ -339,17 +339,17 @@ def get_default_config():
             
             # Debug and validation
             'debug_mode': False,
-            'validate_frames': True,  # Enable frame validation
-            'frame_validation_threshold': 0.1,  # Reject frames with brightness < 10% or > 90%
+            'validate_frames': True,                # Enable frame validation
+            'frame_validation_threshold': 0.1,      # Reject frames with brightness < 10% or > 90%
             
             # Frame statistics collection
             'collect_frame_stats': True,
-            'stats_update_interval': 30.0,  # Update stats every 30 seconds
+            'stats_update_interval': 30.0,          # Update stats every 30 seconds
             
             # Contrast enhancement
             'contrast_enhancement': {
                 'enabled': True,
-                'method': 'clahe',  # 'clahe', 'histogram', or 'none'
+                'method': 'clahe',                  # 'clahe', 'histogram', or 'none'
                 'clahe_clip_limit': 3.0,
                 'clahe_grid_size': 8,
             },
@@ -357,8 +357,8 @@ def get_default_config():
             # Region of interest (ROI) extraction
             'roi_extraction': {
                 'enabled': True,
-                'default_padding': 10,  # Pixels to add around bbox
-                'min_roi_size': 32,  # Minimum ROI size in pixels
+                'default_padding': 10,              # Pixels to add around bbox
+                'min_roi_size': 32,                 # Minimum ROI size in pixels
             },
             
             # Multi-source composite settings
@@ -375,9 +375,9 @@ def get_default_config():
             # Frame buffering and queuing
             'frame_buffer': {
                 'buffer_size': 3,
-                'queue_timeout': 0.1,  # seconds
+                'queue_timeout': 0.1,               # seconds
                 'max_queue_size': 100,
-                'drop_old_frames': True,  # Drop old frames when queue is full
+                'drop_old_frames': True,            # Drop old frames when queue is full
             },
             
             # Frame quality assessment
@@ -386,15 +386,15 @@ def get_default_config():
                 'min_brightness': 20.0,
                 'max_brightness': 235.0,
                 'min_contrast': 10.0,
-                'blur_threshold': 100.0,  # Laplacian variance threshold
+                'blur_threshold': 100.0,            # Laplacian variance threshold
             },
             
             # Performance optimization
             'performance': {
-                'use_half_precision': False,  # Use float16 for processing
+                'use_half_precision': False,        # Use float16 for processing
                 'enable_caching': True,
-                'cache_size': 10,  # Number of frames to cache
-                'optimize_for_size': True,  # Optimize memory usage
+                'cache_size': 10,                   # Number of frames to cache
+                'optimize_for_size': True,          # Optimize memory usage
             },
             
             # Frame preprocessing pipeline
@@ -408,18 +408,18 @@ def get_default_config():
             
             # Color space conversion options
             'color_space_conversion': {
-                'input_format': 'bgr',  # OpenCV default
-                'output_format': 'rgb',  # Most models expect RGB
-                'conversion_method': 'opencv',  # 'opencv', 'numpy', or 'manual'
+                'input_format': 'bgr',              # OpenCV default
+                'output_format': 'rgb',             # Most models expect RGB
+                'conversion_method': 'opencv',      # 'opencv', 'numpy', or 'manual'
             },
             
             # Dynamic scaling parameters
             'dynamic_scaling': {
                 'enabled': True,
-                'min_face_size': 50,  # Minimum face size for scaling decisions
-                'max_face_size': 300,  # Maximum face size for scaling decisions
+                'min_face_size': 50,                # Minimum face size for scaling decisions
+                'max_face_size': 300,               # Maximum face size for scaling decisions
                 'scale_adjustment_step': 0.1,
-                'stability_threshold': 0.8,  # Confidence threshold for stable scaling
+                'stability_threshold': 0.8,         # Confidence threshold for stable scaling
             },
         },
         
@@ -453,21 +453,21 @@ def get_default_config():
         'violation_confidence_threshold': 0.4,
         
         # ========== LOGGING INTERVALS ==========
-        'log_interval': 1,  # Process every Nth frame
+        'log_interval': 10,  # Process every Nth frame
         'enable_logging': True,
         'enable_image_logging': True,
         
         # ========== RESOURCE MANAGEMENT ==========
         'resource_monitoring': {
-            'memory_threshold_mb': 1024,  # Warn at 1GB
-            'cleanup_interval': 60.0,  # seconds
+            'memory_threshold_mb': 1024,    # Warn at 1GB
+            'cleanup_interval': 60.0,       # seconds
             'max_open_files': 100,
             'max_threads': 50,
         },
         
         # ========== TRACKING BUFFER SIZES ==========
         'tracking_buffers': {
-            'max_track_age': 500,  # seconds
+            'max_track_age': 500,           # seconds
             'max_violation_history': 100,
             'cleanup_old_tracks_interval': 60.0,
         },
@@ -559,7 +559,7 @@ def get_default_config():
                 'initial_mask_weight': 0.5,
                 'initial_no_mask_weight': 0.5,
                 
-                # Weight adjustment parameters (NEW - optional to expose)
+                # Weight adjustment parameters  
                 'weight_increase_high_conf': 0.4,
                 'weight_decrease_low_conf': 0.3,
                 'weight_increase_opposite': 0.1,
@@ -570,26 +570,26 @@ def get_default_config():
             
             # 🎯 **MODIFIED** Violation verification configuration
             'violation_verification_enabled': True,
-            'min_violation_duration': 1,       # DECREASED from 20.0 - quicker to detect violations
-            'min_violation_frames': 1,           # DECREASED from 35 - quicker to detect violations
+            'min_violation_duration': 1,            # DECREASED from 20.0 - quicker to detect violations
+            'min_violation_frames': 1,              # DECREASED from 35 - quicker to detect violations
             'violation_confidence_threshold': 0.15, # DECREASED from 0.9 - more sensitive to violations
         },    
         
         # ========== VIOLATION VERIFICATION CONFIGURATION ==========
         'violation_verification': {
             'enabled': True,
-            'min_duration_seconds': 0.1,           # DECREASED from 30 - faster verification
-            'min_frames': 1 ,                     # DECREASED from 50 - faster verification
-            'confidence_threshold': 0.1,         # DECREASED from 0.85 - more sensitive
+            'min_duration_seconds': 0.1,            # DECREASED from 30 - faster verification
+            'min_frames': 1 ,                       # DECREASED from 50 - faster verification
+            'confidence_threshold': 0.1,            # DECREASED from 0.85 - more sensitive
             'progressive_verification': True,
             'log_unverified_violations': True,
-            'unverified_log_cooldown': 10,        # DECREASED from 15 - more frequent logging
+            'unverified_log_cooldown': 10,          # DECREASED from 15 - more frequent logging
             'false_negative_monitoring': True,
             # 🆕 Modified multi-level verification
             'verification_levels': {
                 'low': {'duration': 1.5, 'frames': 1},      # Quicker initial detection
-                'medium': {'duration': 2.0, 'frames': 2},  # Medium confidence
-                'high': {'duration': 3.0, 'frames': 3}    # High confidence (verified)
+                'medium': {'duration': 2.0, 'frames': 2},   # Medium confidence
+                'high': {'duration': 3.0, 'frames': 3}      # High confidence (verified)
             }
         },  
                 
@@ -603,7 +603,7 @@ def get_default_config():
         
         # ========== MODIFIABLE! SERVER PUSH CONFIGURATION ==========        
         'server_push_enabled': True,
-        'server_endpoint': '',
+        'server_endpoint': 'https://vps.scasda.my.id//actions/foto_pusat_data_unggah.php',                  # Server endpoint
         'server_push_cooldown': 5,
         'server_timeout': 10,
         'server_retry_attempts': 10,
@@ -617,28 +617,28 @@ def get_default_config():
         
         # ========== MODIFIABLE! ALERT CONFIGURATION ==========
         'enable_voice_alerts': True,
-        'alert_server_url': " ",
-        'alert_cooldown_seconds': 15,            # DECREASED - more responsive alerts
-        'min_violation_frames': 1,              # DECREASED - more sensitive
-        'min_violation_seconds': 1,              # DECREASED - faster alerts
-        'max_gap_frames': 10,                    # INCREASED - more tolerant to gaps
+        'alert_server_url': '',                     # Server endpoint
+        'alert_cooldown_seconds': 15,               # DECREASED - more responsive alerts
+        'min_violation_frames': 1,                  # DECREASED - more sensitive
+        'min_violation_seconds': 1,                 # DECREASED - faster alerts
+        'max_gap_frames': 10,                       # INCREASED - more tolerant to gaps
         'alert_language': 'id',
         'alert_style': 'formal',
         'enable_individual_alerts': True,
         'enable_group_alerts': True,
-        'alert_timeout_seconds': 2,              # DECREASED from 3 - faster alert processing
+        'alert_timeout_seconds': 2,                 # DECREASED from 3 - faster alert processing
         # 🆕 Modified alert verification requirements
         'alert_verification_required': True,
-        'min_alert_confidence': 0.85,            # DECREASED from 0.9 - more sensitive alerts
-        'alert_buffer_size': 100,                 # DECREASED from 25 - faster alert decisions
+        'min_alert_confidence': 0.85,               # DECREASED from 0.9 - more sensitive alerts
+        'alert_buffer_size': 100,                   # DECREASED from 25 - faster alert decisions
         
         # ========== FAISS SYSTEM CONFIGURATION ========== 
-        'use_faiss_gpu': True,  # Enable GPU acceleration for FAISS
-        'faiss_index_type': 'FlatL2',  # Options: 'FlatL2', 'FlatIP', 'IVFFlat', 'IVFPQ'
-        'faiss_nlist': 100,  # For IVF indices
-        'faiss_pq_m': 8,  # For IVFPQ: number of sub-vectors
-        'faiss_pq_bits': 8,  # For IVFPQ: bits per sub-vector
-        'faiss_max_l2_distance': 100.0,  # For L2 distance normalization
+        'use_faiss_gpu': True,              # Enable GPU acceleration for FAISS
+        'faiss_index_type': 'FlatL2',       # Options: 'FlatL2', 'FlatIP', 'IVFFlat', 'IVFPQ'
+        'faiss_nlist': 100,                 # For IVF indices
+        'faiss_pq_m': 8,                    # For IVFPQ: number of sub-vectors
+        'faiss_pq_bits': 8,                 # For IVFPQ: bits per sub-vector
+        'faiss_max_l2_distance': 100.0,     # For L2 distance normalization
         
         # Model paths
         'embedding_model': 'Facenet512',
@@ -683,9 +683,9 @@ def get_default_config():
         },
         
         # ========== ADVANCED FEATURES ==========
-        'enable_multi_scale': True,
-        'enable_temporal_fusion': True,
-        'enable_quality_aware': True,
+        'enable_multi_scale': False,
+        'enable_temporal_fusion': False,
+        'enable_quality_aware': False,
  
         
         # ========== BASE64 CONFIGURATION ==========
@@ -696,7 +696,7 @@ def get_default_config():
         'headless': False,
         'use_gpu': False,
         'gpu_device': 0,
-        'shutdown_at' : '11:56:45', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours MODIFIABLE!
+        'shutdown_at' : '14:27:45', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours MODIFIABLE!
         
         # ========== ANNOTATION CONFIGURATION ==========
         'annotation_box_thickness': 1,
@@ -726,7 +726,7 @@ def get_default_config():
             {
                 'enabled': False,
                 'recipient': 'faridraihan17@gmail.com',
-                'language': 'en',          # 'en' or 'id'
+                'language': 'en',           # 'en' or 'id'
                 'attach_zip': False,        # whether to include the ZIP archive
                 # SMTP settings (optional – if not provided, fallback to global)
                 'smtp_server': 'smtp.gmail.com',
@@ -736,7 +736,7 @@ def get_default_config():
                 'use_tls': True
             },
             {
-                'enabled': True,
+                'enabled': False,
                 'recipient': 'humanj241@gmail.com',
                 'language': 'id',          # 'en' or 'id'
                 'attach_zip': False        # whether to include the ZIP archive
@@ -744,8 +744,8 @@ def get_default_config():
             {
                 'enabled': False,
                 'recipient': 'ikeepmypromiz@gmail.com',
-                'language': 'en',          # 'en' or 'id'
-                'attach_zip': True        # whether to include the ZIP archive
+                'language': 'en',           # 'en' or 'id'
+                'attach_zip': True          # whether to include the ZIP archive
             }
         ]     
     }
@@ -754,7 +754,16 @@ def get_default_config():
 def get_advanced_sources_config():
     """Return advanced sources configuration with parameters"""
     return {  
-                         
+                  
+        # '1': {
+        #     'url': 'rtsp://admin:admin888@192.168.110.40:554/Streaming/Channels/601',
+        #     'description': 'Atas Server Gedangan',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },
+                                 
         '6': {
             'url': '0',
             'description': 'Main Camera',
@@ -1032,32 +1041,7 @@ def main():
             log_ger.info("   - RTSP URLs and credentials") 
             log_ger.info("   - Network connectivity")
             return
-    # else:
-    #     # Single source mode
-    #     #camera_source = args.camera
-    #     rtsp_source = args.rtsp
-
-    #     log_ger.info(f"\n📹 Single Source Mode:")
-    #     log_ger.info(f"CURRENTLY DISABLED!")
-    #     #log_ger.info(f"   Camera Source: {camera_source}")
-    #     log_ger.info(f"   RTSP Source: {rtsp_source}")
-        
-    #     # For single source, create a sources_config with one entry
-    #     sources_config = {
-    #         'main_camera': {
-    #             'url': rtsp_source,
-    #             'description': 'Main Camera',
-    #             'priority': 'high',
-    #             'processing_scale': 1.0,
-    #             'buffer_size': 3,
-    #             'cctv_name': args.cctv_name or config.get('cctv_name', 'Main-Camera')
-    #         }
-    #     }
-        
-    #     # Test single stream connection
-    #     if not test_multi_stream_connections(sources_config):
-    #         log_ger.info("❌ Stream connection test failed.")
-    #         return
+ 
     
     # Test server connection if enabled and requested
     if config.get('server_push_enabled', False) and args.test_server:
@@ -1075,7 +1059,7 @@ def main():
     # Create robust face recognition system using factory
     log_ger.info("\n🔄 Creating face recognition system...")
     try:
-        face_system = create_system(config, system_type="robust_face_recognition")
+        face_system = create_system(config, system_type="voyager", config_profile="robust_face_recognition")
         
         # Verify GPU usage
         verify_gpu_usage(face_system)
@@ -1084,7 +1068,7 @@ def main():
         log_ger.warning(f"❌ Failed to create face recognition system: {e}")
         log_ger.info("🔄 Falling back to CPU mode...")
         config['use_gpu'] = False
-        face_system = create_system(config, system_type="robust_face_recognition")
+        face_system = create_system(config, system_type="voyager", config_profile="robust_face_recognition")
     
     # Apply multi-source specific configurations
     multi_source_config = {

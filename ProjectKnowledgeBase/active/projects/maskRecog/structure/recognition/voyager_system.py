@@ -547,42 +547,89 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
             self.debug_stats['recognition_times'].append(recognition_time)
             return None, 0.0
                     
-    def _recognize_with_voyager(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
-        """Recognition using Voyager index. (No time recording here.)"""
+    def _recognize_with_voyager(self, embedding: np.ndarray, start_time: float = None) -> Tuple[Optional[str], float]:
+        """
+        Recognize using Voyager index with distance threshold and majority voting on top-K results.
+        
+        Args:
+            embedding: Face embedding vector.
+            start_time: Optional timestamp for performance measurement. If None, the current time is used.
+        
+        Returns:
+            (identity, similarity) where similarity is the highest cosine similarity among the 
+            winning identity's neighbours that passed the threshold.
+        """
+        if start_time is None:
+            start_time = time.time()   # fallback for calls from base class
+
         try:
-            # Ensure embedding is the right shape and type
+            # Ensure embedding is flat and float32
             embedding = embedding.flatten().astype(np.float32)
 
-            # Query Voyager for nearest neighbors - use adaptive k based on index size
+            # Determine adaptive K (min 5, up to all items)
             item_count = self._get_voyager_item_count()
-            k = min(5, item_count)
+            k = min(5, item_count) if item_count > 0 else 0
 
-            neighbors, distances = self.voyager_index.query(embedding, k=k)
-
-            if len(neighbors) == 0 or len(distances) == 0:
+            if k == 0:
                 return None, 0.0
 
-            # Convert Voyager distance to similarity score 
-            best_similarity = 1.0 - distances[0]
-            best_voyager_id = neighbors[0]
+            # Query Voyager
+            neighbors, distances = self.voyager_index.query(embedding, k=k)
 
+            if len(neighbors) == 0:
+                return None, 0.0
+
+            # Convert distances to similarities
+            similarities = 1.0 - np.array(distances)
+
+            # Apply distance (similarity) threshold
             threshold = self.config['recognition_threshold']
-
-            if best_similarity >= threshold:
-                identity = self.voyager_id_to_identity.get(best_voyager_id)
-
-                # Record successful Voyager query (performance monitor only)
+            valid_mask = similarities >= threshold
+            if not np.any(valid_mask):
+                # No neighbour meets the threshold
                 self.voyager_performance_monitor.record_voyager_performance(
-                    start_time, success=True, used_fallback=False
+                    start_time, success=False, used_fallback=False
                 )
-                # No time recording here – caller will add to debug_stats
-                return identity, best_similarity
+                return None, 0.0
 
-            # No match above threshold
+            # Get identities and similarities for valid neighbours
+            valid_neighbors = np.array(neighbors)[valid_mask]
+            valid_similarities = similarities[valid_mask]
+
+            # Count votes per identity
+            votes = {}
+            sim_sums = {}
+            for nid, sim in zip(valid_neighbors, valid_similarities):
+                identity = self.voyager_id_to_identity.get(nid)
+                if identity is None:
+                    continue
+                votes[identity] = votes.get(identity, 0) + 1
+                sim_sums.setdefault(identity, []).append(sim)
+
+            if not votes:
+                return None, 0.0
+
+            # Majority voting with tie‑breaker: highest average similarity
+            max_votes = max(votes.values())
+            candidates = [id for id, cnt in votes.items() if cnt == max_votes]
+
+            if len(candidates) == 1:
+                best_identity = candidates[0]
+            else:
+                # Tie – pick the one with highest average similarity
+                best_identity = max(
+                    candidates,
+                    key=lambda id: np.mean(sim_sums[id])
+                )
+
+            # Return the highest similarity among the winning identity's neighbours
+            best_similarity = max(sim_sums[best_identity])
+
+            # Record performance (always include start_time)
             self.voyager_performance_monitor.record_voyager_performance(
-                start_time, success=False, used_fallback=False
+                start_time, success=True, used_fallback=False
             )
-            return None, best_similarity
+            return best_identity, best_similarity
 
         except Exception as e:
             self.logger.error(f"Voyager recognition error: {e}")
@@ -590,7 +637,7 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
                 start_time, success=False, used_fallback=True
             )
             return None, 0.0
-            
+                
     def _recognize_face_original(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
         """Original recognition method kept for compatibility - now uses GPU optimization"""
         return self._recognize_face_gpu_optimized(embedding, start_time)

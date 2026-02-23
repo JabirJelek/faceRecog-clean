@@ -2833,11 +2833,22 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 logger.info(f"📁 ImageLogger already exists for {source_id}: {status['image_log_folder']}")
                 return True
 
-            source_config = self.source_configs[source_id]
+            source_config = self.source_configs[source_id].copy()   # work on a copy
+
+            # 🆕 Merge global server‑push settings if missing in source_config
+            server_keys = [
+                'server_push_enabled', 'server_endpoint',
+                'server_push_cooldown', 'server_timeout',
+                'server_retry_attempts', 'server_retry_delay'
+            ]
+            for key in server_keys:
+                if key in self.config and key not in source_config:
+                    source_config[key] = self.config[key]
+
             cctv_name = self._get_cached_cctv_name(source_id)
             logger.debug(f"🔍 Creating ImageLogger for {source_id} with CCTV name: {cctv_name}")
 
-            source_logger = ImageLogger(source_config)
+            source_logger = ImageLogger(source_config)   # now contains server settings
             if source_logger.cctv_name != cctv_name:
                 logger.warning(f"⚠️ CCTV name mismatch! Expected: {cctv_name}, Got: {source_logger.cctv_name}")
                 source_logger.update_cctv_name(cctv_name)

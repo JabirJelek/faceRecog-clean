@@ -263,10 +263,25 @@ class ImageLogger:
             self.logger.debug(f"Server push cooldown active. Skipping push. Next push in {remaining:.1f}s")
             return False
         
-        # Validate endpoint
-        if not self.server_endpoint:
-            self.logger.error("Server endpoint not configured")
+        # --- Cooldown check with visible log ---
+        current_time = time.time()
+        if current_time - self.last_server_push_time < self.server_push_cooldown:
+            remaining = self.server_push_cooldown - (current_time - self.last_server_push_time)
+            self.logger.warning(f"⏳ Server push cooldown active. Next push in {remaining:.1f}s – skipping.")
             return False
+
+        # --- Sanitize endpoint URL ---
+        endpoint = self.server_endpoint
+        if endpoint:
+            # Remove duplicate slashes in the path (except after https://)
+            import re
+            endpoint = re.sub(r'(?<!:)/+', '/', endpoint)
+            self.logger.debug(f"Sanitized endpoint: {endpoint}")
+        else:
+            self.logger.error("❌ Server endpoint not configured")
+            return False
+        
+        
         
         try:
             # 🆕 UPDATED: Prepare the payload with ONLY required fields
@@ -294,12 +309,12 @@ class ImageLogger:
             }
             
             # Retry logic
+            self.logger.info(f"📤 Starting server push (attempt 1/{self.server_retry_attempts})...")
+
             for attempt in range(self.server_retry_attempts):
                 try:
-                    self.logger.info(f"Pushing violation to server (attempt {attempt + 1}/{self.server_retry_attempts})...")
-                    
                     response = requests.post(
-                        self.server_endpoint,
+                        endpoint,  # use sanitized URL
                         json=payload,
                         headers=headers,
                         timeout=self.server_timeout
@@ -488,7 +503,7 @@ class ImageLogger:
                 self.logger.info(
                     f"✅ Saved violation image #{self.saved_image_count}: {filename} "
                     f"(Violations: {len(violations)}, Base64: {base64_data is not None}, "
-                    f"Resized: {self.enable_resize}, Server Push: {self.server_push_enabled and base64_data})"
+                    f"Resized: {self.enable_resize}, Server Push: {self.server_push_enabled})"
                 )
                 
                 return True, base64_data
