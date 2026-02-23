@@ -86,7 +86,59 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
         self._load_embeddings_database()
         
         self.index_validation_errors = 0
-        self.logger.info("Index rebuild complete")        
+        self.logger.info("Index rebuild complete")     
+        
+    def _rebuild_voyager_index_from_centroids(self):
+        """Rebuild Voyager index from current identity centroids."""
+        self.logger.info("Rebuilding Voyager index from centroids...")
+        
+        # Clear current index and mappings
+        self.voyager_index = None
+        self.voyager_id_to_identity = {}
+        self.identity_to_voyager_id = {}
+        self.next_voyager_id = 0
+        
+        # Determine embedding dimension from the first centroid (if any)
+        if not self.identity_centroids:
+            self.logger.warning("No centroids to rebuild index")
+            return
+        
+        first_centroid = next(iter(self.identity_centroids.values()))
+        dimension = len(first_centroid)
+        
+        # Initialize new Voyager index
+        self._initialize_voyager_index(dimension)
+        
+        vectors = []
+        voyager_ids = []
+        identities = []
+        centroid_tensors = []
+        
+        for identity, centroid in self.identity_centroids.items():
+            voyager_id = self.next_voyager_id
+            self.voyager_id_to_identity[voyager_id] = identity
+            self.identity_to_voyager_id[identity] = voyager_id
+            self.next_voyager_id += 1
+            
+            vectors.append(centroid)
+            voyager_ids.append(voyager_id)
+            identities.append(identity)
+            
+            # Prepare GPU tensor
+            centroid_tensor = torch.from_numpy(centroid).to(self.device).float()
+            centroid_tensors.append(centroid_tensor)
+        
+        # Batch add to Voyager
+        if vectors:
+            vectors_array = np.array(vectors)
+            self.voyager_index.add_items(vectors_array, voyager_ids)
+            
+            # Update GPU tensor
+            if centroid_tensors:
+                self.identity_centroids_tensor = torch.stack(centroid_tensors)
+                self.identity_names_list = identities
+            
+            self.logger.info(f"Rebuilt Voyager index with {len(vectors)} identities")           
         
                
     def _load_embeddings_database(self):
@@ -188,25 +240,26 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
             traceback.print_exc()
             # Initialize empty index anyway
             self._initialize_voyager_index(512)
-            
+                    
     def _recognize_face_gpu_optimized(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
-        """GPU-optimized recognition with fallback to CPU"""
+        """GPU-optimized recognition with fallback to CPU. (No time recording here.)"""
         if not self.identity_centroids:
             return None, 0.0
-        
-        # Try GPU first, fallback to CPU if GPU fails
+
         try:
             if torch.cuda.is_available() and self.identity_centroids_tensor is not None:
-                return self._recognize_on_gpu(embedding)
+                identity, similarity = self._recognize_on_gpu(embedding)
             else:
-                return self._recognize_on_cpu(embedding, start_time)
+                identity, similarity = self._recognize_on_cpu(embedding, start_time)
         except (RuntimeError, torch.cuda.OutOfMemoryError) as e:
             self.logger.warning(f"GPU recognition failed, falling back to CPU: {e}")
-            # Clear GPU cache and retry on CPU
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
-            return self._recognize_on_cpu(embedding, start_time)
+            identity, similarity = self._recognize_on_cpu(embedding, start_time)
 
+        # Removed time recording – caller will handle it
+        return identity, similarity
+        
     def _recognize_on_gpu(self, embedding: np.ndarray) -> Tuple[Optional[str], float]:
         """GPU-based recognition implementation"""
         embedding_tensor = torch.from_numpy(embedding).to(self.device).float().flatten()
@@ -224,9 +277,9 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
             best_identity = self.identity_names_list[best_index]
         
         return best_identity, best_similarity
-
+    
     def _recognize_on_cpu(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
-        """CPU-based fallback recognition"""
+        """CPU-based fallback recognition (no time recording)"""
         best_identity = None
         best_similarity = 0.0
         
@@ -247,11 +300,9 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
                 best_similarity = similarity
                 best_identity = identity
         
-        recognition_time = (time.time() - start_time) * 1000
-        self.debug_stats['recognition_times'].append(recognition_time)
-        
-        return best_identity, best_similarity   
-    
+        # Time recording removed – will be done by caller
+        return best_identity, best_similarity    
+
     def save_voyager_index(self, filepath: Optional[str] = None):
         """Save Voyager index to disk with corruption check"""
         if self.voyager_index is None:
@@ -446,20 +497,19 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
         return True
 
     def recognize_face(self, embedding: np.ndarray) -> Tuple[Optional[str], float]:
-        """Enhanced recognition with robust error recovery"""
-        start_time = time.time()
-        
+        start_time = time.time()  # Start timing the whole recognition attempt
+
         # Validate input embedding
         if not self._validate_embedding(embedding):
             self.logger.warning(f"Invalid embedding provided: shape={embedding.shape}")
             return None, 0.0
-        
+
         try:
             # Try Voyager first
             if (self.voyager_index is not None and 
                 self._get_voyager_item_count() > 0 and
                 self.config.get('use_voyager', True)):
-                
+
                 # Periodic index validation
                 current_time = time.time()
                 if current_time - self.last_validation_time > self.max_validation_interval:
@@ -469,99 +519,105 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
                         self.voyager_performance_monitor.record_voyager_performance(
                             start_time, success=False, used_fallback=True
                         )
+                        # Record total time before returning
+                        recognition_time = (time.time() - start_time) * 1000
+                        self.debug_stats['recognition_times'].append(recognition_time)
                         return result
                     self.last_validation_time = current_time
-                
-                result = self._recognize_with_voyager(embedding, start_time)
-                if result[0] is not None:
-                    return result
-            
-            # Fallback
+
+                identity, similarity = self._recognize_with_voyager(embedding, start_time)
+                if identity is not None:
+                    # Voyager succeeded – record time and return
+                    recognition_time = (time.time() - start_time) * 1000
+                    self.debug_stats['recognition_times'].append(recognition_time)
+                    return identity, similarity
+
+            # Fallback to GPU‑optimized recognition
             result = self._recognize_face_gpu_optimized(embedding, start_time)
             self.voyager_performance_monitor.record_voyager_performance(
                 start_time, success=False, used_fallback=True
             )
+            recognition_time = (time.time() - start_time) * 1000
+            self.debug_stats['recognition_times'].append(recognition_time)
             return result
-            
+
         except Exception as e:
             self.logger.error(f"Recognition failed: {e}")
-            # Return safe default
+            recognition_time = (time.time() - start_time) * 1000
+            self.debug_stats['recognition_times'].append(recognition_time)
             return None, 0.0
-        
+                    
     def _recognize_with_voyager(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
-        """Recognition using Voyager index"""
+        """Recognition using Voyager index. (No time recording here.)"""
         try:
             # Ensure embedding is the right shape and type
             embedding = embedding.flatten().astype(np.float32)
-            
+
             # Query Voyager for nearest neighbors - use adaptive k based on index size
             item_count = self._get_voyager_item_count()
             k = min(5, item_count)
-            
+
             neighbors, distances = self.voyager_index.query(embedding, k=k)
-            
+
             if len(neighbors) == 0 or len(distances) == 0:
                 return None, 0.0
-            
+
             # Convert Voyager distance to similarity score 
-            # Voyager Cosine space: distance = 1 - cosine_similarity
             best_similarity = 1.0 - distances[0]
             best_voyager_id = neighbors[0]
-            
+
             threshold = self.config['recognition_threshold']
-            
+
             if best_similarity >= threshold:
                 identity = self.voyager_id_to_identity.get(best_voyager_id)
-                
-                # Record successful Voyager query
+
+                # Record successful Voyager query (performance monitor only)
                 self.voyager_performance_monitor.record_voyager_performance(
                     start_time, success=True, used_fallback=False
                 )
-                
-                if self.config.get('verbose_voyager', False):
-                    self.logger.debug(f"Voyager matched: {identity} (similarity: {best_similarity:.3f})")
-                
+                # No time recording here – caller will add to debug_stats
                 return identity, best_similarity
-            
+
             # No match above threshold
             self.voyager_performance_monitor.record_voyager_performance(
                 start_time, success=False, used_fallback=False
             )
             return None, best_similarity
-            
+
         except Exception as e:
             self.logger.error(f"Voyager recognition error: {e}")
             self.voyager_performance_monitor.record_voyager_performance(
                 start_time, success=False, used_fallback=True
             )
             return None, 0.0
-        
+            
     def _recognize_face_original(self, embedding: np.ndarray, start_time: float) -> Tuple[Optional[str], float]:
         """Original recognition method kept for compatibility - now uses GPU optimization"""
         return self._recognize_face_gpu_optimized(embedding, start_time)
 
     def add_identity_to_voyager(self, identity: str, embedding: np.ndarray):
-        """Add new identity to Voyager index with GPU optimization"""
-        if self.voyager_index is None:
-            # Initialize with the dimension of the new embedding
-            dimension = len(embedding.flatten())
-            self._initialize_voyager_index(dimension)
+        """Add or update an identity in the Voyager index."""
+        # Update centroid in the dictionary (always)
+        self.identity_centroids[identity] = embedding.flatten().copy()
         
-        # Check if identity already exists
         if identity in self.identity_to_voyager_id:
-            voyager_id = self.identity_to_voyager_id[identity]
-            self.logger.info(f"Updating existing identity '{identity}' in Voyager index")
-            
-            # Update GPU tensor
-            if self.identity_centroids_tensor is not None:
-                index = self.identity_names_list.index(identity)
-                new_centroid_tensor = torch.from_numpy(embedding).to(self.device).float()
-                self.identity_centroids_tensor[index] = new_centroid_tensor
+            # Existing identity – rebuild the entire index from current centroids
+            self.logger.info(f"Updating existing identity '{identity}'; rebuilding Voyager index")
+            self._rebuild_voyager_index_from_centroids()
         else:
+            # New identity – add to existing index
+            if self.voyager_index is None:
+                dimension = len(embedding.flatten())
+                self._initialize_voyager_index(dimension)
+            
             voyager_id = self.next_voyager_id
             self.next_voyager_id += 1
             
-            # Add to GPU tensor
+            # Update mappings
+            self.voyager_id_to_identity[voyager_id] = identity
+            self.identity_to_voyager_id[identity] = voyager_id
+            
+            # Update GPU tensor
             new_centroid_tensor = torch.from_numpy(embedding).to(self.device).float()
             if self.identity_centroids_tensor is None:
                 self.identity_centroids_tensor = new_centroid_tensor.unsqueeze(0)
@@ -572,21 +628,16 @@ class VoyagerFaceRecognitionSystem(FaceRecognitionSystem):
                     new_centroid_tensor.unsqueeze(0)
                 ])
                 self.identity_names_list.append(identity)
-        
-        # Update mappings
-        self.voyager_id_to_identity[voyager_id] = identity
-        self.identity_to_voyager_id[identity] = voyager_id
-        self.identity_centroids[identity] = embedding  # Maintain compatibility
-        
-        # Add to Voyager index
-        embedding_flat = embedding.flatten().astype(np.float32)
-        self.voyager_index.add_items(np.array([embedding_flat]), [voyager_id])
-        
-        item_count = self._get_voyager_item_count()
-        self.logger.info(f"Added/updated identity '{identity}' in Voyager index (ID: {voyager_id})")
-        self.logger.info(f"Voyager index now contains {item_count} items")
-        self.logger.info(f"GPU tensor now contains {len(self.identity_names_list)} centroids")
-        
+            
+            # Add to Voyager index
+            embedding_flat = embedding.flatten().astype(np.float32)
+            self.voyager_index.add_items(np.array([embedding_flat]), [voyager_id])
+            
+            item_count = self._get_voyager_item_count()
+            self.logger.info(f"Added new identity '{identity}' to Voyager index (ID: {voyager_id})")
+            self.logger.info(f"Voyager index now contains {item_count} items")
+            
+            
     def get_voyager_stats(self) -> Dict:
         """Get Voyager performance statistics"""
         stats = self.voyager_performance_monitor.get_voyager_stats()

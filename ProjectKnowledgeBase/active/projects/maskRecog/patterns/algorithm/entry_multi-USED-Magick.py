@@ -693,10 +693,10 @@ def get_default_config():
         'base64_quality': 50,
         
         # ========== SYSTEM MODE ==========
-        'headless': True,
+        'headless': False,
         'use_gpu': False,
         'gpu_device': 0,
-        'shutdown_at' : '10:25:30', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours MODIFIABLE!
+        'shutdown_at' : '11:56:45', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours MODIFIABLE!
         
         # ========== ANNOTATION CONFIGURATION ==========
         'annotation_box_thickness': 1,
@@ -724,10 +724,10 @@ def get_default_config():
         # Email sending config
         'email': [
             {
-                'enabled': True,
+                'enabled': False,
                 'recipient': 'faridraihan17@gmail.com',
                 'language': 'en',          # 'en' or 'id'
-                'attach_zip': True,        # whether to include the ZIP archive
+                'attach_zip': False,        # whether to include the ZIP archive
                 # SMTP settings (optional – if not provided, fallback to global)
                 'smtp_server': 'smtp.gmail.com',
                 'smtp_port': 587,
