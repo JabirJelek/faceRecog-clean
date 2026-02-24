@@ -1,0 +1,1 @@
+https://vps.scasda.my.id/accounting/public/api/submit_ai_detection

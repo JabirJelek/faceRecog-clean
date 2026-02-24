@@ -21,10 +21,124 @@ import os
 from typing import Dict
 import datetime
 import threading
-
+import urllib.parse
 
 
 log_ger = logging.getLogger(__name__)
+
+
+
+def resolve_server_urls(config: dict) -> None:
+    """
+    Resolve server_endpoint and alert_server_url to actual URLs.
+    If the value starts with http:// or https://, it is used directly.
+    Otherwise, it is treated as a file path and the URL is read from that file.
+    The resolved URL string is stored back in the original key **only if it is a valid HTTP/HTTPS URL**.
+    Additionally, a parsed component dictionary is stored under *_parts keys.
+    """
+    def resolve_key(key):
+        raw = config.get(key)
+        if not raw or not isinstance(raw, str):
+            return
+
+        # Already a URL? Use it directly.
+        if raw.startswith(('http://', 'https://')):
+            actual_url = raw
+            log_ger.info(f"✅ {key} already a URL: {actual_url}")
+        else:
+            # Treat as file path
+            if not os.path.isfile(raw):
+                log_ger.warning(f"❌ {key} file not found: {raw}")
+                config[key] = ''          # disable
+                return
+            try:
+                with open(raw, 'r') as f:
+                    actual_url = f.readline().strip()
+                if not actual_url:
+                    log_ger.warning(f"❌ {key} file is empty: {raw}")
+                    config[key] = ''
+                    return
+                log_ger.info(f"✅ {key} resolved from file: {actual_url}")
+            except Exception as e:
+                log_ger.warning(f"❌ Could not read {key} file {raw}: {e}")
+                config[key] = ''
+                return
+
+        # Validate that the resolved string is a proper HTTP/HTTPS URL
+        if not actual_url.startswith(('http://', 'https://')):
+            log_ger.warning(f"❌ {key} resolved value is not a valid HTTP/HTTPS URL: {actual_url}")
+            config[key] = ''   # disable
+            return
+
+        # Update config with the actual URL string
+        config[key] = actual_url
+
+        # Parse and store components (unchanged) ...
+        parsed = urllib.parse.urlparse(actual_url)
+        parts = {
+            'scheme': parsed.scheme,
+            'netloc': parsed.netloc,
+            'path': parsed.path,
+            'params': parsed.params,
+            'query': parsed.query,
+            'fragment': parsed.fragment,
+            'directories': [p for p in parsed.path.split('/') if p] if parsed.path else []
+        }
+        if parts['directories']:
+            parts['target'] = parts['directories'][-1]
+            parts['directories'] = parts['directories'][:-1]
+        config[f"{key}_parts"] = parts
+
+    resolve_key('server_endpoint')
+    resolve_key('alert_server_url')
+    
+def resolve_email_config(config: dict) -> None:
+    """
+    Resolve SMTP settings for all enabled email recipients.
+    If a value is a file path (exists or ends with .txt), read the first line.
+    For smtp_port, convert the read string to int.
+    """
+    email_cfg = config.get('email')
+    if not email_cfg:
+        return
+
+    # Handle both single dict and list of dicts
+    if isinstance(email_cfg, dict):
+        items = [email_cfg]
+    elif isinstance(email_cfg, list):
+        items = email_cfg
+    else:
+        return
+
+    def resolve_value(value):
+        if not isinstance(value, str):
+            return value
+        # If it's a file path (has slash/backslash or ends with .txt) and exists
+        if ('/' in value or '\\' in value or value.endswith('.txt')) and os.path.exists(value):
+            try:
+                with open(value, 'r') as f:
+                    content = f.readline().strip()
+                return content
+            except Exception as e:
+                log_ger.warning(f"⚠️ Could not read file {value}: {e}")
+                return value
+        return value
+
+    for item in items:
+        # Resolve each SMTP field
+        if 'smtp_server' in item:
+            item['smtp_server'] = resolve_value(item['smtp_server'])
+        if 'smtp_user' in item:
+            item['smtp_user'] = resolve_value(item['smtp_user'])
+        if 'smtp_password' in item:
+            item['smtp_password'] = resolve_value(item['smtp_password'])
+        if 'smtp_port' in item:
+            port_val = resolve_value(item['smtp_port'])
+            try:
+                item['smtp_port'] = int(port_val)
+            except (ValueError, TypeError):
+                log_ger.warning(f"⚠️ Invalid port value: {port_val}, using default 587")
+                item['smtp_port'] = 587
 
 def test_multi_stream_connections(sources_config: Dict[str, Dict]) -> bool:
     """Test if we can connect to all streams before starting main processing"""
@@ -297,7 +411,7 @@ def validate_email_config(config: dict, test_connection: bool = False) -> None:
                 log_ger.warning(f"❌ SMTP login failed for {item.get('recipient', 'unknown')}: {e}")
                 log_ger.info("   Check your username, password, and SMTP server settings.")
                 sys.exit(1)
-                          
+                                        
 def get_default_config():
     """Return the complete default configuration"""
     return {
@@ -603,11 +717,13 @@ def get_default_config():
         
         # ========== MODIFIABLE! SERVER PUSH CONFIGURATION ==========        
         'server_push_enabled': True,
-        'server_endpoint': 'https://vps.scasda.my.id//actions/foto_pusat_data_unggah.php',                  # Server endpoint
+        'server_endpoint': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\z_server_endpoint.txt',                  # Server endpoint
         'server_push_cooldown': 5,
         'server_timeout': 10,
         'server_retry_attempts': 10,
         'server_retry_delay': 2,
+        'circuit_breaker_failure_threshold': 5,
+        'circuit_breaker_recovery_timeout': 60,        
         
         # ========== IMAGE RESIZE CONFIGURATION ==========
         'enable_image_resize': True,
@@ -617,7 +733,7 @@ def get_default_config():
         
         # ========== MODIFIABLE! ALERT CONFIGURATION ==========
         'enable_voice_alerts': True,
-        'alert_server_url': '',                     # Server endpoint
+        'alert_server_url': '', # r'projects/maskRecog/z_alert_endpoint.txt', # Server endpoint
         'alert_cooldown_seconds': 15,               # DECREASED - more responsive alerts
         'min_violation_frames': 1,                  # DECREASED - more sensitive
         'min_violation_seconds': 1,                 # DECREASED - faster alerts
@@ -725,30 +841,31 @@ def get_default_config():
         # Email sending config
         'email': [
             {
-                'enabled': False,
-                'recipient': 'faridraihan17@gmail.com',
-                'language': 'en',           # 'en' or 'id'
-                'attach_zip': False,        # whether to include the ZIP archive
-                # SMTP settings (optional – if not provided, fallback to global)
-                'smtp_server': 'smtp.gmail.com',
-                'smtp_port': 587,
-                'smtp_user': 'faridraihan17@gmail.com',
-                'smtp_password': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\pass.txt',
-                'use_tls': True
-            },
-            {
                 'enabled': True,
                 'recipient': 'humanj241@gmail.com',
-                'language': 'id',          # 'en' or 'id'
-                'attach_zip': True        # whether to include the ZIP archive
+                'language': 'id',
+                'attach_zip': True,
+                # Add SMTP fields (will fall back to first recipient’s values if omitted, but included for completeness)
+                'smtp_server': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\smtp_server.txt',
+                'smtp_port': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\smtp_port.txt',
+                'smtp_user': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\smtp_user.txt',
+                'smtp_password': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\pass.txt',
+                'use_tls': True
             },            
             {
                 'enabled': False,
+                'recipient': 'faridraihan17@gmail.com',
+                'language': 'en',
+                'attach_zip': False,
+            },
+            {
+                'enabled': False,
                 'recipient': 'ikeepmypromiz@gmail.com',
-                'language': 'en',           # 'en' or 'id'
-                'attach_zip': True          # whether to include the ZIP archive
+                'language': 'en',
+                'attach_zip': True
             }
-        ]     
+        ]
+    
     }
     
     
@@ -792,36 +909,50 @@ def load_custom_config(config_path: str = None) -> Dict:
     return get_default_config()
 
 def test_server_connection(config: dict) -> bool:
-    """Test connection to the violation server"""
+    """Test connection to the violation server.
+
+    This test only checks if the server is reachable (i.e., we can establish
+    a TCP connection and receive any HTTP response). The specific HTTP status
+    code is ignored – any response means the server is alive.
+    """
     if not config.get('server_push_enabled', False):
         log_ger.info("📤 Server push disabled, skipping server connection test")
         return True
-        
+
     server_endpoint = config.get('server_endpoint', '')
     if not server_endpoint:
-        log_ger.info("❌ No server endpoint configured")
+        log_ger.info("❌ No server endpoint configured (empty or invalid)")
         return False
-        
+
+    if not server_endpoint.startswith(('http://', 'https://')):
+        log_ger.warning(f"❌ Server endpoint is not a valid HTTP/HTTPS URL: {server_endpoint}")
+        return False
+
     try:
         import requests
         log_ger.info(f"🔍 Testing server connection: {server_endpoint}")
-        
-        # Test health endpoint
-        health_url = server_endpoint.replace('/api/violations', '/api/health')
-        response = requests.get(health_url, timeout=10)
-        
-        if response.status_code == 200:
-            log_ger.info(f"✅ Server connection successful: {health_url}")
-            return True
-        else:
-            log_ger.warning(f"❌ Server health check failed: {response.status_code}")
-            return False
-            
-    except Exception as e:
-        log_ger.warning(f"❌ Server connection test failed: {e}")
-        log_ger.info("💡 Make sure the test server is running: python test_upload_server.py")
-        return False
 
+        # Send a GET request with a short timeout; any response indicates reachability.
+        response = requests.get(server_endpoint, timeout=10, allow_redirects=False)
+
+        # If we get here, the server responded (even with 404, 405, 500, etc.)
+        log_ger.info(f"✅ Server responded with status code: {response.status_code}")
+        return True
+
+    except requests.exceptions.ConnectionError as e:
+        log_ger.warning(f"❌ Server connection failed (cannot reach server): {e}")
+        return False
+    except requests.exceptions.Timeout as e:
+        log_ger.warning(f"❌ Server connection timed out: {e}")
+        return False
+    except requests.exceptions.RequestException as e:
+        # Other HTTP‑related errors (invalid URL, too many redirects, etc.)
+        log_ger.warning(f"❌ Server request error: {e}")
+        return False
+    except Exception as e:
+        log_ger.warning(f"❌ Unexpected error testing server: {e}")
+        return False
+    
 def print_server_push_info(config: dict):
     """Print server push configuration information"""
     if config.get('server_push_enabled', False):
@@ -976,7 +1107,9 @@ def main():
     
     # Load configuration
     config = load_custom_config(args.config)
-    # validate_email_config(config, test_connection=args.test_email)  
+    resolve_server_urls(config)          # already present
+    resolve_email_config(config)          # <-- add this line
+    validate_email_config(config, test_connection=args.test_email)  
     
     # Resolve output.root_dir relative to LOG_ROOT if it's a relative path
     if 'output' in config and 'root_dir' in config['output']:

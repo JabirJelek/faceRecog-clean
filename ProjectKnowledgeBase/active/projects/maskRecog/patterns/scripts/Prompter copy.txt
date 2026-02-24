@@ -10,7 +10,10 @@
 
 #### Instructions
 
-Propose addition of the multi_realtime to include every image in violations folder
+From that function, please modify the function for different checking. Each time we access the url, it directly utilize the process inside
+which means, there are no api/health, when we test the server, this will always return with failed code because there is no api/health. Only check
+if the server can response our connection or not.
+
 
 
 #### Tips
@@ -20,6 +23,9 @@ IF you encounter unknown syntax because not existing in the codebase but might e
 Stabilize from the error if it exist. No need to apply testing method unless asked for it. 
 
 
+
+#### Debug of the codebase
+2026-02-24 12:43:10,122 - __main__ - WARNING - ❌ Server health check failed: 405
 
 #### References
 
@@ -32,9 +38,48 @@ https://github-com.translate.goog/karanpratapsingh/system-design?_x_tr_sl=en&_x_
 
  
 
+#### Function to modify 
+
+def test_server_connection(config: dict) -> bool:
+    """Test connection to the violation server"""
+    if not config.get('server_push_enabled', False):
+        log_ger.info("📤 Server push disabled, skipping server connection test")
+        return True
+
+    server_endpoint = config.get('server_endpoint', '')
+    if not server_endpoint:
+        log_ger.info("❌ No server endpoint configured (empty or invalid)")
+        return False
+
+    if not server_endpoint.startswith(('http://', 'https://')):
+        log_ger.warning(f"❌ Server endpoint is not a valid HTTP/HTTPS URL: {server_endpoint}")
+        return False
+
+    try:
+        import requests
+        log_ger.info(f"🔍 Testing server connection: {server_endpoint}")
+
+        health_url = server_endpoint.replace('/api/violations', '/api/health')
+        response = requests.get(health_url, timeout=10)
+
+        if response.status_code == 200:
+            log_ger.info(f"✅ Server connection successful: {health_url}")
+            return True
+        else:
+            log_ger.warning(f"❌ Server health check failed: {response.status_code}")
+            return False
+    except Exception as e:
+        log_ger.warning(f"❌ Server connection test failed: {e}")
+        log_ger.info("💡 Make sure the test server is running and the URL is correct.")
+        return False
+    
+
+
 
 
 #### Several utilized file
+
+
 
 
 
@@ -103,6 +148,7 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         self.data_logger = None          # will be created if logging enabled
         output_cfg = config.get('output', {})
         self.output_root = output_cfg.get('root_dir', '')      # FIXED syntax
+        self.violations_folder = output_cfg.get('violations_folder', None)   # new        
         self.create_timestamped_subdir = output_cfg.get('create_timestamped_subdir', True)
         self.enable_exit_status = output_cfg.get('enable_exit_status', True)
         self.run_dir = None          # will be set by _create_run_directory()
@@ -285,6 +331,15 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
         else:
             self.run_dir = self.output_root
         os.makedirs(self.run_dir, exist_ok=True)
+        
+        if self.violations_folder:
+            # Create a timestamped subfolder inside the violations folder
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            self.image_log_dir = os.path.join(self.violations_folder, timestamp)
+        else:
+            self.image_log_dir = os.path.join(self.run_dir, 'images')
+        
+        os.makedirs(self.image_log_dir, exist_ok=True)        
         
         # Create subdirectories for different log types
         self.image_log_dir = os.path.join(self.run_dir, 'images')
@@ -2910,8 +2965,11 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
                 source_logger.update_cctv_name(cctv_name)
 
             safe_cctv_name = self._create_source_safe_name(cctv_name)
-            # Construct the base directory for this source's images
-            source_image_dir = os.path.join(self.image_log_dir, f"{self.current_log_session}_{safe_cctv_name}")
+            
+            # Base directory for this source's images: 
+            #   image_log_dir / f"{self.current_log_session}_{safe_cctv_name}"
+            source_image_dir = os.path.join(self.image_log_dir, 
+                                            f"{self.current_log_session}_{safe_cctv_name}")
 
             logger.debug(f"🔍 Setting up ImageLogger with base directory: {source_image_dir}")
 
@@ -3558,3 +3616,1419 @@ class MultiSourceRealTimeProcessor(BaseProcessor):
             
             
             
+
+# main/entry_multi.py
+
+
+import sys
+import os
+from pathlib import Path
+import logging
+
+
+# Get the project root (go up 2 levels from current file)
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.append(str(PROJECT_ROOT))
+
+LOG_ROOT = Path(__file__).parent.parent.parent.parent.parent
+
+
+from structure import create_system, ConfigManager
+from structure import MultiSourceRealTimeProcessor
+import time
+import os
+from typing import Dict
+import datetime
+import threading
+import urllib.parse
+
+
+log_ger = logging.getLogger(__name__)
+
+
+
+def resolve_server_urls(config: dict) -> None:
+    """
+    Resolve server_endpoint and alert_server_url to actual URLs.
+    If the value starts with http:// or https://, it is used directly.
+    Otherwise, it is treated as a file path and the URL is read from that file.
+    The resolved URL string is stored back in the original key **only if it is a valid HTTP/HTTPS URL**.
+    Additionally, a parsed component dictionary is stored under *_parts keys.
+    """
+    def resolve_key(key):
+        raw = config.get(key)
+        if not raw or not isinstance(raw, str):
+            return
+
+        # Already a URL? Use it directly.
+        if raw.startswith(('http://', 'https://')):
+            actual_url = raw
+            log_ger.info(f"✅ {key} already a URL: {actual_url}")
+        else:
+            # Treat as file path
+            if not os.path.isfile(raw):
+                log_ger.warning(f"❌ {key} file not found: {raw}")
+                config[key] = ''          # disable
+                return
+            try:
+                with open(raw, 'r') as f:
+                    actual_url = f.readline().strip()
+                if not actual_url:
+                    log_ger.warning(f"❌ {key} file is empty: {raw}")
+                    config[key] = ''
+                    return
+                log_ger.info(f"✅ {key} resolved from file: {actual_url}")
+            except Exception as e:
+                log_ger.warning(f"❌ Could not read {key} file {raw}: {e}")
+                config[key] = ''
+                return
+
+        # Validate that the resolved string is a proper HTTP/HTTPS URL
+        if not actual_url.startswith(('http://', 'https://')):
+            log_ger.warning(f"❌ {key} resolved value is not a valid HTTP/HTTPS URL: {actual_url}")
+            config[key] = ''   # disable
+            return
+
+        # Update config with the actual URL string
+        config[key] = actual_url
+
+        # Parse and store components (unchanged) ...
+        parsed = urllib.parse.urlparse(actual_url)
+        parts = {
+            'scheme': parsed.scheme,
+            'netloc': parsed.netloc,
+            'path': parsed.path,
+            'params': parsed.params,
+            'query': parsed.query,
+            'fragment': parsed.fragment,
+            'directories': [p for p in parsed.path.split('/') if p] if parsed.path else []
+        }
+        if parts['directories']:
+            parts['target'] = parts['directories'][-1]
+            parts['directories'] = parts['directories'][:-1]
+        config[f"{key}_parts"] = parts
+
+    resolve_key('server_endpoint')
+    resolve_key('alert_server_url')
+    
+def resolve_email_config(config: dict) -> None:
+    """
+    Resolve SMTP settings for all enabled email recipients.
+    If a value is a file path (exists or ends with .txt), read the first line.
+    For smtp_port, convert the read string to int.
+    """
+    email_cfg = config.get('email')
+    if not email_cfg:
+        return
+
+    # Handle both single dict and list of dicts
+    if isinstance(email_cfg, dict):
+        items = [email_cfg]
+    elif isinstance(email_cfg, list):
+        items = email_cfg
+    else:
+        return
+
+    def resolve_value(value):
+        if not isinstance(value, str):
+            return value
+        # If it's a file path (has slash/backslash or ends with .txt) and exists
+        if ('/' in value or '\\' in value or value.endswith('.txt')) and os.path.exists(value):
+            try:
+                with open(value, 'r') as f:
+                    content = f.readline().strip()
+                return content
+            except Exception as e:
+                log_ger.warning(f"⚠️ Could not read file {value}: {e}")
+                return value
+        return value
+
+    for item in items:
+        # Resolve each SMTP field
+        if 'smtp_server' in item:
+            item['smtp_server'] = resolve_value(item['smtp_server'])
+        if 'smtp_user' in item:
+            item['smtp_user'] = resolve_value(item['smtp_user'])
+        if 'smtp_password' in item:
+            item['smtp_password'] = resolve_value(item['smtp_password'])
+        if 'smtp_port' in item:
+            port_val = resolve_value(item['smtp_port'])
+            try:
+                item['smtp_port'] = int(port_val)
+            except (ValueError, TypeError):
+                log_ger.warning(f"⚠️ Invalid port value: {port_val}, using default 587")
+                item['smtp_port'] = 587
+
+def test_multi_stream_connections(sources_config: Dict[str, Dict]) -> bool:
+    """Test if we can connect to all streams before starting main processing"""
+    log_ger.debug(f"\n🔍 Testing multi-stream connections for {len(sources_config)} sources...")
+    
+    # FIXED: Use the correct module name
+    from structure import StreamManager
+    
+    successful_sources = []
+    failed_sources = []
+    
+    for source_id, source_config in sources_config.items():
+        log_ger.info(f"\n📹 Testing source: {source_id}")
+        try:
+            test_manager = StreamManager(source_config)
+            success = test_manager.initialize_stream(source_config['url'])
+            
+            if success:
+                # Test reading a few frames
+                frame_success_count = 0
+                for i in range(3):
+                    frame_success, frame = test_manager.read_frame()
+                    if frame_success and frame is not None:
+                        frame_success_count += 1
+                        log_ger.info(f"   ✅ Frame {i+1}: {frame.shape}")
+                    else:
+                        log_ger.warning(f"   ❌ Failed to read frame {i+1}")
+                
+                if frame_success_count >= 2:  # Require at least 2 successful frames
+                    successful_sources.append(source_id)
+                    log_ger.info(f"✅ Source {source_id} test successful")
+                else:
+                    failed_sources.append(source_id)
+                    log_ger.warning(f"❌ Source {source_id} test failed - insufficient frames")
+            else:
+                failed_sources.append(source_id)
+                log_ger.warning(f"❌ Source {source_id} test failed - initialization failed")
+                
+            test_manager.release()
+            
+        except Exception as e:
+            failed_sources.append(source_id)
+            log_ger.warning(f"❌ Source {source_id} test error: {e}")
+    
+    # Print summary
+    log_ger.info(f"\n📊 STREAM TEST SUMMARY:")
+    log_ger.info(f"   ✅ Successful: {len(successful_sources)} sources")
+    log_ger.warning(f"   ❌ Failed: {len(failed_sources)} sources")
+    
+    if failed_sources:
+        log_ger.info(f"   Failed sources: {failed_sources}")
+    
+    # Return True if at least one source is successful
+    return len(successful_sources) > 0
+
+def check_gpu_availability(config: dict) -> dict:
+    """Check and report GPU availability, updating config accordingly"""
+    try:
+        import torch
+        if torch.cuda.is_available():
+            device_count = torch.cuda.device_count()
+            current_device = config.get('gpu_device', 0)
+            
+            if current_device < device_count:
+                gpu_name = torch.cuda.get_device_name(current_device)
+                memory_info = torch.cuda.get_device_properties(current_device)
+                total_memory = memory_info.total_memory / (1024**3)  # Convert to GB
+                
+                log_ger.info(f"🎮 GPU {current_device}: {gpu_name} available")
+                log_ger.info(f"🎮 CUDA version: {torch.version.cuda}")
+                log_ger.info(f"🎮 Total GPU Memory: {total_memory:.1f} GB")
+                
+                # Test GPU functionality
+                test_tensor = torch.randn(1000, 1000).cuda()
+                test_result = test_tensor * 2
+                del test_tensor, test_result
+                torch.cuda.empty_cache()
+                
+                log_ger.info("✅ GPU functionality test passed")
+                config['use_gpu'] = True
+                return config
+            else:
+                log_ger.warning(f"⚠️  GPU device {current_device} not available, falling back to CPU")
+                config['use_gpu'] = False
+        else:
+            log_ger.warning(f"⚠️  CUDA not available, falling back to CPU")
+            config['use_gpu'] = False
+            
+    except Exception as e:
+        log_ger.warning(f"⚠️  GPU check failed: {e}, falling back to CPU")
+        config['use_gpu'] = False
+    
+    return config
+
+def check_onnx_gpu_availability():
+    """Check if ONNX Runtime can use GPU"""
+    try:
+        import onnxruntime as ort
+        available_providers = ort.get_available_providers()
+        log_ger.info(f"🔧 Available ONNX Providers: {available_providers}")
+        
+        if 'CUDAExecutionProvider' in available_providers:
+            log_ger.info("✅ ONNX CUDA Execution Provider available")
+            return True
+        else:
+            log_ger.warning(f"⚠️  ONNX CUDA Execution Provider not available")
+            return False
+            
+    except Exception as e:
+        log_ger.warning(f"⚠️  ONNX GPU check failed: {e}")
+        return False
+
+def print_system_info(config: dict):
+    """Print comprehensive system information"""
+    log_ger.info("\n" + "="*60)
+    log_ger.info("🖥️  SYSTEM INFORMATION")
+    log_ger.info("="*60)
+    
+    # CPU Information
+    try:
+        import psutil
+        cpu_count = psutil.cpu_count()
+        memory_total = psutil.virtual_memory().total / (1024**3)  # GB
+        log_ger.info(f"💻 CPU Cores: {cpu_count}")
+        log_ger.info(f"💾 Total RAM: {memory_total:.1f} GB")
+    except:
+        log_ger.info("💻 CPU: Information not available")
+    
+    # GPU Information
+    try:
+        import torch
+        if torch.cuda.is_available():
+            for i in range(torch.cuda.device_count()):
+                gpu_name = torch.cuda.get_device_name(i)
+                memory_info = torch.cuda.get_device_properties(i)
+                total_memory = memory_info.total_memory / (1024**3)
+                log_ger.info(f"🎮 GPU {i}: {gpu_name} ({total_memory:.1f} GB)")
+        else:
+            log_ger.info("🎮 GPU: No CUDA devices available")
+    except:
+        log_ger.info("🎮 GPU: Information not available")
+    
+    # Python Information
+    import sys
+    log_ger.info(f"🐍 Python Version: {sys.version.split()[0]}")
+    
+    # Library Versions
+    try:
+        import torch
+        log_ger.info(f"🔥 PyTorch Version: {torch.__version__}")
+    except:
+        pass
+        
+    try:
+        import cv2
+        log_ger.info(f"👁️  OpenCV Version: {cv2.__version__}")
+    except:
+        pass
+        
+    try:
+        import onnxruntime as ort
+        log_ger.info(f"🔧 ONNX Runtime Version: {ort.__version__}")
+    except:
+        pass
+    
+    log_ger.info("="*60)
+
+def verify_gpu_usage(face_system):
+    """Verify that GPU is actually being used by the models"""
+    log_ger.info("\n🔍 Verifying GPU usage...")
+    
+    try:
+        # Check YOLO model device
+        if hasattr(face_system, 'detection_model') and face_system.detection_model:
+            yolo_device = next(face_system.detection_model.model.parameters()).device
+            log_ger.info(f"🎯 YOLO Model Device: {yolo_device}")
+        
+        # Check ONNX mask detector
+        if hasattr(face_system, 'mask_detector') and face_system.mask_detector:
+            providers = face_system.mask_detector.get_providers()
+            log_ger.info(f"🎯 ONNX Mask Detector Providers: {providers}")
+            
+        # Check DeepFace backend
+        try:
+            from deepface.commons import functions
+            backend = functions.get_backend()
+            log_ger.info(f"🎯 DeepFace Backend: {backend}")
+        except:
+            log_ger.info("🎯 DeepFace Backend: Could not determine")
+            
+    except Exception as e:
+        log_ger.warning(f"⚠️  GPU verification failed: {e}")
+        
+def validate_email_config(config: dict, test_connection: bool = False) -> None:
+    """Validate email configuration and resolve password; exit with helpful message on failure."""
+    email_cfg = config.get('email', {})
+    
+    # If email is disabled or empty, return
+    if not email_cfg:
+        return
+    
+    # Handle both single dict and list of dicts
+    if isinstance(email_cfg, dict):
+        items = [email_cfg]
+    elif isinstance(email_cfg, list):
+        items = email_cfg
+    else:
+        return  # unexpected type, ignore
+    
+    enabled_items = [item for item in items if item.get('enabled', False)]
+    if not enabled_items:
+        return  # no enabled email
+    
+    for idx, item in enumerate(enabled_items):
+        # Use the same validation logic as before, but with current item
+        password_setting = item.get('smtp_password', '')
+        if not password_setting:
+            log_ger.warning(f"❌ Email enabled for recipient {item.get('recipient', 'unknown')} but 'smtp_password' is missing.")
+            sys.exit(1)
+
+        resolved = None
+        source_desc = "unknown"
+
+        if password_setting.startswith("env:"):
+            env_var = password_setting[4:]
+            resolved = os.environ.get(env_var, "")
+            source_desc = f"environment variable '{env_var}'"
+            if not resolved:
+                log_ger.warning(f"❌ Email enabled for {item.get('recipient', 'unknown')} but {source_desc} is not set or empty.")
+                log_ger.info("\n💡 To fix:")
+                log_ger.info(f"   - Windows (Command Prompt): set {env_var}=your_password")
+                log_ger.info(f"   - Windows (PowerShell):     $env:{env_var} = 'your_password'")
+                log_ger.info(f"   - Linux/macOS:               export {env_var}=your_password")
+                sys.exit(1)
+        elif '/' in password_setting or '\\' in password_setting or password_setting.endswith(('.txt', '.pwd')):
+            source_desc = f"file '{password_setting}'"
+            if not os.path.exists(password_setting):
+                log_ger.warning(f"❌ Email enabled for {item.get('recipient', 'unknown')} but password file '{password_setting}' does not exist.")
+                sys.exit(1)
+            try:
+                with open(password_setting, 'r') as f:
+                    resolved = f.readline().strip()
+                if not resolved:
+                    log_ger.warning(f"❌ Password file '{password_setting}' is empty.")
+                    sys.exit(1)
+            except Exception as e:
+                log_ger.warning(f"❌ Could not read password file '{password_setting}': {e}")
+                sys.exit(1)
+        else:
+            resolved = password_setting
+            source_desc = "plain text in config"
+
+        if not resolved:
+            log_ger.warning(f"❌ Resolved password for {item.get('recipient', 'unknown')} from {source_desc} is empty.")
+            sys.exit(1)
+
+        log_ger.info(f"✅ Email password resolved for {item.get('recipient', 'unknown')} from {source_desc} (length {len(resolved)}).")
+
+        if test_connection:
+            try:
+                import smtplib
+                server = smtplib.SMTP(item.get('smtp_server', 'smtp.gmail.com'),
+                                      item.get('smtp_port', 587))
+                if item.get('use_tls', True):
+                    server.starttls()
+                server.login(item.get('smtp_user', ''), resolved)
+                server.quit()
+                log_ger.info(f"✅ SMTP login successful for {item.get('recipient', 'unknown')} – credentials are valid.")
+            except Exception as e:
+                log_ger.warning(f"❌ SMTP login failed for {item.get('recipient', 'unknown')}: {e}")
+                log_ger.info("   Check your username, password, and SMTP server settings.")
+                sys.exit(1)
+                                        
+def get_default_config():
+    """Return the complete default configuration"""
+    return {
+        # ========== MODEL PATHS ==========        
+        'detection_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\yolov12s-face.pt',
+        'embeddings_db_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\dataset\person_512.json',
+        'mask_model_path': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\dependencies\model\mask_detector_cus4.onnx',
+        
+                                                # PLEASE FIX THE STABILITY OF THE VERIFICATION 
+                                                # VALUE BEFORE TRYING TO CHANGE THE TYPE OF mask MODEL USED.        
+        
+        # ========== CORE DETECTION PARAMETERS ==========
+        'detection_confidence': 0.5,
+        'recognition_threshold': 0.8,
+        'mask_detection_threshold': 0.6,            # INCREASED from 0.5 - makes mask detection more conservative
+        'detection_iou': 0.3,
+        'min_face_size': 10,                        # Min face height in pixels
+        'max_faces_per_frame': 15,
+        'enable_person_detection': True,
+        'person_detection_confidence_threshold': 0.4,        
+        
+        # ========== FRAME PROCESSING CONFIGURATION ==========
+        'frame_processing': {
+            # Basic processing parameters
+            'processing_width': 640,
+            'processing_height': 480,
+            'min_processing_scale': 0.3,
+            'max_processing_scale': 4.5,
+            'default_processing_scale': 1.0,
+            
+            # Color and normalization settings
+            'convert_to_rgb': True,                 # Convert BGR to RGB for models that expect RGB
+            'normalize_values': False,              # Normalize pixel values to [0, 1]
+            'apply_mean_std_normalization': False,  # Apply ImageNet mean/std normalization
+            
+            # Normalization values (ImageNet standard)
+            'normalization_mean': [0.485, 0.456, 0.406],
+            'normalization_std': [0.229, 0.224, 0.225],
+            
+            # Debug and validation
+            'debug_mode': False,
+            'validate_frames': True,                # Enable frame validation
+            'frame_validation_threshold': 0.1,      # Reject frames with brightness < 10% or > 90%
+            
+            # Frame statistics collection
+            'collect_frame_stats': True,
+            'stats_update_interval': 30.0,          # Update stats every 30 seconds
+            
+            # Contrast enhancement
+            'contrast_enhancement': {
+                'enabled': True,
+                'method': 'clahe',                  # 'clahe', 'histogram', or 'none'
+                'clahe_clip_limit': 3.0,
+                'clahe_grid_size': 8,
+            },
+            
+            # Region of interest (ROI) extraction
+            'roi_extraction': {
+                'enabled': True,
+                'default_padding': 10,              # Pixels to add around bbox
+                'min_roi_size': 32,                 # Minimum ROI size in pixels
+            },
+            
+            # Multi-source composite settings
+            'composite_creation': {
+                'grid_target_width': 480,
+                'grid_target_height': 360,
+                'horizontal_target_height': 360,
+                'vertical_target_width': 480,
+                'maintain_aspect_ratio': True,
+                'max_composite_width': 1920,
+                'max_composite_height': 1080,
+            },
+            
+            # Frame buffering and queuing
+            'frame_buffer': {
+                'buffer_size': 3,
+                'queue_timeout': 0.1,               # seconds
+                'max_queue_size': 100,
+                'drop_old_frames': True,            # Drop old frames when queue is full
+            },
+            
+            # Frame quality assessment
+            'quality_assessment': {
+                'enabled': True,
+                'min_brightness': 20.0,
+                'max_brightness': 235.0,
+                'min_contrast': 10.0,
+                'blur_threshold': 100.0,            # Laplacian variance threshold
+            },
+            
+            # Performance optimization
+            'performance': {
+                'use_half_precision': False,        # Use float16 for processing
+                'enable_caching': True,
+                'cache_size': 10,                   # Number of frames to cache
+                'optimize_for_size': True,          # Optimize memory usage
+            },
+            
+            # Frame preprocessing pipeline
+            'preprocessing_pipeline': [
+                'validate_frame',
+                'resize_for_processing',
+                'convert_color_space',
+                'enhance_contrast',
+                'normalize_if_needed'
+            ],
+            
+            # Color space conversion options
+            'color_space_conversion': {
+                'input_format': 'bgr',              # OpenCV default
+                'output_format': 'rgb',             # Most models expect RGB
+                'conversion_method': 'opencv',      # 'opencv', 'numpy', or 'manual'
+            },
+            
+            # Dynamic scaling parameters
+            'dynamic_scaling': {
+                'enabled': True,
+                'min_face_size': 50,                # Minimum face size for scaling decisions
+                'max_face_size': 300,               # Maximum face size for scaling decisions
+                'scale_adjustment_step': 0.1,
+                'stability_threshold': 0.8,         # Confidence threshold for stable scaling
+            },
+        },
+        
+        # ========== CCTV CONFIGURATION ==========
+        'cctv_name': 'Default',  
+        
+        # ========== MULTI-SOURCE DISPLAY CONFIGURATION ==========
+        'display_layout': 'grid',  # 'grid', 'horizontal', 'vertical'
+        'max_display_sources': 4,
+        
+        # ========== MULTI-SOURCE PROCESSING CONFIGURATION ==========
+        'processing_width': 640,
+        'processing_height': 480,
+        'processing_scale': 1.0,
+        
+        # ========== STREAM HEALTH MONITORING ==========
+        'stream_health': {
+            'check_interval': 30.0,  # seconds
+            'success_rate_threshold': 0.3,  # 30%
+            'unhealthy_retry_delay': 2.0,  # seconds
+            'max_consecutive_errors': 10,
+        },
+        
+        # ========== MAINTENANCE CONFIGURATION ==========
+        'maintenance_interval': 300.0,  # 5 minutes in seconds
+        
+        # ========== VIOLATION VERIFICATION (PROCESSOR LEVEL) ==========
+        'violation_verification_enabled': True,
+        'min_violation_duration': 0.1,  # seconds
+        'min_violation_frames': 1,
+        'violation_confidence_threshold': 0.4,
+        
+        # ========== LOGGING INTERVALS ==========
+        'log_interval': 10,  # Process every Nth frame
+        'enable_logging': True,
+        'enable_image_logging': True,
+        
+        # ========== RESOURCE MANAGEMENT ==========
+        'resource_monitoring': {
+            'memory_threshold_mb': 1024,    # Warn at 1GB
+            'cleanup_interval': 60.0,       # seconds
+            'max_open_files': 100,
+            'max_threads': 50,
+        },
+        
+        # ========== TRACKING BUFFER SIZES ==========
+        'tracking_buffers': {
+            'max_track_age': 500,           # seconds
+            'max_violation_history': 100,
+            'cleanup_old_tracks_interval': 60.0,
+        },
+        
+        # ========== GRID LAYOUT CONFIGURATION ==========
+        'grid_layout': {
+            'target_height': 360,
+            'target_width': 480,
+            'max_grid_size': 4,  # 2x2 grid max
+        },
+        
+        # ========== HORIZONTAL LAYOUT CONFIGURATION ==========
+        'horizontal_layout': {
+            'target_height': 360,
+            'maintain_aspect_ratio': True,
+        },
+        
+        # ========== VERTICAL LAYOUT CONFIGURATION ==========
+        'vertical_layout': {
+            'target_width': 480,
+            'maintain_aspect_ratio': True,
+        },
+        
+        # ========== SOURCE OVERLAY CONFIGURATION ==========
+        'source_overlay': {
+            'show_source_id': True,
+            'show_cctv_name': True,
+            'show_violation_count': True,
+            'font_scale': 0.5,
+            'font_thickness': 2,
+            'text_color': (255, 255, 255),  # White
+            'background_color': (0, 0, 0),  # Black with transparency
+            'background_alpha': 0.7,
+        },        
+            
+        # ========== ENHANCED TRACKING CONFIGURATION ==========
+        'tracking': {
+            'enabled': True,
+            'fairness_enabled': True,
+            'confidence_frames': 3,
+            'cooldown_seconds': 5,
+            'min_iou': 0.3,
+            'max_recognitions_per_person': 10,
+            'recent_window_size': 300,
+            'enable_velocity_prediction': True,
+            'enable_appearance_matching': True,
+            'max_track_age': 500,
+            
+            # ByteTrack person tracking configuration
+            'enable_person_tracking': True,
+            'enabled':True,
+            'person_track_confidence': 0.55,
+            'person_track_max_age': 90,
+            'person_iou_threshold': 0.3,
+            'bytetrack_track_thresh': 0.5,
+            'bytetrack_track_buffer': 100,
+            'bytetrack_match_thresh': 0.8,
+            'bytetrack_min_box_area': 10,
+            
+            # 🎯 Progressive mask detection configuration
+            'progressive_mask': {          
+                
+                # Buffer and temporal parameters
+                'mask_buffer_size': 200,
+                'min_mask_frames': 2,
+                'occlusion_timeout': 3.0,
+                
+                # Confidence and stability thresholds  
+                'mask_confidence_threshold': 0.1,
+                'mask_consistency_threshold': 0.1,
+                
+                # Require higher stability before committing
+                'min_stability_to_commit': 0.15,
+                
+                # State holding parameters
+                'state_hold_duration': 15.0,
+                'verification_grace_ratio': 0.1,
+                
+                # Spatial consistency parameters
+                'spatial_consistency_weight': 0.3,
+                'max_bbox_variation': 0.45,
+                
+                # Extreme confidence handling
+                'extreme_confidence_threshold': 0.95,
+                'extreme_mask_penalty': 0.8,
+                'extreme_no_mask_boost': 0.9,
+                
+                # Initial weight parameters
+                'initial_mask_weight': 0.5,
+                'initial_no_mask_weight': 0.5,
+                
+                # Weight adjustment parameters  
+                'weight_increase_high_conf': 0.4,
+                'weight_decrease_low_conf': 0.3,
+                'weight_increase_opposite': 0.1,
+                
+                'confidence_smoothing_factor': 0.3,
+                'stability_smoothing_factor': 0.2,                
+            },
+            
+            # 🎯 **MODIFIED** Violation verification configuration
+            'violation_verification_enabled': True,
+            'min_violation_duration': 1,            # DECREASED from 20.0 - quicker to detect violations
+            'min_violation_frames': 1,              # DECREASED from 35 - quicker to detect violations
+            'violation_confidence_threshold': 0.15, # DECREASED from 0.9 - more sensitive to violations
+        },    
+        
+        # ========== VIOLATION VERIFICATION CONFIGURATION ==========
+        'violation_verification': {
+            'enabled': True,
+            'min_duration_seconds': 0.1,            # DECREASED from 30 - faster verification
+            'min_frames': 1 ,                       # DECREASED from 50 - faster verification
+            'confidence_threshold': 0.1,            # DECREASED from 0.85 - more sensitive
+            'progressive_verification': True,
+            'log_unverified_violations': True,
+            'unverified_log_cooldown': 10,          # DECREASED from 15 - more frequent logging
+            'false_negative_monitoring': True,
+            # 🆕 Modified multi-level verification
+            'verification_levels': {
+                'low': {'duration': 1.5, 'frames': 1},      # Quicker initial detection
+                'medium': {'duration': 2.0, 'frames': 2},   # Medium confidence
+                'high': {'duration': 3.0, 'frames': 3}      # High confidence (verified)
+            }
+        },  
+                
+        # ========== LOGGING CONFIGURATION ==========
+        'enable_logging': True,
+        'enable_image_logging': True,
+        'log_interval': 5,
+        'image_log_interval': 5,
+        'max_images_per_session': 5000,
+        'min_save_interval': 1.0,
+        
+        # ========== MODIFIABLE! SERVER PUSH CONFIGURATION ==========        
+        'server_push_enabled': True,
+        'server_endpoint': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\active\projects\maskRecog\z_server_endpoint.txt',                  # Server endpoint
+        'server_push_cooldown': 5,
+        'server_timeout': 10,
+        'server_retry_attempts': 10,
+        'server_retry_delay': 2,
+        'circuit_breaker_failure_threshold': 5,
+        'circuit_breaker_recovery_timeout': 60,        
+        
+        # ========== IMAGE RESIZE CONFIGURATION ==========
+        'enable_image_resize': True,
+        'image_resize_width': 1024,
+        'image_resize_height': 576,
+        'image_resize_method': 'default',
+        
+        # ========== MODIFIABLE! ALERT CONFIGURATION ==========
+        'enable_voice_alerts': True,
+        'alert_server_url': '', # r'projects/maskRecog/z_alert_endpoint.txt', # Server endpoint
+        'alert_cooldown_seconds': 15,               # DECREASED - more responsive alerts
+        'min_violation_frames': 1,                  # DECREASED - more sensitive
+        'min_violation_seconds': 1,                 # DECREASED - faster alerts
+        'max_gap_frames': 10,                       # INCREASED - more tolerant to gaps
+        'alert_language': 'id',
+        'alert_style': 'formal',
+        'enable_individual_alerts': True,
+        'enable_group_alerts': True,
+        'alert_timeout_seconds': 2,                 # DECREASED from 3 - faster alert processing
+        # 🆕 Modified alert verification requirements
+        'alert_verification_required': True,
+        'min_alert_confidence': 0.85,               # DECREASED from 0.9 - more sensitive alerts
+        'alert_buffer_size': 100,                   # DECREASED from 25 - faster alert decisions
+        
+        # ========== FAISS SYSTEM CONFIGURATION ========== 
+        'use_faiss_gpu': True,              # Enable GPU acceleration for FAISS
+        'faiss_index_type': 'FlatL2',       # Options: 'FlatL2', 'FlatIP', 'IVFFlat', 'IVFPQ'
+        'faiss_nlist': 100,                 # For IVF indices
+        'faiss_pq_m': 8,                    # For IVFPQ: number of sub-vectors
+        'faiss_pq_bits': 8,                 # For IVFPQ: bits per sub-vector
+        'faiss_max_l2_distance': 100.0,     # For L2 distance normalization
+        
+        # Model paths
+        'embedding_model': 'Facenet512',
+        
+        # ========== STREAM MANAGEMENT CONFIGURATION ==========
+        'stream_manager': {
+            'max_reconnect_attempts': 10,
+            'reconnect_delay': 3,
+            'health_check_interval': 10,
+            'max_frame_gap': 5,
+            'buffer_size': 100,
+            'open_timeout': 10000,
+            'read_timeout': 5000,
+        },
+        
+        # ========== DISPLAY CONFIGURATION ==========
+        'display': {
+            'default_width': 1280,
+            'default_height': 720,
+            'max_display_width': 1920,
+            'max_display_height': 1080,
+            'resize_method': 'fit_to_screen',
+            'show_resize_info': False,
+            'show_performance_stats': False,
+        },
+        
+        # ========== DEBUG CONFIGURATION ==========
+        'debug': {
+            'enabled': False,
+            'show_detection_debug': False,
+            'save_debug_frames': False,
+            'max_debug_frames': 100,
+            'verbose': False,
+        },
+        
+        # ========== CONTEXT-AWARE SCALING ==========
+        'context_aware_scaling': {
+            'enabled': True,
+            'debug_mode': False,
+            'min_context_samples': 10,
+            'max_context_samples': 100,
+        },
+        
+        # ========== ADVANCED FEATURES ==========
+        'enable_multi_scale': False,
+        'enable_temporal_fusion': False,
+        'enable_quality_aware': False,
+ 
+        
+        # ========== BASE64 CONFIGURATION ==========
+        'enable_base64_logging': True,
+        'base64_quality': 50,
+        
+        # ========== SYSTEM MODE ==========
+        'headless': False,
+        'use_gpu': False,
+        'gpu_device': 0,
+        'shutdown_at' : '14:27:45', # e.g., "22:30:00" or None (no auto shutdown),  with 24 hours MODIFIABLE!
+        
+        # ========== ANNOTATION CONFIGURATION ==========
+        'annotation_box_thickness': 1,
+        'annotation_text_thickness': 1, 
+        'annotation_min_text_scale': 0.3,
+        'annotation_max_text_scale': 0.8,
+        
+        # ========== PERFORMANCE TUNING ==========
+        'performance': {
+            'fps_update_interval': 5.0,
+            'dynamic_adjustment_enabled': True,
+            'quality_threshold_high': 0.8,
+            'quality_threshold_low': 0.3,
+            'face_size_threshold_small': 50,
+            'face_size_threshold_large': 200,
+        },
+        
+        # Automatic folder location
+        'output': {
+            'root_dir': r'logs-running\magick\runs-magick',                    # Base directory for all runs
+            "violations_folder": "/path/to/violations", # optional
+            'create_timestamped_subdir': True,      # Create YYYYMMDD_HHMMSS subfolder
+            'enable_exit_status': True,              # Write exit_status.json on shutdown
+        },
+        
+        # Email sending config
+        'email': [
+            {
+                'enabled': True,
+                'recipient': 'humanj241@gmail.com',
+                'language': 'id',
+                'attach_zip': True,
+                # Add SMTP fields (will fall back to first recipient’s values if omitted, but included for completeness)
+                'smtp_server': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\smtp_server.txt',
+                'smtp_port': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\smtp_port.txt',
+                'smtp_user': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\smtp_user.txt',
+                'smtp_password': r'D:\RaihanFarid\Dokumen\faceRecog\ProjectKnowledgeBase\pass.txt',
+                'use_tls': True
+            },            
+            {
+                'enabled': False,
+                'recipient': 'faridraihan17@gmail.com',
+                'language': 'en',
+                'attach_zip': False,
+            },
+            {
+                'enabled': False,
+                'recipient': 'ikeepmypromiz@gmail.com',
+                'language': 'en',
+                'attach_zip': True
+            }
+        ]
+    
+    }
+    
+    
+def get_advanced_sources_config():
+    """Return advanced sources configuration with parameters"""
+    return {  
+                  
+        # '1': {
+        #     'url': 'rtsp://admin:admin888@192.168.110.40:554/Streaming/Channels/601',
+        #     'description': 'Atas Server Gedangan',
+        #     'priority': 'medium',
+        #     'processing_scale':1,            
+        #     'buffer_size': 100,
+        #     'cctv_name':None,
+        # },
+                                 
+        '6': {
+            'url': '0',
+            'description': 'Main Camera',
+            'priority': 'medium',
+            'processing_scale':1,            
+            'buffer_size': 100,
+            'cctv_name':None,
+        },
+                                 
+    }
+            
+def load_custom_config(config_path: str = None) -> Dict:
+    """Load custom configuration from file if provided"""
+    if config_path and os.path.exists(config_path):
+        try:
+            import json
+            with open(config_path, 'r') as f:
+                custom_config = json.load(f)
+            log_ger.info(f"✅ Loaded custom configuration from: {config_path}")
+            return custom_config
+        except Exception as e:
+            log_ger.warning(f"❌ Failed to load custom configuration: {e}")
+            log_ger.info("🔄 Using default configuration")
+    
+    return get_default_config()
+
+def test_server_connection(config: dict) -> bool:
+    """Test connection to the violation server"""
+    if not config.get('server_push_enabled', False):
+        log_ger.info("📤 Server push disabled, skipping server connection test")
+        return True
+
+    server_endpoint = config.get('server_endpoint', '')
+    if not server_endpoint:
+        log_ger.info("❌ No server endpoint configured (empty or invalid)")
+        return False
+
+    if not server_endpoint.startswith(('http://', 'https://')):
+        log_ger.warning(f"❌ Server endpoint is not a valid HTTP/HTTPS URL: {server_endpoint}")
+        return False
+
+    try:
+        import requests
+        log_ger.info(f"🔍 Testing server connection: {server_endpoint}")
+
+        health_url = server_endpoint.replace('/api/violations', '/api/health')
+        response = requests.get(health_url, timeout=10)
+
+        if response.status_code == 200:
+            log_ger.info(f"✅ Server connection successful: {health_url}")
+            return True
+        else:
+            log_ger.warning(f"❌ Server health check failed: {response.status_code}")
+            return False
+    except Exception as e:
+        log_ger.warning(f"❌ Server connection test failed: {e}")
+        log_ger.info("💡 Make sure the test server is running and the URL is correct.")
+        return False
+    
+def print_server_push_info(config: dict):
+    """Print server push configuration information"""
+    if config.get('server_push_enabled', False):
+        log_ger.info("\n📤 SERVER PUSH CONFIGURATION")
+        log_ger.info("="*40)
+        log_ger.info(f"   Endpoint: {config.get('server_endpoint')}")
+        log_ger.info(f"   Cooldown: {config.get('server_push_cooldown')}s")
+        log_ger.info(f"   Timeout: {config.get('server_timeout')}s")
+        log_ger.info(f"   Retry Attempts: {config.get('server_retry_attempts')}")
+        log_ger.info(f"   CCTV Name: {config.get('cctv_name')}")
+        log_ger.info("   JSON Structure:")
+        log_ger.info("     {")
+        log_ger.info('       "filename": "string",')
+        log_ger.info('       "image_format": "jpg",')
+        log_ger.info('       "image_data": "base64_string",')
+        log_ger.info('       "detected_name": "string",')
+        log_ger.info('       "cctv_name": "string"')
+        log_ger.info("     }")
+        log_ger.info("="*40)
+
+def print_multi_source_info(sources_config: Dict[str, Dict]):
+    """Print multi-source configuration information"""
+    log_ger.info("\n🎯 MULTI-SOURCE CONFIGURATION")
+    log_ger.info("="*50)
+    for source_id, source_config in sources_config.items():
+        log_ger.info(f"📹 {source_id}:")
+        log_ger.info(f"   URL: {source_config.get('url', 'N/A')}")
+        log_ger.info(f"   Description: {source_config.get('description', 'No description')}")
+        log_ger.info(f"   Priority: {source_config.get('priority', 'medium')}")
+        log_ger.info(f"   CCTV Name: {source_config.get('cctv_name', 'Unknown')}")
+        log_ger.info(f"   Processing Scale: {source_config.get('processing_scale', 1.0)}")
+    log_ger.info("="*50)
+
+def print_verification_summary(processor):
+    """Print comprehensive verification summary from TrackingManager"""
+    try:
+        if hasattr(processor, 'get_verification_stats'):
+            stats = processor.get_verification_stats()
+            
+            log_ger.info("\n" + "="*60)
+            log_ger.info("✅ TRACKING MANAGER VERIFICATION SUMMARY")
+            log_ger.info("="*60)
+            
+            # Aggregate stats
+            aggregate = stats.get('aggregate', {})
+            log_ger.info(f"\n📊 AGGREGATE STATISTICS:")
+            log_ger.info(f"   Total Detected: {aggregate.get('total_detected', 0)}")
+            log_ger.info(f"   Total Verified: {aggregate.get('total_verified', 0)}")
+            log_ger.info(f"   Total Rejected: {aggregate.get('total_rejected', 0)}")
+            log_ger.info(f"   False Positives Prevented: {aggregate.get('false_positives_prevented', 0)}")
+            log_ger.info(f"   Active Violation Tracks: {aggregate.get('active_tracks', 0)}")
+            log_ger.info(f"   Currently Verified: {aggregate.get('currently_verified', 0)}")
+            
+            # Calculate rates
+            total_detected = max(1, aggregate.get('total_detected', 1))
+            total_verified = aggregate.get('total_verified', 0)
+            total_rejected = aggregate.get('total_rejected', 0)
+            false_positives_prevented = aggregate.get('false_positives_prevented', 0)
+            
+            log_ger.info(f"\n📈 VERIFICATION SYSTEM METRICS:")
+            
+            # 1. What percentage of detections were verified?
+            verification_success_rate = (total_verified / total_detected) * 100
+            log_ger.info(f"   Verified Detections: {verification_success_rate:.1f}% ({total_verified}/{total_detected})")
+            
+            # 2. What percentage of detections were rejected?
+            rejection_rate = (total_rejected / total_detected) * 100
+            log_ger.info(f"   Rejected Detections: {rejection_rate:.1f}% ({total_rejected}/{total_detected})")
+            
+            # 3. Of the rejected detections, how many were false positives?
+            if total_rejected > 0:
+                false_positive_catch_rate = (false_positives_prevented / total_rejected) * 100
+                log_ger.info(f"   False Positives Caught: {false_positive_catch_rate:.1f}% ({false_positives_prevented}/{total_rejected})")
+            else:
+                log_ger.info(f"   False Positives Caught: N/A (no rejected detections)")
+            
+            # 4. Overall system accuracy (if we assume verified = correct)
+            total_decisions = total_verified + total_rejected
+            if total_decisions > 0:
+                accuracy = ((total_verified + false_positives_prevented) / total_decisions) * 100
+                log_ger.info(f"   System Accuracy: {accuracy:.1f}%")
+            else:
+                log_ger.info(f"   System Accuracy: N/A (no decisions made)")
+            
+            # Per-source stats
+            per_source = stats.get('per_source', {})
+            if per_source:
+                log_ger.info(f"\n📊 PER-SOURCE STATISTICS:")
+                for source_id, source_stats in per_source.items():
+                    log_ger.info(f"\n   📹 Source: {source_id}")
+                    log_ger.info(f"      Detected: {source_stats.get('total_detected', 0)}")
+                    log_ger.info(f"      Verified: {source_stats.get('total_verified', 0)}")
+                    log_ger.info(f"      Rejected: {source_stats.get('total_rejected', 0)}")
+                    log_ger.info(f"      Active Tracks: {source_stats.get('active_violation_tracks', 0)}")
+            
+            # System stats
+            system_stats = stats.get('system_stats', {})
+            if system_stats:
+                log_ger.info(f"\n📊 SYSTEM STATISTICS:")
+                log_ger.info(f"   Total Logged: {system_stats.get('total_logged', 0)}")
+                log_ger.info(f"   Verified Logged: {system_stats.get('verified_logged', 0)}")
+                
+                if system_stats.get('last_verified_time'):
+                    last_time = datetime.datetime.fromtimestamp(system_stats['last_verified_time'])
+                    log_ger.info(f"   Last Verified: {last_time.strftime('%H:%M:%S')}")
+            
+            log_ger.info("="*60)
+            
+    except Exception as e:
+        log_ger.warning(f"⚠️ Error printing verification summary: {e}")
+        
+def monitor_verification_performance(processor, interval_seconds=30):
+    """Monitor verification performance periodically"""
+    def monitor_worker():
+        while getattr(processor, 'running', False):
+            try:
+                print_verification_summary(processor)
+                time.sleep(interval_seconds)
+            except Exception as e:
+                log_ger.warning(f"⚠️ Verification monitoring error: {e}")
+                time.sleep(interval_seconds)
+    
+    monitor_thread = threading.Thread(target=monitor_worker, daemon=True, name="verification_monitor")
+    monitor_thread.start()
+    log_ger.info(f"📊 Started verification performance monitoring (interval: {interval_seconds}s)")
+
+
+def main():
+    # === UNIFIED LOGGING CONFIGURATION ===
+    import logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    # ======================================
+
+    # Load configuration
+    import argparse
+    parser = argparse.ArgumentParser(description='Run modular face recognition system')
+    parser.add_argument('--config', type=str, help='Path to custom configuration JSON file')
+    parser.add_argument('--multi-source', action='store_true', help='Enable multi-camera processing')
+    parser.add_argument('--sources-config', type=str, help='Path to multi-source configuration JSON file')
+    parser.add_argument('--camera', type=str, default='0', help='Camera source (default: 0)')
+    parser.add_argument('--rtsp', type=str, help='RTSP stream URL')
+    parser.add_argument('--no-gpu', action='store_true', help='Disable GPU acceleration')
+    parser.add_argument('--cctv-name', type=str, help='Override CCTV name')
+    parser.add_argument('--no-server-push', action='store_true', help='Disable server push')
+    parser.add_argument('--test-server', action='store_true', help='Test server connection before starting')
+    parser.add_argument('--test-email', action='store_true', help='Test email connection before starting')
+    parser.add_argument('--shutdown-at', type=str, help='Automatically shutdown at specified time (HH:MM:SS)')
+    args = parser.parse_args()
+    
+    # Load configuration
+    config = load_custom_config(args.config)
+    resolve_server_urls(config)          # already present
+    resolve_email_config(config)          # <-- add this line
+    validate_email_config(config, test_connection=args.test_email)  
+    
+    # Resolve output.root_dir relative to LOG_ROOT if it's a relative path
+    if 'output' in config and 'root_dir' in config['output']:
+        root_dir = config['output']['root_dir']
+        if not os.path.isabs(root_dir):
+            # Convert to absolute path using LOG_ROOT
+            config['output']['root_dir'] = str(LOG_ROOT / root_dir)
+            log_ger.info(f"📁 Output root resolved to: {config['output']['root_dir']}")
+            
+    # Initiate automatic shutdown        
+    if args.shutdown_at:
+        config['shutdown_at'] = args.shutdown_at
+        log_ger.info(f"⏰ Shutdown scheduled at {args.shutdown_at}")            
+    
+    # Override GPU setting if requested
+    if args.no_gpu:
+        config['use_gpu'] = False
+        log_ger.info("🎮 GPU acceleration disabled via command line")
+    
+    # Override server push setting if requested
+    if args.no_server_push:
+        config['server_push_enabled'] = False
+        log_ger.info("📤 Server push disabled via command line")
+    
+    # Print system information
+    print_system_info(config)
+    
+    # Check GPU availability and update config
+    log_ger.info("\n🔍 Checking GPU availability...")
+    config = check_gpu_availability(config)
+    check_onnx_gpu_availability()
+    
+    # Set environment variables for GPU optimization
+    if config.get('use_gpu', False):
+        os.environ['CUDA_VISIBLE_DEVICES'] = str(config.get('gpu_device', 0))
+        # Optimize for GPU
+        os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+        os.environ['TF_GPU_THREAD_MODE'] = 'gpu_private'
+        log_ger.info("🎯 Set GPU environment variables")
+    
+    # Load multi-source configuration if enabled
+    if args.multi_source:
+        if args.sources_config and os.path.exists(args.sources_config):
+            try:
+                import json
+                with open(args.sources_config, 'r') as f:
+                    sources_config = json.load(f)
+                log_ger.info(f"✅ Loaded multi-source configuration from: {args.sources_config}")
+            except Exception as e:
+                log_ger.warning(f"❌ Failed to load multi-source configuration: {e}")
+                log_ger.info("🔄 Using default multi-source configuration")
+                sources_config = get_advanced_sources_config()
+        else:
+            log_ger.info("🔄 Using default multi-source configuration")
+            sources_config = get_advanced_sources_config()
+        
+        print_multi_source_info(sources_config)
+        
+        # Test multi-stream connections
+        if not test_multi_stream_connections(sources_config):
+            log_ger.info("❌ Multi-stream connection test failed. Please check:")
+            log_ger.info("   - Camera connections")
+            log_ger.info("   - RTSP URLs and credentials") 
+            log_ger.info("   - Network connectivity")
+            return
+ 
+    
+    # Test server connection if enabled and requested
+    if config.get('server_push_enabled', False) and args.test_server:
+        if not test_server_connection(config):
+            log_ger.info("❌ Server connection test failed. Continue without server push? (y/n)")
+            choice = input().strip().lower()
+            if choice != 'y':
+                log_ger.info("🛑 Exiting...")
+                return
+            else:
+                config['server_push_enabled'] = False
+                log_ger.warning(f"⚠️  Continuing without server push")
+                
+    
+    # Create robust face recognition system using factory
+    log_ger.info("\n🔄 Creating face recognition system...")
+    try:
+        face_system = create_system(config, system_type="voyager", config_profile="robust_face_recognition")
+        
+        # Verify GPU usage
+        verify_gpu_usage(face_system)
+        
+    except Exception as e:
+        log_ger.warning(f"❌ Failed to create face recognition system: {e}")
+        log_ger.info("🔄 Falling back to CPU mode...")
+        config['use_gpu'] = False
+        face_system = create_system(config, system_type="voyager", config_profile="robust_face_recognition")
+    
+    # Apply multi-source specific configurations
+    multi_source_config = {
+        'display_layout': config.get('display_layout', 'grid'),
+        'max_display_sources': config.get('max_display_sources', 4),
+        'processing_width': config.get('processing_width', 640),
+        'processing_height': config.get('processing_height', 480),
+        'processing_scale': config.get('processing_scale', 1.0),
+        'violation_verification_enabled': config.get('violation_verification_enabled', True),
+        'min_violation_duration': config.get('min_violation_duration', 0.5),
+        'min_violation_frames': config.get('min_violation_frames', 1),
+        'violation_confidence_threshold': config.get('violation_confidence_threshold', 0.6),
+        'log_interval': config.get('log_interval', 1),
+        'enable_logging': config.get('enable_logging', True),
+        'enable_image_logging': config.get('enable_image_logging', True),
+    }
+
+    # Merge with existing config
+    full_config = {**config, **multi_source_config}
+
+    # Initialize processor with full config
+    processor = MultiSourceRealTimeProcessor(
+        face_system, 
+        full_config  # Use the merged config
+    )
+    
+    # Apply configurations to processor
+    processor.apply_alert_config(config)
+    processor.apply_tracking_config(config)
+    processor.apply_logging_config(config)
+    
+    # 🆕 Apply violation verification configuration to all tracking managers
+    if 'tracking' in config and 'violation_verification_enabled' in config['tracking']:
+        verification_config = {
+            'violation_verification_enabled': config['tracking']['violation_verification_enabled'],
+            'min_violation_duration': config['tracking'].get('min_violation_duration', 5.0),
+            'min_violation_frames': config['tracking'].get('min_violation_frames', 5),
+            'violation_confidence_threshold': config['tracking'].get('violation_confidence_threshold', 0.85)
+        }
+        processor.apply_verification_config(verification_config)
+    
+    # Print comprehensive configuration status
+    log_ger.info("\n" + "="*60)
+    log_ger.info("🎯 MULTI-SOURCE SYSTEM CONFIGURATION STATUS")
+    log_ger.info("="*60)
+    log_ger.info(f"📊 Sources: {len(sources_config)} cameras configured")
+    #log_ger.info(f"📊 Processing: Interval={config['processing_interval']}, Buffer={config['buffer_size']}")
+    log_ger.info(f"🔍 Detection: Confidence={config['detection_confidence']}, Recognition Threshold={config['recognition_threshold']}")
+    log_ger.info(f"🎯 Face Tracking: {'ENABLED' if config['tracking']['enabled'] else 'DISABLED'}")
+    
+    # Print verification configuration
+    if config['tracking'].get('violation_verification_enabled', False):
+        log_ger.info(f"✅ Violation Verification: ENABLED")
+        log_ger.info(f"   - Min Duration: {config['tracking'].get('min_violation_duration', 5.0)}s")
+        log_ger.info(f"   - Min Frames: {config['tracking'].get('min_violation_frames', 5)}")
+        log_ger.info(f"   - Confidence Threshold: {config['tracking'].get('violation_confidence_threshold', 0.85)}")
+    else:
+        log_ger.info(f"✅ Violation Verification: DISABLED")
+    
+    log_ger.info(f"📝 Logging: {'ENABLED' if config['enable_logging'] else 'DISABLED'}")
+    log_ger.info(f"🔊 Alerts: {'ENABLED' if config['enable_voice_alerts'] else 'DISABLED'}")
+    log_ger.info(f"📤 Server Push: {'ENABLED' if config['server_push_enabled'] else 'DISABLED'}")
+    log_ger.info(f"🐛 Debug: {'ENABLED' if config['debug']['enabled'] else 'DISABLED'}")
+    log_ger.info(f"🖼️  Display Layout: {getattr(processor, 'display_layout', 'grid')}")
+    log_ger.info(f"🎮 GPU Acceleration: {'ENABLED' if config['use_gpu'] else 'DISABLED'}")
+    if config['use_gpu']:
+        log_ger.info(f"🎮 GPU Device: {config['gpu_device']}")
+    log_ger.info("="*60)
+    
+    
+    # Print server push details if enabled
+    if config.get('server_push_enabled', False):
+        print_server_push_info(config)
+    
+    # Print module-specific status
+    processor.print_tracking_status()
+    processor.print_alert_status()
+    
+    # Apply display configuration
+    if hasattr(processor, 'set_display_size'):
+        processor.set_display_size(
+            config['display']['default_width'],
+            config['display']['default_height'],
+            config['display']['resize_method']
+        )
+    
+    # Apply debug configuration
+    if config['debug']['enabled']:
+        processor.toggle_debug_mode()
+    if config['display']['show_performance_stats']:
+        processor.toggle_performance_stats()
+    if config['display']['show_resize_info']:
+        processor.toggle_resize_info()    
+    
+    
+    
+    
+    # Final system readiness check
+    log_ger.info("\n🔍 FINAL SYSTEM READINESS CHECK")
+    log_ger.info("="*40)
+    log_ger.info(f"📹 Sources: {len(sources_config)} cameras ready")
+    for source_id in sources_config.keys():
+        log_ger.info(f"   - {source_id}")
+    log_ger.info(f"🎮 GPU: {'READY' if config['use_gpu'] else 'CPU MODE'}")
+    log_ger.info(f"📤 Server Push: {'READY' if config['server_push_enabled'] else 'DISABLED'}")
+    log_ger.info(f"🔊 Audio Alerts: {'READY' if config['enable_voice_alerts'] else 'DISABLED'}")
+    log_ger.info(f"🎯 Tracking: {'READY' if config['tracking']['enabled'] else 'DISABLED'}")
+    log_ger.info(f"✅ Violation Verification: {'READY' if config['tracking'].get('violation_verification_enabled', False) else 'DISABLED'}")
+    log_ger.info("="*40)
+    
+    # Print verification-specific controls
+    log_ger.info("\n🎮 VERIFICATION CONTROLS:")
+    log_ger.info("   [V] - Toggle violation verification")
+    log_ger.info("   [S] - Show verification statistics")
+    log_ger.info("   [M] - Start verification monitoring")    
+    
+    # Print multi-source controls
+    log_ger.info("\n🎮 MULTI-SOURCE CONTROLS:")
+    log_ger.info("   [m] - Cycle through display layouts (grid, horizontal, vertical)")
+    log_ger.info("   [n] - Toggle source health display")
+    log_ger.info("   [0] - Show source health report")
+    log_ger.info("   [l] - Toggle logging")
+    log_ger.info("   [v] - Toggle voice alerts")
+    log_ger.info("   [p] - Toggle performance stats")
+    log_ger.info("   [d] - Toggle debug mode")
+    log_ger.info("   [q] - Quit")
+    
+    # Add a small delay to ensure everything is ready
+    log_ger.info("\n⏳ Starting multi-source processing in 3 seconds...")
+    time.sleep(3)
+    
+    # 🆕 CRITICAL: Ensure ImageLoggers are created for all sources
+    log_ger.info("\n🔍 ENSURING IMAGE LOGGERS ARE CREATED FOR ALL SOURCES")
+    for source_id in sources_config.keys():
+        if source_id in processor.active_sources:
+            log_ger.info(f"🔄 Ensuring ImageLogger for: {source_id}")
+            success = processor.force_create_image_logger(source_id)
+            if success:
+                log_ger.info(f"✅ ImageLogger created for: {source_id}")
+            else:
+                log_ger.warning(f"❌ Failed to create ImageLogger for: {source_id}")
+
+    # 🆕 DEBUG: Check CCTV names before starting
+    log_ger.info("\n🔍 PRE-START CCTV NAME CHECK")
+    processor.debug_cctv_names()
+        
+    # Start multi-source processing
+    try:
+        # 🆕 ONLY ONE SOURCE ADDITION BLOCK
+        log_ger.info("\n🎯 ADDING SOURCES WITH DYNAMIC CCTV NAMING")
+        log_ger.info("="*50)
+
+        # First, remove any existing sources to start fresh
+        existing_sources = list(processor.stream_managers.keys())
+        for source_id in existing_sources:
+            log_ger.info(f"🔄 Removing existing source: {source_id}")
+            processor.remove_source(source_id)
+
+        # Now add the sources with proper dynamic naming
+        for source_id, source_config in sources_config.items():
+            log_ger.info(f"📹 Adding source: {source_id}")
+            
+            # 🆕 DEBUG: Test CCTV naming before adding
+            test_url = source_config.get('url', '')
+            if test_url:
+                extracted_name = processor._extract_cctv_name_from_url(test_url, source_id)
+                log_ger.info(f"   🔍 CCTV name extraction test: {extracted_name}")
+            
+            success = processor.add_source(source_id, source_config)
+            if success:
+                # Verify the CCTV name was set correctly
+                source_info = processor.get_source_info(source_id)
+                if source_info:
+                    actual_cctv_name = source_info.get('cctv_name', 'Unknown')
+                    log_ger.info(f"✅ Successfully added {source_id} → {actual_cctv_name}")
+            else:
+                log_ger.warning(f"❌ Failed to add {source_id}")
+
+        log_ger.info("="*50)
+        
+        # Print all sources information
+        processor.print_all_sources_info()
+        
+        # Print CCTV mapping
+        processor.print_cctv_mapping()
+        
+        # Setup logging ONLY ONCE after all sources are added, because this is creating run directory.
+        log_ger.info("\n🔄 Setting up multi-source logging with dynamic CCTV names...")
+        processor.setup_multi_source_logging()
+
+        
+        if processor.run_dir:
+            log_file = os.path.join(processor.run_dir, 'console.log')
+            file_handler = logging.FileHandler(log_file, encoding='utf-8')
+            file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+            logging.getLogger().addHandler(file_handler)
+            log_ger.info(f"📄 Console output will also be written to {log_file}")        
+        
+        # Run the multi-source processing
+        processor.run_multi_source_stable(sources_config)
+        
+        # Start verification performance monitoring
+        log_ger.info("\n📊 Starting verification performance monitoring...")
+        monitor_verification_performance(processor, interval_seconds=60)
+        
+        
+    except KeyboardInterrupt:
+        log_ger.info("\n🛑 Shutting down by user request...")
+        
+        # Print final verification summary
+        log_ger.info("\n📊 FINAL VERIFICATION SUMMARY:")
+        print_verification_summary(processor)
+        
+    except Exception as e:
+        log_ger.warning(f"❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        processor.stop_all_sources()
+
+if __name__ == "__main__":
+    main()

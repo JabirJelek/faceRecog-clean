@@ -76,6 +76,16 @@ class ImageLogger:
         self.recent_violations = deque(maxlen=10)
         self.pending_server_violations = deque(maxlen=50)
         
+        # Circuit breaker configuration
+        self.circuit_breaker_failure_threshold = config.get('circuit_breaker_failure_threshold', 5)
+        self.circuit_breaker_recovery_timeout = config.get('circuit_breaker_recovery_timeout', 60)  # seconds
+        self.circuit_breaker_state = 'CLOSED'  # CLOSED, OPEN, HALF_OPEN
+        self.circuit_breaker_failure_count = 0
+        self.circuit_breaker_last_failure_time = 0
+        
+        # Use a Session for connection reuse
+        self._http_session = requests.Session()        
+        
                 
         # 🆕 FIX: Enhanced CCTV name configuration with better fallback
         self.cctv_name = config.get('cctv_name')
@@ -243,120 +253,125 @@ class ImageLogger:
     
     def push_violation_to_server(self, violation_data: Dict[str, Any]) -> bool:
         """
-        Push violation data to configured server endpoint with cooldown.
-        
-        Args:
-            violation_data: Dictionary containing violation data including base64 image
-            
-        Returns:
-            bool: True if push successful, False otherwise
+        Push violation to server synchronously with circuit breaker and exponential backoff.
+        Blocks the caller until success or final failure.
         """
         # Check if server push is enabled
         if not self.server_push_enabled:
             self.logger.debug("Server push disabled")
             return False
-        
-        # Check cooldown
-        current_time = time.time()  # 🆕 FIX: Use time.time() instead of datetime.time
-        if current_time - self.last_server_push_time < self.server_push_cooldown:
-            remaining = self.server_push_cooldown - (current_time - self.last_server_push_time)
-            self.logger.debug(f"Server push cooldown active. Skipping push. Next push in {remaining:.1f}s")
+
+        # Sanitize endpoint URL
+        endpoint = self.server_endpoint
+        if not endpoint:
+            self.logger.error("❌ Server endpoint not configured")
             return False
-        
-        # --- Cooldown check with visible log ---
+        # Remove duplicate slashes in path (simple cleaning)
+        import re
+        endpoint = re.sub(r'(?<!:)/+', '/', endpoint)
+
+        # --- Circuit Breaker Check ---
+        if self.circuit_breaker_state == 'OPEN':
+            # Check if recovery timeout has passed
+            if time.time() - self.circuit_breaker_last_failure_time > self.circuit_breaker_recovery_timeout:
+                self.logger.info("Circuit breaker transitioning to HALF_OPEN")
+                self.circuit_breaker_state = 'HALF_OPEN'
+            else:
+                self.logger.warning("Circuit breaker OPEN – skipping push")
+                self.stats['server_errors'] += 1
+                return False
+
+        # --- Cooldown Check (per source) ---
         current_time = time.time()
         if current_time - self.last_server_push_time < self.server_push_cooldown:
             remaining = self.server_push_cooldown - (current_time - self.last_server_push_time)
-            self.logger.warning(f"⏳ Server push cooldown active. Next push in {remaining:.1f}s – skipping.")
+            self.logger.debug(f"Server push cooldown active, {remaining:.1f}s remaining")
             return False
 
-        # --- Sanitize endpoint URL ---
-        endpoint = self.server_endpoint
-        if endpoint:
-            # Remove duplicate slashes in the path (except after https://)
-            import re
-            endpoint = re.sub(r'(?<!:)/+', '/', endpoint)
-            self.logger.debug(f"Sanitized endpoint: {endpoint}")
-        else:
-            self.logger.error("❌ Server endpoint not configured")
-            return False
-        
-        
-        
-        try:
-            # 🆕 UPDATED: Prepare the payload with ONLY required fields
-            payload = {
-                'filename': violation_data.get('filename', ''),
-                'image_format': violation_data.get('image_format', 'jpg'),
-                'image_data': violation_data.get('image_data', ''),
-                'detected_name': violation_data.get('detected_name', 'Unknown'),
-                'cctv_name': self.cctv_name  # 🆕 FIX: Use the instance's CCTV name
-            }
-            
-            # Validate required fields
-            if not payload['image_data']:
-                self.logger.error("No image data available for server push")
-                return False
-                
-            if not payload['filename']:
-                # Generate a filename if not provided
-                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                payload['filename'] = f"violation_{timestamp}"
-            
-            headers = {
-                'Content-Type': 'application/json',
-                'User-Agent': f'FaceRecognition-Logger/1.0 ({self.cctv_name})'
-            }
-            
-            # Retry logic
-            self.logger.info(f"📤 Starting server push (attempt 1/{self.server_retry_attempts})...")
+        # Prepare payload (same as before)
+        payload = {
+            'filename': violation_data.get('filename', ''),
+            'image_format': violation_data.get('image_format', 'jpg'),
+            'image_data': violation_data.get('image_data', ''),
+            'detected_name': violation_data.get('detected_name', 'Unknown'),
+            'cctv_name': self.cctv_name
+        }
 
-            for attempt in range(self.server_retry_attempts):
-                try:
-                    response = requests.post(
-                        endpoint,  # use sanitized URL
-                        json=payload,
-                        headers=headers,
-                        timeout=self.server_timeout
-                    )
-                    
-                    if response.status_code == 200:
-                        self.last_server_push_time = current_time
-                        self.stats['server_pushes'] += 1
-                        self.stats['last_server_push'] = datetime.datetime.now()
-                        
-                        self.logger.info(f"✅ Successfully pushed violation to server. Response: {response.status_code}")
-                        self.logger.debug(f"📤 Payload sent: filename={payload['filename']}, detected_name={payload['detected_name']}, cctv_name={payload['cctv_name']}")
-                        return True
-                    else:
-                        self.logger.warning(f"Server returned error status: {response.status_code} - {response.text}")
-                        
-                        # If it's a client error (4xx), don't retry
-                        if 400 <= response.status_code < 500:
-                            self.logger.error(f"Client error {response.status_code}, stopping retries")
-                            break
-                        
-                except requests.exceptions.Timeout:
-                    self.logger.warning(f"Server request timeout (attempt {attempt + 1}/{self.server_retry_attempts})")
-                except requests.exceptions.ConnectionError:
-                    self.logger.warning(f"Server connection error (attempt {attempt + 1}/{self.server_retry_attempts})")
-                except requests.exceptions.RequestException as e:
-                    self.logger.warning(f"Server request error: {e} (attempt {attempt + 1}/{self.server_retry_attempts})")
-                
-                # Wait before retry (except on last attempt)
-                if attempt < self.server_retry_attempts - 1:
-                    time.sleep(self.server_retry_delay)
-            
-            # If we get here, all attempts failed
-            self.stats['server_errors'] += 1
-            self.logger.error(f"❌ Failed to push violation to server after {self.server_retry_attempts} attempts")
+        if not payload['image_data']:
+            self.logger.error("No image data for server push")
             return False
-            
-        except Exception as e:
-            self.stats['server_errors'] += 1
-            self.logger.error(f"❌ Unexpected error during server push: {e}")
-            return False
-                
+
+        headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': f'FaceRecognition-Logger/1.0 ({self.cctv_name})'
+        }
+
+        # --- Retry Loop with Exponential Backoff ---
+        attempt = 0
+        max_attempts = self.server_retry_attempts
+        base_delay = self.server_retry_delay
+
+        while attempt < max_attempts:
+            attempt += 1
+            try:
+                self.logger.info(f"📤 Server push attempt {attempt}/{max_attempts}...")
+                response = self._http_session.post(
+                    endpoint,
+                    json=payload,
+                    headers=headers,
+                    timeout=self.server_timeout
+                )
+
+                if response.status_code == 200:
+                    # Success
+                    self.last_server_push_time = current_time
+                    self.stats['server_pushes'] += 1
+                    self.stats['last_server_push'] = datetime.datetime.now()
+
+                    # Circuit breaker: record success
+                    self.circuit_breaker_failure_count = 0
+                    self.circuit_breaker_state = 'CLOSED'
+
+                    self.logger.info(f"✅ Server push successful (attempt {attempt})")
+                    return True
+                else:
+                    self.logger.warning(f"Server returned HTTP {response.status_code}: {response.text[:100]}")
+                    # Don't retry on 4xx client errors (except 429 rate limit maybe)
+                    if 400 <= response.status_code < 500 and response.status_code != 429:
+                        self.logger.error(f"Client error {response.status_code}, stopping retries")
+                        break
+
+            except requests.exceptions.Timeout:
+                self.logger.warning(f"Timeout on attempt {attempt}")
+            except requests.exceptions.ConnectionError:
+                self.logger.warning(f"Connection error on attempt {attempt}")
+            except requests.exceptions.RequestException as e:
+                self.logger.warning(f"Request error on attempt {attempt}: {e}")
+            except Exception as e:
+                self.logger.error(f"Unexpected error on attempt {attempt}: {e}")
+
+            # If this was the last attempt, break out
+            if attempt >= max_attempts:
+                break
+
+            # Exponential backoff before next retry
+            sleep_time = base_delay * (2 ** (attempt - 1))  # 1st retry: base_delay, 2nd: 2*base_delay, 3rd: 4*base_delay, ...
+            self.logger.info(f"Retrying in {sleep_time:.1f}s...")
+            time.sleep(sleep_time)
+
+        # --- All retries failed ---
+        self.stats['server_errors'] += 1
+
+        # Update circuit breaker
+        self.circuit_breaker_failure_count += 1
+        self.circuit_breaker_last_failure_time = time.time()
+        if self.circuit_breaker_failure_count >= self.circuit_breaker_failure_threshold:
+            self.circuit_breaker_state = 'OPEN'
+            self.logger.warning(f"Circuit breaker OPEN after {self.circuit_breaker_failure_count} failures")
+
+        self.logger.error(f"❌ Failed to push violation after {max_attempts} attempts")
+        return False
+              
     def save_annotated_frame(self, frame: np.ndarray, results: List[Dict], 
                         original_frame: Optional[np.ndarray] = None) -> Tuple[bool, Optional[str]]:
         """
@@ -573,7 +588,14 @@ class ImageLogger:
             'retry_attempts': self.server_retry_attempts,
             'retry_delay': self.server_retry_delay,
             'last_push_time': self.last_server_push_time,
-            'time_since_last_push': time.time() - self.last_server_push_time if self.last_server_push_time > 0 else None
+            'time_since_last_push': time.time() - self.last_server_push_time if self.last_server_push_time > 0 else None,
+            'circuit_breaker': {
+                'state': self.circuit_breaker_state,
+                'failure_count': self.circuit_breaker_failure_count,
+                'failure_threshold': self.circuit_breaker_failure_threshold,
+                'recovery_timeout': self.circuit_breaker_recovery_timeout,
+                'last_failure_time': self.circuit_breaker_last_failure_time
+            }            
         }
         
         return status
