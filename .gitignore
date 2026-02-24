@@ -19,4 +19,7 @@ ProjectKnowledgeBase/active/mailkit/
 ProjectKnowledgeBase/active/logs-running/
 Prompter.txt
 
-pass.txt
+ProjectKnowledgeBase/pass.txt
+ProjectKnowledgeBase/smtp_port.txt
+ProjectKnowledgeBase/smtp_server.txt
+ProjectKnowledgeBase/smtp_user.txt
