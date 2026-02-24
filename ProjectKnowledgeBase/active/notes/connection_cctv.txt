@@ -12,7 +12,8 @@ Untuk rtsp link gedangan berikut:
 
 
 2. rtsp://admin:admin888@192.168.0.3:554/Streaming/Channels/101
-https://vps.scasda.my.id//actions/foto_pusat_data_unggah.php
+https://vps.scasda.my.id/accounting/public/api/submit_ai_detection
+
 https://vps.scasda.my.id/actions/a_notifikasi_suara_speaker.php
 
     Camera: 7, 15, 1
